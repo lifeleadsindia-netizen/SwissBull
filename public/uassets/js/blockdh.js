@@ -253,31 +253,31 @@ async function depositActivation() {
             return notifyAlert("Invalid Package", "Please select a valid deposit package.", "error");
         }
 
-        if (!window.ethereum)
-            return notifyAlert("Not Connected", "Please connect wallet", "error");
+        // if (!window.ethereum)
+        //     return notifyAlert("Not Connected", "Please connect wallet", "error");
 
         if (transferButton) {
             transferButton.innerHTML = "Wait! Processing...";
         }
 
-        const accounts = await ethereum.request({
-            method: "eth_requestAccounts",
-        });
-        const chainId = await ethereum.request({ method: "eth_chainId" });
-        console.log(chainId + "" + accounts);
-        //Ensure connected to BSC mainnet
-        if (chainId != 56) {
-            // 0x38 is the chain ID for Binance Smart Chain Mainnet
-            if (transferButton) {
-                transferButton.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Deposit Fund';
-            }
-            notifyAlert(
-                "Wrong Network",
-                "Please connect to Binance Smart Chain Mainnet",
-                "error",
-            );
-            return;
-        }
+        // const accounts = await ethereum.request({
+        //     method: "eth_requestAccounts",
+        // });
+        // const chainId = await ethereum.request({ method: "eth_chainId" });
+        // console.log(chainId + "" + accounts);
+        // //Ensure connected to BSC mainnet
+        // if (chainId != 56) {
+        //     // 0x38 is the chain ID for Binance Smart Chain Mainnet
+        //     if (transferButton) {
+        //         transferButton.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Deposit Fund';
+        //     }
+        //     notifyAlert(
+        //         "Wrong Network",
+        //         "Please connect to Binance Smart Chain Mainnet",
+        //         "error",
+        //     );
+        //     return;
+        // }
 
         // const provider = new ethers.providers.Web3Provider(window.ethereum);
         // const signer = provider.getSigner(accounts[0]);
@@ -290,7 +290,7 @@ async function depositActivation() {
         // );
 
         // await tx.wait();
-        const txnid = 'rhdrhdh'; // tx.hash;
+        const txnid = '0x55d398326f99059ff775485246999027b3197944'; // tx.hash;
         //Ajax code for activation
         $.ajax({
             url: route,
