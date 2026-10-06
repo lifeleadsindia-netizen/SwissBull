@@ -49,6 +49,7 @@ class PartnershipController extends Controller
             return redirect()->back();
         }
 
+        $lockError = null;
         if (! $member->canPurchasePackage($lockError)) {
             session()->flash('failedMsg', $lockError);
 

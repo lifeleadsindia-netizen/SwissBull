@@ -169,7 +169,14 @@ class MemberDetail extends Model
     {
         if ($this->isTradingWalletLocked()) {
             $remaining = $this->tradingWalletRemainingLockDays();
-            $until = $this->trading_wallet_locked_until ? $this->trading_wallet_locked_until->format('d M Y') : 'lock expiry';
+            $latestLockedUntil = $this->trading_wallet_locked_until;
+            if (! $latestLockedUntil) {
+                $pkgLockedUntil = $this->packageDetails()->where('locked_until', '>', now())->max('locked_until');
+                if ($pkgLockedUntil) {
+                    $latestLockedUntil = Carbon::parse($pkgLockedUntil);
+                }
+            }
+            $until = $latestLockedUntil instanceof Carbon ? $latestLockedUntil->format('d M Y') : ($latestLockedUntil ? Carbon::parse($latestLockedUntil)->format('d M Y') : 'lock expiry');
             $errorMessage = "Package purchase is locked. You cannot purchase or apply for another package during the active Lock Period ({$remaining} day(s) remaining until {$until}).";
 
             return false;

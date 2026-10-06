@@ -41,6 +41,7 @@ class ActivationController extends Controller
             return redirect()->back();
         }
 
+        $lockError = null;
         if ($member->status == 'Active' && ! $member->canPurchasePackage($lockError)) {
             session()->flash('failedMsg', $lockError);
 
