@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Funds Details')
 @section('content')
     @push('head')
@@ -47,8 +47,8 @@
             @endif
             <div class="card">
                 <div class="card-header"><h3>{{ __('Add Funds Details')}}</h3>
-                    <span class="ml-auto mr-2"><a href="{{url('hdgteyusjasget/funds/add-funds')}}" class="btn btn-sm btn-success text-white"> + Add Funds</a></span>
-                    <span class="ml-2 mr-0"><a href="{{url('hdgteyusjasget/funds/deduct-funds')}}" class="btn btn-sm btn-danger text-white"> - Deduct Funds</a></span>
+                    <span class="ml-auto mr-2"><a href="{{url('admin/funds/add-funds')}}" class="btn btn-sm btn-success text-white"> + Add Funds</a></span>
+                    <span class="ml-2 mr-0"><a href="{{url('admin/funds/deduct-funds')}}" class="btn btn-sm btn-danger text-white"> - Deduct Funds</a></span>
                 </div>
                 <div class="card-body px-5 mx-2" style="overflow-x: auto;">
                     <table id="data_table" class="table">

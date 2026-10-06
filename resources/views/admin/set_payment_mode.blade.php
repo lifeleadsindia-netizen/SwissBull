@@ -1,4 +1,4 @@
-@extends('admin.layouts.main') 
+﻿@extends('admin.layouts.main') 
 @section('title', 'Set Payment Mode')
 @section('content')
     @push('head')
@@ -99,7 +99,7 @@
                                         <td>{{ $list['name']}}</td>
                                         <td><img src="{{asset('uploads')}}/{{ $list['image']}}" width="100"> </td>
                                         <td>
-                                        <a href="{{url('hdgteyusjasget/mode/delete')}}/{{$list['id']}}" class="btn btn-sm btn-primary" onclick="return confirm('Are you sure to delete data')"> Delete</a> </td>
+                                        <a href="{{url('admin/mode/delete')}}/{{$list['id']}}" class="btn btn-sm btn-primary" onclick="return confirm('Are you sure to delete data')"> Delete</a> </td>
                                     </tr>
                                     @php $i++;  @endphp
                                 @endforeach

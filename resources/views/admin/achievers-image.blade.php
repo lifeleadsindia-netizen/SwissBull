@@ -1,4 +1,4 @@
-@extends('admin.layouts.main') 
+﻿@extends('admin.layouts.main') 
 @section('title', 'Achievers Details')
 @section('content')
     @push('head')
@@ -109,7 +109,7 @@
                                     </td>
                                     <td>
                                         <div class="text-center">
-                                            <a class="btn btn-danger text-white" href="{{url('hdgteyusjasget/achv-image/delete')}}/{{$list['id']}}">Delete</a>
+                                            <a class="btn btn-danger text-white" href="{{url('admin/achv-image/delete')}}/{{$list['id']}}">Delete</a>
                                         </div>
                                     </td>
                                 </tr>

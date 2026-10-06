@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'PEPE Token Withdrawal Settings')
 @section('content')
     <div class="container-fluid">
@@ -17,7 +17,7 @@
                     <nav class="breadcrumb-container" aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="{{ url('hdgteyusjasget/dashboard') }}"><i class="ik ik-home"></i></a>
+                                <a href="{{ url('admin/dashboard') }}"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Payment Management') }}</a></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('PEPE Token Settings') }}</li>
@@ -293,7 +293,7 @@
                                 <button type="submit" class="btn btn-success btn-lg px-4 font-weight-bold">
                                     <i class="ik ik-save mr-1"></i> {{ __('Save PEPE Settings') }}
                                 </button>
-                                <a href="{{ url('hdgteyusjasget/payment-history') }}"
+                                <a href="{{ url('admin/payment-history') }}"
                                     class="btn btn-outline-secondary ml-2">
                                     {{ __('View Payment History') }}
                                 </a>

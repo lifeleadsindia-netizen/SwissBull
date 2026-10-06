@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Member Details')
 @section('content')
     @push('head')
@@ -110,7 +110,7 @@
                                         <td><span class="btn btn-{{ $list['pepe_wallet'] == 0 ? 'danger' : 'success' }}">{{ $list['pepe_wallet'] }}</span></td>
                                         <td><span class="btn btn-{{ $list['status'] == 'Active' ? 'success' : 'danger' }}">{{ $list['status'] == 'Active' ? 'Active' : ($list['status'] == 'Temp' ? 'Inactive' : $list['status']) }}</span></td>
                                         <td>
-                                            <a href="{{ url('hdgteyusjasget/member-login') }}/{{ $list['id'] }}"
+                                            <a href="{{ url('admin/member-login') }}/{{ $list['id'] }}"
                                                 target="_blank" class="btn btn-success text-white"><i
                                                     class="ik ik-eye text-white"></i> View</a>
                                         </td>

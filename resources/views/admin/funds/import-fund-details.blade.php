@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Import Fund Details')
 @section('content')
     @push('head')
@@ -20,10 +20,10 @@
                     <nav class="breadcrumb-container" aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="{{ url('hdgteyusjasget/dashboard') }}"><i class="ik ik-home"></i></a>
+                                <a href="{{ url('admin/dashboard') }}"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a
-                                    href="{{ url('hdgteyusjasget/dashboard') }}">{{ __('Admin') }}</a></li>
+                                    href="{{ url('admin/dashboard') }}">{{ __('Admin') }}</a></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('Import Fund Details') }}</li>
                         </ol>
                     </nav>

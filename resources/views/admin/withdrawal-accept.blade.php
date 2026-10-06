@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Accept Withdrawal Online')
 @section('content')
     @push('head')
@@ -316,7 +316,7 @@
                         success: function(response) {
                             swal("Completed", "Withdrawal process has been completed successfully", "success")
                                 .then(function() {
-                                    window.location.href = "{{ url('hdgteyusjasget/new-withdrawal-request') }}";
+                                    window.location.href = "{{ url('admin/new-withdrawal-request') }}";
                                 });
 
                         },
