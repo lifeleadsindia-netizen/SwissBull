@@ -11,6 +11,7 @@ use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\Notification;
 use App\Models\PackageDetail;
+use App\Models\PackageDistribution;
 use App\Models\PartnershipDetail;
 use App\Models\PartnershipIncome;
 use App\Models\PepeSetting;
@@ -725,6 +726,40 @@ class AdminController extends Controller
         $var->roi_rate = $rate;
         $var->save();
         session()->flash('successMsg', 'ROI rates updated successfully.');
+
+        return redirect()->back();
+    }
+
+    public function setPackages()
+    {
+        $distribution = PackageDistribution::first();
+
+        return view('admin.set-packages', compact('distribution'));
+    }
+
+    public function savePackages(Request $request)
+    {
+        $validated = $request->validate([
+            'trading_wallet' => 'required|numeric|min:0',
+            'referral_bonus' => 'required|numeric|min:0',
+            'team_trading_profit' => 'required|numeric|min:0',
+            'team_performance_bonus' => 'required|numeric|min:0',
+            'hero_of_the_month' => 'required|numeric|min:0',
+        ]);
+
+        $distribution = PackageDistribution::first();
+        if (! $distribution) {
+            $distribution = new PackageDistribution;
+        }
+
+        $distribution->trading_wallet = $validated['trading_wallet'];
+        $distribution->referral_bonus = $validated['referral_bonus'];
+        $distribution->team_trading_profit = $validated['team_trading_profit'];
+        $distribution->team_performance_bonus = $validated['team_performance_bonus'];
+        $distribution->hero_of_the_month = $validated['hero_of_the_month'];
+        $distribution->save();
+
+        session()->flash('successMsg', 'Package distribution configuration updated successfully.');
 
         return redirect()->back();
     }
