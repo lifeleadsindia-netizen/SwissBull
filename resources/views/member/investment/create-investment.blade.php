@@ -50,6 +50,14 @@
 
                         {{-- Card Body --}}
                         <div class="card-body">
+                            @if (isset($data) && $data->isTradingWalletLocked())
+                                <div class="alert alert-warning mb-4" role="alert" style="border-left: 4px solid #ff9800;">
+                                    <i class="fa-solid fa-lock me-2"></i>
+                                    <strong>{{ __('Package Purchase Locked') }}:</strong>
+                                    {{ __('You cannot purchase another package during your active Lock Period.') }}
+                                    ({{ $data->tradingWalletRemainingLockDays() }} {{ __('day(s) remaining until') }} {{ $data->trading_wallet_locked_until ? $data->trading_wallet_locked_until->format('d M Y') : '' }}).
+                                </div>
+                            @endif
                             <form action="{{ route('createInvestment') }}" method="post">
                                 @csrf
                                 <div class="row g-4">

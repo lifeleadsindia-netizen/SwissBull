@@ -33,6 +33,14 @@
                  <div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">
                     <a href="{{ url('hdgteyusjasget/notification') }}"><i class="ik ik-bell"></i><span>Notification</span> </a>
                 </div>
+
+                <div class="nav-item {{ (request()->is('*set-packages*') || request()->is('*set_packages*')) ? 'active' : '' }}">
+                    <a href="{{ route('admin.setPackages') }}"><i class="ik ik-sliders"></i><span>{{ __('Set Packages') }}</span></a>
+                </div>
+
+                <div class="nav-item {{ request()->is('*trading-wallet-control*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.tradingWalletControl') }}"><i class="ik ik-pocket"></i><span>{{ __('Trading Wallet Control') }}</span></a>
+                </div>
                 
                 <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
                 <!--    <a href="{{ url('hdgteyusjasget/setRate') }}"><i class="ik ik-sliders"></i><span>Set Rate</span> </a>-->
@@ -67,6 +75,7 @@
                         <a href="{{url('hdgteyusjasget/member-details')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('Members Details')}}</a>
                         {{-- <a href="{{url('hdgteyusjasget/member-security')}}" class="menu-item {{ ($segment1 == 'badges') ? 'active' : '' }}">{{ __('Members Security')}}</a> --}}
                         <a href="{{url('hdgteyusjasget/account-control')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('Account Control')}}</a>
+                        <a href="{{ route('admin.tradingWalletControl') }}" class="menu-item {{ request()->is('*trading-wallet-control*') ? 'active' : '' }}">{{ __('Trading Wallet Control') }}</a>
                         <a href="{{ url('hdgteyusjasget/wallet-address') }}"
                             class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __('Member Wallet Address') }}</a>
                         <a href="{{url('hdgteyusjasget/package-details')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('Package Details')}}</a>

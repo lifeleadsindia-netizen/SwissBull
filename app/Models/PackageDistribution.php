@@ -6,16 +6,38 @@ use Illuminate\Database\Eloquent\Model;
 
 class PackageDistribution extends Model
 {
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'package_distributions';
 
-    protected $guarded = [];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'trading_wallet',
+        'referral_bonus',
+        'team_trading_profit',
+        'team_performance_bonus',
+        'hero_of_the_month',
+    ];
 
     /**
-     * Get the package distribution percentage configuration from the database.
-     * Database is the source of truth; values can be updated by admin in the future.
+     * The attributes that should be cast.
      *
-     * @return array
+     * @var array<string, string>
      */
+    protected $casts = [
+        'trading_wallet' => 'decimal:2',
+        'referral_bonus' => 'decimal:2',
+        'team_trading_profit' => 'decimal:2',
+        'team_performance_bonus' => 'decimal:2',
+        'hero_of_the_month' => 'decimal:2',
+    ];
     public static function getDistributionConfig(): array
     {
         $config = PackageDistribution::first();

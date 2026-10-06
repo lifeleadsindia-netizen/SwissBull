@@ -35,17 +35,30 @@ Route::get('/', [FrontendController::class, 'index']);
 Route::get('/forget-password', [AdminController::class, 'forgetPassword']);
 Route::post('retrivePassword', [AdminController::class, 'retrivePassword'])->name('retrivePassword');
 
-Route::get('/hdgteyusjasget', [AdminController::class, 'index']);
+Route::get('/admin', [AdminController::class, 'index']);
 Route::get('/send-admin-otp', [AdminController::class, 'sendAdminOtp']);
 Route::post('adminLogin', [AdminController::class, 'authenticate'])->name('adminLogin');
 
-Route::group(['prefix' => 'hdgteyusjasget', 'middleware' => 'AdminAuth'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
     Route::get('/logout', [AdminController::class, 'logout']);
 
     // set advertise rates
     Route::get('/set_rate', [AdminController::class, 'setRate']);
     Route::post('/setRoiRate', [AdminController::class, 'setRoiRate'])->name('setRoiRate');
+
+    // set packages
+    Route::get('/set-packages', [AdminController::class, 'setPackages'])->name('admin.setPackages');
+    Route::get('/set_packages', [AdminController::class, 'setPackages']);
+    Route::post('/savePackages', [AdminController::class, 'savePackages'])->name('admin.savePackages');
+    Route::post('/set-packages', [AdminController::class, 'savePackages']);
+
+    // Trading Wallet Control
+    Route::get('/trading-wallet-control', [AdminController::class, 'tradingWalletControl'])->name('admin.tradingWalletControl');
+    Route::post('/trading-wallet-control', [AdminController::class, 'applyTradingWalletControl'])->name('admin.applyTradingWalletControl');
+    Route::post('/apply-trading-wallet-control', [AdminController::class, 'applyTradingWalletControl']);
+    Route::post('/filter-trading-members', [AdminController::class, 'filterTradingMembers'])->name('admin.filterTradingMembers');
+    Route::post('/get-trading-member', [AdminController::class, 'getTradingMember'])->name('admin.getTradingMember');
 
     // Color Dashboard
     Route::get('/color-dashboard', [AdminController::class, 'colorDashboard']);
@@ -166,8 +179,8 @@ Route::group(['prefix' => 'hdgteyusjasget', 'middleware' => 'AdminAuth'], functi
     Route::get('/tutorial-videos/delete/{id}', [AdminMediaController::class, 'deleteVideo'])->name('admin.media.tutorial-videos.delete');
 
     // PEPE Token Settings
-    // Route::get('/pepe-settings', [AdminController::class, 'pepeSettings'])->name('admin.pepeSettings');
-    // Route::post('/updatePepeSettings', [AdminController::class, 'updatePepeSettings'])->name('admin.updatePepeSettings');
+    Route::get('/pepe-settings', [AdminController::class, 'pepeSettings'])->name('admin.pepeSettings');
+    Route::post('/updatePepeSettings', [AdminController::class, 'updatePepeSettings'])->name('admin.updatePepeSettings');
 });
 
 // Member Routes
@@ -258,6 +271,9 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::post('pepeValidate', [WithdrawalController::class, 'pepeValidate'])->name('pepeValidate');
     Route::post('getPrivateKeyPepe', [WithdrawalController::class, 'getPrivateKeyPepe'])->name('getPrivateKeyPepe');
     Route::post('initiatePepeWithdrawal', [WithdrawalController::class, 'initiatePepeWithdrawal'])->name('initiatePepeWithdrawal');
+
+    // Trading Wallet withdrawal validation
+    Route::post('tradingWalletValidate', [WithdrawalController::class, 'tradingWalletValidate'])->name('tradingWalletValidate');
 
     // Geneology Section
     Route::get('/team/geneology', [MemberDetailController::class, 'geneology'])->name('member.team.geneology');

@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\MemberDetail;
-use App\Models\PepeRewardLog;
 use App\Models\PepeSetting;
 use App\Models\SingleLegIncome;
 use App\Models\WalletTransfer;
-use App\Models\WhatsappReferral;
 use App\Models\WithdrawalRequest;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -290,10 +289,7 @@ class WithdrawalController extends Controller
         }
 
         // Available balance
-        $totalEarned = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
-        if ($totalEarned <= 0) {
-            $totalEarned = (float) PepeRewardLog::where('member_id', $memberid)->sum('reward_amount');
-        }
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
 
         $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
@@ -460,10 +456,7 @@ class WithdrawalController extends Controller
         }
 
         // Calculate available PEPE tokens
-        $totalEarned = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
-        if ($totalEarned <= 0) {
-            $totalEarned = (float) PepeRewardLog::where('member_id', $memberid)->sum('reward_amount');
-        }
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
 
         $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
@@ -564,10 +557,7 @@ class WithdrawalController extends Controller
         $countryData = Country::where('name', $country)->first();
 
         // Statistics
-        $totalEarned = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
-        if ($totalEarned <= 0) {
-            $totalEarned = (float) PepeRewardLog::where('member_id', $memberid)->sum('reward_amount');
-        }
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
 
         $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
@@ -723,6 +713,39 @@ class WithdrawalController extends Controller
             'status' => 'success',
             'message' => 'PEPE Withdrawal request has been processed successfully.',
             'new_balance' => (float) $mem->pepe_wallet,
+        ]);
+    }
+
+    /**
+     * Validate Trading Wallet withdrawal request based on Lock Period (Condition A) and Max Percentage (Condition B).
+     */
+    public function tradingWalletValidate(Request $request)
+    {
+        $memberid = $request->post('memberid') ?? session('MEMBER_ID');
+        $withAmount = (float) $request->post('withAmount');
+
+        $member = MemberDetail::where('memberid', $memberid)->first();
+        if (! $member) {
+            return response()->json([
+                'code' => 0,
+                'data' => 0,
+                'message' => 'Member account not found.',
+            ], 404);
+        }
+
+        $errorMsg = null;
+        if (! $member->canWithdrawTradingWallet($withAmount, $errorMsg)) {
+            return response()->json([
+                'code' => 0,
+                'data' => 0,
+                'message' => $errorMsg,
+            ]);
+        }
+
+        return response()->json([
+            'code' => 1,
+            'data' => $withAmount,
+            'message' => 'Trading Wallet withdrawal validated successfully.',
         ]);
     }
 }

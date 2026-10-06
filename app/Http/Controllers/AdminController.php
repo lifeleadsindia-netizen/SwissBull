@@ -11,6 +11,7 @@ use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\Notification;
 use App\Models\PackageDetail;
+use App\Models\PackageDistribution;
 use App\Models\PartnershipDetail;
 use App\Models\PartnershipIncome;
 use App\Models\PepeSetting;
@@ -19,6 +20,7 @@ use App\Models\SetRate;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
+use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
@@ -729,6 +731,40 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
+    public function setPackages()
+    {
+        $distribution = PackageDistribution::first();
+
+        return view('admin.set-packages', compact('distribution'));
+    }
+
+    public function savePackages(Request $request)
+    {
+        $validated = $request->validate([
+            'trading_wallet' => 'required|numeric|min:0',
+            'referral_bonus' => 'required|numeric|min:0',
+            'team_trading_profit' => 'required|numeric|min:0',
+            'team_performance_bonus' => 'required|numeric|min:0',
+            'hero_of_the_month' => 'required|numeric|min:0',
+        ]);
+
+        $distribution = PackageDistribution::first();
+        if (! $distribution) {
+            $distribution = new PackageDistribution;
+        }
+
+        $distribution->trading_wallet = $validated['trading_wallet'];
+        $distribution->referral_bonus = $validated['referral_bonus'];
+        $distribution->team_trading_profit = $validated['team_trading_profit'];
+        $distribution->team_performance_bonus = $validated['team_performance_bonus'];
+        $distribution->hero_of_the_month = $validated['hero_of_the_month'];
+        $distribution->save();
+
+        session()->flash('successMsg', 'Package distribution configuration updated successfully.');
+
+        return redirect()->back();
+    }
+
     public function achiversImages()
     {
         $result['data'] = AchiversImage::all();
@@ -1269,5 +1305,341 @@ class AdminController extends Controller
         session()->flash('successMsg', 'PEPE token withdrawal & DApp settings have been updated successfully!');
 
         return redirect()->back();
+    }
+
+    /**
+     * Show Trading Wallet Control management page with date-based package & member selection and active settings.
+     * Records are sourced from Package Details verified with Member Details.
+     */
+    public function tradingWalletControl(Request $request)
+    {
+        $dateFrom = $request->query('date_from');
+        $dateTo = $request->query('date_to');
+
+        $setting = TradingWalletSetting::getActiveSetting();
+
+        $packages = collect();
+        if ($dateFrom && $dateTo) {
+            $start = Carbon::parse($dateFrom)->startOfDay();
+            $end = Carbon::parse($dateTo)->endOfDay();
+
+            // Sourced from Package Details verified against Member Details
+            $packages = PackageDetail::with('member')
+                ->whereHas('member')
+                ->where('status', '!=', 'Rejected')
+                ->whereBetween('created_at', [$start, $end])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        $members = $packages;
+
+        return view('admin.trading-wallet-control', compact('packages', 'members', 'dateFrom', 'dateTo', 'setting'));
+    }
+
+    /**
+     * AJAX query to filter package entries by date range for Trading Wallet Control.
+     * Only members who have actually purchased/activated a package appear.
+     */
+    public function filterTradingMembers(Request $request)
+    {
+        $request->validate([
+            'date_from' => 'required|date',
+            'date_to' => 'required|date|after_or_equal:date_from',
+        ], [
+            'date_from.required' => 'Please select Package Date From.',
+            'date_to.required' => 'Please select Package Date To.',
+            'date_to.after_or_equal' => 'Package Date To must be on or after Package Date From.',
+        ]);
+
+        $start = Carbon::parse($request->input('date_from'))->startOfDay();
+        $end = Carbon::parse($request->input('date_to'))->endOfDay();
+
+        // Must come from Package Details, verified against Member Details
+        $packages = PackageDetail::with('member')
+            ->whereHas('member')
+            ->where('status', '!=', 'Rejected')
+            ->whereBetween('created_at', [$start, $end])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $data = $packages->map(function ($pkg) {
+            $mem = $pkg->member;
+            $isLocked = $pkg->isLocked() || $mem->isTradingWalletLocked();
+            $remDays = max($pkg->remainingLockDays(), $mem->tradingWalletRemainingLockDays());
+            $lockedUntil = $pkg->locked_until ?? $mem->trading_wallet_locked_until;
+            $maxWithdrawable = $mem->tradingWalletMaxWithdrawable();
+
+            return [
+                'package_id' => $pkg->id,
+                'id' => $pkg->id,
+                'memberid' => $mem->memberid,
+                'name' => $mem->name,
+                'mobile' => $mem->mobile,
+                'package_type' => $pkg->package_type,
+                'package_value' => (float) ($pkg->package_value ?? 0.00),
+                'package_date' => $pkg->created_at ? $pkg->created_at->format('d M Y') : 'N/A',
+                'registration_date' => $pkg->created_at ? $pkg->created_at->format('d M Y') : ($mem->created_at ? $mem->created_at->format('d M Y') : 'N/A'),
+                'raw_created_at' => $pkg->created_at ? $pkg->created_at->format('Y-m-d H:i:s') : null,
+                'trading_wallet' => (float) ($mem->p2p_wallet ?? 0.00),
+                'p2p_wallet' => (float) ($mem->p2p_wallet ?? 0.00),
+                'lock_days' => (int) ($pkg->lock_days ?: $mem->trading_wallet_lock_days ?: 0),
+                'withdrawal_percent' => (float) ($mem->trading_wallet_withdrawal_percent ?? 100.00),
+                'is_locked' => $isLocked,
+                'remaining_lock_days' => $remDays,
+                'locked_until' => $lockedUntil ? $lockedUntil->format('d M Y') : null,
+                'max_withdrawable' => $maxWithdrawable,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'count' => $data->count(),
+            'packages' => $data,
+            'members' => $data,
+            'message' => "Found {$data->count()} package entry/entries verified with member details between {$request->date_from} and {$request->date_to}.",
+        ]);
+    }
+
+    /**
+     * Apply Trading Wallet Lock and Post-Lock Maximum Withdrawal Percentage:
+     * - Data comes from Package Details and Member Details.
+     * - Relationship between Package Details Entry -> Corresponding Member Details Entry is verified.
+     * - Default/Current-Day Mode: Updates active setting and syncs today's activations (older records untouched).
+     * - Date Range Selection Mode: Applies new Lock Period only to the selected historical package records.
+     */
+    public function applyTradingWalletControl(Request $request)
+    {
+        $action = $request->input('action');
+        $selectedPackages = $request->input('selected_packages', []);
+        $selectedMembers = $request->input('selected_members', []);
+
+        $hasSelection = (is_array($selectedPackages) && count($selectedPackages) > 0)
+            || (is_array($selectedMembers) && count($selectedMembers) > 0);
+
+        $rules = [
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date',
+            'lock_days' => 'required|integer|min:0',
+            'withdrawal_percent' => 'required|numeric|min:0|max:100',
+        ];
+
+        if ($action === 'apply_selected' || ($action !== 'save_current_setting' && $hasSelection)) {
+            if (! $hasSelection) {
+                return redirect()->back()->withErrors([
+                    'selected_packages' => 'Please select at least one package entry using the checkboxes.',
+                ]);
+            }
+        }
+
+        $request->validate($rules, [
+            'lock_days.required' => 'Please enter the lock period in days.',
+            'lock_days.integer' => 'Lock days must be a whole number.',
+            'lock_days.min' => 'Lock days cannot be negative.',
+            'withdrawal_percent.required' => 'Please enter the maximum withdrawal percentage limit.',
+            'withdrawal_percent.numeric' => 'Withdrawal percentage must be a valid number.',
+            'withdrawal_percent.min' => 'Withdrawal percentage must be at least 0%.',
+            'withdrawal_percent.max' => 'Withdrawal percentage cannot exceed 100%.',
+        ]);
+
+        $lockDays = (int) $request->input('lock_days');
+        $withdrawalPercent = (float) $request->input('withdrawal_percent');
+
+        // WORKFLOW 1: Direct Save Current Setting / Today's Entries (Tasks 1, 3, 4, 7)
+        if ($action === 'save_current_setting' || ! $hasSelection) {
+            $setting = TradingWalletSetting::getActiveSetting();
+            $setting->lock_days = $lockDays;
+            $setting->withdrawal_percent = $withdrawalPercent;
+            $setting->save();
+
+            // Task 3: Current-Day Lock Period Changes
+            // Changes made today apply to today's active package entries verified with member details
+            $today = Carbon::today();
+            $todayPackages = PackageDetail::with('member')
+                ->whereHas('member')
+                ->where(function ($q) use ($today) {
+                    $q->whereDate('created_at', $today)
+                        ->orWhereDate('lock_applied_at', $today);
+                })
+                ->get();
+
+            $updatedTodayCount = 0;
+            foreach ($todayPackages as $pkg) {
+                $mem = $pkg->member;
+                if (! $mem) {
+                    continue;
+                }
+
+                $baseDate = $pkg->created_at ? Carbon::parse($pkg->created_at)
+                    : ($pkg->lock_applied_at ? Carbon::parse($pkg->lock_applied_at) : now());
+                $lockedUntil = $lockDays > 0 ? $baseDate->copy()->addDays($lockDays) : null;
+
+                $pkg->lock_days = $lockDays;
+                $pkg->lock_applied_at = $baseDate;
+                $pkg->locked_until = $lockedUntil;
+                $pkg->save();
+
+                $mem->trading_wallet_lock_days = $lockDays;
+                $mem->trading_wallet_lock_applied_at = $baseDate;
+                $mem->trading_wallet_locked_until = $lockedUntil;
+                $mem->trading_wallet_withdrawal_percent = $withdrawalPercent;
+                $mem->save();
+
+                $updatedTodayCount++;
+            }
+
+            // Sync any members activated today in member_details
+            $todayMembers = MemberDetail::where(function ($q) use ($today) {
+                $q->whereDate('activated_at', $today)
+                    ->orWhereDate('trading_wallet_lock_applied_at', $today);
+            })->get();
+
+            foreach ($todayMembers as $m) {
+                $baseDate = $m->activated_at ? Carbon::parse($m->activated_at)
+                    : ($m->trading_wallet_lock_applied_at ? Carbon::parse($m->trading_wallet_lock_applied_at) : now());
+                $lockedUntil = $lockDays > 0 ? $baseDate->copy()->addDays($lockDays) : null;
+
+                $m->trading_wallet_lock_days = $lockDays;
+                $m->trading_wallet_lock_applied_at = $baseDate;
+                $m->trading_wallet_locked_until = $lockedUntil;
+                $m->trading_wallet_withdrawal_percent = $withdrawalPercent;
+                $m->save();
+            }
+
+            session()->flash('successMsg', "Active Lock Period updated to {$lockDays} days ({$withdrawalPercent}% max withdrawal). {$updatedTodayCount} current-day (today's) package entry/entries updated. Historical entries remain unchanged.");
+
+            $redirectUrl = route('admin.tradingWalletControl');
+            if ($request->filled('date_from') && $request->filled('date_to')) {
+                $redirectUrl .= '?date_from='.urlencode($request->input('date_from')).'&date_to='.urlencode($request->input('date_to'));
+            }
+
+            return redirect($redirectUrl);
+        }
+
+        // WORKFLOW 2: Admin Date Range Update for Selected Packages / Members (Tasks 5 & 6)
+        $appliedAt = now();
+        $lockedUntil = $lockDays > 0 ? $appliedAt->copy()->addDays($lockDays) : null;
+
+        $packageQuery = PackageDetail::with('member')->whereHas('member');
+
+        if (! empty($selectedPackages)) {
+            $packageQuery->whereIn('id', $selectedPackages);
+        } elseif (! empty($selectedMembers)) {
+            $packageQuery->whereIn('memberid', $selectedMembers);
+        }
+
+        $packagesToUpdate = $packageQuery->get();
+        $updatedCount = 0;
+        $updatedMembersMap = [];
+
+        foreach ($packagesToUpdate as $pkg) {
+            $mem = $pkg->member;
+            if (! $mem) {
+                continue; // Confirm relationship: only valid relationships are locked
+            }
+
+            $pkg->lock_days = $lockDays;
+            $pkg->lock_applied_at = $appliedAt;
+            $pkg->locked_until = $lockedUntil;
+            $pkg->save();
+
+            $mem->trading_wallet_lock_days = $lockDays;
+            $mem->trading_wallet_lock_applied_at = $appliedAt;
+            $mem->trading_wallet_locked_until = $lockedUntil;
+            $mem->trading_wallet_withdrawal_percent = $withdrawalPercent;
+            $mem->save();
+
+            $updatedMembersMap[$mem->memberid] = true;
+            $updatedCount++;
+        }
+
+        // Also if selected_members was explicitly passed, ensure matching members in MemberDetail are updated
+        if (! empty($selectedMembers)) {
+            MemberDetail::whereIn('memberid', $selectedMembers)->update([
+                'trading_wallet_lock_days' => $lockDays,
+                'trading_wallet_lock_applied_at' => $appliedAt,
+                'trading_wallet_locked_until' => $lockedUntil,
+                'trading_wallet_withdrawal_percent' => $withdrawalPercent,
+                'updated_at' => now(),
+            ]);
+            foreach ($selectedMembers as $smId) {
+                $updatedMembersMap[$smId] = true;
+            }
+        }
+
+        // If no date range filter was active or date range covers today, also sync active setting
+        if (! $request->filled('date_from') || $request->input('date_from') === now()->toDateString()) {
+            $setting = TradingWalletSetting::getActiveSetting();
+            $setting->lock_days = $lockDays;
+            $setting->withdrawal_percent = $withdrawalPercent;
+            $setting->save();
+        }
+
+        $memberCount = count($updatedMembersMap);
+        $lockDescription = $lockDays > 0
+            ? "locked for {$lockDays} days (until ".$lockedUntil->format('d M Y').')'
+            : 'unlocked (0 days)';
+
+        session()->flash('successMsg', "Trading Wallet Control applied successfully to {$updatedCount} package entry/entries across {$memberCount} verified member(s): {$lockDescription} with {$withdrawalPercent}% post-lock maximum withdrawal limit.");
+
+        $redirectUrl = route('admin.tradingWalletControl');
+        if ($request->filled('date_from') && $request->filled('date_to')) {
+            $redirectUrl .= '?date_from='.urlencode($request->input('date_from')).'&date_to='.urlencode($request->input('date_to'));
+        }
+
+        return redirect($redirectUrl);
+    }
+
+    /**
+     * AJAX query to check Member ID and return member details + package details for Trading Wallet Control.
+     */
+    public function getTradingMember(Request $request)
+    {
+        $memberid = trim((string) $request->input('memberid'));
+        if ($memberid === '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please enter a Member ID.',
+            ], 422);
+        }
+
+        $member = MemberDetail::where('memberid', $memberid)->first();
+        if (! $member) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Member ID not found. Please enter a valid Member ID.',
+            ], 404);
+        }
+
+        $latestPkg = PackageDetail::where('memberid', $memberid)
+            ->where('status', '!=', 'Rejected')
+            ->latest()
+            ->first();
+
+        $regDate = $member->created_at ? Carbon::parse($member->created_at)->format('d M Y') : 'N/A';
+        $lockedUntil = $member->trading_wallet_locked_until ? Carbon::parse($member->trading_wallet_locked_until)->format('d M Y h:i A') : null;
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $member->id,
+                'memberid' => $member->memberid,
+                'name' => $member->name,
+                'mobile' => $member->mobile,
+                'registration_date' => $regDate,
+                'has_package' => $latestPkg !== null,
+                'package_type' => $latestPkg ? $latestPkg->package_type : 'None',
+                'package_value' => $latestPkg ? (float) $latestPkg->package_value : 0.00,
+                'package_date' => $latestPkg && $latestPkg->created_at ? $latestPkg->created_at->format('d M Y') : 'N/A',
+                'trading_wallet' => (float) ($member->p2p_wallet ?? 0.00),
+                'lock_days' => (int) ($member->trading_wallet_lock_days ?? 0),
+                'withdrawal_percent' => (float) ($member->trading_wallet_withdrawal_percent ?? 100.00),
+                'locked_until' => $lockedUntil,
+                'is_locked' => $member->isTradingWalletLocked(),
+                'remaining_lock_days' => $member->tradingWalletRemainingLockDays(),
+                'max_withdrawable' => $member->tradingWalletMaxWithdrawable(),
+            ],
+            'message' => 'Member found successfully.',
+        ]);
     }
 }
