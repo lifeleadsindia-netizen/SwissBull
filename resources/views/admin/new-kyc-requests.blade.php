@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'New KYC Requests')
 @section('content')
     @push('head')
@@ -81,7 +81,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{url('hdgteyusjasget/KYC/view')}}/{{$list['id']}}"><i class="ik ik-eye"></i> View KYC</a>
+                                        <a href="{{url('admin/KYC/view')}}/{{$list['id']}}"><i class="ik ik-eye"></i> View KYC</a>
                                     </td>
                                 </tr>
                                 @php $i++;  @endphp

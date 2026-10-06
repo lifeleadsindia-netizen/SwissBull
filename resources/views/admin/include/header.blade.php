@@ -1,4 +1,4 @@
-<header class="header-top" header-theme="light">
+﻿<header class="header-top" header-theme="light">
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="top-menu d-flex align-items-center">
@@ -15,10 +15,10 @@
                         <img class="avatar" src="{{ asset('uploads/avatar.jpg')}}" alt="">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="{{url('hdgteyusjasget/profile')}}"><i
+                        <a class="dropdown-item" href="{{url('admin/profile')}}"><i
                                 class="ik ik-user dropdown-icon"></i> {{ __('Profile')}}</a>
 
-                        <a class="dropdown-item" href="{{ url('hdgteyusjasget/logout') }}">
+                        <a class="dropdown-item" href="{{ url('admin/logout') }}">
                             <i class="ik ik-power dropdown-icon"></i>
                             {{ __('Logout')}}
                         </a>

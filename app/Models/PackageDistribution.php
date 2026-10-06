@@ -38,4 +38,16 @@ class PackageDistribution extends Model
         'team_performance_bonus' => 'decimal:2',
         'hero_of_the_month' => 'decimal:2',
     ];
+    public static function getDistributionConfig(): array
+    {
+        $config = PackageDistribution::first();
+
+        return [
+            'p2p_wallet' => $config ? (float) $config->p2p_wallet : 70.0,
+            'referral_bonus' => $config ? (float) $config->referral_bonus : 10.0,
+            'team_trading_profit' => $config ? (float) $config->team_trading_profit : 8.0,
+            'team_performance_bonus' => $config ? (float) $config->team_performance_bonus : 10.0,
+            'hero_of_the_month' => $config ? (float) $config->hero_of_the_month : 2.0,
+        ];
+    }
 }

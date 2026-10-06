@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'WhatsApp Referral Messages')
 @section('content')
     @push('head')
@@ -56,7 +56,7 @@
                     <nav class="breadcrumb-container" aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="{{ url('hdgteyusjasget/dashboard') }}"><i class="ik ik-home"></i></a>
+                                <a href="{{ url('admin/dashboard') }}"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Marketing') }}</a></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('WhatsApp Messages') }}</li>
@@ -232,7 +232,7 @@
                                                     <i class="ik ik-edit"></i> Edit
                                                 </button>
                                                 <a class="btn btn-danger btn-sm text-white"
-                                                    href="{{ url('hdgteyusjasget/whatsapp-messages/delete/' . $item->id) }}"
+                                                    href="{{ url('admin/whatsapp-messages/delete/' . $item->id) }}"
                                                     onclick="return confirm('Are you sure you want to delete this message template?')">
                                                     <i class="ik ik-trash-2"></i> Delete
                                                 </a>

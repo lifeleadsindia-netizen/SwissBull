@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 
 <head>
@@ -205,7 +205,7 @@
                 <p class="notice-text">Password will be sent to your registered email ID.</p>
 
                 <div class="d-flex justify-content-center mt-2">
-                    <a href="{{ url('/hdgteyusjasget') }}" class="forgot-link">Back to Login</a>
+                    <a href="{{ url('/admin') }}" class="forgot-link">Back to Login</a>
                 </div>
             </form>
         </div>

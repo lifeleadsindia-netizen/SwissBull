@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Tests\Feature;
 
@@ -72,14 +72,14 @@ class PepeRedeemTest extends TestCase
         // 3. Verify Admin Payment History page has this PEPE request in pepeData
         $admin = Admin::first();
         $resHistoryPage = $this->withSession(['ADMIN_LOGIN' => true, 'admin_id' => $admin ? $admin->id : 1])
-            ->get('/hdgteyusjasget/payment-history');
+            ->get('/admin/payment-history');
         $resHistoryPage->assertStatus(200);
         $resHistoryPage->assertSee($memberId);
         $resHistoryPage->assertSee('1,000 PEPE');
 
         // 4. Verify Admin New Withdrawal Requests page does NOT have any pending PEPE request
         $resNewRequests = $this->withSession(['ADMIN_LOGIN' => true, 'admin_id' => $admin ? $admin->id : 1])
-            ->get('/hdgteyusjasget/new-withdrawal-request');
+            ->get('/admin/new-withdrawal-request');
         $resNewRequests->assertStatus(200);
         $resNewRequests->assertDontSee($req->request_id);
 
@@ -97,7 +97,7 @@ class PepeRedeemTest extends TestCase
         $session = ['ADMIN_LOGIN' => true, 'admin_id' => $admin ? $admin->id : 1];
 
         // 1. View settings page
-        $resView = $this->withSession($session)->get('/hdgteyusjasget/pepe-settings');
+        $resView = $this->withSession($session)->get('/admin/pepe-settings');
         $resView->assertStatus(200);
         $resView->assertSee('PEPE Token Withdrawal Settings');
         $resView->assertSee('0x25d887Ce7a35172C62FeBFD67a1856F20FaEbB00');
@@ -107,7 +107,7 @@ class PepeRedeemTest extends TestCase
         $customAbi = json_encode([
             ['inputs' => [], 'name' => 'customFunc', 'outputs' => [], 'stateMutability' => 'view', 'type' => 'function'],
         ]);
-        $resUpdate = $this->withSession($session)->post('/hdgteyusjasget/updatePepeSettings', [
+        $resUpdate = $this->withSession($session)->post('/admin/updatePepeSettings', [
             'contract_address' => $newContract,
             'token_abi' => $customAbi,
             'token_symbol' => 'PEPE2',
@@ -133,7 +133,7 @@ class PepeRedeemTest extends TestCase
         ]);
 
         // 3. Test invalid JSON validation for token_abi
-        $resInvalidAbi = $this->withSession($session)->post('/hdgteyusjasget/updatePepeSettings', [
+        $resInvalidAbi = $this->withSession($session)->post('/admin/updatePepeSettings', [
             'contract_address' => $newContract,
             'token_abi' => '{ invalid json }',
             'token_symbol' => 'PEPE2',
@@ -227,7 +227,7 @@ class PepeRedeemTest extends TestCase
         // Verify Admin Payment History displays this txnid
         $admin = Admin::first();
         $resAdminHistory = $this->withSession(['ADMIN_LOGIN' => true, 'admin_id' => $admin ? $admin->id : 1])
-            ->get('/hdgteyusjasget/payment-history');
+            ->get('/admin/payment-history');
         $resAdminHistory->assertStatus(200);
         $resAdminHistory->assertSee($fakeTxHash);
 

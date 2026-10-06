@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Dash Messages')
 @section('content')
     @push('head')
@@ -93,7 +93,7 @@
                                     <td>{{ $list['message']}}</td>
                                     <td>
                                         <div class="text-center">
-                                            <a class="btn btn-danger text-white" href="{{url('hdgteyusjasget/dash-messages/delete')}}/{{$list['id']}}">Delete</a>
+                                            <a class="btn btn-danger text-white" href="{{url('admin/dash-messages/delete')}}/{{$list['id']}}">Delete</a>
                                         </div>
                                     </td>
                                 </tr>

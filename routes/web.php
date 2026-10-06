@@ -53,6 +53,13 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::post('/savePackages', [AdminController::class, 'savePackages'])->name('admin.savePackages');
     Route::post('/set-packages', [AdminController::class, 'savePackages']);
 
+    // Trading Wallet Control
+    Route::get('/trading-wallet-control', [AdminController::class, 'tradingWalletControl'])->name('admin.tradingWalletControl');
+    Route::post('/trading-wallet-control', [AdminController::class, 'applyTradingWalletControl'])->name('admin.applyTradingWalletControl');
+    Route::post('/apply-trading-wallet-control', [AdminController::class, 'applyTradingWalletControl']);
+    Route::post('/filter-trading-members', [AdminController::class, 'filterTradingMembers'])->name('admin.filterTradingMembers');
+    Route::post('/get-trading-member', [AdminController::class, 'getTradingMember'])->name('admin.getTradingMember');
+
     // Color Dashboard
     Route::get('/color-dashboard', [AdminController::class, 'colorDashboard']);
 
@@ -264,6 +271,9 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::post('pepeValidate', [WithdrawalController::class, 'pepeValidate'])->name('pepeValidate');
     Route::post('getPrivateKeyPepe', [WithdrawalController::class, 'getPrivateKeyPepe'])->name('getPrivateKeyPepe');
     Route::post('initiatePepeWithdrawal', [WithdrawalController::class, 'initiatePepeWithdrawal'])->name('initiatePepeWithdrawal');
+
+    // Trading Wallet withdrawal validation
+    Route::post('tradingWalletValidate', [WithdrawalController::class, 'tradingWalletValidate'])->name('tradingWalletValidate');
 
     // Geneology Section
     Route::get('/team/geneology', [MemberDetailController::class, 'geneology'])->name('member.team.geneology');

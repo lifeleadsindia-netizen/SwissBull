@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'View Support Tickets')
 @section('content')
     @push('head')
@@ -38,7 +38,7 @@
                     <div class="card-header">
                         <h3>Recent Chat</h3>
                         <div class="card-header-right">
-                            <a href="{{url('hdgteyusjasget/closed-ticket')}}/{{$support['ticket_id']}}" class="btn btn-primary">Close Ticket</a>
+                            <a href="{{url('admin/closed-ticket')}}/{{$support['ticket_id']}}" class="btn btn-primary">Close Ticket</a>
                         </div>
                     </div>
                     <div class="card-body chat-box scrollable card-300" >

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace Tests\Feature;
 
@@ -27,31 +27,31 @@ class AdminMediaManagementTest extends TestCase
 
     public function test_guest_cannot_access_admin_media_routes(): void
     {
-        $this->get('/hdgteyusjasget/promotion-banners')->assertRedirect('/hdgteyusjasget');
-        $this->get('/hdgteyusjasget/business-plan-pdfs')->assertRedirect('/hdgteyusjasget');
-        $this->get('/hdgteyusjasget/plan-videos')->assertRedirect('/hdgteyusjasget');
-        $this->get('/hdgteyusjasget/tutorial-videos')->assertRedirect('/hdgteyusjasget');
+        $this->get('/admin/promotion-banners')->assertRedirect('/admin');
+        $this->get('/admin/business-plan-pdfs')->assertRedirect('/admin');
+        $this->get('/admin/plan-videos')->assertRedirect('/admin');
+        $this->get('/admin/tutorial-videos')->assertRedirect('/admin');
     }
 
     public function test_admin_can_access_media_management_pages(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/hdgteyusjasget/promotion-banners');
+            ->get('/admin/promotion-banners');
         $response->assertStatus(200);
         $response->assertSee('Promotion Banners');
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/hdgteyusjasget/business-plan-pdfs');
+            ->get('/admin/business-plan-pdfs');
         $response->assertStatus(200);
         $response->assertSee('Business Plan PDFs');
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/hdgteyusjasget/plan-videos');
+            ->get('/admin/plan-videos');
         $response->assertStatus(200);
         $response->assertSee('Plan Videos');
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/hdgteyusjasget/tutorial-videos');
+            ->get('/admin/tutorial-videos');
         $response->assertStatus(200);
         $response->assertSee('Tutorial Videos');
     }
@@ -135,19 +135,19 @@ class AdminMediaManagementTest extends TestCase
         $this->assertNotNull($banner);
 
         $initialStatus = $banner->status;
-        $this->from('/hdgteyusjasget/promotion-banners')
+        $this->from('/admin/promotion-banners')
             ->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/hdgteyusjasget/promotion-banners/status/'.$banner->id)
-            ->assertRedirect('/hdgteyusjasget/promotion-banners');
+            ->get('/admin/promotion-banners/status/'.$banner->id)
+            ->assertRedirect('/admin/promotion-banners');
 
         $banner->refresh();
         $this->assertNotEquals($initialStatus, $banner->status);
 
         // Toggle back to keep original state
-        $this->from('/hdgteyusjasget/promotion-banners')
+        $this->from('/admin/promotion-banners')
             ->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/hdgteyusjasget/promotion-banners/status/'.$banner->id)
-            ->assertRedirect('/hdgteyusjasget/promotion-banners');
+            ->get('/admin/promotion-banners/status/'.$banner->id)
+            ->assertRedirect('/admin/promotion-banners');
 
         $banner->refresh();
         $this->assertEquals($initialStatus, $banner->status);
@@ -188,7 +188,7 @@ class AdminMediaManagementTest extends TestCase
         $fakeVideo = UploadedFile::fake()->create('sample_presentation.mkv', 50000, 'video/x-matroska');
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/hdgteyusjasget/plan-videos/save', [
+            ->post('/admin/plan-videos/save', [
                 'title' => 'Test 200MB Plan Video',
                 'video_source' => 'upload',
                 'video_file' => $fakeVideo,
@@ -203,7 +203,7 @@ class AdminMediaManagementTest extends TestCase
         // Test rejected upload over 200MB (> 204800 KB)
         $oversizedVideo = UploadedFile::fake()->create('huge_video.mp4', 210000, 'video/mp4');
         $failResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/hdgteyusjasget/plan-videos/save', [
+            ->post('/admin/plan-videos/save', [
                 'title' => 'Oversized Video',
                 'video_source' => 'upload',
                 'video_file' => $oversizedVideo,
