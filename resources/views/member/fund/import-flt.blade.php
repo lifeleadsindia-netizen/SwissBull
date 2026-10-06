@@ -107,6 +107,22 @@
     }
     .dep-input[readonly] { color: #94A3B8 !important; cursor: default; }
 
+    /* Package select dropdown */
+    select.dep-input {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23F59E0B' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 16px center !important;
+        padding-right: 42px !important;
+        cursor: pointer;
+    }
+    select.dep-input option {
+        background-color: #08090C !important;
+        color: #F8FAFC !important;
+    }
+
     /* Amount input group */
     .dep-prefix {
         background: #08090C !important;
@@ -278,16 +294,32 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="dep-label">
+                            <label class="dep-label" for="package">
+                                <i class="fa-solid fa-cubes-stacked me-1"></i> Package Selection
+                            </label>
+                            <select class="form-control dep-input" name="package" id="package">
+                                <option value="" selected disabled>Select Package</option>
+                                <option value="50-500">50 - 500</option>
+                                <option value="600-5000">600 - 5000</option>
+                                <option value="6000+">6000 and above</option>
+                            </select>
+                            @error('package')
+                                <span class="text-danger d-block mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="dep-label" for="amount">
                                 <i class="fa-solid fa-dollar-sign me-1"></i> Amount (USDT BEP-20)
                             </label>
                             <div class="input-group">
                                 <span class="dep-prefix">$</span>
                                 <input type="text" class="form-control dep-input amount-field"
-                                    name="amount" value="0" id="amount"
+                                    name="amount" value="" id="amount"
                                     onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46'
-                                    placeholder="Enter amount">
+                                    placeholder="Select a package first">
                             </div>
+                            <div id="amount-hint" class="mt-1" style="font-size: 11.5px; color: #F59E0B; display: none;"></div>
                             @error('amount')
                                 <span class="text-danger d-block mt-1">{{ $message }}</span>
                             @enderror
