@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\MemberDetail;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -123,6 +124,9 @@ class UserAccessController extends Controller
                 $var->phonecode = $phoneCode;
                 $var->country = $country;
                 $var->save();
+
+                // Rule 2: Direct referral registration (inactive) awards 500 PEPE tokens to direct sponsor
+                PepeRewardService::awardDirectRegistrationReward($sponsorid, $var);
 
                 $data = MemberDetail::find($var->id);
                 $userid = $data->memberid;

@@ -28,6 +28,15 @@ class NotificationTest extends TestCase
             'title' => 'Broadcast Update',
         ]);
 
+        MemberDetail::updateOrCreate(
+            ['memberid' => 'MEM1001'],
+            [
+                'name' => 'Target Member',
+                'email' => 'target1001@example.com',
+                'password' => bcrypt('password'),
+            ]
+        );
+
         $responseTargeted = $this->withSession(['ADMIN_LOGIN' => true])
             ->post(route('saveNotification'), [
                 'type' => 'Specific Member',

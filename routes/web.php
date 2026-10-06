@@ -166,8 +166,8 @@ Route::group(['prefix' => 'hdgteyusjasget', 'middleware' => 'AdminAuth'], functi
     Route::get('/tutorial-videos/delete/{id}', [AdminMediaController::class, 'deleteVideo'])->name('admin.media.tutorial-videos.delete');
 
     // PEPE Token Settings
-    // Route::get('/pepe-settings', [AdminController::class, 'pepeSettings'])->name('admin.pepeSettings');
-    // Route::post('/updatePepeSettings', [AdminController::class, 'updatePepeSettings'])->name('admin.updatePepeSettings');
+    Route::get('/pepe-settings', [AdminController::class, 'pepeSettings'])->name('admin.pepeSettings');
+    Route::post('/updatePepeSettings', [AdminController::class, 'updatePepeSettings'])->name('admin.updatePepeSettings');
 });
 
 // Member Routes

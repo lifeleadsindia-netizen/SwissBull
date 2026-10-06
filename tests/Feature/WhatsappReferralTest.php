@@ -6,6 +6,7 @@ use App\Models\MemberDetail;
 use App\Models\PepeRewardLog;
 use App\Models\WhatsappReferral;
 use App\Models\WhatsappReferralMessage;
+use App\Services\PepeRewardService;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -64,7 +65,7 @@ class WhatsappReferralTest extends TestCase
             ->postJson('/member/whatsapp/verify', ['mobile_number' => $targetMobile]);
         $resVerify->assertStatus(200)->assertJson(['success' => true]);
 
-        // 3. Successful Process Referral & 1000 PEPE credit
+        // 3. Successful Process Referral & 500 PEPE credit
         $resProcess = $this->withSession(['MEMBER_ID' => $memberId])
             ->postJson('/member/whatsapp/process', ['mobile_number' => $targetMobile]);
         $resProcess->assertStatus(200)->assertJson(['success' => true]);
@@ -73,31 +74,50 @@ class WhatsappReferralTest extends TestCase
         $this->assertDatabaseHas('whatsapp_referrals', [
             'member_id' => $memberId,
             'mobile_number' => $targetMobile,
-            'reward_amount' => 1000.00,
+            'reward_amount' => 500.00,
         ]);
 
         $this->assertDatabaseHas('pepe_reward_logs', [
             'member_id' => $memberId,
             'mobile_number' => $targetMobile,
-            'reward_amount' => 1000.00,
+            'reward_amount' => 500.00,
+            'reward_type' => 'message',
         ]);
 
         // Redeem earned PEPE tokens directly
+        $dummyTxn = '0x'.bin2hex(random_bytes(32));
         $resRedeem = $this->withSession(['MEMBER_ID' => $memberId])
-            ->postJson('/member/pepe/redeem', ['amount' => 1000]);
+            ->postJson('/member/pepe/redeem', [
+                'amount' => 500,
+                'txnid' => $dummyTxn,
+            ]);
         $resRedeem->assertStatus(200)->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('withdrawal_requests', [
             'memberid' => $memberId,
-            'gross_amount' => 1000,
+            'gross_amount' => 500,
+            'txnid' => $dummyTxn,
             'type' => 'Airdrop Withdrawal',
             'status' => 'Approved',
         ]);
 
-        // 4. Rule 1: Daily Limit Check (Attempting second referral today)
+        // 4. Rule 1: Daily Limit Check (Simulate 10 total referrals today, then test 11th fails)
+        for ($i = 2; $i <= 10; $i++) {
+            WhatsappReferral::create([
+                'member_id' => $memberId,
+                'mobile_number' => '98'.rand(10000000, 89999999),
+                'reward_amount' => 500.00,
+                'status' => 'Approved',
+                'created_at' => now(),
+            ]);
+        }
+
         $resDaily = $this->withSession(['MEMBER_ID' => $memberId])
             ->postJson('/member/whatsapp/process', ['mobile_number' => '9891238475']);
-        $resDaily->assertStatus(422)->assertJson(['success' => false, 'message' => 'You have already used your daily referral for today.']);
+        $resDaily->assertStatus(422)->assertJson([
+            'success' => false,
+            'message' => 'You have reached the maximum daily limit of 10 messages (5,000 PEPE tokens) for today.',
+        ]);
 
         // 5. Member 2 attempt to use the same mobile number (Cross-user duplicate check)
         $member2Id = 'WATEST'.rand(1000, 9999);
@@ -126,6 +146,78 @@ class WhatsappReferralTest extends TestCase
         $msg->delete();
         WhatsappReferral::whereIn('member_id', [$memberId, $member2Id])->delete();
         PepeRewardLog::whereIn('member_id', [$memberId, $member2Id])->delete();
+    }
+
+    public function test_direct_registration_and_activation_pepe_rewards(): void
+    {
+        $sponsorId = 'SPON'.rand(1000, 9999);
+        $sponsor = MemberDetail::create([
+            'memberid' => $sponsorId,
+            'name' => 'Sponsor Tester',
+            'mobile' => '9812345678',
+            'email' => 'sponsor'.rand(100, 999).'@example.com',
+            'password' => bcrypt('password'),
+            'pepe_wallet' => 0,
+        ]);
+
+        $directMemberId = 'DIR'.rand(1000, 9999);
+        $directMember = MemberDetail::create([
+            'memberid' => $directMemberId,
+            'sponsorid' => $sponsorId,
+            'name' => 'Direct Referral',
+            'mobile' => '9898765432',
+            'email' => 'direct'.rand(100, 999).'@example.com',
+            'password' => bcrypt('password'),
+            'status' => 'Temp',
+            'pepe_wallet' => 0,
+        ]);
+
+        // Rule 2: Direct Registration Reward (500 PEPE)
+        $regReward = PepeRewardService::awardDirectRegistrationReward($sponsorId, $directMember);
+        $this->assertNotNull($regReward);
+        $this->assertEquals(500.0, (float) $regReward->reward_amount);
+
+        $sponsor->refresh();
+        $this->assertEquals(500.0, (float) $sponsor->pepe_wallet);
+
+        $this->assertDatabaseHas('pepe_reward_logs', [
+            'member_id' => $sponsorId,
+            'referred_member_id' => $directMemberId,
+            'reward_type' => 'direct_registration',
+            'reward_amount' => 500.00,
+        ]);
+
+        // Idempotency: Calling again should return null and not double credit
+        $duplicateReg = PepeRewardService::awardDirectRegistrationReward($sponsorId, $directMember);
+        $this->assertNull($duplicateReg);
+        $sponsor->refresh();
+        $this->assertEquals(500.0, (float) $sponsor->pepe_wallet);
+
+        // Rule 3: Direct Activation Reward (500 PEPE)
+        $actReward = PepeRewardService::awardDirectActivationReward($sponsorId, $directMember);
+        $this->assertNotNull($actReward);
+        $this->assertEquals(500.0, (float) $actReward->reward_amount);
+
+        $sponsor->refresh();
+        $this->assertEquals(1000.0, (float) $sponsor->pepe_wallet);
+
+        $this->assertDatabaseHas('pepe_reward_logs', [
+            'member_id' => $sponsorId,
+            'referred_member_id' => $directMemberId,
+            'reward_type' => 'direct_activation',
+            'reward_amount' => 500.00,
+        ]);
+
+        // Idempotency: Calling activation reward again should return null
+        $duplicateAct = PepeRewardService::awardDirectActivationReward($sponsorId, $directMember);
+        $this->assertNull($duplicateAct);
+        $sponsor->refresh();
+        $this->assertEquals(1000.0, (float) $sponsor->pepe_wallet);
+
+        // Cleanup
+        $sponsor->delete();
+        $directMember->delete();
+        PepeRewardLog::where('member_id', $sponsorId)->delete();
     }
 
     public function test_whatsapp_referral_supports_various_country_mobile_lengths(): void

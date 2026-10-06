@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 
 class ActivationController extends Controller
@@ -46,6 +47,9 @@ class ActivationController extends Controller
             updateDownline($sponsorid);
             updateUpline($sponsorid, $memberid);
             team_update($sponsorid);
+
+            // Rule 3: Direct referral activate hone par 500 PEPE BEP20 tokens
+            PepeRewardService::awardDirectActivationReward($sponsorid, $member);
         }
 
         $new = new PackageDetail;

@@ -7,6 +7,7 @@ use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
 use App\Models\PartnershipIncome;
+use App\Models\PepeRewardLog;
 use App\Models\RoiLevelIncome;
 use App\Models\SingleLegIncome;
 use App\Models\StakingIncome;
@@ -282,14 +283,20 @@ function getCurrencySymbol($memberid)
 
 function todayPEPEWithdrawal()
 {
-    $sum = WhatsappReferral::where('status', 'Completed')->whereDate('created_at', date('Y-m-d'))->sum('reward_amount');
+    $sum = PepeRewardLog::whereDate('created_at', date('Y-m-d'))->sum('reward_amount');
+    if ($sum <= 0) {
+        $sum = WhatsappReferral::where('status', 'Completed')->whereDate('created_at', date('Y-m-d'))->sum('reward_amount');
+    }
 
     return $sum;
 }
 
 function totalPEPEWithdrawal()
 {
-    $sum = WhatsappReferral::where('status', 'Completed')->sum('reward_amount');
+    $sum = PepeRewardLog::sum('reward_amount');
+    if ($sum <= 0) {
+        $sum = WhatsappReferral::where('status', 'Completed')->sum('reward_amount');
+    }
 
     return $sum;
 }
