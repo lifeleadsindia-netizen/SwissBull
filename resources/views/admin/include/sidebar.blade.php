@@ -33,6 +33,10 @@
                  <div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">
                     <a href="{{ url('hdgteyusjasget/notification') }}"><i class="ik ik-bell"></i><span>Notification</span> </a>
                 </div>
+
+                <div class="nav-item {{ (request()->is('*set-packages*') || request()->is('*set_packages*')) ? 'active' : '' }}">
+                    <a href="{{ route('admin.setPackages') }}"><i class="ik ik-sliders"></i><span>{{ __('Set Packages') }}</span></a>
+                </div>
                 
                 <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
                 <!--    <a href="{{ url('hdgteyusjasget/setRate') }}"><i class="ik ik-sliders"></i><span>Set Rate</span> </a>-->
