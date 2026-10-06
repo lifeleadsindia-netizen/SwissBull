@@ -725,4 +725,37 @@ class WithdrawalController extends Controller
             'new_balance' => (float) $mem->pepe_wallet,
         ]);
     }
+
+    /**
+     * Validate Trading Wallet withdrawal request based on Lock Period (Condition A) and Max Percentage (Condition B).
+     */
+    public function tradingWalletValidate(Request $request)
+    {
+        $memberid = $request->post('memberid') ?? session('MEMBER_ID');
+        $withAmount = (float) $request->post('withAmount');
+
+        $member = MemberDetail::where('memberid', $memberid)->first();
+        if (! $member) {
+            return response()->json([
+                'code' => 0,
+                'data' => 0,
+                'message' => 'Member account not found.',
+            ], 404);
+        }
+
+        $errorMsg = null;
+        if (! $member->canWithdrawTradingWallet($withAmount, $errorMsg)) {
+            return response()->json([
+                'code' => 0,
+                'data' => 0,
+                'message' => $errorMsg,
+            ]);
+        }
+
+        return response()->json([
+            'code' => 1,
+            'data' => $withAmount,
+            'message' => 'Trading Wallet withdrawal validated successfully.',
+        ]);
+    }
 }

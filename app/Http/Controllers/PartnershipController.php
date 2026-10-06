@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
+use App\Models\PackageDetail;
 use App\Models\PartnershipDetail;
+use App\Models\TradingWalletSetting;
 use Illuminate\Http\Request;
 
 class PartnershipController extends Controller
@@ -44,6 +46,12 @@ class PartnershipController extends Controller
         //     session()->flash('failedMsg', 'Your value is not multiple of $10');
         //     return redirect()->back();
         // }
+
+        if (! $member->canPurchasePackage($lockError)) {
+            session()->flash('failedMsg', $lockError);
+
+            return redirect()->back();
+        }
 
         if ($member->p2p_wallet < $amount) {
             session()->flash('failedMsg', 'Insufficient wallet balance.');
@@ -103,6 +111,18 @@ class PartnershipController extends Controller
         $staking->status = 'Active';
         $staking->save();
 
+        $setting = TradingWalletSetting::getActiveSetting();
+
+        $pkg = new PackageDetail;
+        $pkg->memberid = $memberid;
+        $pkg->package_type = 'Partnership Package';
+        $pkg->package_value = $amount;
+        $pkg->payment_mode = 'Fund Wallet';
+        $pkg->txnid = 'P/'.date('YmdHis');
+        $pkg->status = 'Accepted';
+        $pkg->applyLock($setting->lock_days);
+        $pkg->save();
+
         $member->partnership_package = $amount;
         $member->partnership_rank = $rank;
         $member->partnership_self_biz += $amount;
@@ -110,6 +130,7 @@ class PartnershipController extends Controller
         $member->part_daily_team_biz += $amount;
         $wallet = $member->p2p_wallet;
         $member->p2p_wallet -= $amount;
+        $member->applyTradingWalletLock($setting->lock_days, $setting->withdrawal_percent);
         $member->save();
 
         walletTransfer(

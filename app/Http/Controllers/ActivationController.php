@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
+use App\Models\TradingWalletSetting;
 use Illuminate\Http\Request;
 
 class ActivationController extends Controller
@@ -40,6 +41,12 @@ class ActivationController extends Controller
             return redirect()->back();
         }
 
+        if ($member->status == 'Active' && ! $member->canPurchasePackage($lockError)) {
+            session()->flash('failedMsg', $lockError);
+
+            return redirect()->back();
+        }
+
         if ($member->status == 'Temp') {
             $member->status = 'Active';
             $member->activated_at = now();
@@ -48,6 +55,8 @@ class ActivationController extends Controller
             team_update($sponsorid);
         }
 
+        $setting = TradingWalletSetting::getActiveSetting();
+
         $new = new PackageDetail;
         $new->memberid = $memberid;
         $new->package_type = 'Account Activation';
@@ -55,11 +64,13 @@ class ActivationController extends Controller
         $new->payment_mode = 'Fund Wallet';
         $new->txnid = 'A/'.date('YmdHis');
         $new->status = 'Accepted';
+        $new->applyLock($setting->lock_days);
         $new->save();
 
         $member->activation_amount = $amount;
         $wallet = $member->p2p_wallet;
         $member->p2p_wallet -= $amount;
+        $member->applyTradingWalletLock($setting->lock_days, $setting->withdrawal_percent);
         $member->save();
 
         levelIncome($sponsorid, $memberid, $name, $amount, 'Account Activation');
