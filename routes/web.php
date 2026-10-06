@@ -35,17 +35,23 @@ Route::get('/', [FrontendController::class, 'index']);
 Route::get('/forget-password', [AdminController::class, 'forgetPassword']);
 Route::post('retrivePassword', [AdminController::class, 'retrivePassword'])->name('retrivePassword');
 
-Route::get('/hdgteyusjasget', [AdminController::class, 'index']);
+Route::get('/admin', [AdminController::class, 'index']);
 Route::get('/send-admin-otp', [AdminController::class, 'sendAdminOtp']);
 Route::post('adminLogin', [AdminController::class, 'authenticate'])->name('adminLogin');
 
-Route::group(['prefix' => 'hdgteyusjasget', 'middleware' => 'AdminAuth'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
     Route::get('/logout', [AdminController::class, 'logout']);
 
     // set advertise rates
     Route::get('/set_rate', [AdminController::class, 'setRate']);
     Route::post('/setRoiRate', [AdminController::class, 'setRoiRate'])->name('setRoiRate');
+
+    // set packages
+    Route::get('/set-packages', [AdminController::class, 'setPackages'])->name('admin.setPackages');
+    Route::get('/set_packages', [AdminController::class, 'setPackages']);
+    Route::post('/savePackages', [AdminController::class, 'savePackages'])->name('admin.savePackages');
+    Route::post('/set-packages', [AdminController::class, 'savePackages']);
 
     // Color Dashboard
     Route::get('/color-dashboard', [AdminController::class, 'colorDashboard']);

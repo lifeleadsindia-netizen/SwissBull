@@ -7,6 +7,7 @@ use App\Models\ImportFund;
 use App\Models\MemberDetail;
 use App\Models\WalletTransfer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class FundController extends Controller
 {
@@ -39,15 +40,114 @@ class FundController extends Controller
 
     public function addFund(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'memberid' => 'required',
+            'package' => 'required',
+            'amount' => 'required|numeric|gt:0',
+            'txnid' => 'required',
+        ], [
+            'memberid.required' => 'Member ID is required.',
+            'package.required' => 'Please select a deposit package.',
+            'amount.required' => 'Please enter deposit amount.',
+            'amount.numeric' => 'Deposit amount must be a valid number.',
+            'amount.gt' => 'Deposit amount must be greater than zero.',
+            'txnid.required' => 'Transaction ID is required.',
+        ]);
 
-        $memberid = $request->post('memberid');
-        $txnid = $request->post('txnid');
-        $amount = $request->post('amount');
+        if ($validator->fails()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            session()->flash('FailedMsg', $validator->errors()->first());
+
+            return redirect()->back();
+        }
+
+        $rawPackage = trim((string) $request->input('package'));
+        $amount = (float) $request->input('amount');
+
+        // Normalize package value
+        $normalizedPackage = match ($rawPackage) {
+            '50-500', '50 - 500' => '50-500',
+            '600-5000', '600 - 5000' => '600-5000',
+            '6000+', '6000 and above' => '6000+',
+            default => null,
+        };
+
+        if ($normalizedPackage === null) {
+            $msg = 'Please select a valid deposit package.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $msg,
+                ], 422);
+            }
+            session()->flash('FailedMsg', $msg);
+
+            return redirect()->back();
+        }
+
+        // Validate package range rules strictly
+        $isValidRange = false;
+        $rangeErrorMsg = '';
+
+        if ($normalizedPackage === '50-500') {
+            if ($amount >= 50 && $amount <= 500) {
+                $isValidRange = true;
+            } else {
+                $rangeErrorMsg = 'For package 50 - 500, deposit amount must be between 50 and 500 USDT.';
+            }
+        } elseif ($normalizedPackage === '600-5000') {
+            if ($amount >= 600 && $amount <= 5000) {
+                $isValidRange = true;
+            } else {
+                $rangeErrorMsg = 'For package 600 - 5000, deposit amount must be between 600 and 5000 USDT.';
+            }
+        } elseif ($normalizedPackage === '6000+') {
+            if ($amount >= 6000) {
+                $isValidRange = true;
+            } else {
+                $rangeErrorMsg = 'For package 6000 and above, deposit amount must be at least 6000 USDT.';
+            }
+        }
+
+        if (! $isValidRange) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $rangeErrorMsg,
+                ], 422);
+            }
+            session()->flash('FailedMsg', $rangeErrorMsg);
+
+            return redirect()->back();
+        }
+
+        $memberid = $request->input('memberid');
+        $txnid = $request->input('txnid');
         $data = MemberDetail::where('memberid', $memberid)->first();
+
+        if (! $data) {
+            $msg = 'Invalid Member ID.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $msg,
+                ], 422);
+            }
+            session()->flash('FailedMsg', $msg);
+
+            return redirect()->back();
+        }
 
         $var = new ImportFund;
         $var->memberid = $memberid;
         $var->orderid = 'OD'.time();
+        $var->package = $normalizedPackage;
         $var->amount = $amount;
         $var->txnid = $txnid;
         $var->type = 'Add';
@@ -62,6 +162,15 @@ class FundController extends Controller
         $data->save();
         p2pwalletTransfer($memberid, $amount, 'debit', $wallet, 'Fund Added', ''.$amount.' USDT added to wallet');
         session()->flash('successMsg', 'Your requested funds have been imported successfully.');
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Your requested funds have been imported successfully.',
+            ]);
+        }
+
+        return redirect()->back();
     }
 
     public function p2pwallet(Request $request)
