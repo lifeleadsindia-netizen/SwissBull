@@ -325,4 +325,15 @@ class DepositFundTest extends TestCase
             'debit' => $depositAmount,
         ]);
     }
+
+    public function test_package_distribution_configuration_reads_from_database(): void
+    {
+        $config = \App\Models\PackageDistribution::getDistributionConfig();
+
+        $this->assertEquals(70.0, $config['p2p_wallet']);
+        $this->assertArrayHasKey('referral_bonus', $config);
+        $this->assertArrayHasKey('team_trading_profit', $config);
+        $this->assertArrayHasKey('team_performance_bonus', $config);
+        $this->assertArrayHasKey('hero_of_the_month', $config);
+    }
 }

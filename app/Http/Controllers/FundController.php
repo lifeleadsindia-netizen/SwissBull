@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Country;
 use App\Models\ImportFund;
 use App\Models\MemberDetail;
+use App\Models\PackageDistribution;
 use App\Models\WalletTransfer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -157,8 +158,16 @@ class FundController extends Controller
         $var->wallet_type = 'Wallet';
         $var->save();
 
+        // Read Package Distribution percentage configuration dynamically from Database
+        // Database is the source of truth (Admin can update values).
+        // Current implementation: P2P Wallet = 70%.
+        // Remaining columns (referral_bonus, team_trading_profit, team_performance_bonus, hero_of_the_month)
+        // are kept prepared in configuration for future income/distribution logic.
+        $distributionConfig = PackageDistribution::getDistributionConfig();
+        $p2pWalletPercent = $distributionConfig['p2p_wallet'];
+
         $wallet = $data->p2p_wallet;
-        $data->p2p_wallet += $amount;
+        $data->p2p_wallet += $amount * $p2pWalletPercent / 100;
         $data->save();
         p2pwalletTransfer($memberid, $amount, 'debit', $wallet, 'Fund Added', ''.$amount.' USDT added to wallet');
         session()->flash('successMsg', 'Your requested funds have been imported successfully.');

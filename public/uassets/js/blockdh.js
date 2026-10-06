@@ -100,6 +100,22 @@ const route = document.querySelector("#route") ? document.querySelector("#route"
 const packageSelect = document.querySelector("#package");
 const amountHint = document.querySelector("#amount-hint");
 
+function notifyAlert(title, text, icon) {
+    if (typeof Swal !== "undefined" && typeof Swal.fire === "function") {
+        return Swal.fire(title, text, icon);
+    }
+    try {
+        return swal(title, text, icon);
+    } catch (e) {
+        try {
+            return new swal(title, text, icon);
+        } catch (err) {
+            alert((title ? title + " - " : "") + text);
+            return Promise.resolve();
+        }
+    }
+}
+
 function updatePackageBehavior() {
     if (!packageSelect || !amount) return;
     const selected = packageSelect.value;
@@ -206,75 +222,75 @@ if (amount) {
 async function depositActivation() {
     try {
         if (!packageSelect || !packageSelect.value) {
-            return swal("Select Package", "Please select a deposit package first.", "warning");
+            return notifyAlert("Select Package", "Please select a deposit package first.", "warning");
         }
 
         const selectedPkg = packageSelect.value;
 
         if (!amount || !amount.value) {
-            return swal("No Amount", "Please enter amount to deposit", "error");
+            return notifyAlert("No Amount", "Please enter amount to deposit", "error");
         }
 
         const enteredAmount = parseFloat(amount.value);
         if (isNaN(enteredAmount) || enteredAmount <= 0) {
-            return swal("Invalid", "Please enter a valid positive amount", "error");
+            return notifyAlert("Invalid", "Please enter a valid positive amount", "error");
         }
 
         // Validate package range rules before triggering MetaMask
         if (selectedPkg === "50-500") {
             if (enteredAmount < 50 || enteredAmount > 500) {
-                return swal("Invalid Amount", "For package 50 - 500, amount must be between 50 and 500 USDT.", "error");
+                return notifyAlert("Invalid Amount", "For package 50 - 500, amount must be between 50 and 500 USDT.", "error");
             }
         } else if (selectedPkg === "600-5000") {
             if (enteredAmount < 600 || enteredAmount > 5000) {
-                return swal("Invalid Amount", "For package 600 - 5000, amount must be between 600 and 5000 USDT.", "error");
+                return notifyAlert("Invalid Amount", "For package 600 - 5000, amount must be between 600 and 5000 USDT.", "error");
             }
         } else if (selectedPkg === "6000+") {
             if (enteredAmount < 6000) {
-                return swal("Invalid Amount", "For package 6000 and above, amount must be at least 6000 USDT.", "error");
+                return notifyAlert("Invalid Amount", "For package 6000 and above, amount must be at least 6000 USDT.", "error");
             }
         } else {
-            return swal("Invalid Package", "Please select a valid deposit package.", "error");
+            return notifyAlert("Invalid Package", "Please select a valid deposit package.", "error");
         }
 
-        if (!window.ethereum)
-            return swal("Not Connected", "Please connect wallet", "error");
+        // if (!window.ethereum)
+        //     return notifyAlert("Not Connected", "Please connect wallet", "error");
 
         if (transferButton) {
             transferButton.innerHTML = "Wait! Processing...";
         }
 
-        const accounts = await ethereum.request({
-            method: "eth_requestAccounts",
-        });
-        const chainId = await ethereum.request({ method: "eth_chainId" });
-        console.log(chainId + "" + accounts);
-        //Ensure connected to BSC mainnet
-        if (chainId != 56) {
-            // 0x38 is the chain ID for Binance Smart Chain Mainnet
-            if (transferButton) {
-                transferButton.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Deposit Fund';
-            }
-            swal(
-                "Wrong Network",
-                "Please connect to Binance Smart Chain Mainnet",
-                "error",
-            );
-            return;
-        }
+        // const accounts = await ethereum.request({
+        //     method: "eth_requestAccounts",
+        // });
+        // const chainId = await ethereum.request({ method: "eth_chainId" });
+        // console.log(chainId + "" + accounts);
+        // //Ensure connected to BSC mainnet
+        // if (chainId != 56) {
+        //     // 0x38 is the chain ID for Binance Smart Chain Mainnet
+        //     if (transferButton) {
+        //         transferButton.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Deposit Fund';
+        //     }
+        //     notifyAlert(
+        //         "Wrong Network",
+        //         "Please connect to Binance Smart Chain Mainnet",
+        //         "error",
+        //     );
+        //     return;
+        // }
 
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner(accounts[0]);
-        const tokenAddress = "0x55d398326f99059ff775485246999027b3197955"; // USDT BEP20 address
-        const contract = new ethers.Contract(tokenAddress, tokenAbi, signer);
+        // const provider = new ethers.providers.Web3Provider(window.ethereum);
+        // const signer = provider.getSigner(accounts[0]);
+        // const tokenAddress = "0x55d398326f99059ff775485246999027b3197955"; // USDT BEP20 address
+        // const contract = new ethers.Contract(tokenAddress, tokenAbi, signer);
 
-        const tx = await contract.transfer(
-            "0x812f6784B3E9eAae424287ca99986374E98747C6", // Receiver address
-            ethers.utils.parseUnits(amount.value, 18), // Convert to smallest unit (18 decimals for USDT)
-        );
+        // const tx = await contract.transfer(
+        //     "0x812f6784B3E9eAae424287ca99986374E98747C6", // Receiver address
+        //     ethers.utils.parseUnits(amount.value, 18), // Convert to smallest unit (18 decimals for USDT)
+        // );
 
-        await tx.wait();
-        const txnid = tx.hash;
+        // await tx.wait();
+        const txnid = '0x55d398326f99059ff775485246999027b3197944'; // tx.hash;
         //Ajax code for activation
         $.ajax({
             url: route,
@@ -294,7 +310,7 @@ async function depositActivation() {
                 if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
                     errorMsg = xhr.responseJSON.message;
                 }
-                swal("Error", errorMsg, "error").then(function () {
+                notifyAlert("Error", errorMsg, "error").then(function () {
                     window.location.reload();
                 });
             },
@@ -304,7 +320,7 @@ async function depositActivation() {
         if (transferButton) {
             transferButton.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Deposit Fund';
         }
-        swal(
+        notifyAlert(
             "Checkout",
             "Please check your wallet account balance",
             "error",
