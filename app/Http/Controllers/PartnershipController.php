@@ -27,23 +27,25 @@ class PartnershipController extends Controller
         $amount = $request->amount;
 
         $member = MemberDetail::where('memberid', $memberid)->first();
-        $sponsorid = $member->sponsorid;
         if (! $member) {
             session()->flash('failedMsg', 'Invalid member.');
 
             return redirect()->back();
         }
 
-        if ($amount < 100) {
-            session()->flash('failedMsg', 'Amount must be at least $100.');
+        $sponsorid = $member->sponsorid;
+
+        if ($amount < 1000) {
+            session()->flash('failedMsg', 'Minimum partnership package is 1,000 USDT.');
 
             return redirect()->back();
         }
 
-        // if ($amount % 10 != 0) {
-        //     session()->flash('failedMsg', 'Your value is not multiple of $10');
-        //     return redirect()->back();
-        // }
+        if (! empty($member->partnership_package) && (float) $amount <= (float) $member->partnership_package) {
+            session()->flash('failedMsg', 'Only higher package will be applicable.');
+
+            return redirect()->back();
+        }
 
         if ($member->p2p_wallet < $amount) {
             session()->flash('failedMsg', 'Insufficient wallet balance.');
@@ -51,33 +53,28 @@ class PartnershipController extends Controller
             return redirect()->back();
         }
 
-        // if (!Hash::check($txn_password, $member->txn_password)) {
-        //     session()->flash('failedMsg', 'Security Pin is incorrect.');
-        //     return redirect()->back();
-        // }
-
-        if ($amount == 100) {
+        if ($amount == 1000) {
             $rate = 2;
-            $capping = 3;
-            $rank = 'Bronze';
-        } elseif ($amount == 200) {
-            $rate = 4;
-            $capping = 5;
+            $capping_x = 2;
+            $capping = 2000;
             $rank = 'Silver';
-        } elseif ($amount == 500) {
-            $rate = 6;
-            $capping = 7;
-            $rank = 'Gold';
-        } elseif ($amount == 1000) {
-            $rate = 8;
-            $capping = 8;
-            $rank = 'Platinum';
         } elseif ($amount == 5000) {
-            $rate = 10;
-            $capping = 10;
+            $rate = 4;
+            $capping_x = 4;
+            $capping = 20000;
+            $rank = 'Gold';
+        } elseif ($amount == 10000) {
+            $rate = 6;
+            $capping_x = 6;
+            $capping = 60000;
+            $rank = 'Platinum';
+        } elseif ($amount == 25000) {
+            $rate = 8;
+            $capping_x = 8;
+            $capping = 200000;
             $rank = 'Diamond';
         } else {
-            session()->flash('failedMsg', 'Invalid amount.');
+            session()->flash('failedMsg', 'Invalid partnership package amount.');
 
             return redirect()->back();
         }
@@ -96,8 +93,8 @@ class PartnershipController extends Controller
         $staking->invest_date = now();
         $staking->invest_amount = $amount;
         $staking->installments = 0;
-        $staking->capping_x = $capping;
-        $staking->capping = $capping * $amount;
+        $staking->capping_x = $capping_x;
+        $staking->capping = $capping;
         $staking->rank = $rank;
         $staking->rate = $rate;
         $staking->status = 'Active';
@@ -122,7 +119,7 @@ class PartnershipController extends Controller
         );
 
         part_team_biz_update($sponsorid, $amount);
-        session()->flash('successMsg', 'Partnership Investment has been created successfully.');
+        session()->flash('successMsg', 'Partnership Package has been activated successfully.');
 
         return redirect()->back();
     }
