@@ -80,7 +80,8 @@
             const menu = profile ? profile.querySelector('.dropdown-menu') : null;
             if (!profile || !menu) return;
 
-            const isOpen = profile.classList.contains('show') || menu.classList.contains('show') || menu.style.display === 'block';
+            const isOpen = profile.classList.contains('show') || menu.classList.contains('show') || menu.style.display ===
+                'block';
             if (isOpen) {
                 closeProfileDropdown();
             } else {
@@ -125,7 +126,8 @@
         });
 
         function markAllRead() {
-            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() }}";
+            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                "{{ csrf_token() }}";
             fetch("{{ route('member.notifications.readAll') }}", {
                 method: "POST",
                 headers: {
@@ -1187,8 +1189,14 @@
                                         </g>
                                     </svg>
                                     @php
-                                        $navUnread = $unreadNotifCount ?? (isset($headerNotifications) ? $headerNotifications->reject(fn($n) => in_array((int)$n->id, $readIds ?? [], true))->count() : 0);
-                                        $navItems = $headerNotifications ?? $notifications ?? collect();
+                                        $navUnread =
+                                            $unreadNotifCount ??
+                                            (isset($headerNotifications)
+                                                ? $headerNotifications
+                                                    ->reject(fn($n) => in_array((int) $n->id, $readIds ?? [], true))
+                                                    ->count()
+                                                : 0);
+                                        $navItems = $headerNotifications ?? ($notifications ?? collect());
                                     @endphp
                                     @if ($navUnread > 0)
                                         <span class="notif-badge"
@@ -1212,15 +1220,18 @@
                                         display: none;
                                         z-index: 99999;
                                     }
+
                                     .header-notif-panel.active {
                                         display: block !important;
                                     }
+
                                     .header-notif-item {
                                         padding: 10px 12px;
                                         margin-bottom: 8px;
                                         border-radius: 10px;
                                         transition: all 0.2s ease;
                                     }
+
                                     .header-notif-item:hover {
                                         transform: translateY(-1px);
                                         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -1230,48 +1241,66 @@
                                 <div class="header-notif-panel" id="headerNotifPanel">
                                     <div
                                         class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-secondary">
-                                        <span class="text-white font-weight-bold"
-                                            style="font-size:13px;"><i class="fas fa-bell me-1 text-warning"></i> Notifications</span>
+                                        <span class="text-white font-weight-bold" style="font-size:13px;"><i
+                                                class="fas fa-bell me-1 text-warning"></i> Notifications</span>
                                         <a href="javascript:void(0);" onclick="markAllRead();"
-                                            style="font-size:11px; color:#f59e0b; text-decoration:none; font-weight: 600;">Mark all read</a>
+                                            style="font-size:11px; color:#f59e0b; text-decoration:none; font-weight: 600;">Mark
+                                            all read</a>
                                     </div>
                                     <div id="headerNotifList">
                                         @if ($navItems->count() > 0)
                                             @foreach ($navItems->take(6) as $n)
                                                 @php
-                                                    $isItemRead = in_array((int)$n->id, $readIds ?? [], true) || in_array((string)$n->id, $readIds ?? [], true);
-                                                    $isSpecific = (strtolower(trim($n->type ?? '')) === 'specific member' || !empty($n->memberid));
+                                                    $isItemRead =
+                                                        in_array((int) $n->id, $readIds ?? [], true) ||
+                                                        in_array((string) $n->id, $readIds ?? [], true);
+                                                    $isSpecific =
+                                                        strtolower(trim($n->type ?? '')) === 'specific member' ||
+                                                        !empty($n->memberid);
                                                 @endphp
                                                 <a href="{{ url('/member/notification/' . $n->id) }}"
                                                     class="header-notif-item"
                                                     style="cursor:pointer; display:block; text-decoration:none; background: {{ $isItemRead ? 'rgba(255,255,255,0.03)' : 'rgba(245, 158, 11, 0.10)' }}; border: 1px solid {{ $isItemRead ? 'rgba(255,255,255,0.06)' : 'rgba(245, 158, 11, 0.25)' }};">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <div class="header-notif-title" style="color: #ffffff; font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
+                                                    <div
+                                                        class="d-flex justify-content-between align-items-center mb-1">
+                                                        <div class="header-notif-title"
+                                                            style="color: #ffffff; font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
                                                             {{ $n->title ?? 'Notification' }}
                                                         </div>
                                                         <div>
-                                                            @if(!$isItemRead)
-                                                                <span class="badge" style="background: #ef4444; color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">NEW</span>
+                                                            @if (!$isItemRead)
+                                                                <span class="badge"
+                                                                    style="background: #ef4444; color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">NEW</span>
                                                             @else
-                                                                <span class="badge" style="background: rgba(255,255,255,0.1); color: #94a3b8; font-size: 9px; padding: 2px 6px; border-radius: 4px;">Read</span>
+                                                                <span class="badge"
+                                                                    style="background: rgba(255,255,255,0.1); color: #94a3b8; font-size: 9px; padding: 2px 6px; border-radius: 4px;">Read</span>
                                                             @endif
                                                         </div>
                                                     </div>
-                                                    <div class="header-notif-msg" style="color: #cbd5e1; font-size: 12px; line-height: 1.4;">
+                                                    <div class="header-notif-msg"
+                                                        style="color: #cbd5e1; font-size: 12px; line-height: 1.4;">
                                                         {{ Str::limit($n->message ?? '-', 65) }}
                                                     </div>
-                                                    <div class="d-flex justify-content-between align-items-center mt-1" style="font-size: 10.5px; color: #94a3b8;">
-                                                        <span><i class="far fa-clock me-1 text-warning"></i> {{ date('d-m-Y h:i A', strtotime($n->created_at ?? now())) }}</span>
-                                                        <span class="badge" style="{{ $isSpecific ? 'background: rgba(239, 68, 68, 0.2); color: #f87171;' : 'background: rgba(245, 158, 11, 0.2); color: #fbbf24;' }} font-size: 9px; padding: 2px 6px; border-radius: 4px;">
+                                                    <div class="d-flex justify-content-between align-items-center mt-1"
+                                                        style="font-size: 10.5px; color: #94a3b8;">
+                                                        <span><i class="far fa-clock me-1 text-warning"></i>
+                                                            {{ date('d-m-Y h:i A', strtotime($n->created_at ?? now())) }}</span>
+                                                        <span class="badge"
+                                                            style="{{ $isSpecific ? 'background: rgba(239, 68, 68, 0.2); color: #f87171;' : 'background: rgba(245, 158, 11, 0.2); color: #fbbf24;' }} font-size: 9px; padding: 2px 6px; border-radius: 4px;">
                                                             {{ $isSpecific ? 'Personal' : 'All Users' }}
                                                         </span>
                                                     </div>
                                                 </a>
                                             @endforeach
                                         @else
-                                            <div class="header-notif-item text-center py-4" style="background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1);">
-                                                <div class="header-notif-title" style="color: #94a3b8; font-size: 13px; font-weight: 600;">No notifications yet</div>
-                                                <div class="header-notif-msg" style="color: #64748b; font-size: 11px; margin-top: 4px;">All platform announcements will appear here.</div>
+                                            <div class="header-notif-item text-center py-4"
+                                                style="background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px dashed rgba(255,255,255,0.1);">
+                                                <div class="header-notif-title"
+                                                    style="color: #94a3b8; font-size: 13px; font-weight: 600;">No
+                                                    notifications yet</div>
+                                                <div class="header-notif-msg"
+                                                    style="color: #64748b; font-size: 11px; margin-top: 4px;">All
+                                                    platform announcements will appear here.</div>
                                             </div>
                                         @endif
                                     </div>
@@ -1286,8 +1315,8 @@
                             <li>
                                 <div class="dropdown header-profile2" id="headerProfileDropdown">
                                     <a class="nav-link" href="javascript:void(0);" role="button"
-                                        onclick="toggleProfileDropdown(event)"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        onclick="toggleProfileDropdown(event)" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
                                         <div class="header-info2 d-flex align-items-center">
                                             <div class="d-flex align-items-center sidebar-info">
                                                 {{-- <div>
@@ -1474,14 +1503,14 @@
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="account_balance">account_balance</i>
-                                <span class="nav-text">Deposit Section</span>
+                                <span class="nav-text">Package Activation</span>
                             </a>
                             <ul aria-expanded="false">
                                 <li><a href="{{ url('member/fund/deposit-fund') }}">Deposit Fund</a>
                                 </li>
                             </ul>
                         </li>
-                        <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
+                        {{-- <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="ads_click">ads_click</i>
                                 <span class="nav-text">Activation</span>
@@ -1492,7 +1521,7 @@
                                 <li><a href="{{ url('member/activation-detail') }}">Account Details</a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> --}}
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="">stack</i>
@@ -1512,7 +1541,8 @@
                                 <span class="nav-text">Income Section</span>
                             </a>
                             <ul aria-expanded="false">
-                                <li><a href="{{ url('member/income/monthly-staking-income') }}">Monthly Staking Income</a>
+                                <li><a href="{{ url('member/income/monthly-staking-income') }}">Monthly Staking
+                                        Income</a>
                                 </li>
                                 <li><a href="{{ url('member/income/staking-level-income') }}">Staking Level
                                         Income</a>

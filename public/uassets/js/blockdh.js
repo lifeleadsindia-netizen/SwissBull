@@ -96,22 +96,153 @@ const transferButton = document.querySelector(".transferBtn");
 const amount = document.querySelector("#amount");
 const memberid = document.querySelector("#memberid");
 const csrf = document.querySelector("#csrf");
-const route = document.querySelector("#route").value;
+const route = document.querySelector("#route") ? document.querySelector("#route").value : "";
+const packageSelect = document.querySelector("#package");
+const amountHint = document.querySelector("#amount-hint");
+
+function updatePackageBehavior() {
+    if (!packageSelect || !amount) return;
+    const selected = packageSelect.value;
+    if (selected === "50-500") {
+        amount.placeholder = "Enter amount (50 - 500)";
+        if (amountHint) {
+            amountHint.style.display = "block";
+            amountHint.style.color = "#F59E0B";
+            amountHint.textContent = "Allowed range: 50 to 500 USDT";
+        }
+    } else if (selected === "600-5000") {
+        amount.placeholder = "Enter amount (600 - 5000)";
+        if (amountHint) {
+            amountHint.style.display = "block";
+            amountHint.style.color = "#F59E0B";
+            amountHint.textContent = "Allowed range: 600 to 5000 USDT";
+        }
+    } else if (selected === "6000+") {
+        amount.placeholder = "Enter amount (6000 and above)";
+        if (amountHint) {
+            amountHint.style.display = "block";
+            amountHint.style.color = "#F59E0B";
+            amountHint.textContent = "Allowed range: 6000 USDT and above";
+        }
+    } else {
+        amount.placeholder = "Select a package first";
+        if (amountHint) {
+            amountHint.style.display = "none";
+            amountHint.textContent = "";
+        }
+    }
+}
+
+if (packageSelect) {
+    packageSelect.addEventListener("change", function () {
+        updatePackageBehavior();
+    });
+}
+
+if (amount) {
+    amount.addEventListener("input", function () {
+        if (!packageSelect) return;
+        const selected = packageSelect.value;
+        const val = parseFloat(amount.value);
+        if (!selected) {
+            if (amountHint) {
+                amountHint.style.display = "block";
+                amountHint.style.color = "#EF4444";
+                amountHint.textContent = "Please select a package first.";
+            }
+            return;
+        }
+        if (!amount.value || isNaN(val)) {
+            updatePackageBehavior();
+            return;
+        }
+
+        if (selected === "50-500") {
+            if (val < 50 || val > 500) {
+                if (amountHint) {
+                    amountHint.style.display = "block";
+                    amountHint.style.color = "#EF4444";
+                    amountHint.textContent = "Amount must be between 50 and 500 USDT.";
+                }
+            } else {
+                if (amountHint) {
+                    amountHint.style.display = "block";
+                    amountHint.style.color = "#10B981";
+                    amountHint.textContent = "Valid amount for Package 1 (50 - 500 USDT).";
+                }
+            }
+        } else if (selected === "600-5000") {
+            if (val < 600 || val > 5000) {
+                if (amountHint) {
+                    amountHint.style.display = "block";
+                    amountHint.style.color = "#EF4444";
+                    amountHint.textContent = "Amount must be between 600 and 5000 USDT.";
+                }
+            } else {
+                if (amountHint) {
+                    amountHint.style.display = "block";
+                    amountHint.style.color = "#10B981";
+                    amountHint.textContent = "Valid amount for Package 2 (600 - 5000 USDT).";
+                }
+            }
+        } else if (selected === "6000+") {
+            if (val < 6000) {
+                if (amountHint) {
+                    amountHint.style.display = "block";
+                    amountHint.style.color = "#EF4444";
+                    amountHint.textContent = "Amount must be at least 6000 USDT.";
+                }
+            } else {
+                if (amountHint) {
+                    amountHint.style.display = "block";
+                    amountHint.style.color = "#10B981";
+                    amountHint.textContent = "Valid amount for Package 3 (6000+ USDT).";
+                }
+            }
+        }
+    });
+}
 
 async function depositActivation() {
     try {
+        if (!packageSelect || !packageSelect.value) {
+            return swal("Select Package", "Please select a deposit package first.", "warning");
+        }
+
+        const selectedPkg = packageSelect.value;
+
+        if (!amount || !amount.value) {
+            return swal("No Amount", "Please enter amount to deposit", "error");
+        }
+
+        const enteredAmount = parseFloat(amount.value);
+        if (isNaN(enteredAmount) || enteredAmount <= 0) {
+            return swal("Invalid", "Please enter a valid positive amount", "error");
+        }
+
+        // Validate package range rules before triggering MetaMask
+        if (selectedPkg === "50-500") {
+            if (enteredAmount < 50 || enteredAmount > 500) {
+                return swal("Invalid Amount", "For package 50 - 500, amount must be between 50 and 500 USDT.", "error");
+            }
+        } else if (selectedPkg === "600-5000") {
+            if (enteredAmount < 600 || enteredAmount > 5000) {
+                return swal("Invalid Amount", "For package 600 - 5000, amount must be between 600 and 5000 USDT.", "error");
+            }
+        } else if (selectedPkg === "6000+") {
+            if (enteredAmount < 6000) {
+                return swal("Invalid Amount", "For package 6000 and above, amount must be at least 6000 USDT.", "error");
+            }
+        } else {
+            return swal("Invalid Package", "Please select a valid deposit package.", "error");
+        }
+
         if (!window.ethereum)
             return swal("Not Connected", "Please connect wallet", "error");
-        if (!amount.value)
-            return swal("No Amount", "Please enter amount to import", "error");
-        if (amount.value < 0)
-            return swal("Invalid", "Invalid input entered", "error");
-        if (amount.value < 10)
-            return swal("Sorry", "Minimum deposit amount is 10$", "error");
-        if (amount.value > 10000)
-            return swal("Sorry", "Maximun deposit amount is 10000$", "error");
-        document.querySelector(".transferBtn").innerHTML =
-            "Wait! Processing...";
+
+        if (transferButton) {
+            transferButton.innerHTML = "Wait! Processing...";
+        }
 
         const accounts = await ethereum.request({
             method: "eth_requestAccounts",
@@ -121,6 +252,9 @@ async function depositActivation() {
         //Ensure connected to BSC mainnet
         if (chainId != 56) {
             // 0x38 is the chain ID for Binance Smart Chain Mainnet
+            if (transferButton) {
+                transferButton.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Deposit Fund';
+            }
             swal(
                 "Wrong Network",
                 "Please connect to Binance Smart Chain Mainnet",
@@ -146,21 +280,30 @@ async function depositActivation() {
             url: route,
             type: "POST",
             data: {
-                memberid: memberid.value,
+                memberid: memberid ? memberid.value : "",
+                package: selectedPkg,
                 amount: amount.value,
                 txnid: txnid,
-                _token: csrf.value,
+                _token: csrf ? csrf.value : "",
             },
             success: function (response) {
-                //alert(response['value']);
                 window.location.reload();
             },
-            error: function () {
-                alert("error");
+            error: function (xhr) {
+                let errorMsg = "There was an error processing your deposit.";
+                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                swal("Error", errorMsg, "error").then(function () {
+                    window.location.reload();
+                });
             },
         });
     } catch (error) {
         console.log(error);
+        if (transferButton) {
+            transferButton.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Deposit Fund';
+        }
         swal(
             "Checkout",
             "Please check your wallet account balance",
@@ -170,4 +313,6 @@ async function depositActivation() {
         });
     }
 }
-transferButton.addEventListener("click", depositActivation);
+if (transferButton) {
+    transferButton.addEventListener("click", depositActivation);
+}
