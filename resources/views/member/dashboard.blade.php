@@ -1167,12 +1167,20 @@
                                     <!-- Banner Top Section -->
                                     <div class="row align-items-center">
                                         <div class="col-lg-7 col-md-12 mb-4 mb-lg-0">
-                                            <div class="d-flex align-items-center mb-2">
-                                                <i class="fab fa-whatsapp text-success me-2" style="font-size: 32px;"></i>
-                                                <h2 class="text-white font-weight-bold mb-0"
-                                                    style="font-size: 28px; letter-spacing: 1px;">
-                                                    DAILY <span style="color: #00e676;">PROMOTION</span>
-                                                </h2>
+                                            <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fab fa-whatsapp text-success me-2" style="font-size: 32px;"></i>
+                                                    <h2 class="text-white font-weight-bold mb-0"
+                                                        style="font-size: 28px; letter-spacing: 1px;">
+                                                        DAILY <span style="color: #00e676;">PROMOTION</span>
+                                                    </h2>
+                                                </div>
+                                                <a href="{{ url('/member/whatsapp/referral-details') }}"
+                                                    class="btn btn-sm font-weight-bold d-inline-flex align-items-center"
+                                                    title="View Full Promotion Airdrop History"
+                                                    style="background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.4); border-radius: 8px; padding: 5px 12px; font-size: 12px;">
+                                                    <i class="fas fa-history me-1"></i> Airdrop History
+                                                </a>
                                             </div>
                                             <div class="d-flex align-items-center bg-dark p-3 rounded mb-3"
                                                 style="border-left: 4px solid #00e676;">
@@ -1184,10 +1192,10 @@
                                                 </div>
                                                 <div>
                                                     <h3 class="mb-0 text-white font-weight-bold">
-                                                        1000 <span style="color: #00e676;">PEPE (BEP20)</span>
+                                                        500 <span style="color: #00e676;">PEPE (BEP20)</span>
                                                     </h3>
                                                     <small class="text-white-50 text-uppercase"
-                                                        style="letter-spacing: 0.5px;">Tokens Per WhatsApp Message</small>
+                                                        style="letter-spacing: 0.5px;">Tokens Per WhatsApp Message (Max 10/Day = 5,000 PEPE)</small>
                                                 </div>
                                             </div>
                                             <!-- Promotional Note Box -->
@@ -1197,10 +1205,8 @@
                                                     <i class="fab fa-whatsapp me-2 mt-1"
                                                         style="color: #00e676; font-size: 20px;"></i>
                                                     <p class="mb-0 text-white" style="font-size: 13px; line-height: 1.5;">
-                                                        Promote your own Referral Link. Send WhatsApp with system generated
-                                                        message to one person daily and earn <strong
-                                                            style="color: #00e676;">1000 PEPE Token</strong> instantly. One
-                                                        Message everyday, no limit on sending promotional messages.
+                                                        Promote your Referral Link. Send WhatsApp messages to earn <strong
+                                                            style="color: #00e676;">500 PEPE Token</strong> per message (Max 10 messages/day = <strong style="color: #00e676;">5,000 PEPE/day</strong>). Plus earn <strong style="color: #00e676;">500 PEPE</strong> on Direct Registration and <strong style="color: #00e676;">500 PEPE</strong> on Direct Activation!
                                                     </p>
                                                 </div>
                                             </div>
@@ -1216,8 +1222,7 @@
                                                         <i class="fas fa-paper-plane" style="color: #00e676;"></i>
                                                     </div>
                                                     <div class="text-white" style="font-size: 13px;">
-                                                        Only <strong style="color: #00e676;">one message</strong> can be
-                                                        sent a day.
+                                                        <strong style="color: #00e676;">Rule 1:</strong> Up to <strong style="color: #00e676;">10 messages/day</strong> (500 PEPE each, max 5,000 PEPE/day).
                                                     </div>
                                                 </div>
 
@@ -1225,11 +1230,10 @@
                                                     style="background: rgba(255, 255, 255, 0.04);">
                                                     <div class="rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
                                                         style="width: 40px; height: 40px; background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676;">
-                                                        <i class="fas fa-link" style="color: #00e676;"></i>
+                                                        <i class="fas fa-user-plus" style="color: #00e676;"></i>
                                                     </div>
                                                     <div class="text-white" style="font-size: 13px;">
-                                                        User will send <strong style="color: #00e676;">One Pre-Printed
-                                                            Message</strong> with his own referral link every day.
+                                                        <strong style="color: #00e676;">Rule 2:</strong> Direct Referral Registration = <strong style="color: #00e676;">500 PEPE</strong>.
                                                     </div>
                                                 </div>
 
@@ -1237,11 +1241,10 @@
                                                     style="background: rgba(255, 255, 255, 0.04);">
                                                     <div class="rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
                                                         style="width: 40px; height: 40px; background: rgba(0, 230, 118, 0.15); border: 1px solid #00e676;">
-                                                        <i class="fas fa-ban" style="color: #00e676;"></i>
+                                                        <i class="fas fa-bolt" style="color: #00e676;"></i>
                                                     </div>
                                                     <div class="text-white" style="font-size: 13px;">
-                                                        No <strong style="color: #00e676;">Duplicate message</strong> is
-                                                        allowed on the same number.
+                                                        <strong style="color: #00e676;">Rule 3:</strong> Direct Referral Activation = <strong style="color: #00e676;">500 PEPE</strong>.
                                                     </div>
                                                 </div>
                                             </div>
@@ -1251,74 +1254,95 @@
                                     <hr style="border-color: rgba(255, 255, 255, 0.1);" class="my-4">
 
                                     <!-- Statistics Section -->
-                                    <div class="row g-3 mb-4 text-center">
-                                        <div class="col-md-2 col-6">
-                                            <div class="p-2 rounded bg-dark border border-secondary">
-                                                <small class="text-white-50 d-block mb-1">Today's Share</small>
-                                                @if (($waTodayStatus ?? '') === 'Shared Today' || ($waTodayStatus ?? '') === 'Used' || ($waTodayCount ?? 0) > 0)
-                                                    <span class="badge bg-success font-weight-bold"
-                                                        id="waTodayStatusBadge" style="font-size: 13px;">
-                                                        <i class="fas fa-check-circle me-1"></i> Shared Today
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-warning text-dark font-weight-bold"
-                                                        id="waTodayStatusBadge" style="font-size: 13px;">
-                                                        <i class="fas fa-clock me-1"></i> Available
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-6">
-                                            <div class="p-2 rounded bg-dark border border-secondary">
-                                                <small class="text-white-50 d-block mb-1">Total Sent Messages</small>
-                                                <h5 class="text-white font-weight-bold mb-0" id="waTotalReferralsVal">
-                                                    {{ $waTotalReferrals ?? 0 }}
-                                                </h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-6">
-                                            <div class="p-2 rounded bg-dark border border-secondary">
-                                                <small class="text-white-50 d-block mb-1">Total PEPE Earned</small>
-                                                <h5 class="text-success font-weight-bold mb-0" id="waTotalPepeVal">
-                                                    {{ number_format($waTotalPepe ?? 0, 0) }} PEPE
-                                                </h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 col-6">
-                                            <div class="p-2 rounded bg-dark border border-secondary">
-                                                <small class="text-white-50 d-block mb-1">Last Date</small>
-                                                <h5 class="text-white font-weight-bold mb-0" style="font-size: 13px;"
-                                                    id="waLastDateVal">
-                                                    {{ isset($waLastDate) && $waLastDate ? date('d-m-Y', strtotime($waLastDate)) : 'N/A' }}
-                                                </h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-12">
-                                            <div class="p-2 rounded bg-dark border position-relative"
-                                                style="border-color: #00e676 !important;">
-                                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                                    <small class="text-white-50">Current PEPE Wallet</small>
-                                                    <div class="d-flex align-items-center">
-                                                        <a href="{{ url('/member/pepe/redeem-history') }}"
-                                                            class="btn btn-xs py-0 px-2 font-weight-bold me-1"
-                                                            title="View PEPE Redeem History"
-                                                            style="background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 11px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); height: 21px; line-height: 21px; display: inline-flex; align-items: center;">
-                                                            <i class="fas fa-history me-1"></i> History
-                                                        </a>
-                                                        <button type="button"
-                                                            class="btn btn-xs py-0 px-2 font-weight-bold"
-                                                            onclick="openPepeRedeemPrompt()"
-                                                            title="Redeem PEPE tokens to BEP-20 wallet"
-                                                            style="background: linear-gradient(135deg, #F59E0B 0%, #10B981 100%); color: #08090C; font-size: 11px; border-radius: 4px; border: none; height: 21px; line-height: 21px; display: inline-flex; align-items: center;">
-                                                            <i class="fas fa-hand-holding-usd me-1"></i> Redeem
-                                                        </button>
-                                                    </div>
+                                    <div class="row g-2 mb-4 text-center">
+                                        <div class="col-lg-2 col-md-4 col-6">
+                                            <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <small class="text-white-50 d-block mb-1">Today's Share</small>
+                                                    @if (($waTodayCount ?? 0) >= 10)
+                                                        <span class="badge bg-danger py-1 px-2 font-weight-bold d-inline-block"
+                                                            id="waTodayStatusBadge" style="font-size: 12px;">
+                                                            <i class="fas fa-ban me-1"></i> Limit (10/10)
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-warning text-dark py-1 px-2 font-weight-bold d-inline-block"
+                                                            id="waTodayStatusBadge" style="font-size: 12px;">
+                                                            <i class="fas fa-clock me-1"></i> ({{ $waTodayCount ?? 0 }}/10)
+                                                        </span>
+                                                    @endif
                                                 </div>
-                                                <h5 class="font-weight-bold mb-0" style="color: #00e676;"
-                                                    id="pepeWalletDisplay">
-                                                    {{ number_format($waAvailablePepe ?? ($data['pepe_wallet'] ?? 0), 0) }}
-                                                    PEPE
-                                                </h5>
+                                                <small class="text-white-50 mt-1 d-block" style="font-size: 10px;">Max 10 / Day</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-4 col-6">
+                                            <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <small class="text-white-50 d-block mb-1">Rule 1: Messages</small>
+                                                    <h5 class="text-white font-weight-bold mb-0" id="waTotalReferralsVal">
+                                                        {{ $waTotalReferrals ?? 0 }}
+                                                    </h5>
+                                                </div>
+                                                <small class="text-success mt-1 d-block" style="font-size: 10px;">500/msg</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-4 col-6">
+                                            <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <small class="text-white-50 d-block mb-1">Rule 2: Direct Reg</small>
+                                                    <h5 class="text-white font-weight-bold mb-0">
+                                                        {{ $waDirectRegCount ?? 0 }}
+                                                    </h5>
+                                                </div>
+                                                <small class="text-info mt-1 d-block" style="font-size: 10px;">+500 PEPE each</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-4 col-6">
+                                            <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <small class="text-white-50 d-block mb-1">Rule 3: Direct Act</small>
+                                                    <h5 class="text-white font-weight-bold mb-0">
+                                                        {{ $waDirectActCount ?? 0 }}
+                                                    </h5>
+                                                </div>
+                                                <small class="text-warning mt-1 d-block" style="font-size: 10px;">+500 PEPE each</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-4 col-6">
+                                            <div class="p-2 rounded bg-dark border border-secondary text-center h-100 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <small class="text-white-50 d-block mb-1">Total PEPE Earned</small>
+                                                    <h5 class="text-success font-weight-bold mb-0" id="waTotalPepeVal" style="font-size: 14px;">
+                                                        {{ number_format($waTotalPepe ?? 0, 0) }} PEPE
+                                                    </h5>
+                                                </div>
+                                                <small class="text-white-50 mt-1 d-block" style="font-size: 10px;">All 3 Rules</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-4 col-6">
+                                            <div class="p-2 rounded bg-dark border position-relative text-center h-100 d-flex flex-column justify-content-between"
+                                                style="border-color: #00e676 !important; background: rgba(0, 230, 118, 0.04) !important;">
+                                                <div>
+                                                    <small class="text-white-50 d-block mb-1">Current Wallet</small>
+                                                    <h5 class="font-weight-bold mb-0" style="color: #00e676; font-size: 14px;"
+                                                        id="pepeWalletDisplay">
+                                                        {{ number_format($waAvailablePepe ?? ($data['pepe_wallet'] ?? 0), 0) }} PEPE
+                                                    </h5>
+                                                </div>
+                                                <div class="d-flex align-items-center justify-content-center gap-1 mt-2">
+                                                    <a href="{{ url('/member/whatsapp/referral-details') }}"
+                                                        class="btn btn-xs py-1 px-1 font-weight-bold flex-fill"
+                                                        title="View Full Promotion Airdrop History"
+                                                        style="background: rgba(0, 230, 118, 0.18); color: #00e676; font-size: 10px; border-radius: 4px; border: 1px solid rgba(0, 230, 118, 0.35); height: 22px; line-height: 20px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                        <i class="fas fa-list me-1"></i> History
+                                                    </a>
+                                                    <button type="button"
+                                                        class="btn btn-xs py-1 px-1 font-weight-bold flex-fill"
+                                                        onclick="openPepeRedeemPrompt()"
+                                                        title="Redeem PEPE tokens to BEP-20 wallet"
+                                                        style="background: linear-gradient(135deg, #F59E0B 0%, #10B981 100%); color: #08090C; font-size: 10px; border-radius: 4px; border: none; height: 22px; line-height: 22px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                        <i class="fas fa-hand-holding-usd me-1"></i> Redeem
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1408,7 +1432,7 @@
                                             <span
                                                 class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"
                                                 style="font-size: 11px; font-weight: 500;">
-                                                <i class="fas fa-gift me-1"></i> Earn 1,000 PEPE
+                                                <i class="fas fa-gift me-1"></i> Earn 500 PEPE / msg (Max 10/day)
                                             </span>
                                         </div>
                                         <div class="row align-items-center g-3">
@@ -1428,7 +1452,7 @@
                                                         class="form-select bg-dark text-white border-secondary"
                                                         style="border-color: rgba(255, 255, 255, 0.15) !important; background-color: #0c1a2e !important;"
                                                         onchange="onWaCountryChange()"
-                                                        {{ ($waTodayStatus ?? '') === 'Shared Today' || ($waTodayStatus ?? '') === 'Used' || ($waTodayCount ?? 0) > 0 ? 'disabled' : '' }}>
+                                                        {{ ($waTodayCount ?? 0) >= 10 ? 'disabled' : '' }}>
                                                         <option value="" data-phonecode="" selected>Select Country
                                                         </option>
                                                         @if (isset($countries) && count($countries) > 0)
@@ -1465,7 +1489,7 @@
                                                         class="form-control bg-dark text-white border-secondary"
                                                         style="border-color: rgba(255, 255, 255, 0.15) !important;"
                                                         placeholder="Select country first" oninput="syncWaFullNumber()"
-                                                        {{ ($waTodayStatus ?? '') === 'Shared Today' || ($waTodayStatus ?? '') === 'Used' || ($waTodayCount ?? 0) > 0 ? 'disabled' : '' }}>
+                                                        {{ ($waTodayCount ?? 0) >= 10 ? 'disabled' : '' }}>
                                                     <input type="hidden" id="wa_mobile" name="wa_mobile">
                                                 </div>
                                                 <div id="wa_country_hint" class="text-white-50 mt-1"
@@ -1478,17 +1502,15 @@
                                                     style="display: none; font-size: 12px;">
                                                 </div>
 
-                                                @if (($waTodayStatus ?? '') === 'Shared Today' || ($waTodayStatus ?? '') === 'Used' || ($waTodayCount ?? 0) > 0)
+                                                @if (($waTodayCount ?? 0) >= 10)
                                                     <button type="button"
                                                         class="btn btn-secondary w-100 py-2 font-weight-bold" disabled
                                                         style="opacity: 0.85;">
-                                                        <i class="fas fa-check-circle text-success me-1"></i> Today's Share
-                                                        Completed
+                                                        <i class="fas fa-check-circle text-success me-1"></i> Today's Limit Reached (10/10)
                                                     </button>
                                                     <small class="text-white-50 d-block mt-1 text-center"
                                                         style="font-size: 11px;">
-                                                        <i class="fas fa-coins text-warning me-1"></i> 1,000 PEPE claimed
-                                                        today. Next reward unlocks tomorrow!
+                                                        <i class="fas fa-coins text-warning me-1"></i> Maximum 5,000 PEPE claimed today (10/10). Next rewards unlock tomorrow!
                                                     </small>
                                                 @else
                                                     <button type="button" id="btnVerifyWa" onclick="verifyWaMobile()"
@@ -1499,9 +1521,12 @@
                                                     <button type="button" id="btnSendWa" onclick="processWaReferral()"
                                                         class="btn btn-success w-100 py-2 font-weight-bold"
                                                         style="display: none; background-color: #00e676; border-color: #00e676; color: #000;">
-                                                        <i class="fab fa-whatsapp me-1"></i> Send WhatsApp Referral & Claim
-                                                        1000 PEPE
+                                                        <i class="fab fa-whatsapp me-1"></i> Send WhatsApp &amp; Claim 500 PEPE
                                                     </button>
+                                                    <small class="text-white-50 d-block mt-1 text-center" id="waRemainingHint"
+                                                        style="font-size: 11px;">
+                                                        {{ 10 - ($waTodayCount ?? 0) }} of 10 messages remaining today
+                                                    </small>
                                                 @endif
                                             </div>
                                         </div>
@@ -1905,9 +1930,9 @@
                                             Swal.fire({
                                                 icon: 'success',
                                                 title: 'Number Verified!',
-                                                html: '<b>' + (res.message || 'Number verified successfully.') + '</b><br><br>Ready to send your WhatsApp referral and claim 1,000 PEPE Tokens?',
+                                                html: '<b>' + (res.message || 'Number verified successfully.') + '</b><br><br>Ready to send your WhatsApp referral and claim 500 PEPE Tokens?',
                                                 showCancelButton: true,
-                                                confirmButtonText: '<i class="fab fa-whatsapp me-1"></i> Send WhatsApp & Claim 1,000 PEPE',
+                                                confirmButtonText: '<i class="fab fa-whatsapp me-1"></i> Send WhatsApp & Claim 500 PEPE',
                                                 cancelButtonText: 'Cancel',
                                                 confirmButtonColor: '#00e676'
                                             }).then(function(result) {
@@ -1938,7 +1963,7 @@
                                             confirmButtonColor: '#00e676'
                                         });
                                     }
-                                });
+                                 });
                             }
 
                             function processWaReferral() {
@@ -1978,14 +2003,22 @@
                                             if (res.wa_total_referrals !== undefined) {
                                                 $('#waTotalReferralsVal').text(res.wa_total_referrals);
                                             }
-                                            window.waAvailablePepe = (window.waAvailablePepe || 0) + (res.reward_amount || 1000);
+                                            window.waAvailablePepe = (window.waAvailablePepe || 0) + (res.reward_amount || 500);
                                             window.pepeWalletBalance = res.pepe_wallet !== undefined ? res.pepe_wallet : window
                                                 .waAvailablePepe;
                                             $('#pepeWalletDisplay').text(Number(window.pepeWalletBalance).toLocaleString() +
                                                 ' PEPE');
-                                            $('#waTodayStatusBadge').removeClass('bg-warning text-dark').addClass(
-                                                'bg-success text-white').html(
-                                                '<i class="fas fa-check-circle me-1"></i> Shared Today');
+
+                                            var currentTodayCount = res.today_count !== undefined ? res.today_count : (({{ $waTodayCount ?? 0 }}) + 1);
+                                            if (currentTodayCount >= 10) {
+                                                $('#waTodayStatusBadge').removeClass('bg-warning text-dark').addClass(
+                                                    'bg-success text-white').html(
+                                                    '<i class="fas fa-check-circle me-1"></i> Completed (10/10)');
+                                            } else {
+                                                $('#waTodayStatusBadge').removeClass('bg-success text-white').addClass(
+                                                    'bg-warning text-dark').html(
+                                                    '<i class="fas fa-clock me-1"></i> Available (' + currentTodayCount + '/10)');
+                                            }
 
                                             if (res.whatsapp_url) {
                                                 window.open(res.whatsapp_url, '_blank');
@@ -1993,9 +2026,9 @@
 
                                             Swal.fire({
                                                 icon: 'success',
-                                                title: '🎉 1,000 PEPE Tokens Earned!',
+                                                title: '🎉 500 PEPE Tokens Earned!',
                                                 html: '<b>' + (res.message || 'Referral saved successfully.') +
-                                                    '</b><br><br>Your promotional referral has been saved and 1,000 PEPE tokens credited to your wallet.<br>Click below to open WhatsApp and send your referral link.',
+                                                    '</b><br><br>Your promotional referral has been saved and 500 PEPE tokens credited to your wallet.<br>(' + (res.today_count || currentTodayCount) + '/10 messages sent today)<br><br>Click below to open WhatsApp and send your referral link.',
                                                 showCancelButton: true,
                                                 confirmButtonText: '<i class="fab fa-whatsapp me-1"></i> Open WhatsApp Now',
                                                 cancelButtonText: 'Done',
@@ -2008,7 +2041,7 @@
                                             });
                                         } else {
                                             $('#btnSendWa').prop('disabled', false).html(
-                                                '<i class="fab fa-whatsapp me-1"></i> Send WhatsApp Referral & Claim 1000 PEPE');
+                                                '<i class="fab fa-whatsapp me-1"></i> Send WhatsApp Referral & Claim 500 PEPE');
                                             Swal.fire({
                                                 icon: 'error',
                                                 title: 'Process Failed',
@@ -2019,7 +2052,7 @@
                                     },
                                     error: function(xhr) {
                                         $('#btnSendWa').prop('disabled', false).html(
-                                            '<i class="fab fa-whatsapp me-1"></i> Send WhatsApp Referral & Claim 1000 PEPE');
+                                            '<i class="fab fa-whatsapp me-1"></i> Send WhatsApp Referral & Claim 500 PEPE');
                                         var errMsg = 'An error occurred while processing referral.';
                                         if (xhr.responseJSON && xhr.responseJSON.message) {
                                             errMsg = xhr.responseJSON.message;

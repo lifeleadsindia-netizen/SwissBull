@@ -8,11 +8,13 @@ use App\Models\Country;
 use App\Models\DashMessage;
 use App\Models\MemberDetail;
 use App\Models\MemberVideo;
+use App\Models\PepeRewardLog;
 use App\Models\PepeSetting;
 use App\Models\PromotionBanner;
 use App\Models\UplineMember;
 use App\Models\WhatsappReferral;
 use App\Models\WithdrawalRequest;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -35,9 +37,13 @@ class MemberDetailController extends Controller
             ->whereDate('created_at', $today)
             ->count();
         $result['waTodayCount'] = $waTodayCount;
-        $result['waTodayStatus'] = $waTodayCount > 0 ? 'Shared Today' : 'Available';
+        $result['waTodayStatus'] = $waTodayCount >= PepeRewardService::DAILY_MESSAGE_LIMIT
+            ? 'Completed (10/10)'
+            : ($waTodayCount > 0 ? 'Available ('.$waTodayCount.'/10)' : 'Available (0/10)');
         $result['waTotalReferrals'] = WhatsappReferral::where('member_id', $memberid)->count();
-        $waTotalPepe = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
+        $result['waDirectRegCount'] = PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_REGISTRATION)->count();
+        $result['waDirectActCount'] = PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_ACTIVATION)->count();
+        $waTotalPepe = PepeRewardService::getTotalEarned($memberid);
         $waTotalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
             ->where('status', 'Approved')

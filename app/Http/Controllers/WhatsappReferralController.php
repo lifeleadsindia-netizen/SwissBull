@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\MemberDetail;
 use App\Models\PepeRewardLog;
 use App\Models\WhatsappReferral;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class WhatsappReferralController extends Controller
 {
@@ -179,16 +179,16 @@ class WhatsappReferralController extends Controller
             ], 422);
         }
 
-        // Rule 1: Daily referral limit
+        // Rule 1: Daily referral limit (max 10 messages/day)
         $today = now()->toDateString();
-        $dailyExists = WhatsappReferral::where('member_id', $memberid)
+        $todayCount = WhatsappReferral::where('member_id', $memberid)
             ->whereDate('created_at', $today)
-            ->exists();
+            ->count();
 
-        if ($dailyExists) {
+        if ($todayCount >= PepeRewardService::DAILY_MESSAGE_LIMIT) {
             return response()->json([
                 'success' => false,
-                'message' => 'You have already used your daily referral for today.',
+                'message' => 'You have reached the maximum daily limit of '.PepeRewardService::DAILY_MESSAGE_LIMIT.' messages ('.number_format(PepeRewardService::DAILY_MESSAGE_TOKEN_LIMIT, 0).' PEPE tokens) for today.',
             ], 422);
         }
 
@@ -200,10 +200,14 @@ class WhatsappReferralController extends Controller
             ], 422);
         }
 
+        $remainingToday = PepeRewardService::DAILY_MESSAGE_LIMIT - $todayCount;
+
         return response()->json([
             'success' => true,
-            'message' => 'Number verified successfully. Click Send WhatsApp Referral to earn 1000 PEPE Tokens.',
+            'message' => 'Number verified successfully. Click Send WhatsApp Referral to earn 500 PEPE Tokens. ('.$remainingToday.' messages remaining today)',
             'clean_mobile' => $cleanMobile,
+            'today_count' => $todayCount,
+            'daily_limit' => PepeRewardService::DAILY_MESSAGE_LIMIT,
         ]);
     }
 
@@ -274,70 +278,30 @@ class WhatsappReferralController extends Controller
 
         $messageModel = null;
         $finalMessageText = $this->resolveMessage($member, $messageModel);
-        $rewardAmount = 1000.00;
 
         try {
-            DB::transaction(function () use ($memberid, $cleanMobile, $messageModel, $rewardAmount) {
-                $today = now()->toDateString();
-
-                // Lock & Check Rule 1: Daily limit
-                $dailyCheck = WhatsappReferral::where('member_id', $memberid)
-                    ->whereDate('created_at', $today)
-                    ->lockForUpdate()
-                    ->first();
-
-                if ($dailyCheck) {
-                    throw new \Exception('You have already used your daily referral for today.');
-                }
-
-                // Lock & Check Rule 2: Duplicate number across ALL members
-                if ($this->isMobileAlreadyUsed($cleanMobile, true)) {
-                    throw new \Exception('This mobile number has already been used for a WhatsApp referral.');
-                }
-
-                // Create referral record
-                WhatsappReferral::create([
-                    'member_id' => $memberid,
-                    'mobile_number' => $cleanMobile,
-                    'message_id' => $messageModel ? $messageModel->id : null,
-                    'reward_amount' => $rewardAmount,
-                    'status' => 'Completed',
-                    'reward_given' => true,
-                ]);
-
-                // Create Reward Log
-                PepeRewardLog::create([
-                    'member_id' => $memberid,
-                    'mobile_number' => $cleanMobile,
-                    'reward_amount' => $rewardAmount,
-                    'message_id' => $messageModel ? $messageModel->id : null,
-                    'reward_date' => $today,
-                ]);
-
-                // Directly credit member's pepe_wallet balance so it reflects across the dashboard & redeem modal immediately
-                $memLock = MemberDetail::where('memberid', $memberid)->lockForUpdate()->first();
-                if ($memLock) {
-                    $memLock->pepe_wallet = ($memLock->pepe_wallet ?? 0) + $rewardAmount;
-                    $memLock->save();
-                }
-            });
+            $awardResult = PepeRewardService::awardMessageReward($memberid, $cleanMobile, $messageModel);
 
             // Reload member data
             $member->refresh();
-            $waTotalPepe = WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
+            $waTotalPepe = PepeRewardService::getTotalEarned($memberid);
             $waTotalReferrals = WhatsappReferral::where('member_id', $memberid)->count();
 
             $waPhoneDigits = preg_replace('/[^0-9]/', '', $cleanMobile);
             $whatsappUrl = 'https://api.whatsapp.com/send?phone='.$waPhoneDigits.'&text='.urlencode($finalMessageText);
 
+            $todayCount = $awardResult['today_count'];
+
             return response()->json([
                 'success' => true,
-                'message' => 'WhatsApp promotional link generated! You have earned 1,000 PEPE tokens. Redeem them anytime to your PEPE Wallet.',
+                'message' => 'WhatsApp promotional link generated! You have earned 500 PEPE tokens ('.$todayCount.'/'.PepeRewardService::DAILY_MESSAGE_LIMIT.' today). Redeem them anytime to your PEPE Wallet.',
                 'whatsapp_url' => $whatsappUrl,
                 'pepe_wallet' => $member->pepe_wallet ?? 0,
                 'wa_total_pepe' => $waTotalPepe,
                 'wa_total_referrals' => $waTotalReferrals,
-                'reward_amount' => $rewardAmount,
+                'reward_amount' => PepeRewardService::AMOUNT_MESSAGE,
+                'today_count' => $todayCount,
+                'daily_limit' => PepeRewardService::DAILY_MESSAGE_LIMIT,
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -360,15 +324,46 @@ class WhatsappReferralController extends Controller
             ->whereDate('created_at', $today)
             ->count();
 
-        $todayStatus = $waTodayCount > 0 ? 'Shared Today' : 'Available';
-        $totalReferrals = WhatsappReferral::where('member_id', $memberid)->count();
-        $totalPepeEarned = WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
-        $lastReferral = WhatsappReferral::where('member_id', $memberid)->latest('created_at')->first();
+        $todayStatus = $waTodayCount >= PepeRewardService::DAILY_MESSAGE_LIMIT
+            ? 'Completed (10/10)'
+            : ($waTodayCount > 0 ? 'Available ('.$waTodayCount.'/10)' : 'Available (0/10)');
+
+        // Rule 1 Statistics: WhatsApp Messages
+        $msgCount = PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_MESSAGE)->count();
+        $msgTokens = (float) PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_MESSAGE)->sum('reward_amount');
+        if ($msgCount === 0) {
+            $msgCount = WhatsappReferral::where('member_id', $memberid)->count();
+            $msgTokens = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
+        }
+
+        // Rule 2 Statistics: Direct Registrations
+        $regCount = PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_REGISTRATION)->count();
+        $regTokens = (float) PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_REGISTRATION)->sum('reward_amount');
+
+        // Rule 3 Statistics: Direct Activations
+        $actCount = PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_ACTIVATION)->count();
+        $actTokens = (float) PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_ACTIVATION)->sum('reward_amount');
+
+        $totalReferrals = $msgCount;
+        $totalPepeEarned = PepeRewardService::getTotalEarned($memberid);
+        $lastReferral = PepeRewardLog::where('member_id', $memberid)->latest('created_at')->first()
+            ?: WhatsappReferral::where('member_id', $memberid)->latest('created_at')->first();
         $lastReferralDate = $lastReferral ? $lastReferral->created_at : null;
+
+        // Filter reward logs by selected rule type
+        $selectedType = $request->query('type', 'all');
+        $rewardLogsQuery = PepeRewardLog::where('member_id', $memberid);
+
+        if ($selectedType !== 'all' && in_array($selectedType, [PepeRewardService::TYPE_MESSAGE, PepeRewardService::TYPE_DIRECT_REGISTRATION, PepeRewardService::TYPE_DIRECT_ACTIVATION], true)) {
+            $rewardLogsQuery->where('reward_type', $selectedType);
+        }
+
+        $rewardLogs = $rewardLogsQuery->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         $referrals = WhatsappReferral::where('member_id', $memberid)
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->paginate(15, ['*'], 'ref_page')
+            ->withQueryString();
 
         $data = $member;
 
@@ -376,10 +371,19 @@ class WhatsappReferralController extends Controller
             'data',
             'member',
             'referrals',
+            'rewardLogs',
             'totalReferrals',
             'totalPepeEarned',
             'lastReferralDate',
-            'todayStatus'
+            'todayStatus',
+            'waTodayCount',
+            'msgCount',
+            'msgTokens',
+            'regCount',
+            'regTokens',
+            'actCount',
+            'actTokens',
+            'selectedType'
         ));
     }
 }

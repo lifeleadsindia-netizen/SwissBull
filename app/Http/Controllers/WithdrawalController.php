@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\MemberDetail;
-use App\Models\PepeRewardLog;
 use App\Models\PepeSetting;
 use App\Models\SingleLegIncome;
 use App\Models\WalletTransfer;
-use App\Models\WhatsappReferral;
 use App\Models\WithdrawalRequest;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -290,10 +289,7 @@ class WithdrawalController extends Controller
         }
 
         // Available balance
-        $totalEarned = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
-        if ($totalEarned <= 0) {
-            $totalEarned = (float) PepeRewardLog::where('member_id', $memberid)->sum('reward_amount');
-        }
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
 
         $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
@@ -460,10 +456,7 @@ class WithdrawalController extends Controller
         }
 
         // Calculate available PEPE tokens
-        $totalEarned = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
-        if ($totalEarned <= 0) {
-            $totalEarned = (float) PepeRewardLog::where('member_id', $memberid)->sum('reward_amount');
-        }
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
 
         $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
@@ -564,10 +557,7 @@ class WithdrawalController extends Controller
         $countryData = Country::where('name', $country)->first();
 
         // Statistics
-        $totalEarned = (float) WhatsappReferral::where('member_id', $memberid)->sum('reward_amount');
-        if ($totalEarned <= 0) {
-            $totalEarned = (float) PepeRewardLog::where('member_id', $memberid)->sum('reward_amount');
-        }
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
 
         $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
