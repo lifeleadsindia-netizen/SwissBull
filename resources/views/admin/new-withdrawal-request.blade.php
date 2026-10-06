@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'New Withdrawal Requests')
 @section('content')
     @push('head')
@@ -81,15 +81,15 @@
                                                     <td>$ {{ $list['service_charge'] }}</td>
                                                     <td>$ {{ $list['net_amount'] }}</td>
                                                     <td class="px-0">
-                                                        <a href="{{ url('hdgteyusjasget/withdrawal/accept-online') }}/{{ $list['id'] }}"
+                                                        <a href="{{ url('admin/withdrawal/accept-online') }}/{{ $list['id'] }}"
                                                             class="btn btn-sm btn-success mx-0">Online Pay</a>
                                                     </td>
                                                     <td class="px-1">
-                                                        <a href="{{ url('hdgteyusjasget/withdrawal/accept') }}/{{ $list['id'] }}"
+                                                        <a href="{{ url('admin/withdrawal/accept') }}/{{ $list['id'] }}"
                                                             class="btn btn-sm btn-primary mx-0">Accept</a>
                                                     </td>
                                                     <td class="px-0">
-                                                        <a href="{{ url('hdgteyusjasget/withdrawal/cancel') }}/{{ $list['id'] }}"
+                                                        <a href="{{ url('admin/withdrawal/cancel') }}/{{ $list['id'] }}"
                                                             class="btn btn-sm btn-danger mx-0">Cancel</a>
                                                     </td>
                                                 </tr>

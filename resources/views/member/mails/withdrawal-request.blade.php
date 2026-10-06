@@ -490,7 +490,7 @@
                 <!-- CTA Section -->
                 <div class="cta-section">
                     <div class="cta">
-                        <a href="{{ !empty($action_url) ? $action_url : (config('detailsApp.url').'/hdgteyusjasget/new-withdrawal-request') }}" class="btn btn-primary" target="_blank" rel="noopener">
+                        <a href="{{ !empty($action_url) ? $action_url : (config('detailsApp.url').'/admin/new-withdrawal-request') }}" class="btn btn-primary" target="_blank" rel="noopener">
                             <i class="fa-solid fa-arrow-up-right-from-square"></i> Review & Process
                         </a>
 

@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Open Support Tickets')
 @section('content')
     @push('head')
@@ -67,7 +67,7 @@
                                         <td><div class="badge badge-danger">{{userUnread($list['ticket_id'])}}</div> </td>
                                         <td>
                                             <div >
-                                                <a href="{{url('hdgteyusjasget/support/view-support-ticket')}}/{{$list['id']}}" class="btn btn-sm btn-primary ">View</a>
+                                                <a href="{{url('admin/support/view-support-ticket')}}/{{$list['id']}}" class="btn btn-sm btn-primary ">View</a>
                                             </div>
                                         </td>
                                     </tr>

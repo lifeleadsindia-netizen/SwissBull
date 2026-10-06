@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Account Statement')
 @section('content')
     @push('head')
@@ -70,7 +70,7 @@
                                         <td><span class="btn btn-primary">{{ $list['status'] }}</span></td>
                                         <td>
                                             <div class="table-actions text-center">
-                                                <a href="{{ url('hdgteyusjasget/member-login') }}/{{ $list['id'] }}"
+                                                <a href="{{ url('admin/member-login') }}/{{ $list['id'] }}"
                                                     target="_blank" class="btn btn-success text-white"><i
                                                         class="ik ik-eye text-white"></i> View</a>
                                             </div>

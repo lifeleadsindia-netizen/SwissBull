@@ -144,7 +144,7 @@ class SupportController extends Controller
         $result['support']->status = 'Closed';
         $result['support']->save();
 
-        return redirect('hdgteyusjasget/support/close-support-ticket');
+        return redirect('admin/support/close-support-ticket');
     }
 
     public function viewClosed($id)

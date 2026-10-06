@@ -38,7 +38,7 @@ class AdminController extends Controller
     public function index()
     {
         if (session()->has('ADMIN_LOGIN')) {
-            return redirect('hdgteyusjasget/dashboard');
+            return redirect('admin/dashboard');
         } else {
             return view('admin.login');
         }
@@ -136,7 +136,7 @@ class AdminController extends Controller
         // if ($adminOtp == null || $adminOtp == '') {
         //     session()->flash('loginmsg', 'Please send otp first');
 
-        //     return redirect('/hdgteyusjasget');
+        //     return redirect('/admin');
         // }
 
         $result = Admin::where('email', $email)->first();
@@ -149,23 +149,23 @@ class AdminController extends Controller
                     $request->session()->put('ADMIN_ID', $result->id);
                     session()->forget('admin_otp');
 
-                    return redirect('hdgteyusjasget/dashboard');
+                    return redirect('admin/dashboard');
                 } else {
                     session()->forget('admin_otp');
                     session()->flash('loginmsg', 'Enter OTP does not match');
 
-                    return redirect('/hdgteyusjasget');
+                    return redirect('/admin');
                 }
                 // $del = SetRate::whereDate('created_at', '<', date('Y-m-d', strtotime('-1day')))->delete();
             } else {
                 session()->flash('loginmsg', 'Please enter valid password to login');
 
-                return redirect('/hdgteyusjasget');
+                return redirect('/admin');
             }
         } else {
             session()->flash('loginmsg', 'Please enter valid email to login');
 
-            return redirect('/hdgteyusjasget');
+            return redirect('/admin');
         }
     }
 
@@ -179,7 +179,7 @@ class AdminController extends Controller
         $request->session()->forget('ADMIN_LOGIN');
         $request->session()->forget('ADMIN_ID');
 
-        return redirect('/hdgteyusjasget');
+        return redirect('/admin');
     }
 
     public function details(Request $request)
@@ -193,7 +193,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'DESC')->get(),
             'pageTitle' => 'Member Details',
-            'action' => url('hdgteyusjasget/member-details'),
+            'action' => url('admin/member-details'),
         ]);
 
         return view('admin.member-details')->with($result);
@@ -206,7 +206,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Member Security',
-            'action' => url('hdgteyusjasget/member-security'),
+            'action' => url('admin/member-security'),
         ]);
 
         return view('admin.member-security')->with($result);
@@ -219,7 +219,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'DESC')->get(),
             'pageTitle' => 'Member Wallet Address',
-            'action' => url('hdgteyusjasget/wallet-address'),
+            'action' => url('admin/wallet-address'),
         ]);
 
         return view('admin.wallet-address')->with($result);
@@ -276,7 +276,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Account Control',
-            'action' => url('hdgteyusjasget/account-control'),
+            'action' => url('admin/account-control'),
         ]);
 
         return view('admin.account-control')->with($result);
@@ -437,7 +437,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Funds Details',
-            'action' => url('hdgteyusjasget/funds/add-funds-details'),
+            'action' => url('admin/funds/add-funds-details'),
         ]);
 
         return view('admin.funds.add-funds-details')->with($result);
@@ -450,7 +450,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Request History',
-            'action' => url('hdgteyusjasget/request-history'),
+            'action' => url('admin/request-history'),
         ]);
 
         return view('admin.funds.request-history')->with($result);
@@ -487,7 +487,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Package Details',
-            'action' => url('hdgteyusjasget/package-details'),
+            'action' => url('admin/package-details'),
         ]);
 
         return view('admin.package-details')->with($result);
@@ -516,7 +516,7 @@ class AdminController extends Controller
             'pepeData' => $pepeData,
             'pepeSettings' => PepeSetting::getSettings(),
             'pageTitle' => 'Payment History',
-            'action' => url('hdgteyusjasget/payment-history'),
+            'action' => url('admin/payment-history'),
         ]);
 
         return view('admin.payment-history')->with($result);
@@ -545,7 +545,7 @@ class AdminController extends Controller
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pepeData' => $pepeData,
             'pageTitle' => 'New Withdrawal Requests',
-            'action' => url('hdgteyusjasget/new-withdrawal-request'),
+            'action' => url('admin/new-withdrawal-request'),
         ]);
 
         return view('admin.new-withdrawal-request')->with($result);
@@ -575,7 +575,7 @@ class AdminController extends Controller
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pepeData' => $pepeData,
             'pageTitle' => 'Cancelled Withdrawal Requests',
-            'action' => url('hdgteyusjasget/cancelled-request'),
+            'action' => url('admin/cancelled-request'),
         ]);
 
         return view('admin.cancelled-request')->with($result);
@@ -659,7 +659,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Transactions',
-            'action' => url('hdgteyusjasget/transaction'),
+            'action' => url('admin/transaction'),
         ]);
 
         return view('admin.transaction')->with($result);
@@ -898,7 +898,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Income',
-            'action' => url('hdgteyusjasget/income/roi-incomes'),
+            'action' => url('admin/income/roi-incomes'),
         ]);
 
         return view('admin.income.roi-incomes')->with($result);
@@ -911,7 +911,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Income',
-            'action' => url('hdgteyusjasget/incomes/staking-incomes'),
+            'action' => url('admin/incomes/staking-incomes'),
         ]);
 
         return view('admin.income.roi-incomes')->with($result);
@@ -924,7 +924,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Details',
-            'action' => url('hdgteyusjasget/income/roi-details'),
+            'action' => url('admin/income/roi-details'),
         ]);
 
         return view('admin.income.roi-details')->with($result);
@@ -937,7 +937,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Details',
-            'action' => url('hdgteyusjasget/incomes/staking-details'),
+            'action' => url('admin/incomes/staking-details'),
         ]);
 
         return view('admin.income.roi-details')->with($result);
@@ -950,7 +950,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Level Income',
-            'action' => url('hdgteyusjasget/income/level-incomes'),
+            'action' => url('admin/income/level-incomes'),
         ]);
 
         return view('admin.income.level-incomes')->with($result);
@@ -963,7 +963,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Team Withdrawal Commission',
-            'action' => url('hdgteyusjasget/income/team-withdrawal-commission-incomes'),
+            'action' => url('admin/income/team-withdrawal-commission-incomes'),
         ]);
 
         return view('admin.income.team-commission-incomes')->with($result);
@@ -976,7 +976,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Level Incomes',
-            'action' => url('hdgteyusjasget/incomes/level-incomes'),
+            'action' => url('admin/incomes/level-incomes'),
         ]);
 
         return view('admin.income.level-incomes')->with($result);
@@ -989,7 +989,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Level Income',
-            'action' => url('hdgteyusjasget/income/staking-level-incomes'),
+            'action' => url('admin/income/staking-level-incomes'),
         ]);
 
         return view('admin.income.staking-level-incomes')->with($result);
@@ -1002,7 +1002,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Single Leg Income',
-            'action' => url('hdgteyusjasget/income/single-leg-incomes'),
+            'action' => url('admin/income/single-leg-incomes'),
         ]);
 
         return view('admin.income.singleleg-incomes')->with($result);
@@ -1015,7 +1015,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Direct Incomes',
-            'action' => url('hdgteyusjasget/incomes/direct-incomes'),
+            'action' => url('admin/incomes/direct-incomes'),
         ]);
 
         return view('admin.income.singleleg-incomes')->with($result);
@@ -1028,7 +1028,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Partnership Income',
-            'action' => url('hdgteyusjasget/income/partnership-incomes'),
+            'action' => url('admin/income/partnership-incomes'),
         ]);
 
         return view('admin.income.partnership-incomes')->with($result);
@@ -1041,7 +1041,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Partnership Details',
-            'action' => url('hdgteyusjasget/income/partnership-details'),
+            'action' => url('admin/income/partnership-details'),
         ]);
 
         return view('admin.income.partnership-details')->with($result);
@@ -1054,7 +1054,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Rank & Reward Incomes',
-            'action' => url('hdgteyusjasget/incomes/reward-incomes'),
+            'action' => url('admin/incomes/reward-incomes'),
         ]);
 
         return view('admin.income.partnership-incomes')->with($result);
@@ -1236,7 +1236,7 @@ class AdminController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Import Fund Details',
-            'action' => url('hdgteyusjasget/funds/import-fund-details'),
+            'action' => url('admin/funds/import-fund-details'),
         ]);
 
         return view('admin.funds.import-fund-details')->with($result);

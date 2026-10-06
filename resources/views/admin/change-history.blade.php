@@ -1,4 +1,4 @@
-@extends('admin.layouts.main') 
+﻿@extends('admin.layouts.main') 
 @section('title', 'History Change')
 @section('content')
     @push('head')
@@ -69,7 +69,7 @@
                                 <td>{{ $list['price_change']}}</td>
                                 <td>
                                     <div class="text-center">
-                                        <a class="btn btn-danger text-white" href="{{url('hdgteyusjasget/change-history/delete')}}/{{$list['id']}}">Delete</a>
+                                        <a class="btn btn-danger text-white" href="{{url('admin/change-history/delete')}}/{{$list['id']}}">Delete</a>
                                     </div>
                                 </td>
                             </tr>

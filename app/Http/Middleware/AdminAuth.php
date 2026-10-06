@@ -18,7 +18,7 @@ class AdminAuth
         if (! $request->session()->has('ADMIN_LOGIN')) {
             Session()->flash('Accessmsg', 'Access Denied. Please Login Using your email and Password');
 
-            return redirect('/hdgteyusjasget');
+            return redirect('/admin');
         }
 
         return $next($request);

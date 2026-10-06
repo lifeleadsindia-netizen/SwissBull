@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Dashboard')
 @section('content')
     <!-- push external head elements to head -->
@@ -557,7 +557,7 @@
                     <div class="card-body commission-overview-body" style="padding: 0px 20px;">
                         <div class="row">
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('hdgteyusjasget/income/roi-incomes') }}"
+                                <a href="{{ url('admin/income/roi-incomes') }}"
                                     class="commission-metric commission-metric-deposit">
                                     <span class="commission-metric-icon"><i class="ik ik-trending-up"></i></span>
                                     <p class="commission-metric-label">Roi Income</p>
@@ -568,7 +568,7 @@
                                 </a>
                             </div>
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('hdgteyusjasget/income/staking-level-incomes') }}"
+                                <a href="{{ url('admin/income/staking-level-incomes') }}"
                                     class="commission-metric commission-metric-advertisement">
                                     <span class="commission-metric-icon"><i class="ik ik-layers"></i></span>
                                     <p class="commission-metric-label">Staking Level Income</p>
@@ -579,7 +579,7 @@
                                 </a>
                             </div>
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('hdgteyusjasget/income/level-incomes') }}"
+                                <a href="{{ url('admin/income/level-incomes') }}"
                                     class="commission-metric commission-metric-withdrawal">
                                     <span class="commission-metric-icon"><i class="ik ik-bar-chart-2"></i></span>
                                     <p class="commission-metric-label">Level Income</p>
@@ -590,7 +590,7 @@
                                 </a>
                             </div>
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('hdgteyusjasget/income/single-leg-incomes') }}"
+                                <a href="{{ url('admin/income/single-leg-incomes') }}"
                                     class="commission-metric commission-metric-deposit">
                                     <span class="commission-metric-icon"><i class="ik ik-pie-chart"></i></span>
                                     <p class="commission-metric-label">Single Leg Income</p>
@@ -601,7 +601,7 @@
                                 </a>
                             </div>
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('hdgteyusjasget/income/partnership-incomes') }}"
+                                <a href="{{ url('admin/income/partnership-incomes') }}"
                                     class="commission-metric commission-metric-advertisement">
                                     <span class="commission-metric-icon"><i class="ik ik-users"></i></span>
                                     <p class="commission-metric-label">Partnership Income</p>
@@ -612,7 +612,7 @@
                                 </a>
                             </div>
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('hdgteyusjasget/income/team-withdrawal-commission-incomes') }}"
+                                <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}"
                                     class="commission-metric commission-metric-withdrawal">
                                     <span class="commission-metric-icon"><i class="ik ik-download"></i></span>
                                     <p class="commission-metric-label">Team Withdrawal Commission</p>

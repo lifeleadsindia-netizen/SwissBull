@@ -1,4 +1,4 @@
-@extends('admin.layouts.main')
+﻿@extends('admin.layouts.main')
 @section('title', 'Plan Videos Management')
 @section('content')
     @push('head')
@@ -88,7 +88,7 @@
                     <nav class="breadcrumb-container" aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="{{ url('hdgteyusjasget/dashboard') }}"><i class="ik ik-home"></i></a>
+                                <a href="{{ url('admin/dashboard') }}"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Media') }}</a></li>
                             <li class="breadcrumb-item active" aria-current="page">{{ __('Plan Videos') }}</li>
