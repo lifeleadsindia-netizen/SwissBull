@@ -1,0 +1,359 @@
+/**
+ * Video Player Extension Styles
+ * Custom styling for enhanced video playback
+ */
+
+.video-player-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    background: #000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.video-player-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+    padding: 30px 10px 10px 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-player-container:hover .video-player-controls {
+    opacity: 1;
+}
+
+/* Video Controls */
+.video-controls {
+    width: 100%;
+    color: #fff;
+}
+
+/* Progress Bar */
+.progress-bar-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 3px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: height 0.2s ease;
+}
+
+.progress-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff0000;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+}
+
+.progress-bar::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #ff0000;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+}
+
+.progress-bar::-moz-range-track {
+    background: transparent;
+    border: none;
+}
+
+.progress-bar:hover {
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.progress-tooltip {
+    position: absolute;
+    bottom: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    pointer-events: none;
+    white-space: nowrap;
+    transform: translateX(-50%);
+}
+
+/* Controls Bottom */
+.controls-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.left-controls,
+.right-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Control Buttons */
+.control-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+    font-size: 18px;
+    position: relative;
+}
+
+.control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.control-btn:active {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.control-btn i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Volume Slider */
+.volume-slider {
+    width: 80px;
+    height: 3px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.volume-slider::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    border: none;
+}
+
+.volume-slider:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Time Display */
+.time-display {
+    font-size: 12px;
+    color: #fff;
+    margin-left: 5px;
+    font-variant-numeric: monospace;
+    min-width: 70px;
+}
+
+/* Quality Menu */
+.quality-menu {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    border-radius: 3px;
+    overflow: hidden;
+    min-width: 120px;
+    z-index: 200;
+    margin-bottom: 5px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.quality-option {
+    padding: 10px 15px;
+    font-size: 13px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+}
+
+.quality-option:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.quality-option.active {
+    background-color: #ff0000;
+    font-weight: bold;
+}
+
+/* Fullscreen Mode */
+.video-player-controls.fullscreen {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+}
+
+/* Icon styles (using Unicode or FontAwesome) */
+.icon-play::before {
+    content: '▶';
+}
+
+.icon-pause::before {
+    content: '⏸';
+}
+
+.icon-volume::before {
+    content: '🔊';
+}
+
+.icon-volume-low::before {
+    content: '🔉';
+}
+
+.icon-volume-high::before {
+    content: '🔊';
+}
+
+.icon-volume-muted::before {
+    content: '🔇';
+}
+
+.icon-bookmark::before {
+    content: '🔖';
+}
+
+.icon-settings::before {
+    content: '⚙';
+}
+
+.icon-fullscreen::before {
+    content: '⛶';
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .progress-tooltip {
+        display: none;
+    }
+
+    .volume-slider {
+        display: none;
+    }
+
+    .time-display {
+        font-size: 11px;
+        min-width: 60px;
+    }
+
+    .control-btn {
+        font-size: 16px;
+        padding: 4px;
+    }
+
+    .quality-menu {
+        right: auto;
+        left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .controls-bottom {
+        gap: 4px;
+    }
+
+    .control-btn {
+        font-size: 14px;
+        padding: 3px;
+    }
+
+    .time-display {
+        display: none;
+    }
+
+    .left-controls {
+        gap: 4px;
+    }
+
+    .right-controls {
+        gap: 4px;
+    }
+}
+
+/* Video player container for fullscreen */
+#video-player-container:-webkit-full-screen {
+    width: 100%;
+    height: 100%;
+}
+
+#video-player-container:-moz-full-screen {
+    width: 100%;
+    height: 100%;
+}
+
+#video-player-container:fullscreen {
+    width: 100%;
+    height: 100%;
+}
+
+/* Video element styling */
+#video-player-container video {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Custom scrollbar for quality menu */
+.quality-menu::-webkit-scrollbar {
+    width: 5px;
+}
+
+.quality-menu::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.quality-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.quality-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
