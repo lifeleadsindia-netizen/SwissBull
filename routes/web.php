@@ -66,6 +66,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::post('/monthly-trading-profit', [AdminController::class, 'saveMonthlyTradingProfit'])->name('admin.saveMonthlyTradingProfit');
     Route::post('/save-monthly-trading-profit', [AdminController::class, 'saveMonthlyTradingProfit']);
 
+    // Referral Bonus Configuration
+    Route::get('/referral-bonus', [AdminController::class, 'referralBonus'])->name('admin.referralBonus');
+    Route::get('/referral_bonus', [AdminController::class, 'referralBonus']);
+    Route::post('/referral-bonus', [AdminController::class, 'saveReferralBonus'])->name('admin.saveReferralBonus');
+    Route::post('/save-referral-bonus', [AdminController::class, 'saveReferralBonus']);
+
     // Color Dashboard
     Route::get('/color-dashboard', [AdminController::class, 'colorDashboard']);
 
