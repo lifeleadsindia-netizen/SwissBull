@@ -64,16 +64,8 @@ class StakingDetail extends Model
      */
     public function getActivationDateAttribute(): ?Carbon
     {
-        if ($this->activated_at) {
-            return Carbon::parse($this->activated_at);
-        }
-
         if ($this->created_at) {
             return Carbon::parse($this->created_at);
-        }
-
-        if ($this->invest_date) {
-            return Carbon::parse($this->invest_date);
         }
 
         return null;
