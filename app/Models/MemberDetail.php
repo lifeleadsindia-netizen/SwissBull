@@ -93,17 +93,29 @@ class MemberDetail extends Model
     }
 
     /**
-     * Get the latest unlock timestamp across member's staking details.
+     * Get the latest unlock timestamp across member's staking details and package details.
      */
     public function tradingWalletLockedUntil(): ?Carbon
     {
+        $latest = null;
+
         $stakings = $this->relationLoaded('stakingDetails')
             ? $this->stakingDetails
             : $this->stakingDetails()->get();
 
-        $latest = null;
         foreach ($stakings as $stk) {
             $unl = $stk->locked_until;
+            if ($unl && (! $latest || $unl->gt($latest))) {
+                $latest = $unl;
+            }
+        }
+
+        $packages = $this->relationLoaded('packageDetails')
+            ? $this->packageDetails
+            : $this->packageDetails()->get();
+
+        foreach ($packages as $pkg) {
+            $unl = $pkg->locked_until;
             if ($unl && (! $latest || $unl->gt($latest))) {
                 $latest = $unl;
             }
@@ -113,7 +125,7 @@ class MemberDetail extends Model
     }
 
     /**
-     * Check if the member's trading wallet is currently locked based on staking_details.
+     * Check if the member's trading wallet is currently locked based on staking_details or package_details.
      */
     public function isTradingWalletLocked(): bool
     {
@@ -121,8 +133,18 @@ class MemberDetail extends Model
             ? $this->stakingDetails
             : $this->stakingDetails()->get();
 
-        return $stakings->contains(function ($stk) {
+        if ($stakings->contains(function ($stk) {
             return $stk->isLocked();
+        })) {
+            return true;
+        }
+
+        $packages = $this->relationLoaded('packageDetails')
+            ? $this->packageDetails
+            : $this->packageDetails()->get();
+
+        return $packages->contains(function ($pkg) {
+            return $pkg->isLocked();
         });
     }
 

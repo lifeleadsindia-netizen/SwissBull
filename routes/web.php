@@ -286,8 +286,9 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::post('getPrivateKeyPepe', [WithdrawalController::class, 'getPrivateKeyPepe'])->name('getPrivateKeyPepe');
     Route::post('initiatePepeWithdrawal', [WithdrawalController::class, 'initiatePepeWithdrawal'])->name('initiatePepeWithdrawal');
 
-    // Trading Wallet withdrawal validation
+    // Trading Wallet withdrawal validation & live dashboard status
     Route::post('tradingWalletValidate', [WithdrawalController::class, 'tradingWalletValidate'])->name('tradingWalletValidate');
+    Route::get('trading-wallet/status', [MemberDetailController::class, 'getTradingWalletStatus'])->name('member.tradingWalletStatus');
 
     // Geneology Section
     Route::get('/team/geneology', [MemberDetailController::class, 'geneology'])->name('member.team.geneology');

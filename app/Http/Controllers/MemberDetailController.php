@@ -9,14 +9,17 @@ use App\Models\DashMessage;
 use App\Models\MemberDetail;
 use App\Models\MemberVideo;
 use App\Models\PackageDetail;
+use App\Models\PackagePlan;
 use App\Models\PepeRewardLog;
 use App\Models\PepeSetting;
 use App\Models\PromotionBanner;
 use App\Models\StakingDetail;
+use App\Models\TradingWalletSetting;
 use App\Models\UplineMember;
 use App\Models\WhatsappReferral;
 use App\Models\WithdrawalRequest;
 use App\Services\PepeRewardService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -73,44 +76,392 @@ class MemberDetailController extends Controller
         $result['countries'] = Country::whereNotNull('phonecode')->where('phonecode', '!=', '')->orderBy('nicename', 'asc')->get();
         $result['pepeSettings'] = PepeSetting::getSettings();
 
-        // Phase 2 + Phase 3: Package, Staking & ROI Information
-        $result['activePackage'] = PackageDetail::where('memberid', $memberid)
+        // Phase 2 + Phase 3: Package, Staking & Trading Wallet Lock Information (Backend Computed)
+        $member = $result['data'];
+
+        $activePackages = PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
             ->latest('created_at')
-            ->first();
+            ->get();
+        $activePackage = $activePackages->first();
+        $result['activePackage'] = $activePackage;
 
-        $latestStaking = StakingDetail::where('memberid', $memberid)
+        $stakings = StakingDetail::where('memberid', $memberid)
             ->latest('created_at')
-            ->first();
-        $result['activeStaking'] = StakingDetail::where('memberid', $memberid)
-            ->where('status', 'Active')
-            ->latest('created_at')
-            ->first() ?? $latestStaking;
+            ->get();
+        $activeStaking = $stakings->where('status', 'Active')->first() ?? $stakings->first();
+        $result['activeStaking'] = $activeStaking;
 
+        // 1. Investment calculations
         $totalInvestQuery = (float) PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
             ->sum('invest_amount');
+        if ($totalInvestQuery <= 0 && $stakings->count() > 0) {
+            $totalInvestQuery = (float) $stakings->where('status', 'Active')->sum('invest_amount');
+            if ($totalInvestQuery <= 0) {
+                $totalInvestQuery = (float) $stakings->sum('invest_amount');
+            }
+        }
+        $totalInvestment = $totalInvestQuery > 0 ? $totalInvestQuery : (float) ($member->self_biz ?? 0);
+        $result['totalInvestment'] = $totalInvestment;
 
-        $result['totalInvestment'] = $totalInvestQuery > 0 ? $totalInvestQuery : (float) ($result['data']->self_biz ?? 0);
+        $activePackageInvestAmount = (float) ($activePackage->invest_amount ?? ($activePackage->package_value ?? ($activeStaking ? $activeStaking->invest_amount : $totalInvestment)));
+        $result['activePackageInvestAmount'] = $activePackageInvestAmount;
 
-        $result['totalPackageEarning'] = (float) PackageDetail::where('memberid', $memberid)
+        // 2. Trading Wallet balance (sourced strictly from member's p2p_wallet)
+        $tradingWalletBalance = (float) ($member->p2p_wallet ?? 0.00);
+        $result['tradingWalletBalance'] = $tradingWalletBalance;
+
+        // 3. Dynamic Admin-configured Package Plan and Return %
+        $packagePlan = null;
+        if ($activePackage && $activePackage->package_range) {
+            $packagePlan = PackagePlan::findByRange($activePackage->package_range);
+        }
+        if (! $packagePlan && $activeStaking && $activeStaking->package) {
+            $packagePlan = PackagePlan::findByRange($activeStaking->package);
+        }
+        if (! $packagePlan && $totalInvestment > 0) {
+            $packagePlan = PackagePlan::where('min_amount', '<=', $totalInvestment)
+                ->where(function ($q) use ($totalInvestment) {
+                    $q->whereNull('max_amount')->orWhere('max_amount', '>=', $totalInvestment);
+                })->first();
+        }
+
+        $defaultSetting = TradingWalletSetting::getActiveSetting();
+        $defaultLockDays = (int) ($defaultSetting->lock_days ?? 30);
+
+        // Maximum Return % must come from actual Admin-configured maximum return / capping setting
+        $maxReturnPercent = 200.00;
+        if ($packagePlan && (float) $packagePlan->max_return_percent > 0) {
+            $maxReturnPercent = (float) $packagePlan->max_return_percent;
+        } elseif ($activePackage && (float) $activePackage->max_return_percent > 0) {
+            $maxReturnPercent = (float) $activePackage->max_return_percent;
+        } elseif ($activeStaking && (float) $activeStaking->getCappingPercent() > 0) {
+            $maxReturnPercent = (float) $activeStaking->getCappingPercent();
+        }
+        $result['maxReturnPercent'] = $maxReturnPercent;
+
+        // Daily ROI rate
+        $dailyRoiPercent = $packagePlan && (float) $packagePlan->return_percent > 0
+            ? (float) $packagePlan->return_percent
+            : ($activeStaking ? $activeStaking->getDailyRate() : (float) ($activePackage->return_percent ?? 5.00));
+        $result['dailyRoiPercent'] = $dailyRoiPercent;
+
+        // 4. Total Earning & Max Earning limit
+        $totalEarnQuery = (float) PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
             ->sum('total_earning');
+        $stakingEarnSum = (float) StakingDetail::where('memberid', $memberid)->sum('total_earned');
+        $totalEarning = round(max($totalEarnQuery, $stakingEarnSum), 2);
+        $result['totalPackageEarning'] = $totalEarning;
+        $result['totalEarning'] = $totalEarning;
 
         $maxEarningQuery = (float) PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
             ->sum('max_earning');
+        if ($maxEarningQuery <= 0 && $stakings->count() > 0) {
+            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) {
+                return $stk->getMaxRoiAmount();
+            });
+        }
+        $maxEarning = $maxEarningQuery > 0
+            ? round($maxEarningQuery, 2)
+            : ($totalInvestment > 0 ? round($totalInvestment * ($maxReturnPercent / 100), 2) : 0.00);
+        $result['maxPackageEarning'] = $maxEarning;
+        $result['maxEarning'] = $maxEarning;
 
-        $result['maxPackageEarning'] = $maxEarningQuery > 0
-            ? $maxEarningQuery
-            : ($result['totalInvestment'] > 0 ? $result['totalInvestment'] * 3.0 : 0.0);
+        $remainingEligibility = max(0.00, round($maxEarning - $totalEarning, 2));
+        $result['remainingEligibility'] = $remainingEligibility;
 
-        $result['packageInvestments'] = PackageDetail::where('memberid', $memberid)
+        // 5. Package Status
+        if ($activePackage && $activePackage->isPackageActive()) {
+            $packageStatus = 'Active';
+        } elseif ($activePackage && $activePackage->isExpired()) {
+            $packageStatus = 'Expired';
+        } elseif ($activeStaking && $activeStaking->status === 'Active') {
+            $packageStatus = 'Active';
+        } elseif ($activeStaking && $activeStaking->status === 'Deactive') {
+            $packageStatus = 'Capped / Deactivated';
+        } elseif ($totalInvestment > 0) {
+            $packageStatus = 'Active';
+        } else {
+            $packageStatus = 'No Active Package';
+        }
+        $result['packageStatus'] = $packageStatus;
+
+        // 6. Multiple Packages Processing & Package-Wise Lock Tracking
+        $packageList = PackageDetail::where('memberid', $memberid)
             ->latest('created_at')
-            ->take(5)
+            ->take(10)
             ->get();
 
+        $processedPackages = [];
+        $isAnyLocked = false;
+        $primaryUnlockTime = null;
+
+        foreach ($packageList as $pkg) {
+            $pkgLockDays = $pkg->lock_days > 0 ? (int) $pkg->lock_days : $defaultLockDays;
+            $pkgActivatedAt = $pkg->activated_at ? Carbon::parse($pkg->activated_at) : ($pkg->created_at ? Carbon::parse($pkg->created_at) : null);
+
+            $pkgLockedUntil = $pkg->locked_until;
+            if (! $pkgLockedUntil && $pkgActivatedAt && $pkgLockDays > 0) {
+                $pkgLockedUntil = $pkgActivatedAt->copy()->addDays($pkgLockDays);
+            }
+
+            $pkgIsLocked = false;
+            $pkgRemainingSeconds = 0;
+            $pkgRemainingDays = 0;
+
+            if ($pkgLockedUntil && now()->lt($pkgLockedUntil)) {
+                $pkgIsLocked = true;
+                $pkgRemainingSeconds = (int) now()->diffInSeconds($pkgLockedUntil, false);
+                $pkgRemainingDays = (int) ceil($pkgRemainingSeconds / 86400);
+
+                $isAnyLocked = true;
+                if (! $primaryUnlockTime || $pkgLockedUntil->gt($primaryUnlockTime)) {
+                    $primaryUnlockTime = $pkgLockedUntil;
+                }
+            }
+
+            $pkgPlan = PackagePlan::findByRange($pkg->package_range);
+            $pkgMaxReturn = $pkgPlan ? (float) $pkgPlan->max_return_percent : (float) ($pkg->max_return_percent ?: $maxReturnPercent);
+
+            $pkg->is_locked = $pkgIsLocked;
+            $pkg->lock_status_label = $pkgIsLocked ? 'Fund Locked' : 'Fund Unlocked';
+            $pkg->remaining_lock_days = $pkgRemainingDays;
+            $pkg->remaining_lock_seconds = $pkgRemainingSeconds;
+            $pkg->unlock_datetime = $pkgLockedUntil ? $pkgLockedUntil->format('d M Y, H:i') : null;
+            $pkg->unlock_timestamp = $pkgLockedUntil ? $pkgLockedUntil->timestamp * 1000 : null;
+            $pkg->computed_max_return_percent = $pkgMaxReturn;
+
+            $processedPackages[] = $pkg;
+        }
+
+        // Staking details lock checks
+        foreach ($stakings as $stk) {
+            if ($stk->isLocked()) {
+                $isAnyLocked = true;
+                $stkUnlock = $stk->locked_until;
+                if ($stkUnlock && (! $primaryUnlockTime || $stkUnlock->gt($primaryUnlockTime))) {
+                    $primaryUnlockTime = $stkUnlock;
+                }
+            }
+        }
+
+        $remainingLockSeconds = ($isAnyLocked && $primaryUnlockTime) ? max(0, (int) now()->diffInSeconds($primaryUnlockTime, false)) : 0;
+        $remainingLockDays = ($isAnyLocked && $primaryUnlockTime) ? (int) ceil($remainingLockSeconds / 86400) : 0;
+        $isFundLocked = $isAnyLocked && ($remainingLockSeconds > 0);
+
+        $lockStatus = $isFundLocked ? 'Fund Locked' : 'Fund Unlocked';
+        $unlockDateTimeFormatted = ($isFundLocked && $primaryUnlockTime) ? $primaryUnlockTime->format('d M Y, H:i') : null;
+        $unlockTimestampMs = ($isFundLocked && $primaryUnlockTime) ? $primaryUnlockTime->timestamp * 1000 : null;
+
+        $result['isFundLocked'] = $isFundLocked;
+        $result['lockStatus'] = $lockStatus;
+        $result['unlockDateTime'] = $unlockDateTimeFormatted;
+        $result['unlockTimestamp'] = $unlockTimestampMs;
+        $result['remainingLockDays'] = $remainingLockDays;
+        $result['remainingLockSeconds'] = $remainingLockSeconds;
+        $result['fundLockTitle'] = $lockStatus;
+        $result['fundUnlocksInText'] = $isFundLocked ? "Fund Unlocks In {$remainingLockDays} Days" : 'Fund Unlocked';
+        $result['fundLockReturnMessage'] = $isFundLocked
+            ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns'
+            : 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns';
+        $result['packageInvestments'] = collect($processedPackages);
+
         return view('member.dashboard')->with($result);
+    }
+
+    /**
+     * API Endpoint: Get real-time Trading Wallet Lock & Financial Status for Member Dashboard.
+     */
+    public function getTradingWalletStatus(Request $request)
+    {
+        $memberid = session('MEMBER_ID') ?? $request->get('memberid');
+        if (! $memberid) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized or session expired.',
+            ], 401);
+        }
+
+        $member = MemberDetail::where('memberid', $memberid)->first();
+        if (! $member) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Member not found.',
+            ], 404);
+        }
+
+        $activePackages = PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->latest('created_at')
+            ->get();
+        $activePackage = $activePackages->first();
+
+        $stakings = StakingDetail::where('memberid', $memberid)->latest('created_at')->get();
+        $activeStaking = $stakings->where('status', 'Active')->first() ?? $stakings->first();
+
+        $totalInvestQuery = (float) PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->sum('invest_amount');
+        if ($totalInvestQuery <= 0 && $stakings->count() > 0) {
+            $totalInvestQuery = (float) $stakings->where('status', 'Active')->sum('invest_amount');
+            if ($totalInvestQuery <= 0) {
+                $totalInvestQuery = (float) $stakings->sum('invest_amount');
+            }
+        }
+        $totalInvestment = $totalInvestQuery > 0 ? $totalInvestQuery : (float) ($member->self_biz ?? 0);
+
+        $tradingWalletBalance = (float) ($member->p2p_wallet ?? 0.00);
+
+        $packagePlan = null;
+        if ($activePackage && $activePackage->package_range) {
+            $packagePlan = PackagePlan::findByRange($activePackage->package_range);
+        }
+        if (! $packagePlan && $activeStaking && $activeStaking->package) {
+            $packagePlan = PackagePlan::findByRange($activeStaking->package);
+        }
+        if (! $packagePlan && $totalInvestment > 0) {
+            $packagePlan = PackagePlan::where('min_amount', '<=', $totalInvestment)
+                ->where(function ($q) use ($totalInvestment) {
+                    $q->whereNull('max_amount')->orWhere('max_amount', '>=', $totalInvestment);
+                })->first();
+        }
+
+        $defaultSetting = TradingWalletSetting::getActiveSetting();
+        $defaultLockDays = (int) ($defaultSetting->lock_days ?? 30);
+
+        $maxReturnPercent = 200.00;
+        if ($packagePlan && (float) $packagePlan->max_return_percent > 0) {
+            $maxReturnPercent = (float) $packagePlan->max_return_percent;
+        } elseif ($activePackage && (float) $activePackage->max_return_percent > 0) {
+            $maxReturnPercent = (float) $activePackage->max_return_percent;
+        } elseif ($activeStaking && (float) $activeStaking->getCappingPercent() > 0) {
+            $maxReturnPercent = (float) $activeStaking->getCappingPercent();
+        }
+
+        $totalEarnQuery = (float) PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->sum('total_earning');
+        $stakingEarnSum = (float) StakingDetail::where('memberid', $memberid)->sum('total_earned');
+        $totalEarning = round(max($totalEarnQuery, $stakingEarnSum), 2);
+
+        $maxEarningQuery = (float) PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->sum('max_earning');
+        if ($maxEarningQuery <= 0 && $stakings->count() > 0) {
+            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) {
+                return $stk->getMaxRoiAmount();
+            });
+        }
+        $maxEarning = $maxEarningQuery > 0
+            ? round($maxEarningQuery, 2)
+            : ($totalInvestment > 0 ? round($totalInvestment * ($maxReturnPercent / 100), 2) : 0.00);
+
+        $remainingEligibility = max(0.00, round($maxEarning - $totalEarning, 2));
+
+        if ($activePackage && $activePackage->isPackageActive()) {
+            $packageStatus = 'Active';
+        } elseif ($activePackage && $activePackage->isExpired()) {
+            $packageStatus = 'Expired';
+        } elseif ($activeStaking && $activeStaking->status === 'Active') {
+            $packageStatus = 'Active';
+        } elseif ($activeStaking && $activeStaking->status === 'Deactive') {
+            $packageStatus = 'Capped / Deactivated';
+        } elseif ($totalInvestment > 0) {
+            $packageStatus = 'Active';
+        } else {
+            $packageStatus = 'No Active Package';
+        }
+
+        $packageList = PackageDetail::where('memberid', $memberid)->latest('created_at')->take(10)->get();
+        $processedPackages = [];
+        $isAnyLocked = false;
+        $primaryUnlockTime = null;
+
+        foreach ($packageList as $pkg) {
+            $pkgLockDays = $pkg->lock_days > 0 ? (int) $pkg->lock_days : $defaultLockDays;
+            $pkgActivatedAt = $pkg->activated_at ? Carbon::parse($pkg->activated_at) : ($pkg->created_at ? Carbon::parse($pkg->created_at) : null);
+            $pkgLockedUntil = $pkg->locked_until;
+            if (! $pkgLockedUntil && $pkgActivatedAt && $pkgLockDays > 0) {
+                $pkgLockedUntil = $pkgActivatedAt->copy()->addDays($pkgLockDays);
+            }
+
+            $pkgIsLocked = false;
+            $pkgRemainingSeconds = 0;
+            $pkgRemainingDays = 0;
+
+            if ($pkgLockedUntil && now()->lt($pkgLockedUntil)) {
+                $pkgIsLocked = true;
+                $pkgRemainingSeconds = (int) now()->diffInSeconds($pkgLockedUntil, false);
+                $pkgRemainingDays = (int) ceil($pkgRemainingSeconds / 86400);
+
+                $isAnyLocked = true;
+                if (! $primaryUnlockTime || $pkgLockedUntil->gt($primaryUnlockTime)) {
+                    $primaryUnlockTime = $pkgLockedUntil;
+                }
+            }
+
+            $pkgPlan = PackagePlan::findByRange($pkg->package_range);
+            $pkgMaxReturn = $pkgPlan ? (float) $pkgPlan->max_return_percent : (float) ($pkg->max_return_percent ?: $maxReturnPercent);
+
+            $processedPackages[] = [
+                'id' => $pkg->id,
+                'package_range' => $pkg->package_range,
+                'invest_amount' => (float) ($pkg->invest_amount ?? $pkg->package_value),
+                'trading_wallet_amount' => (float) ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)),
+                'is_locked' => $pkgIsLocked,
+                'lock_status_label' => $pkgIsLocked ? 'Fund Locked' : 'Fund Unlocked',
+                'remaining_lock_days' => $pkgRemainingDays,
+                'remaining_lock_seconds' => $pkgRemainingSeconds,
+                'unlock_datetime' => $pkgLockedUntil ? $pkgLockedUntil->format('d M Y, H:i') : null,
+                'unlock_timestamp' => $pkgLockedUntil ? $pkgLockedUntil->timestamp * 1000 : null,
+                'max_return_percent' => $pkgMaxReturn,
+                'max_earning' => (float) ($pkg->max_earning ?? 0.0),
+                'total_earning' => (float) ($pkg->total_earning ?? 0.0),
+                'status' => $pkg->status,
+            ];
+        }
+
+        foreach ($stakings as $stk) {
+            if ($stk->isLocked()) {
+                $isAnyLocked = true;
+                $stkUnlock = $stk->locked_until;
+                if ($stkUnlock && (! $primaryUnlockTime || $stkUnlock->gt($primaryUnlockTime))) {
+                    $primaryUnlockTime = $stkUnlock;
+                }
+            }
+        }
+
+        $remainingLockSeconds = ($isAnyLocked && $primaryUnlockTime) ? max(0, (int) now()->diffInSeconds($primaryUnlockTime, false)) : 0;
+        $remainingLockDays = ($isAnyLocked && $primaryUnlockTime) ? (int) ceil($remainingLockSeconds / 86400) : 0;
+        $isFundLocked = $isAnyLocked && ($remainingLockSeconds > 0);
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'investment' => $totalInvestment,
+                'trading_wallet' => $tradingWalletBalance,
+                'total_earning' => $totalEarning,
+                'max_earning' => $maxEarning,
+                'remaining_eligibility' => $remainingEligibility,
+                'package_status' => $packageStatus,
+                'is_locked' => $isFundLocked,
+                'lock_status' => $isFundLocked ? 'Fund Locked' : 'Fund Unlocked',
+                'unlock_datetime' => ($isFundLocked && $primaryUnlockTime) ? $primaryUnlockTime->format('d M Y, H:i') : null,
+                'unlock_timestamp' => ($isFundLocked && $primaryUnlockTime) ? $primaryUnlockTime->timestamp * 1000 : null,
+                'remaining_lock_days' => $remainingLockDays,
+                'remaining_lock_seconds' => $remainingLockSeconds,
+                'maximum_return_percent' => $maxReturnPercent,
+                'fund_lock_title' => $isFundLocked ? 'Fund Locked' : 'Fund Unlocked',
+                'fund_unlocks_in_text' => $isFundLocked ? "Fund Unlocks In {$remainingLockDays} Days" : 'Fund Unlocked',
+                'fund_lock_return_message' => $isFundLocked
+                    ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns'
+                    : 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns',
+                'packages' => $processedPackages,
+            ],
+        ]);
     }
 
     public function tradingDashboard(Request $request)
