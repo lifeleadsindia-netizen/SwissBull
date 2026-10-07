@@ -179,7 +179,7 @@ class WithdrawalController extends Controller
         $country = session('country');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
         $result['country'] = Country::where('name', $country)->first();
-        $result['reqdata'] = WithdrawalRequest::where('memberid', $memberid)->orderBy('created_at', 'desc')->get();
+        $result['reqdata'] = WithdrawalRequest::where([['memberid', $memberid],['type', 'Wallet']])->orderBy('created_at', 'desc')->get();
 
         return view('member.wallet.withdrawal-history')->with($result);
     }
