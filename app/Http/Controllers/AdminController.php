@@ -985,26 +985,36 @@ class AdminController extends Controller
      */
     public function saveDailyTeamInvestmentShare(Request $request)
     {
-        $rules = [];
-        $messages = [];
+        $rules = [
+            'level_1_directs' => 'required|integer|min:0',
+        ];
+        $messages = [
+            'level_1_directs.required' => 'Please enter Level-1 Direct Referral requirement.',
+            'level_1_directs.integer' => 'Level-1 Direct Referral requirement must be a whole number.',
+            'level_1_directs.min' => 'Level-1 Direct Referral requirement cannot be negative.',
+        ];
+
         for ($i = 1; $i <= 10; $i++) {
             $rules["level_{$i}_rate"] = 'required|numeric|min:0|max:100';
-            $rules["level_{$i}_directs"] = 'required|integer|min:0';
             $messages["level_{$i}_rate.required"] = "Please enter Level-{$i} Rate (%).";
             $messages["level_{$i}_rate.numeric"] = "Level-{$i} Rate must be a valid number.";
             $messages["level_{$i}_rate.min"] = "Level-{$i} Rate cannot be negative.";
             $messages["level_{$i}_rate.max"] = "Level-{$i} Rate cannot exceed 100%.";
-            $messages["level_{$i}_directs.required"] = "Please enter Level-{$i} Direct Referral requirement.";
-            $messages["level_{$i}_directs.integer"] = "Level-{$i} Direct Referral requirement must be a whole number.";
-            $messages["level_{$i}_directs.min"] = "Level-{$i} Direct Referral requirement cannot be negative.";
+
+            if ($i > 1) {
+                $rules["level_{$i}_directs"] = 'nullable|integer|min:0';
+            }
         }
 
         $request->validate($rules, $messages);
 
+        $level1Directs = (int) $request->input('level_1_directs');
+        $directsChain = DailyTeamInvestmentShareConfiction::calculateDirectsChain($level1Directs);
+
         $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
         for ($i = 1; $i <= 10; $i++) {
             $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
-            $setting->{"level_{$i}_directs"} = (int) $request->input("level_{$i}_directs");
+            $setting->{"level_{$i}_directs"} = $directsChain[$i];
         }
         $setting->save();
 

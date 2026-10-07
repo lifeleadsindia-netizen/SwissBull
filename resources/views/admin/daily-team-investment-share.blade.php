@@ -78,20 +78,25 @@
                             </p>
                         </div>
 
+                        @php
+                            $level1DirectsVal = (int) old('level_1_directs', optional($setting)->level_1_directs ?? 4);
+                        @endphp
+
                         @for ($i = 1; $i <= 10; $i++)
                             @php
                                 $rateField = "level_{$i}_rate";
                                 $directsField = "level_{$i}_directs";
                                 $defaultRate = '1.00';
-                                $defaultDirects = ($i === 1) ? 4 : 2;
 
                                 $rateVal = optional($setting)->{$rateField} !== null
                                     ? number_format((float) $setting->{$rateField}, 2, '.', '')
                                     : $defaultRate;
 
-                                $directsVal = optional($setting)->{$directsField} !== null
-                                    ? (int) $setting->{$directsField}
-                                    : $defaultDirects;
+                                if ($i === 1) {
+                                    $directsVal = $level1DirectsVal;
+                                } else {
+                                    $directsVal = $level1DirectsVal + (($i - 1) * 2);
+                                }
                             @endphp
                             <div class="col-xl-6 col-lg-6 col-md-12 mb-4">
                                 <div class="card h-100 shadow-sm border-0">
@@ -137,20 +142,30 @@
                                                         {{ __('Direct Referrals', ['num' => $i]) }} <span class="text-danger">*</span>
                                                     </label>
                                                     <div class="input-group">
-                                                        <input type="number" step="1" min="0"
-                                                            class="form-control @error('level_' . $i . '_directs') is-invalid @enderror"
-                                                            id="level_{{ $i }}_directs" name="level_{{ $i }}_directs" value="{{ old('level_' . $i . '_directs', $directsVal) }}"
-                                                            placeholder="{{ $defaultDirects }}"
-                                                            required>
+                                                        @if ($i === 1)
+                                                            <input type="number" step="1" min="0"
+                                                                class="form-control @error('level_1_directs') is-invalid @enderror"
+                                                                id="level_1_directs" name="level_1_directs" value="{{ $directsVal }}"
+                                                                placeholder="4"
+                                                                required>
+                                                        @else
+                                                            <input type="number" step="1" min="0"
+                                                                class="form-control @error('level_' . $i . '_directs') is-invalid @enderror"
+                                                                id="level_{{ $i }}_directs" name="level_{{ $i }}_directs" value="{{ $directsVal }}"
+                                                                placeholder="{{ $directsVal }}"
+                                                                readonly
+                                                                tabindex="-1"
+                                                                style="background-color: #f8f9fa; cursor: not-allowed;">
+                                                        @endif
                                                         <div class="input-group-append">
                                                             <span class="input-group-text font-weight-bold bg-light">{{ __('Directs') }}</span>
                                                         </div>
                                                     </div>
                                                     <small class="form-text text-muted">
                                                         @if ($i === 1)
-                                                            {{ __('4 Direct Referrals required.') }}
+                                                            {{ __('Base requirement. Sets the auto chain (+2) for subsequent levels.') }}
                                                         @else
-                                                            {{ __('+2 Direct Referrals required.') }}
+                                                            <i class="ik ik-link text-primary mr-1"></i>{{ __('Auto-calculated: Previous level + 2') }}
                                                         @endif
                                                     </small>
                                                     @error('level_' . $i . '_directs')
@@ -176,3 +191,40 @@
         </div>
     </div>
 @endsection
+
+@push('script')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var level1Input = document.getElementById('level_1_directs');
+            if (!level1Input) {
+                return;
+            }
+
+            function recalculateDirectsChain() {
+                var raw = level1Input.value.trim();
+                var baseVal = parseInt(raw, 10);
+                var isValid = !isNaN(baseVal) && baseVal >= 0;
+
+                for (var i = 2; i <= 10; i++) {
+                    var targetInput = document.getElementById('level_' + i + '_directs');
+                    if (targetInput) {
+                        if (isValid) {
+                            var calculated = baseVal + ((i - 1) * 2);
+                            targetInput.value = calculated;
+                            targetInput.setAttribute('placeholder', calculated);
+                        } else {
+                            targetInput.value = '';
+                        }
+                    }
+                }
+            }
+
+            level1Input.addEventListener('input', recalculateDirectsChain);
+            level1Input.addEventListener('change', recalculateDirectsChain);
+            level1Input.addEventListener('keyup', recalculateDirectsChain);
+
+            // Run immediately on page load
+            recalculateDirectsChain();
+        });
+    </script>
+@endpush

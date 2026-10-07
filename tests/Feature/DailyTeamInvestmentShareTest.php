@@ -17,27 +17,28 @@ class DailyTeamInvestmentShareTest extends TestCase
 
     protected function tearDown(): void
     {
+        $chain = DailyTeamInvestmentShareConfiction::calculateDirectsChain(4);
         DailyTeamInvestmentShareConfiction::updateOrCreate(['id' => 1], [
             'level_1_rate' => 1.00,
-            'level_1_directs' => 4,
+            'level_1_directs' => $chain[1],
             'level_2_rate' => 1.00,
-            'level_2_directs' => 2,
+            'level_2_directs' => $chain[2],
             'level_3_rate' => 1.00,
-            'level_3_directs' => 2,
+            'level_3_directs' => $chain[3],
             'level_4_rate' => 1.00,
-            'level_4_directs' => 2,
+            'level_4_directs' => $chain[4],
             'level_5_rate' => 1.00,
-            'level_5_directs' => 2,
+            'level_5_directs' => $chain[5],
             'level_6_rate' => 1.00,
-            'level_6_directs' => 2,
+            'level_6_directs' => $chain[6],
             'level_7_rate' => 1.00,
-            'level_7_directs' => 2,
+            'level_7_directs' => $chain[7],
             'level_8_rate' => 1.00,
-            'level_8_directs' => 2,
+            'level_8_directs' => $chain[8],
             'level_9_rate' => 1.00,
-            'level_9_directs' => 2,
+            'level_9_directs' => $chain[9],
             'level_10_rate' => 1.00,
-            'level_10_directs' => 2,
+            'level_10_directs' => $chain[10],
         ]);
         parent::tearDown();
     }
@@ -79,37 +80,67 @@ class DailyTeamInvestmentShareTest extends TestCase
             $response->assertSee("name=\"level_{$i}_directs\"", false);
         }
 
-        // Verify default rate 1.00% and direct referrals (4 for L1, 2 for L2..10)
-        $response->assertSee('name="level_1_directs" value="4"', false);
-        $response->assertSee('name="level_2_directs" value="2"', false);
-        $response->assertSee('name="level_10_directs" value="2"', false);
-        $response->assertSee('value="1.00"', false);
+        // Verify Level 1 is editable and has default 4
+        $response->assertSee('id="level_1_directs"', false);
+        $response->assertSee('name="level_1_directs"', false);
+        $response->assertSee('value="4"', false);
+        $this->assertDoesNotMatchRegularExpression('/id="level_1_directs"[^>]*readonly/', $response->getContent());
+
+        // Verify Level 2..10 are readonly and have auto chain values: 6, 8, 10... 22
+        $this->assertMatchesRegularExpression('/id="level_2_directs"[^>]*value="6"[^>]*readonly/', $response->getContent());
+        $this->assertMatchesRegularExpression('/id="level_3_directs"[^>]*value="8"[^>]*readonly/', $response->getContent());
+        $this->assertMatchesRegularExpression('/id="level_10_directs"[^>]*value="22"[^>]*readonly/', $response->getContent());
+
+        // Verify JS auto chain script exists
+        $response->assertSee('recalculateDirectsChain', false);
     }
 
-    public function test_admin_can_save_and_update_rates_and_directs(): void
+    public function test_admin_saves_level_1_as_4_and_chain_persists_6_8_10_to_22(): void
     {
         $postData = [
-            'level_1_rate' => '1.50',
-            'level_1_directs' => '5',
-            'level_2_rate' => '1.25',
-            'level_2_directs' => '3',
-            'level_3_rate' => '1.20',
-            'level_3_directs' => '3',
-            'level_4_rate' => '1.10',
-            'level_4_directs' => '3',
-            'level_5_rate' => '1.05',
-            'level_5_directs' => '2',
-            'level_6_rate' => '1.00',
-            'level_6_directs' => '2',
-            'level_7_rate' => '0.90',
-            'level_7_directs' => '2',
-            'level_8_rate' => '0.80',
-            'level_8_directs' => '2',
-            'level_9_rate' => '0.70',
-            'level_9_directs' => '2',
-            'level_10_rate' => '0.50',
-            'level_10_directs' => '2',
+            'level_1_directs' => '4',
         ];
+        for ($i = 1; $i <= 10; $i++) {
+            $postData["level_{$i}_rate"] = '1.00';
+        }
+
+        $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->post('/admin/daily-team-investment-share', $postData);
+
+        $response->assertSessionHas('successMsg');
+        $response->assertRedirect('/admin/daily-team-investment-share');
+
+        $this->assertDatabaseHas('daily_team_investment_share_confiction', [
+            'level_1_rate' => 1.00,
+            'level_1_directs' => 4,
+            'level_2_directs' => 6,
+            'level_3_directs' => 8,
+            'level_4_directs' => 10,
+            'level_5_directs' => 12,
+            'level_6_directs' => 14,
+            'level_7_directs' => 16,
+            'level_8_directs' => 18,
+            'level_9_directs' => 20,
+            'level_10_directs' => 22,
+        ]);
+
+        $settings = DailyTeamInvestmentShareConfiction::getLevelSettings();
+        $this->assertEquals(4, $settings[1]['directs']);
+        $this->assertEquals(6, $settings[2]['directs']);
+        $this->assertEquals(8, $settings[3]['directs']);
+        $this->assertEquals(10, $settings[4]['directs']);
+        $this->assertEquals(12, $settings[5]['directs']);
+        $this->assertEquals(22, $settings[10]['directs']);
+    }
+
+    public function test_admin_saves_level_1_as_1_and_chain_persists_3_5_7_to_19(): void
+    {
+        $postData = [
+            'level_1_directs' => '1',
+        ];
+        for ($i = 1; $i <= 10; $i++) {
+            $postData["level_{$i}_rate"] = '1.50';
+        }
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
             ->post('/admin/daily-team-investment-share', $postData);
@@ -119,45 +150,66 @@ class DailyTeamInvestmentShareTest extends TestCase
 
         $this->assertDatabaseHas('daily_team_investment_share_confiction', [
             'level_1_rate' => 1.50,
-            'level_1_directs' => 5,
-            'level_2_rate' => 1.25,
+            'level_1_directs' => 1,
             'level_2_directs' => 3,
-            'level_10_rate' => 0.50,
-            'level_10_directs' => 2,
+            'level_3_directs' => 5,
+            'level_4_directs' => 7,
+            'level_5_directs' => 9,
+            'level_6_directs' => 11,
+            'level_7_directs' => 13,
+            'level_8_directs' => 15,
+            'level_9_directs' => 17,
+            'level_10_directs' => 19,
         ]);
 
-        $settings = DailyTeamInvestmentShareConfiction::getLevelSettings();
-        $this->assertEquals(1.50, $settings[1]['rate']);
-        $this->assertEquals(5, $settings[1]['directs']);
-        $this->assertEquals(1.25, $settings[2]['rate']);
-        $this->assertEquals(3, $settings[2]['directs']);
-        $this->assertEquals(0.50, $settings[10]['rate']);
-        $this->assertEquals(2, $settings[10]['directs']);
+        $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->get('/admin/daily-team-investment-share');
+
+        $refreshResponse->assertStatus(200);
+        $refreshResponse->assertSee('id="level_1_directs" name="level_1_directs" value="1"', false);
+        $refreshResponse->assertSee('id="level_2_directs" name="level_2_directs" value="3"', false);
+        $refreshResponse->assertSee('id="level_3_directs" name="level_3_directs" value="5"', false);
+        $refreshResponse->assertSee('id="level_10_directs" name="level_10_directs" value="19"', false);
     }
 
-    public function test_saved_values_persist_on_refresh(): void
+    public function test_backend_enforces_chain_calculation_and_overrides_tampered_inputs(): void
     {
         $postData = [
-            'level_1_rate' => '2.00',
-            'level_1_directs' => '6',
-            'level_2_rate' => '1.80',
-            'level_2_directs' => '4',
-            'level_3_rate' => '1.50',
-            'level_3_directs' => '3',
-            'level_4_rate' => '1.40',
-            'level_4_directs' => '3',
-            'level_5_rate' => '1.30',
-            'level_5_directs' => '2',
+            'level_1_directs' => '4',
+            'level_2_directs' => '999', // Tampered value
+            'level_3_directs' => '100', // Tampered value
+        ];
+        for ($i = 1; $i <= 10; $i++) {
+            $postData["level_{$i}_rate"] = '2.00';
+        }
+
+        $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->post('/admin/daily-team-investment-share', $postData);
+
+        $this->assertDatabaseHas('daily_team_investment_share_confiction', [
+            'level_1_directs' => 4,
+            'level_2_directs' => 6, // Overridden to 6 by backend formula
+            'level_3_directs' => 8, // Overridden to 8 by backend formula
+        ]);
+        $this->assertDatabaseMissing('daily_team_investment_share_confiction', [
+            'level_2_directs' => 999,
+        ]);
+    }
+
+    public function test_rate_fields_and_directs_persist_on_refresh(): void
+    {
+        $postData = [
+            'level_1_rate' => '2.50',
+            'level_1_directs' => '4',
+            'level_2_rate' => '2.00',
+            'level_3_rate' => '1.80',
+            'level_4_rate' => '1.60',
+            'level_5_rate' => '1.40',
             'level_6_rate' => '1.20',
-            'level_6_directs' => '2',
-            'level_7_rate' => '1.10',
-            'level_7_directs' => '2',
-            'level_8_rate' => '1.00',
-            'level_8_directs' => '2',
-            'level_9_rate' => '0.80',
-            'level_9_directs' => '1',
-            'level_10_rate' => '0.60',
-            'level_10_directs' => '1',
+            'level_7_rate' => '1.00',
+            'level_8_rate' => '0.80',
+            'level_9_rate' => '0.60',
+            'level_10_rate' => '0.40',
         ];
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
@@ -167,85 +219,12 @@ class DailyTeamInvestmentShareTest extends TestCase
             ->get('/admin/daily-team-investment-share');
 
         $refreshResponse->assertStatus(200);
-        $refreshResponse->assertSee('value="2.00"', false);
-        $refreshResponse->assertSee('name="level_1_directs" value="6"', false);
-        $refreshResponse->assertSee('value="1.80"', false);
-        $refreshResponse->assertSee('name="level_2_directs" value="4"', false);
-        $refreshResponse->assertSee('value="0.60"', false);
-        $refreshResponse->assertSee('name="level_10_directs" value="1"', false);
-    }
-
-    public function test_admin_can_edit_values_and_save_again(): void
-    {
-        // First save
-        $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', [
-                'level_1_rate' => '2.50',
-                'level_1_directs' => '7',
-                'level_2_rate' => '2.00',
-                'level_2_directs' => '5',
-                'level_3_rate' => '1.80',
-                'level_3_directs' => '4',
-                'level_4_rate' => '1.60',
-                'level_4_directs' => '3',
-                'level_5_rate' => '1.40',
-                'level_5_directs' => '3',
-                'level_6_rate' => '1.20',
-                'level_6_directs' => '2',
-                'level_7_rate' => '1.00',
-                'level_7_directs' => '2',
-                'level_8_rate' => '0.80',
-                'level_8_directs' => '2',
-                'level_9_rate' => '0.60',
-                'level_9_directs' => '2',
-                'level_10_rate' => '0.40',
-                'level_10_directs' => '2',
-            ]);
-
-        // Second edit / save
-        $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', [
-                'level_1_rate' => '3.00',
-                'level_1_directs' => '8',
-                'level_2_rate' => '2.50',
-                'level_2_directs' => '6',
-                'level_3_rate' => '2.00',
-                'level_3_directs' => '5',
-                'level_4_rate' => '1.80',
-                'level_4_directs' => '4',
-                'level_5_rate' => '1.50',
-                'level_5_directs' => '3',
-                'level_6_rate' => '1.30',
-                'level_6_directs' => '3',
-                'level_7_rate' => '1.10',
-                'level_7_directs' => '2',
-                'level_8_rate' => '0.90',
-                'level_8_directs' => '2',
-                'level_9_rate' => '0.70',
-                'level_9_directs' => '2',
-                'level_10_rate' => '0.50',
-                'level_10_directs' => '2',
-            ]);
-
-        $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/daily-team-investment-share');
-
-        $refreshResponse->assertStatus(200);
-        $refreshResponse->assertSee('value="3.00"', false);
-        $refreshResponse->assertSee('name="level_1_directs" value="8"', false);
         $refreshResponse->assertSee('value="2.50"', false);
-        $refreshResponse->assertSee('name="level_2_directs" value="6"', false);
-        $refreshResponse->assertSee('value="0.50"', false);
-        $refreshResponse->assertSee('name="level_10_directs" value="2"', false);
-
-        $this->assertDatabaseHas('daily_team_investment_share_confiction', [
-            'level_1_rate' => 3.00,
-            'level_1_directs' => 8,
-            'level_2_rate' => 2.50,
-            'level_2_directs' => 6,
-            'level_10_rate' => 0.50,
-            'level_10_directs' => 2,
-        ]);
+        $refreshResponse->assertSee('value="2.00"', false);
+        $refreshResponse->assertSee('value="0.40"', false);
+        $refreshResponse->assertSee('id="level_1_directs" name="level_1_directs" value="4"', false);
+        $refreshResponse->assertSee('id="level_2_directs" name="level_2_directs" value="6"', false);
+        $refreshResponse->assertSee('id="level_10_directs" name="level_10_directs" value="22"', false);
     }
 
     public function test_validation_rejects_empty_or_invalid_values(): void
@@ -255,18 +234,14 @@ class DailyTeamInvestmentShareTest extends TestCase
                 'level_1_rate' => '',
                 'level_1_directs' => '-2',
                 'level_2_rate' => '-5',
-                'level_2_directs' => 'abc',
                 'level_3_rate' => '120', // exceeds 100%
-                'level_3_directs' => '',
             ]);
 
         $response->assertSessionHasErrors([
             'level_1_rate',
             'level_1_directs',
             'level_2_rate',
-            'level_2_directs',
             'level_3_rate',
-            'level_3_directs',
         ]);
     }
 
