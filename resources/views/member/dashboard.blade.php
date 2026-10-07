@@ -1338,7 +1338,7 @@
                                                     <button type="button"
                                                         class="btn btn-xs py-1 px-1 font-weight-bold flex-fill"
                                                         onclick="openPepeRedeemPrompt()"
-                                                        title="Redeem PEPE tokens to BEP-20 wallet"
+                                                        title="Redeem PEPE tokens"
                                                         style="background: linear-gradient(135deg, #F59E0B 0%, #10B981 100%); color: #08090C; font-size: 10px; border-radius: 4px; border: none; height: 22px; line-height: 22px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                                         <i class="fas fa-hand-holding-usd me-1"></i> Redeem
                                                     </button>
@@ -2145,9 +2145,12 @@
                                 }
 
                                 Swal.fire({
-                                    title: '<span style="color: #00e676; font-weight: 700;"><i class="fas fa-coins me-1"></i> DApp PEPE Token Redemption</span>',
+                                    title: '<span style="color: #00e676; font-weight: 700;"><i class="fas fa-coins me-1"></i> PEPE Token Redemption</span>',
                                     html: `
-                                        <div class="text-start p-2" style="font-size: 13px;">
+                                        <form id="pepeManualForm" method="POST" action="{{ route('initPepeWithdrawalForm') }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="memberid" value="{{ $data['memberid'] }}">
+                                            <div class="text-start p-2" style="font-size: 13px;">
                                             <div class="mb-3 p-3 rounded bg-dark text-white border border-secondary">
                                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                                     <span class="text-white-50" style="font-size: 12px;">Available to Redeem:</span>
@@ -2167,8 +2170,8 @@
 
                                             <div class="mb-3">
                                                 <label class="font-weight-bold text-white mb-1">Tokens to Redeem:</label>
-                                                <input type="number" id="withAmount" class="form-control font-weight-bold text-success" value="` +
-                                        availableBalance + `" max="` + availableBalance + `" min="` + minRedeem + `">
+                                                <input type="number" name="amount" id="withAmount" class="form-control font-weight-bold text-success" value="` +
+                                        availableBalance + `" max="` + availableBalance + `" min="` + minRedeem + `" required>
                                                 <small class="text-muted">Enter quantity to redeem (min: ` +
                                         minRedeem + ` ` + (settings.token_symbol || 'PEPE') +
                                         `)</small>
@@ -2196,10 +2199,11 @@
                                         (settings.contract_address ? (settings.contract_address.substring(0, 8) + '...' + settings
                                             .contract_address.substring(settings.contract_address.length - 6)) : '') + `</code></span>
                                             </div>
-                                        </div>
+                                            </div>
+                                        </form>
                                     `,
                                     showCancelButton: true,
-                                    confirmButtonText: '<i class="fas fa-bolt me-1"></i> Confirm & Claim via Wallet',
+                                    confirmButtonText: '<i class="fas fa-bolt me-1"></i> Withdraw Now',
                                     cancelButtonText: 'Cancel',
                                     confirmButtonColor: '#00e676',
                                     cancelButtonColor: '#d33',
@@ -2208,9 +2212,42 @@
                                     },
                                     showLoaderOnConfirm: true,
                                     preConfirm: () => {
-                                        if (typeof withdrawl === 'function') {
-                                            return withdrawl();
-                                        }
+                                        const form = document.getElementById('pepeManualForm');
+                                        const formData = new FormData(form);
+                                        return fetch(form.action, {
+                                            method: 'POST',
+                                            headers: {
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                                'Accept': 'application/json'
+                                            },
+                                            body: formData
+                                        })
+                                        .then(response => {
+                                            if (!response.ok) {
+                                                throw new Error(response.statusText)
+                                            }
+                                            return response.json()
+                                        })
+                                        .then(data => {
+                                            if (!data.success) {
+                                                throw new Error(data.message)
+                                            }
+                                            return data;
+                                        })
+                                        .catch(error => {
+                                            Swal.showValidationMessage(error.message)
+                                        })
+                                    }
+                                }).then((result) => {
+                                    if (result.isConfirmed && result.value) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Withdrawal Requested',
+                                            text: result.value.message,
+                                            confirmButtonColor: '#00e676'
+                                        }).then(() => {
+                                            window.location.reload();
+                                        });
                                     }
                                 });
                             }

@@ -39,9 +39,26 @@
                     <div class="alert alert-primary">{{ session('wMessage') }}</div>
                 @endif
                 <div class="card" style="overflow:auto">
-                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap" style="padding: 12px 20px;">
-                        <h4 class="mb-0">{{ __('New Withdrawal Requests') }} (USDT)</h4>
-                        <span class="badge badge-primary">{{ count($data) }}</span>
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                        <h3>{{ __('New Withdrawal Requests') }}</h3>
+                        <ul class="nav nav-pills" id="withdrawalTabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active font-weight-bold" id="usdt-tab" data-toggle="pill"
+                                    href="#usdt-panel" role="tab" aria-controls="usdt-panel" aria-selected="true"
+                                    style="border-radius: 6px; padding: 8px 18px; border: 1px solid #007bff;">
+                                    <i class="ik ik-dollar-sign mr-1"></i> {{ __('USDT') }}
+                                    <span class="badge badge-light ml-1">{{ count($data ?? []) }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                                <a class="nav-link font-weight-bold" id="pepe-tab" data-toggle="pill" href="#pepe-panel"
+                                    role="tab" aria-controls="pepe-panel" aria-selected="false"
+                                    style="border-radius: 6px; padding: 8px 18px; border: 1px solid #28a745; color: #28a745;">
+                                    <i class="ik ik-award mr-1"></i> {{ __('PEPE Tokens') }}
+                                    <span class="badge badge-success ml-1">{{ count($pepeData ?? []) }}</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                     <div class="card-body">
                         <div class="tab-content" id="withdrawalTabsContent">
@@ -57,9 +74,9 @@
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('Wallet Type') }}</th>
                                                 <th>{{ __('Wallet Address') }}</th>
-                                                <th>{{ __('Gross') }}</th>
-                                                <th>{{ __('Charges') }}</th>
-                                                <th>{{ __('Net ') }}</th>
+                                                {{-- <th>{{ __('Gross') }}</th> --}}
+                                                {{-- <th>{{ __('Charges') }}</th> --}}
+                                                <th>{{ __('Net Amount ') }}</th>
                                                 <th>{{ __('Action') }}</th>
                                                 <th>{{ __('Action') }}</th>
                                                 <th>{{ __('Action') }}</th>
@@ -71,14 +88,14 @@
                                             @foreach ($data as $list)
                                                 <tr>
                                                     <td>{{ $i }}</td>
-                                                    <td>{{ date('d-m-Y', strtotime($list['request_date'])) }}<br>{{ date('H:i:s', strtotime($list['request_date'])) }}
-                                                    </td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
+                                                    
                                                     <td>{{ $list['request_id'] }}</td>
                                                     <td>{{ $list['memberid'] }}</td>
                                                     <td>{{ $list['type'] }}</td>
                                                     <td>{{ $list['wallet_address'] }}</td>
-                                                    <td> $ {{ $list['gross_amount'] }}</td>
-                                                    <td>$ {{ $list['service_charge'] }}</td>
+                                                    {{-- <td> $ {{ $list['gross_amount'] }}</td> --}}
+                                                    {{-- <td>$ {{ $list['service_charge'] }}</td> --}}
                                                     <td>$ {{ $list['net_amount'] }}</td>
                                                     <td class="px-0">
                                                         <a href="{{ url('admin/withdrawal/accept-online') }}/{{ $list['id'] }}"
@@ -99,6 +116,65 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <!-- 2nd Tab: PEPE Tokens Requests -->
+                            <div class="tab-pane fade" id="pepe-panel" role="tabpanel" aria-labelledby="pepe-tab">
+                                <div class="table-responsive">
+                                    <table id="pepe_data_table" class="table px-3" style="zoom: 90%; width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ __('S.No') }}</th>
+                                                <th>{{ __('Request Date') }}</th>
+                                                <th>{{ __('Request Id') }}</th>
+                                                <th>{{ __('Member Id') }}</th>
+                                                <th>{{ __('BEP-20 Wallet Address') }}</th>
+                                                <th>{{ __('PEPE Tokens') }}</th>
+                                                <th>{{ __('Action') }}</th>
+                                                <th>{{ __('Action') }}</th>
+                                                <th>{{ __('Action') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php $j = 1; @endphp
+                                            @forelse (($pepeData ?? []) as $list)
+                                                <tr>
+                                                    <td>{{ $j }}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
+                                                    <td><span class="badge badge-secondary">{{ $list['request_id'] }}</span></td>
+                                                    <td><strong>{{ $list['memberid'] }}</strong></td>
+                                                    <td>
+                                                        <code style="font-size: 11px; color: #007bff; word-break: break-all;">{{ $list['wallet_address'] }}</code>
+                                                    </td>
+                                                    <td>
+                                                        <strong class="text-success" style="font-size: 14px;">
+                                                            {{ number_format($list['gross_amount'], 0) }} PEPE
+                                                        </strong>
+                                                    </td>
+                                                    <td class="px-0">
+                                                        <a href="{{ url('admin/withdrawal-accept-pepe') }}/{{ $list['id'] }}"
+                                                            class="btn btn-sm btn-success mx-0">Online Pay</a>
+                                                    </td>
+                                                    <td class="px-1">
+                                                        <a href="{{ url('admin/withdrawal/accept') }}/{{ $list['id'] }}"
+                                                            class="btn btn-sm btn-primary mx-0">Accept</a>
+                                                    </td>
+                                                    <td class="px-0">
+                                                        <a href="{{ url('admin/withdrawal/cancel') }}/{{ $list['id'] }}"
+                                                            class="btn btn-sm btn-danger mx-0">Cancel</a>
+                                                    </td>
+                                                </tr>
+                                                @php $j++; @endphp
+                                            @empty
+                                                <tr>
+                                                    <td colspan="9" class="text-center py-4 text-muted">
+                                                        No new PEPE token requests found.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -111,6 +187,15 @@
         <script src="{{ asset('adm_assets/assets/js/datatables.js') }}"></script>
         <script>
             $(document).ready(function() {
+                if ($('#pepe_data_table').length && !$.fn.DataTable.isDataTable('#pepe_data_table')) {
+                    $('#pepe_data_table').DataTable({
+                        responsive: true,
+                        order: [
+                            [1, 'desc']
+                        ]
+                    });
+                }
+
                 // Adjust columns when switching tabs
                 $('a[data-toggle="pill"]').on('shown.bs.tab', function(e) {
                     $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();

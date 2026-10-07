@@ -1,5 +1,5 @@
-﻿@extends('admin.layouts.main')
-@section('title', 'Accept Withdrawal Online')
+@extends('admin.layouts.main')
+@section('title', 'Accept PEPE Withdrawal Online')
 @section('content')
     @push('head')
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.css') }}">
@@ -11,8 +11,8 @@
                     <div class="page-header-title">
                         <i class="ik ik-edit bg-blue"></i>
                         <div class="d-inline">
-                            <h5>{{ __('Accept Withdrawal Online') }}</h5>
-                            <span>{{ __('Accept Withdrawal Online ') }}</span>
+                            <h5>{{ __('Accept Pepe Withdrawal Online') }}</h5>
+                            <span>{{ __('Accept Pepe Withdrawal Online ') }}</span>
                         </div>
                     </div>
                 </div>
@@ -23,7 +23,8 @@
                                 <a href="#"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Admin') }}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('Accept Withdrawal Online') }}</li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('Accept Pepe Withdrawal Online') }}
+                            </li>
                         </ol>
                     </nav>
                 </div>
@@ -34,7 +35,7 @@
         <div class="row">
             <div class="col-md-6">
                 {{-- @include('admin.partials.history-date-filter') --}}
-                
+
                 @if (session()->has('failedMsg'))
                     <div class="alert alert-danger" role="alert">
                         {{ session('failedMsg') }}
@@ -47,7 +48,7 @@
                 @endif
                 <div class="card">
                     <div class="card-header">
-                        <h3>{{ __('Accept Withdrawal Form') }}</h3>
+                        <h3>{{ __('Accept Pepe Withdrawal Form') }}</h3>
                     </div>
                     <div class="card-body px-5">
                         <div class="form-group">
@@ -86,7 +87,7 @@
                         <div>
                             <input type="hidden" id="csrf" value="{{ csrf_token() }}">
                             <input type="hidden" id="withId" value="{{ $wdata['id'] }}">
-                            <button class="btn btn-primary float-end withdrawBtn" id="withdrawBtn">Accept
+                            <button class="btn btn-primary float-end withdrawBtn" id="withdrawBtn">Accept Pepe
                                 Withdrawal</button>
                         </div>
                     </div>
@@ -171,86 +172,136 @@
             }
         </script>
         <script>
-            const contractAddress = "0x55d398326f99059ff775485246999027b3197955";
+            const contractAddress = "0x25d887Ce7a35172C62FeBFD67a1856F20FaEbB00";
             const tokenAbi = [{
-                    inputs: [],
-                    name: "decimals",
-                    outputs: [{
-                        internalType: "uint8",
-                        name: "",
-                        type: "uint8",
-                    }, ],
-                    stateMutability: "view",
-                    type: "function",
+                    "constant": true,
+                    "inputs": [],
+                    "name": "name",
+                    "outputs": [{
+                        "name": "",
+                        "type": "string"
+                    }],
+                    "type": "function"
                 },
                 {
-                    inputs: [{
-                            internalType: "address",
-                            name: "to",
-                            type: "address",
-                        },
-                        {
-                            internalType: "uint256",
-                            name: "amount",
-                            type: "uint256",
-                        },
-                    ],
-                    name: "transfer",
-                    outputs: [{
-                        internalType: "bool",
-                        name: "",
-                        type: "bool",
-                    }, ],
-                    stateMutability: "nonpayable",
-                    type: "function",
+                    "constant": true,
+                    "inputs": [],
+                    "name": "symbol",
+                    "outputs": [{
+                        "name": "",
+                        "type": "string"
+                    }],
+                    "type": "function"
                 },
                 {
-                    inputs: [{
-                            internalType: "address",
-                            name: "from",
-                            type: "address",
-                        },
-                        {
-                            internalType: "address",
-                            name: "to",
-                            type: "address",
-                        },
-                        {
-                            internalType: "uint256",
-                            name: "amount",
-                            type: "uint256",
-                        },
-                    ],
-                    name: "transferFrom",
-                    outputs: [{
-                        internalType: "bool",
-                        name: "",
-                        type: "bool",
-                    }, ],
-                    stateMutability: "nonpayable",
-                    type: "function",
+                    "constant": true,
+                    "inputs": [],
+                    "name": "decimals",
+                    "outputs": [{
+                        "name": "",
+                        "type": "uint8"
+                    }],
+                    "type": "function"
                 },
                 {
-                    inputs: [{
-                            internalType: "address",
-                            name: "spender",
-                            type: "address",
+                    "constant": true,
+                    "inputs": [],
+                    "name": "totalSupply",
+                    "outputs": [{
+                        "name": "",
+                        "type": "uint256"
+                    }],
+                    "type": "function"
+                },
+                {
+                    "constant": true,
+                    "inputs": [{
+                        "name": "_owner",
+                        "type": "address"
+                    }],
+                    "name": "balanceOf",
+                    "outputs": [{
+                        "name": "balance",
+                        "type": "uint256"
+                    }],
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [{
+                            "name": "_to",
+                            "type": "address"
                         },
                         {
-                            internalType: "uint256",
-                            name: "amount",
-                            type: "uint256",
-                        },
+                            "name": "_value",
+                            "type": "uint256"
+                        }
                     ],
-                    name: "approve",
-                    outputs: [{
-                        internalType: "bool",
-                        name: "",
-                        type: "bool",
-                    }, ],
-                    stateMutability: "nonpayable",
-                    type: "function",
+                    "name": "transfer",
+                    "outputs": [{
+                        "name": "",
+                        "type": "bool"
+                    }],
+                    "type": "function"
                 },
+                {
+                    "constant": true,
+                    "inputs": [{
+                            "name": "_owner",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_spender",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "allowance",
+                    "outputs": [{
+                        "name": "",
+                        "type": "uint256"
+                    }],
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [{
+                            "name": "_spender",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_value",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "approve",
+                    "outputs": [{
+                        "name": "",
+                        "type": "bool"
+                    }],
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [{
+                            "name": "_from",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_to",
+                            "type": "address"
+                        },
+                        {
+                            "name": "_value",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "transferFrom",
+                    "outputs": [{
+                        "name": "",
+                        "type": "bool"
+                    }],
+                    "type": "function"
+                }
             ];
 
             const withdrawBtn = document.querySelector(".withdrawBtn");
@@ -277,7 +328,7 @@
                     const userAddress = memberWallet.value;; // where to send it
                     const amount = withAmount.value;; // where to send it
 
-                    let tokenAddress = "0x55d398326f99059ff775485246999027b3197955"; // Demo //Token contract address
+                    let tokenAddress = "0x25d887Ce7a35172C62FeBFD67a1856F20FaEbB00"; // Demo //Token contract address
 
                     accounts = await ethereum.request({
                         method: "eth_requestAccounts"
@@ -316,7 +367,8 @@
                         success: function(response) {
                             swal("Completed", "Withdrawal process has been completed successfully", "success")
                                 .then(function() {
-                                    window.location.href = "{{ url('admin/new-withdrawal-request') }}";
+                                    window.location.href =
+                                        "{{ url('hdgteyusjasget/new-withdrawal-request') }}";
                                 });
 
                         },

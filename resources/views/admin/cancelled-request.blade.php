@@ -68,12 +68,13 @@
                                                 <th>{{ __('Request Date')}}</th>
                                                 <th>{{ __('Request Id') }}</th>
                                                 <th>{{ __('Member Id')}}</th>
-                                                <th>{{ __('Name')}}</th>
+                                                {{-- <th>{{ __('Name')}}</th> --}}
                                                 <th>{{ __('Type')}}</th>
-                                                <th>{{ __('Gross')}}</th>
-                                                <th>{{ __('Charges')}}</th>
+                                                {{-- <th>{{ __('Gross')}}</th> --}}
+                                                {{-- <th>{{ __('Charges')}}</th> --}}
                                                 <th>{{ __('Net ')}}</th>
                                                 <th>{{ __('Cancelled On ')}}</th>
+                                                <th>{{ __('Status')}}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -81,15 +82,16 @@
                                             @foreach ($data as $list )
                                                 <tr>
                                                     <td>{{$i}}</td>
-                                                    <td>{{ date('d-m-Y', strtotime($list['request_date']))}}<br>{{ date('H:i:s', strtotime($list['request_date']))}}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
                                                     <td>{{ $list['request_id']}}</td>
                                                     <td>{{ $list['memberid']}}</td>
-                                                    <td>{{ $list['name']}}</td>
+                                                    {{-- <td>{{ $list['name']}}</td> --}}
                                                     <td><span class="badge badge-{{$list['type'] == 'Exchange'? 'warning':'primary'}}">{{ $list['type'] }}</span></td>
-                                                    <td>$ {{ $list['gross_amount']}}</td>
-                                                    <td>$ {{ $list['service_charge']}}</td>
+                                                    {{-- <td>$ {{ $list['gross_amount']}}</td> --}}
+                                                    {{-- <td>$ {{ $list['service_charge']}}</td> --}}
                                                     <td>$ {{ $list['net_amount']}}</td>
                                                     <td>{{date('d-m-Y', strtotime( $list['updated_at']))}}</td>
+                                                    <td><span class="badge badge-danger">{{ $list['status']}}</span></td>
                                                 </tr>
                                                 @php $i++;  @endphp
                                             @endforeach
@@ -120,7 +122,7 @@
                                             @forelse (($pepeData ?? []) as $list)
                                                 <tr>
                                                     <td>{{ $j }}</td>
-                                                    <td>{{ date('d-m-Y', strtotime($list['request_date'])) }}<br>{{ date('H:i:s', strtotime($list['request_date'])) }}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
                                                     <td><span class="badge badge-secondary">{{ $list['request_id'] }}</span></td>
                                                     <td><strong>{{ $list['memberid'] }}</strong></td>
                                                     <td>

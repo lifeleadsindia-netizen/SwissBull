@@ -1,4 +1,4 @@
-@extends('member.layouts.main2')
+@extends('member.layouts.main')
 @section('title', 'Main Wallet')
 @section('container')
 
@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- <form action="{{ route('initWithdrawal') }}" method="post" enctype="multipart/form-data"> --}}
+                            <form action="{{ route('initWithdrawal') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="basic-form mb-3">
@@ -87,26 +87,15 @@
                                     Income Wallet withdrawal has 15% service charge deduction.
                                 </div>
                                 <div class="mb-3">
-                                    <input type="hidden" name="route" id="route"
-                                        value="{{ route('initiate-withdrawal') }}">
-                                    <input type="hidden" name="balValidate" id="balValidate"
-                                        value="{{ route('balValidate') }}">
-                                    <input type="hidden" name="getPvtcd" id="getPvtcd" value="{{ route('getPvtcd') }}">
-                                    <input type="hidden" name="netamount" id="netamount" value="{{ $data['wallet'] }}">
-                                    <input type="hidden" class="form-control" value="{{ csrf_token() }}" id="csrf">
-                                    <input type="hidden" name="memberid" id="memberid" value="{{ $data['memberid'] }}">
-                                    <input type="hidden" name="memberWallet" value="{{ $data['member_wallet'] }}"
-                                        id="memberWallet">
-                                    <input type="hidden" name="backUrl" value="{{ config('detailsApp.url') }}"
-                                        id="backUrl">
-                                    <button
+                                   
+                                    <button type="submit"
                                         class="btn btn-primary btn-rounded  btn-block mt-3 mb-4 float-end withdraw_btn subBtn">Withdraw Now</button>
                                     <div class="text-center">
                                         <span id="wMesg" class="text-danger text-center"></span>
                                     </div>
                                 </div>
                             </div>
-                            {{-- </form> --}}
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -133,91 +122,5 @@
         })();
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/3.0.0-rc.5/web3.min.js"></script>
-    <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.1/dist/umd/index.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.js"></script>
-    <script src="{{ asset('uassets/js/main_wallets2.js') }}"></script>
-
-    <!--**********************************
-                        Scripts
-                    ***********************************-->
-    <!-- Required vendors -->
-    <script src="{{ asset('uassets/vendor/global/global.min.js') }}"></script>
-    <script src="{{ asset('uassets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js') }}"></script>
-
-    <!-- Datatable -->
-    <script src="{{ asset('uassets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('uassets/vendor/datatables/responsive/responsive.js') }}"></script>
-    <script src="{{ asset('uassets/js/plugins-init/datatables.init.js') }}"></script>
-
-
-    <!-- Apex Chart -->
-    <script src="{{ asset('uassets/vendor/apexchart/apexchart.js') }}"></script>
-    <script src="{{ asset('uassets/vendor/chart-js/chart.bundle.min.js') }}"></script>
-
-    <!-- counter -->
-    <script src="{{ asset('uassets/vendor/counter/counter.min.js') }}"></script>
-    <script src="{{ asset('uassets/vendor/counter/waypoint.min.js') }}"></script>
-
-    <!-- Chart piety plugin files -->
-    {{-- <script src="{{asset('uassets/vendor/peity/jquery.peity.min.js')}}"></script>
-            <script src="{{asset('uassets/vendor/swiper/js/swiper-bundle.min.js')}}"></script> --}}
-    <script src="{{ asset('uassets/vendor/peity/jquery.peity.min.js') }}"></script>
-    <script src="{{ asset('uassets/js/dashboard/trading-market.js') }}"></script>
-
-    <!-- Dashboard 1 -->
-    <script src="{{ asset('uassets/js/dashboard/dashboard-1.js') }}"></script>
-    <script src="{{ asset('uassets/js/custom.min.js') }}"></script>
-    <script src="{{ asset('uassets/js/dlabnav-init.js') }}"></script>
-    <script src="{{ asset('uassets/js/demo.js') }}"></script>
-    <script src="{{ asset('uassets/js/main.js') }}"></script>
-    {{-- <script src="{{asset('uassets/js/styleSwitcher.js')}}"></script> --}}
-    <script type="text/javascript">
-        function googleTranslateFunction() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-            }, 'google_translate_element');
-        }
-    </script>
-    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateFunction"></script>
-    <script>
-        jQuery(document).ready(function() {
-            setTimeout(function() {
-                dlabSettingsOptions.version = 'light';
-                new dlabSettings(dlabSettingsOptions);
-                setCookie('version', 'light');
-            }, 1500)
-        });
-    </script>
-    <script>
-        $(function() {
-            function isMobileView() {
-                return window.innerWidth <= 768;
-            }
-
-            //withdrawal code
-            $('#withAmount').on('input', function() {
-
-                var netBalance = parseInt($('#netamount').val());
-                var inputAmount = parseInt($(this).val());
-                //  alert("Echo");
-                if (inputAmount > netBalance) {
-
-                    $('#withdrawBtn').attr('disabled', true);
-                    $('#wMesg').html('Enter amount can not be greater then Net Balance');
-                } else if (inputAmount < 10) {
-                    $('#withdrawBtn').attr('disabled', true);
-                    $('#wMesg').html('Minimum withdrawal amount is $10');
-                } else {
-                    $('#withdrawBtn').attr('disabled', false);
-                    $('#wMesg').html('');
-                }
-            });
-
-        })
-    </script>
+  
 @endsection
