@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
 use App\Models\PackagePlan;
+use App\Models\RoiLevelIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
 use Carbon\Carbon;
@@ -191,9 +192,105 @@ class StakingRoiService
 
                 $stats['credited']++;
                 $stats['total_amount'] += $eligibleRoi;
+
+                // G. Team Trading Profit: L1–L10: 5%, 5%, 4%, 4%, 3%, 3%, 2%, 2%, 1%, 1% on daily profit (min 4-decimal precision)
+                $this->distributeTeamTradingProfit($staking->memberid, $member->name ?? $staking->memberid, $eligibleRoi, $dateStr);
             });
         }
 
         return $stats;
+    }
+
+    /**
+     * Distribute Team Trading Profit to uplines (L1–L10: 5%, 5%, 4%, 4%, 3%, 3%, 2%, 2%, 1%, 1%).
+     * Daily trading profit par calculate hoga, minimum 4-decimal precision ke saath.
+     *
+     * @return array<int, array>
+     */
+    public function distributeTeamTradingProfit(string $memberId, string $memberName, float $dailyRoi, string $dateStr): array
+    {
+        $levelRates = [
+            1 => 5.00,
+            2 => 5.00,
+            3 => 4.00,
+            4 => 4.00,
+            5 => 3.00,
+            6 => 3.00,
+            7 => 2.00,
+            8 => 2.00,
+            9 => 1.00,
+            10 => 1.00,
+        ];
+
+        $distributed = [];
+        $currentMember = MemberDetail::where('memberid', $memberId)->first();
+        if (! $currentMember || empty($currentMember->sponsorid) || $currentMember->sponsorid === 'Root') {
+            return $distributed;
+        }
+
+        $sponsorId = $currentMember->sponsorid;
+
+        for ($level = 1; $level <= 10; $level++) {
+            if (empty($sponsorId) || $sponsorId === 'Root') {
+                break;
+            }
+
+            $sponsor = MemberDetail::where('memberid', $sponsorId)->first();
+            if (! $sponsor) {
+                break;
+            }
+
+            $rate = $levelRates[$level] ?? 0.00;
+            // Minimum 4-decimal precision per specification
+            $amount = round($dailyRoi * ($rate / 100), 4);
+
+            if ($amount > 0 && $sponsor->status === 'Active') {
+                // Prevent duplicate record on same date for same sponsor, level and downline
+                $alreadyPaid = RoiLevelIncome::where([
+                    ['memberid', $sponsor->memberid],
+                    ['level', $level],
+                    ['level_id', $memberId],
+                ])->whereDate('created_at', $dateStr)->exists();
+
+                if (! $alreadyPaid) {
+                    $roiLevel = new RoiLevelIncome;
+                    $roiLevel->memberid = $sponsor->memberid;
+                    $roiLevel->level = $level;
+                    $roiLevel->level_id = $memberId;
+                    $roiLevel->name = $memberName;
+                    $roiLevel->type = 'Team Trading Profit';
+                    $roiLevel->staking_income = $dailyRoi;
+                    $roiLevel->rate = $rate;
+                    $roiLevel->amount = $amount;
+                    $roiLevel->status = 'Paid';
+                    $roiLevel->created_at = Carbon::parse($dateStr.' '.now()->format('H:i:s'));
+                    $roiLevel->save();
+
+                    $oldWallet = (float) $sponsor->wallet;
+                    $sponsor->wallet = $oldWallet + $amount;
+                    $sponsor->save();
+
+                    walletTransfer(
+                        $sponsor->memberid,
+                        $amount,
+                        'debit',
+                        $oldWallet,
+                        'Team Trading Profit',
+                        "Level {$level} Team Trading Profit from {$memberId} ($".number_format($dailyRoi, 4).' daily profit)'
+                    );
+
+                    $distributed[] = [
+                        'level' => $level,
+                        'sponsorid' => $sponsor->memberid,
+                        'rate' => $rate,
+                        'amount' => $amount,
+                    ];
+                }
+            }
+
+            $sponsorId = $sponsor->sponsorid;
+        }
+
+        return $distributed;
     }
 }

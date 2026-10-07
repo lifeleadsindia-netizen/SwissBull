@@ -4,7 +4,6 @@ use App\Models\DirectIncome;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\ReferralBonusConfiction;
-use App\Models\RoiLevelIncome;
 use App\Models\StakingDetail;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
@@ -52,79 +51,62 @@ function p2pwalletTransfer($memberid, $amount, $type, $p2pwallet, $walletType, $
     }
 }
 
-// function levelIncome($sponsorid, $memberid, $name, $_amount, $type)
-// {
-//     if ($sponsorid != 'Root') {
-//         $limit = 11;
-//         for ($i = 1; $i < $limit; $i++) {
-//             $level = $i;
-//             $rate = ;
-//             $amount = $_amount * $rate / 100;
+function levelIncome($sponsorid, $memberid, $name, $_amount, $type = 'Daily Team Investment Share')
+{
+    if ($sponsorid != 'Root') {
+        $limit = 11;
+        for ($i = 1; $i < $limit; $i++) {
+            $level = $i;
+            $rate = 1.00; // L1–L10 = 1% each per PDF specification
+            $amount = round($_amount * $rate / 100, 2);
 
-//             if ($sponsorid != 'Root') {
-//                 $var = MemberDetail::where('memberid', $sponsorid)->first();
-//                 $status = $var->status;
-//                 $downline = $var->downline;
+            if ($sponsorid != 'Root') {
+                $var = MemberDetail::where('memberid', $sponsorid)->first();
+                if (! $var) {
+                    break;
+                }
+                $status = $var->status;
+                $downline = (int) $var->downline;
 
-//                 if ($amount > 0 && $status == 'Active') {
+                if ($amount > 0) {
+                    $insert = new LevelIncome;
+                    $insert->package = $_amount;
+                    $insert->memberid = $sponsorid;
+                    $insert->level = $level;
+                    $insert->level_id = $memberid;
+                    $insert->amount = $amount;
+                    $insert->rate = $rate;
+                    $insert->name = $name;
+                    $insert->type = $type;
 
-//                     if ($type == 'Account Activation') {
-//                         $insert = new LevelIncome;
-//                         $insert->package = $_amount;
-//                     } else {
-//                         $insert = new RoiLevelIncome;
-//                         $insert->staking_income = $_amount;
-//                     }
+                    // L1 requires 4 direct referrals; thereafter +2 direct referrals per level (L1: 4, L2: 6, ... L10: 22)
+                    $requiredDirects = 4 + ($level - 1) * 2;
 
-//                     $insert->memberid = $sponsorid;
-//                     $insert->level = $level;
-//                     $insert->level_id = $memberid;
-//                     $insert->amount = $amount;
-//                     $insert->rate = $rate;
-//                     $insert->name = $name;
-//                     $insert->type = $type;
+                    if ($status == 'Active' && $downline >= $requiredDirects) {
+                        $insert->status = 'Paid';
+                        $wallet = $var->wallet;
+                        $var->wallet += $amount;
+                        $var->save();
 
-//                     if ($level == 1 && $downline >= 4|| $level == 2 && $downline >= 2 || $level == 3 && $downline >= 2 || $level == 4 && $downline >= 2 || $level == 5 && $downline >= 2 || $level == 6 && $downline >= 2 || $level == 7 && $downline >= 2 || $level == 8 && $downline >= 2 || $level == 9 && $downline >= 2 || $level == 10 && $downline >= 2) {
+                        walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Daily Team Investment Share', 'Level '.$level.' Daily Team Investment Share Amount Added into wallet.');
+                    } else {
+                        $insert->status = 'Flushed';
+                    }
+                    $insert->save();
+                }
 
-//                         $insert->status = 'Paid';
-//                         $wallet = $var->wallet;
-//                         $var->wallet += $amount;
-//                         $var->save();
-
-//                         walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Level Income', ' '.$i.'Activation Level Income Amount Added into wallet.');
-//                         $insert->status = 'Paid';
-//                     } else {
-//                         $insert->status = 'Flushed';
-//                     }
-//                     $insert->save();
-//                 }
-//                 $inc = MemberDetail::where('memberid', $sponsorid)->first();
-//                 $sponsorid = $inc['sponsorid'];
-//             } else {
-//                 break;
-//             }
-//         }
-//     }
-// }
+                $inc = MemberDetail::where('memberid', $sponsorid)->first();
+                $sponsorid = $inc ? $inc->sponsorid : 'Root';
+            } else {
+                break;
+            }
+        }
+    }
+}
 
 function levelRate($level)
 {
-
-    if ($level == 1) {
-        $rate = 10;
-    } elseif ($level == 2) {
-        $rate = 3;
-    } elseif ($level == 3) {
-        $rate = 2;
-    } elseif ($level >= 4 && $level <= 6) {
-        $rate = 1;
-    } elseif ($level >= 7 && $level <= 10) {
-        $rate = 0.5;
-    } else {
-        $rate = 0;
-    }
-
-    return $rate;
+    return ($level >= 1 && $level <= 10) ? 1.00 : 0.00;
 }
 
 function withdrawalIncome($sponsorid, $memberid, $name, $id, $type)

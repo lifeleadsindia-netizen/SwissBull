@@ -164,7 +164,8 @@ class InvestmentController extends Controller
             'Staking amount deducted from wallet'
         );
 
-        levelIncome($sponsorid, $memberid, $name, $amount, 'Stacking Activation');
+        directIncome($sponsorid, $memberid, $name, $amount, 'Referral Bonus');
+        levelIncome($sponsorid, $memberid, $name, $amount, 'Daily Team Investment Share');
         team_biz_update($sponsorid, $amount);
         session()->flash('successMsg', 'Staking has been created successfully.');
 

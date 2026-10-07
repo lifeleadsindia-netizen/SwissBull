@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\DirectIncome;
+use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
+use App\Models\PartnershipIncome;
 use App\Models\RoiLevelIncome;
 use App\Models\SingleLegIncome;
 use App\Models\StakingIncome;
+use App\Models\WithdrawalIncome;
 
 class IncomeController extends Controller
 {
@@ -17,6 +20,14 @@ class IncomeController extends Controller
         $result['rData'] = StakingIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
 
         return view('member.income.roi-incomes')->with($result);
+    }
+
+    public function directIncome()
+    {
+        $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
+        $result['dData'] = DirectIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
+
+        return view('member.income.direct-incomes')->with($result);
     }
 
     public function stakingLevelIncome()
@@ -35,6 +46,14 @@ class IncomeController extends Controller
         return view('member.income.level-incomes')->with($result);
     }
 
+    public function heroIncome()
+    {
+        $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
+        $result['hData'] = HeroOfTheMonthReward::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
+
+        return view('member.income.hero-rewards')->with($result);
+    }
+
     public function singleLegIncome()
     {
         $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
@@ -46,7 +65,7 @@ class IncomeController extends Controller
     public function partnershipIncome()
     {
         $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
-        $result['pData'] = DirectIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
+        $result['pData'] = PartnershipIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
 
         return view('member.income.partnership-incomes')->with($result);
     }
@@ -54,7 +73,7 @@ class IncomeController extends Controller
     public function withdrawalCommissionIncome()
     {
         $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
-        $result['wData'] = DirectIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
+        $result['wData'] = WithdrawalIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
 
         return view('member.income.withdrawal-Commission')->with($result);
     }

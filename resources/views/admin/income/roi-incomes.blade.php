@@ -9,10 +9,10 @@
             <div class="row align-items-end">
                 <div class="col-lg-8">
                     <div class="page-header-title">
-                        <i class="ik ik-edit bg-blue"></i>
+                        <i class="ik ik-trending-up bg-blue"></i>
                         <div class="d-inline">
-                            <h5>{{ __('Roi Income') }}</h5>
-                            <span>{{ __('Roi Income details') }}</span>
+                            <h5>{{ __('Monthly Trading Profit') }}</h5>
+                            <span>{{ __('Monthly Trading Profit records and daily ROI installments') }}</span>
                         </div>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                                 <a href="#"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Admin') }}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('Roi Income') }}</li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('Monthly Trading Profit') }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -40,7 +40,7 @@
                 @endif
                 <div class="card">
                     <div class="card-header">
-                        <h3>{{ __('Roi Income') }}</h3>
+                        <h3>{{ __('Monthly Trading Profit') }}</h3>
                     </div>
                     <div class="card-body px-5 " style="overflow: auto">
                         <div class="responsive">
