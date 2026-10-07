@@ -106,8 +106,6 @@
                             class="menu-item {{ (request()->is('*monthly-trading-profit') || request()->is('*roi-incomes*')) ? 'active' : '' }}">{{ __('Monthly Trading Profit') }}</a>
                         <a href="{{ url('admin/income/roi-details') }}"
                             class="menu-item {{ request()->is('*roi-details*') ? 'active' : '' }}">{{ __('Trading Profit Details') }}</a>
-                        <a href="{{ route('admin.monthlyTradingProfit') }}"
-                            class="menu-item {{ request()->is('admin/monthly-trading-profit') ? 'active' : '' }}">{{ __('Trading Profit Config') }}</a>
                     </div>
                 </div>
 
@@ -117,8 +115,6 @@
                     <div class="submenu-content">
                         <a href="{{ url('admin/income/referral-bonus') }}"
                             class="menu-item {{ (request()->is('*referral-bonus*') || request()->is('*direct-incomes*')) ? 'active' : '' }}">{{ __('Referral Bonus') }}</a>
-                        <a href="{{ route('admin.referralBonus') }}"
-                            class="menu-item {{ request()->is('admin/referral-bonus') ? 'active' : '' }}">{{ __('Referral Bonus Config') }}</a>
                         <a href="{{ url('admin/income/team-trading-profit') }}"
                             class="menu-item {{ (request()->is('*team-trading-profit*') || request()->is('*staking-level-incomes*')) ? 'active' : '' }}">{{ __('Team Trading Profit') }}</a>
                         <a href="{{ url('admin/income/daily-team-investment-share') }}"
@@ -127,8 +123,6 @@
                             class="menu-item {{ request()->is('*hero-of-the-month*') ? 'active' : '' }}">{{ __('Hero of the Month') }}</a>
                         <a href="{{ url('admin/income/single-leg-incomes') }}"
                             class="menu-item {{ request()->is('*single-leg-incomes*') ? 'active' : '' }}">{{ __('Single Leg Income') }}</a>
-                        <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}"
-                            class="menu-item {{ request()->is('*team-withdrawal-commission-incomes*') ? 'active' : '' }}">{{ __('Team Withdrawal Commission') }}</a>
                     </div>
                 </div>
 

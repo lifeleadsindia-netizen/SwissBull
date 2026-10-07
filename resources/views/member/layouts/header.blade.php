@@ -1554,7 +1554,6 @@
                                 <li><a href="{{ url('member/income/daily-team-investment-share') }}">Daily Team Investment Share</a></li>
                                 <li><a href="{{ url('member/income/hero-of-the-month') }}">Hero of the Month</a></li>
                                 <li><a href="{{ url('member/income/partnership-income') }}">Partnership Income</a></li>
-                                <li><a href="{{ url('member/income/team-withdrawal-commission') }}">Team Withdrawal Commission</a></li>
                             </ul>
                         </li>
 

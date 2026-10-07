@@ -214,8 +214,7 @@ function totalIncome($memberid)
         + totalMemberLevelIncome($memberid)
         + totalMemberHeroOfTheMonthIncome($memberid)
         + totalMemberPartnershipIncome($memberid)
-        + totalMemberSingleLegIncome($memberid)
-        + totalMemberTeamWithdrawalCommissionIncome($memberid);
+        + totalMemberSingleLegIncome($memberid);
 
     return $sum;
 }

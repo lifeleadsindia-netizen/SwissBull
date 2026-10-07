@@ -3461,42 +3461,23 @@
                                             </a>
                                         </div>
 
-                                        @if (totalMemberSingleLegIncome($data['memberid']) > 0 || totalMemberTeamWithdrawalCommissionIncome($data['memberid']) > 0)
-                                            <!-- Additional Legacy Earnings -->
-                                            @if (totalMemberSingleLegIncome($data['memberid']) > 0)
-                                                <div class="col-xl-6 col-md-6 col-sm-12 mb-3">
-                                                    <a href="{{ url('member/income/single-leg-income') }}" class="text-decoration-none">
-                                                        <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
-                                                            <div class="card-body p-3">
-                                                                <div class="media align-items-center">
-                                                                    <span class="me-3"><i class="la la-pie-chart" style="font-size: 1.5rem;"></i></span>
-                                                                    <div class="media-body text-white">
-                                                                        <small class="text-white-50">Single Leg Income</small>
-                                                                        <h5 class="text-white mb-0">$ {{ number_format((float) totalMemberSingleLegIncome($data['memberid']), 2) }}</h5>
-                                                                    </div>
+                                        @if (totalMemberSingleLegIncome($data['memberid']) > 0)
+                                            <!-- Additional Single Leg Earnings -->
+                                            <div class="col-xl-6 col-md-6 col-sm-12 mb-3">
+                                                <a href="{{ url('member/income/single-leg-income') }}" class="text-decoration-none">
+                                                    <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
+                                                        <div class="card-body p-3">
+                                                            <div class="media align-items-center">
+                                                                <span class="me-3"><i class="la la-pie-chart" style="font-size: 1.5rem;"></i></span>
+                                                                <div class="media-body text-white">
+                                                                    <small class="text-white-50">Single Leg Income</small>
+                                                                    <h5 class="text-white mb-0">$ {{ number_format((float) totalMemberSingleLegIncome($data['memberid']), 2) }}</h5>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </a>
-                                                </div>
-                                            @endif
-                                            @if (totalMemberTeamWithdrawalCommissionIncome($data['memberid']) > 0)
-                                                <div class="col-xl-6 col-md-6 col-sm-12 mb-3">
-                                                    <a href="{{ url('member/income/team-withdrawal-commission') }}" class="text-decoration-none">
-                                                        <div class="widget-stat card dash-3d-card row-theme-4 h-100 mb-0">
-                                                            <div class="card-body p-3">
-                                                                <div class="media align-items-center">
-                                                                    <span class="me-3"><i class="la la-arrow-down" style="font-size: 1.5rem;"></i></span>
-                                                                    <div class="media-body text-white">
-                                                                        <small class="text-white-50">Team Withdrawal Commission</small>
-                                                                        <h5 class="text-white mb-0">$ {{ number_format((float) totalMemberTeamWithdrawalCommissionIncome($data['memberid']), 2) }}</h5>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            @endif
+                                                    </div>
+                                                </a>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>

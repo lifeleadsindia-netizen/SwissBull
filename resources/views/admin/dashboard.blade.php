@@ -634,29 +634,16 @@
                                 </a>
                             </div>
 
-                            @if (totalAdminSingleLegIncome() > 0 || totalAdminTeamWithdrawalCommissionIncome() > 0)
-                                @if (totalAdminSingleLegIncome() > 0)
-                                    <div class="col-xl-6 col-md-6 mb-3">
-                                        <a href="{{ url('admin/income/single-leg-incomes') }}"
-                                            class="commission-metric commission-metric-deposit">
-                                            <span class="commission-metric-icon"><i class="ik ik-pie-chart"></i></span>
-                                            <p class="commission-metric-label">Single Leg Income</p>
-                                            <h4 class="commission-metric-value">$ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}</h4>
-                                            <span class="commission-metric-link">View Details <i class="ik ik-arrow-right"></i></span>
-                                        </a>
-                                    </div>
-                                @endif
-                                @if (totalAdminTeamWithdrawalCommissionIncome() > 0)
-                                    <div class="col-xl-6 col-md-6 mb-3">
-                                        <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}"
-                                            class="commission-metric commission-metric-withdrawal">
-                                            <span class="commission-metric-icon"><i class="ik ik-download"></i></span>
-                                            <p class="commission-metric-label">Team Withdrawal Commission</p>
-                                            <h4 class="commission-metric-value">$ {{ number_format((float) totalAdminTeamWithdrawalCommissionIncome(), 2) }}</h4>
-                                            <span class="commission-metric-link">View Details <i class="ik ik-arrow-right"></i></span>
-                                        </a>
-                                    </div>
-                                @endif
+                            @if (totalAdminSingleLegIncome() > 0)
+                                <div class="col-xl-6 col-md-6 mb-3">
+                                    <a href="{{ url('admin/income/single-leg-incomes') }}"
+                                        class="commission-metric commission-metric-deposit">
+                                        <span class="commission-metric-icon"><i class="ik ik-pie-chart"></i></span>
+                                        <p class="commission-metric-label">Single Leg Income</p>
+                                        <h4 class="commission-metric-value">$ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}</h4>
+                                        <span class="commission-metric-link">View Details <i class="ik ik-arrow-right"></i></span>
+                                    </a>
+                                </div>
                             @endif
                         </div>
                     </div>

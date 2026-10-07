@@ -145,7 +145,7 @@ class IncomeDashboardAndSidebarTest extends TestCase
         $res->assertStatus(200);
         $res->assertSee('Hero of the Month');
 
-        // 6. Member Dashboard has new income titles & values
+        // 6. Member Dashboard has new income titles & values and does not show Team Withdrawal Commission
         $dashRes = $this->withSession($session)->get('member/dashboard');
         $dashRes->assertStatus(200);
         $dashRes->assertSee('Monthly Trading Profit');
@@ -154,6 +154,7 @@ class IncomeDashboardAndSidebarTest extends TestCase
         $dashRes->assertSee('Daily Team Investment Share');
         $dashRes->assertSee('Hero of the Month');
         $dashRes->assertSee('Partnership Income');
+        $dashRes->assertDontSee('Team Withdrawal Commission');
     }
 
     public function test_admin_income_views_render_successfully(): void
@@ -185,7 +186,7 @@ class IncomeDashboardAndSidebarTest extends TestCase
         $res->assertStatus(200);
         $res->assertSee('Hero of the Month');
 
-        // 6. Admin Dashboard
+        // 6. Admin Dashboard and Sidebar
         $dashRes = $this->withSession($adminSession)->get('admin/dashboard');
         $dashRes->assertStatus(200);
         $dashRes->assertSee('Monthly Trading Profit');
@@ -193,5 +194,6 @@ class IncomeDashboardAndSidebarTest extends TestCase
         $dashRes->assertSee('Team Trading Profit');
         $dashRes->assertSee('Daily Team Investment Share');
         $dashRes->assertSee('Hero of the Month');
+        $dashRes->assertDontSee('Team Withdrawal Commission');
     }
 }
