@@ -82,10 +82,10 @@
                                     @enderror
                                 </div>
 
-                                <div class="alert alert-warning mt-3 mb-0" role="alert">
+                                {{-- <div class="alert alert-warning mt-3 mb-0" role="alert">
                                     <strong>Note:</strong>
                                     Income Wallet withdrawal has 15% service charge deduction.
-                                </div>
+                                </div> --}}
                                 <div class="mb-3">
                                    
                                     <button type="submit"
