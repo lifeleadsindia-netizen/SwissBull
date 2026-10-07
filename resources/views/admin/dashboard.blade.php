@@ -1,1025 +1,546 @@
-﻿@extends('admin.layouts.main')
+@extends('admin.layouts.main')
 @section('title', 'Dashboard')
 @section('content')
     <!-- push external head elements to head -->
     @push('head')
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/weather-icons/css/weather-icons.min.css') }}">
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/owl.carousel/dist/assets/owl.carousel.min.css') }}">
-        <link rel="stylesheet"
-            href="{{ asset('adm_assets/assets/plugins/owl.carousel/dist/assets/owl.theme.default.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/owl.carousel/dist/assets/owl.theme.default.min.css') }}">
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/chartist/dist/chartist.min.css') }}">
-        <style>
-            .order-usdt-section {
-                border: 0;
-                overflow: hidden;
-                border-radius: 14px;
-                box-shadow: 0 14px 36px rgba(18, 38, 63, 0.12);
-            }
-
-            .order-usdt-header {
-                background:
-                    radial-gradient(circle at right top, rgba(255, 255, 255, 0.22), transparent 38%),
-                    linear-gradient(125deg, #0b365d 0%, #126a83 54%, #1f8a70 100%);
-                color: #fff;
-                border-bottom: 0;
-                padding: 20px 22px;
-            }
-
-            .order-usdt-header h3 {
-                color: #fff;
-                font-size: 22px;
-                font-weight: 700;
-                letter-spacing: 0.2px;
-            }
-
-            .order-usdt-subtitle {
-                color: rgba(255, 255, 255, 0.9);
-                font-size: 13px;
-                margin: 4px 0 0;
-            }
-
-            .order-usdt-btn {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 6px;
-                white-space: nowrap;
-                line-height: 1;
-                border-radius: 999px;
-                padding: 9px 16px;
-                font-weight: 700;
-                border: 1px solid rgba(255, 255, 255, 0.35);
-                color: #fff;
-                background: linear-gradient(135deg, #ff9f43, #ff6b6b);
-                box-shadow: 0 8px 18px rgba(255, 107, 107, 0.32);
-                transition: all 0.2s ease;
-            }
-
-            .order-usdt-btn i {
-                font-size: 14px;
-                margin-left: 0;
-                transition: transform 0.2s ease;
-            }
-
-            .order-usdt-btn:hover {
-                color: #fff;
-                transform: translateY(-1px);
-                box-shadow: 0 12px 22px rgba(255, 107, 107, 0.38);
-            }
-
-            .order-usdt-btn:focus,
-            .order-usdt-btn:active {
-                color: #fff;
-                box-shadow: 0 0 0 0.2rem rgba(255, 159, 67, 0.28);
-            }
-
-            .order-usdt-btn:hover i {
-                transform: translateX(2px);
-            }
-
-            .order-usdt-grid {
-                background: linear-gradient(180deg, #f7fbff, #ffffff);
-                border-top: 1px solid #edf3f9;
-            }
-
-            .order-usdt-stat {
-                border-radius: 12px;
-                padding: 16px;
-                background: #fff;
-                border: 1px solid #eaf0f7;
-                height: 100%;
-                position: relative;
-                overflow: hidden;
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-            }
-
-            .order-usdt-stat::after {
-                content: "";
-                position: absolute;
-                left: 0;
-                bottom: 0;
-                width: 100%;
-                height: 3px;
-            }
-
-            .order-usdt-stat:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 12px 22px rgba(18, 38, 63, 0.11);
-            }
-
-            .order-usdt-label {
-                color: #738092;
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.7px;
-                margin-bottom: 8px;
-            }
-
-            .order-usdt-value {
-                font-size: 28px;
-                line-height: 1;
-                font-weight: 700;
-                margin: 0;
-                color: #1f2d3d;
-            }
-
-            .order-usdt-icon {
-                width: 44px;
-                height: 44px;
-                border-radius: 12px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 18px;
-                margin-bottom: 12px;
-            }
-
-            .order-usdt-total .order-usdt-icon {
-                background: rgba(15, 76, 129, 0.12);
-                color: #0f4c81;
-            }
-
-            .order-usdt-total::after {
-                background: #0f4c81;
-            }
-
-            .order-usdt-allowed .order-usdt-icon {
-                background: rgba(23, 162, 95, 0.12);
-                color: #17a25f;
-            }
-
-            .order-usdt-allowed::after {
-                background: #17a25f;
-            }
-
-            .order-usdt-other .order-usdt-icon {
-                background: rgba(240, 173, 78, 0.16);
-                color: #d4942f;
-            }
-
-            .order-usdt-other::after {
-                background: #f0ad4e;
-            }
-
-            .order-usdt-amount .order-usdt-icon {
-                background: rgba(111, 66, 193, 0.13);
-                color: #6f42c1;
-            }
-
-            .order-usdt-amount::after {
-                background: #6f42c1;
-            }
-
-            .order-usdt-meta {
-                border: 1px solid #e6edf5;
-                border-radius: 12px;
-                padding: 14px 16px;
-                background: #fff;
-            }
-
-            .order-usdt-meta-top {
-                font-size: 12px;
-                font-weight: 600;
-                color: #607086;
-                margin-bottom: 10px;
-            }
-
-            .order-usdt-progress {
-                height: 8px;
-                background: #edf2f8;
-                border-radius: 999px;
-                overflow: hidden;
-            }
-
-            .order-usdt-progress-allowed {
-                background: linear-gradient(90deg, #1abc76, #109b61);
-                height: 100%;
-                float: left;
-            }
-
-            .order-usdt-progress-other {
-                background: linear-gradient(90deg, #f3b450, #df9931);
-                height: 100%;
-                float: left;
-            }
-
-            .order-usdt-legend {
-                font-size: 12px;
-                color: #6d7787;
-                margin-top: 10px;
-            }
-
-            /* Pool Cards Styling */
-            .pool-card {
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
-                border: 2px solid rgba(0, 255, 156, 0.2);
-                border-radius: 12px;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .pool-card::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 4px;
-                background: linear-gradient(90deg, #00ff9c, #007bff);
-            }
-
-            .pool-card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-            }
-
-            .pool-card-primary {
-                border-left: 5px solid #007bff;
-            }
-
-            .pool-card-success {
-                border-left: 5px solid #00ff9c;
-            }
-
-            .pool-card-danger {
-                border-left: 5px solid #ff6b6b;
-            }
-
-            .pool-card-value {
-                font-weight: 700;
-                margin-bottom: 0.5rem;
-                font-size: 1.8rem;
-            }
-
-            .pool-value-total {
-                color: #007bff;
-            }
-
-            .pool-value-active {
-                color: #00ff9c;
-            }
-
-            .pool-value-inactive {
-                color: #ff6b6b;
-            }
-
-            .pool-card-label {
-                color: #666;
-                font-size: 0.95rem;
-                font-weight: 600;
-                margin: 0;
-            }
-
-            .pool-card-icon {
-                font-size: 2.5rem;
-                opacity: 0.8;
-                transition: all 0.3s ease;
-            }
-
-            .pool-icon-primary {
-                color: #007bff;
-            }
-
-            .pool-icon-success {
-                color: #00ff9c;
-            }
-
-            .pool-icon-danger {
-                color: #ff6b6b;
-            }
-
-            .pool-card:hover .pool-card-icon {
-                opacity: 1;
-                transform: scale(1.1);
-            }
-
-            .commission-overview-card {
-                border: 0;
-                border-radius: 14px;
-                overflow: hidden;
-                box-shadow: 0 14px 36px rgba(18, 38, 63, 0.12);
-                background: #fff;
-            }
-
-            .commission-overview-header {
-                background:
-                    radial-gradient(circle at right top, rgba(255, 255, 255, 0.2), transparent 40%),
-                    linear-gradient(130deg, #213a75 0%, #265d9b 55%, #2c86b8 100%);
-                padding: 18px 22px;
-                color: #fff;
-            }
-
-            .commission-overview-header h3 {
-                margin: 0;
-                color: #fff;
-                font-size: 22px;
-                font-weight: 700;
-            }
-
-            .commission-overview-subtitle {
-                margin: 4px 0 0;
-                font-size: 13px;
-                color: rgba(255, 255, 255, 0.88);
-            }
-
-            .commission-overview-body {
-                background: linear-gradient(180deg, #f7fbff, #ffffff);
-                border-top: 1px solid #e9f1fa;
-                padding: 16px;
-            }
-
-            .commission-metric {
-                display: block;
-                border: 1px solid #e7eff8;
-                border-radius: 12px;
-                background: #fff;
-                padding: 16px;
-                text-decoration: none !important;
-                position: relative;
-                overflow: hidden;
-                height: 100%;
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-            }
-
-            .commission-metric:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 12px 22px rgba(18, 38, 63, 0.11);
-            }
-
-            .commission-metric::after {
-                content: "";
-                position: absolute;
-                left: 0;
-                bottom: 0;
-                width: 100%;
-                height: 3px;
-            }
-
-            .commission-metric-icon {
-                width: 44px;
-                height: 44px;
-                border-radius: 12px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 18px;
-                margin-bottom: 10px;
-            }
-
-            .commission-metric-label {
-                font-size: 12px;
-                color: #6f7f92;
-                text-transform: uppercase;
-                font-weight: 700;
-                letter-spacing: 0.7px;
-                margin-bottom: 8px;
-            }
-
-            .commission-metric-value {
-                font-size: 28px;
-                line-height: 1;
-                font-weight: 700;
-                margin: 0;
-                color: #1f2d3d;
-            }
-
-            .commission-metric-link {
-                margin-top: 8px;
-                display: inline-block;
-                font-size: 12px;
-                font-weight: 600;
-                color: #75859b;
-            }
-
-            .commission-metric-deposit .commission-metric-icon {
-                background: rgba(42, 119, 242, 0.14);
-                color: #2a77f2;
-            }
-
-            .commission-metric-deposit::after {
-                background: #2a77f2;
-            }
-
-            .commission-metric-withdrawal .commission-metric-icon {
-                background: rgba(230, 85, 98, 0.14);
-                color: #e65562;
-            }
-
-            .commission-metric-withdrawal::after {
-                background: #e65562;
-            }
-
-            .commission-metric-advertisement .commission-metric-icon {
-                background: rgba(36, 176, 111, 0.15);
-                color: #24b06f;
-            }
-
-            .commission-metric-advertisement::after {
-                background: #24b06f;
-            }
-        </style>
     @endpush
 
-    <div class="container-fluid">
+    <div class="adm-dashboard-container">
+        <!-- 1. DASHBOARD HEADER AREA -->
+        <div class="adm-dash-header">
+            <div>
+                <h1 class="adm-dash-title">Admin Dashboard</h1>
+                <p class="adm-dash-subtitle">Monitor your members, wallets and platform performance in real time.</p>
+            </div>
+            <div>
+                <div class="adm-date-badge">
+                    <i class="ik ik-calendar"></i>
+                    <div class="adm-date-text">
+                        <span class="adm-date-val">
+                            {{ date('F d, Y') }} <span class="chevron">▾</span>
+                        </span>
+                        <span class="adm-date-sub">Today</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TOP 4 STATISTICS CARDS -->
         <div class="row">
-            <!-- page statustic chart start -->
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-red text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-8">
-                                <h4 class="mb-0">{{ totalMembersadmin() }}</h4>
-                                <p class="mb-0">Total Members</p>
-                            </div>
-                            <div class="col-4 text-right">
-                                <i class="ik ik-shopping-cart f-30"></i>
-                            </div>
+            <!-- Card 1: Total Members -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="adm-stat-card adm-stat-blue">
+                    <div class="adm-stat-top">
+                        <div class="adm-stat-title-wrap">
+                            <span class="adm-stat-indicator"></span>
+                            <h4 class="adm-stat-title">Total Members</h4>
                         </div>
-                        <div id="Widget-line-chart1" class="chart-line chart-shadow"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-blue text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-8">
-                                <h4 class="mb-0">{{ totalActiveMembers() }}</h4>
-                                <p class="mb-0">Total Active </p>
-                            </div>
-                            <div class="col-4 text-right">
-                                <i class="ik ik-shopping-cart f-30"></i>
-                            </div>
+                        <div class="adm-stat-icon">
+                            <i class="ik ik-users"></i>
                         </div>
-                        <div id="Widget-line-chart2" class="chart-line chart-shadow"></div>
                     </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-green text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-8">
-                                <h4 class="mb-0">{{ totalTempMembers() }}</h4>
-                                <p class="mb-0">Total Inactive </p>
-                            </div>
-                            <div class="col-4 text-right">
-                                <i class="fas fa-cube f-30"></i>
-                            </div>
+                    <div class="adm-stat-bottom">
+                        <div>
+                            <h2 class="adm-stat-num">{{ totalMembersadmin() }}</h2>
+                            <span class="adm-stat-badge">
+                                <i class="ik ik-trending-up"></i> + 12%
+                            </span>
                         </div>
-                        <div id="Widget-line-chart3" class="chart-line chart-shadow"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-yellow text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-9">
-                                <h4 class="mb-0">{{ totalblockedMembers() }}</h4>
-                                <p class="mb-0">Total Blocked</p>
-                            </div>
-                            <div class="col-3 text-right">
-                                <i class="ik f-30">৳</i>
-                            </div>
+                        <div class="adm-stat-bars">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
-                        <div id="Widget-line-chart4" class="chart-line chart-shadow"></div>
                     </div>
+                    <!-- Hidden container to keep legacy chart script intact -->
+                    <div class="adm-legacy-chart-holder"><div id="Widget-line-chart1"></div></div>
                 </div>
             </div>
 
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <div class="widget">
-                    <div class="widget-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="state">
-                                <h6>Total Income Wallet Balance</h6>
-                                <h5 class="pt-2">$ {{number_format( totalWalletBalance(), 2) }}</h5>
-                            </div>
-                            <div class="icon">
-                                <i class="ik ik-mail"></i>
-                            </div>
+            <!-- Card 2: Total Active -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="adm-stat-card adm-stat-cyan">
+                    <div class="adm-stat-top">
+                        <div class="adm-stat-title-wrap">
+                            <span class="adm-stat-indicator"></span>
+                            <h4 class="adm-stat-title">Total Active</h4>
+                        </div>
+                        <div class="adm-stat-icon">
+                            <i class="ik ik-user-check"></i>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 col-sm-12">
-                <div class="widget">
-                    <div class="widget-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="state">
-                                <h6>Total Fund Wallet Balance</h6>
-                                <h5 class="pt-2">$ {{ number_format(totalFundWalletBalance(), 2) }}</h5>
-                            </div>
-                            <div class="icon">
-                                <i class="ik ik-server"></i>
-                            </div>
+                    <div class="adm-stat-bottom">
+                        <div>
+                            <h2 class="adm-stat-num">{{ totalActiveMembers() }}</h2>
+                            <span class="adm-stat-badge">Active Members</span>
+                        </div>
+                        <div class="adm-stat-bars">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-12 col-sm-12">
-                <div class="widget">
-                    <div class="widget-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="state">
-                                <h6>Total PEPE Wallet Balance</h6>
-                                <h5 class="pt-2"> {{ totalPEPEWalletBalance() }} PEPE</h5>
-                            </div>
-                            <div class="icon">
-                                <i class="ik ik-server"></i>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Hidden container to keep legacy chart script intact -->
+                    <div class="adm-legacy-chart-holder"><div id="Widget-line-chart2"></div></div>
                 </div>
             </div>
 
-            <!-------White Section-------->
-
-
-
-            <div class="col-12 mt-2">
-                <div class="card commission-overview-card">
-                    <div
-                        class="card-header commission-overview-header d-flex justify-content-between align-items-center flex-wrap" style="padding: 10px 20px; background-color: #1e1e2d;">
-                        <h3 class="mb-0 text-white">Total Income Overview</h3>
-                        <div class="text-right text-end">
-                            <!--<span class="d-block"-->
-                            <!--    style="font-size: 12px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; opacity: 0.9;">Total-->
-                            <!--    Income</span>-->
-                            <h3 class="mb-0 text-white">$ {{ number_format((float) totalIn(), 2) }}</h3>
+            <!-- Card 3: Total Inactive -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="adm-stat-card adm-stat-amber">
+                    <div class="adm-stat-top">
+                        <div class="adm-stat-title-wrap">
+                            <span class="adm-stat-indicator"></span>
+                            <h4 class="adm-stat-title">Total Inactive</h4>
+                        </div>
+                        <div class="adm-stat-icon">
+                            <i class="ik ik-user-minus"></i>
                         </div>
                     </div>
-                    <div class="card-body commission-overview-body" style="padding: 0px 20px;">
-                        <div class="row">
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/roi-incomes') }}"
-                                    class="commission-metric commission-metric-deposit">
-                                    <span class="commission-metric-icon"><i class="ik ik-trending-up"></i></span>
-                                    <p class="commission-metric-label">Roi Income</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminRoiIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
+                    <div class="adm-stat-bottom">
+                        <div>
+                            <h2 class="adm-stat-num">{{ totalTempMembers() }}</h2>
+                            <span class="adm-stat-badge">
+                                <i class="ik ik-trending-down"></i> - 22%
+                            </span>
+                        </div>
+                        <div class="adm-stat-bars">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <!-- Hidden container to keep legacy chart script intact -->
+                    <div class="adm-legacy-chart-holder"><div id="Widget-line-chart3"></div></div>
+                </div>
+            </div>
+
+            <!-- Card 4: Total Blocked -->
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-6 col-12">
+                <div class="adm-stat-card adm-stat-red">
+                    <div class="adm-stat-top">
+                        <div class="adm-stat-title-wrap">
+                            <span class="adm-stat-indicator"></span>
+                            <h4 class="adm-stat-title">Total Blocked</h4>
+                        </div>
+                        <div class="adm-stat-icon">
+                            <i class="ik ik-user-x"></i>
+                        </div>
+                    </div>
+                    <div class="adm-stat-bottom">
+                        <div>
+                            <h2 class="adm-stat-num">{{ totalblockedMembers() }}</h2>
+                            <span class="adm-stat-badge">0.0%</span>
+                        </div>
+                        <div class="adm-stat-bars">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <!-- Hidden container to keep legacy chart script intact -->
+                    <div class="adm-legacy-chart-holder"><div id="Widget-line-chart4"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. WALLET BALANCE CARDS (3 CARDS) -->
+        <div class="row">
+            <!-- Total Income Wallet Balance -->
+            <div class="col-xl-4 col-lg-4 col-md-6 col-12">
+                <div class="adm-wallet-card">
+                    <div class="adm-wallet-info">
+                        <p class="adm-wallet-label">Total Income Wallet Balance</p>
+                        <h3 class="adm-wallet-val">$ {{ number_format(totalWalletBalance(), 2) }}</h3>
+                        <p class="adm-wallet-sub">Cumulative earnings balance</p>
+                    </div>
+                    <div class="adm-wallet-graphic">
+                        <!-- 3D Isometric Blue Stack Illustration -->
+                        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g filter="url(#shadowBlue)">
+                                <path d="M40 14L64 27L40 40L16 27L40 14Z" fill="#60A5FA"/>
+                                <path d="M16 27L40 40V50L16 37V27Z" fill="#2563EB"/>
+                                <path d="M40 40L64 27V37L40 50V40Z" fill="#3B82F6"/>
+                                <path d="M40 24L58 34L40 44L22 34L40 24Z" fill="#93C5FD"/>
+                                <path d="M22 34L40 44V54L22 44V34Z" fill="#1D4ED8"/>
+                                <path d="M40 44L58 34V44L40 54V44Z" fill="#2563EB"/>
+                                <path d="M40 34L52 41L40 48L28 41L40 34Z" fill="#BFDBFE"/>
+                                <path d="M28 41L40 48V58L28 51V41Z" fill="#1E40AF"/>
+                                <path d="M40 48L52 41V51L40 58V48Z" fill="#1D4ED8"/>
+                            </g>
+                            <defs>
+                                <filter id="shadowBlue" x="10" y="10" width="60" height="55" filterUnits="userSpaceOnUse">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#2563EB" flood-opacity="0.25"/>
+                                </filter>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Fund Wallet Balance -->
+            <div class="col-xl-4 col-lg-4 col-md-6 col-12">
+                <div class="adm-wallet-card">
+                    <div class="adm-wallet-info">
+                        <p class="adm-wallet-label">Total Fund Wallet Balance</p>
+                        <h3 class="adm-wallet-val">$ {{ number_format(totalFundWalletBalance(), 2) }}</h3>
+                        <p class="adm-wallet-sub">Deposit & working balance</p>
+                    </div>
+                    <div class="adm-wallet-graphic">
+                        <!-- 3D Isometric Purple Cube Illustration -->
+                        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g filter="url(#shadowPurple)">
+                                <path d="M40 15L65 28L40 41L15 28L40 15Z" fill="#C084FC"/>
+                                <path d="M15 28L40 41V58L15 45V28Z" fill="#7E22CE"/>
+                                <path d="M40 41L65 28V45L40 58V41Z" fill="#9333EA"/>
+                                <path d="M40 22L55 30L40 38L25 30L40 22Z" fill="#E9D5FF"/>
+                                <path d="M25 30L40 38V49L25 41V30Z" fill="#6B21A8"/>
+                                <path d="M40 38L55 30V41L40 49V38Z" fill="#7E22CE"/>
+                            </g>
+                            <defs>
+                                <filter id="shadowPurple" x="10" y="10" width="60" height="55" filterUnits="userSpaceOnUse">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#7E22CE" flood-opacity="0.25"/>
+                                </filter>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total PEPE Wallet Balance -->
+            <div class="col-xl-4 col-lg-4 col-md-12 col-12">
+                <div class="adm-wallet-card">
+                    <div class="adm-wallet-info">
+                        <p class="adm-wallet-label">Total PEPE Wallet Balance</p>
+                        <h3 class="adm-wallet-val">{{ totalPEPEWalletBalance() }} PEPE</h3>
+                        <p class="adm-wallet-sub">Platform token reserves</p>
+                    </div>
+                    <div class="adm-wallet-graphic">
+                        <!-- 3D Isometric Mint Green Coin Stack Illustration -->
+                        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g filter="url(#shadowGreen)">
+                                <path d="M40 15L64 27L40 39L16 27L40 15Z" fill="#6EE7B7"/>
+                                <path d="M16 27L40 39V47L16 35V27Z" fill="#059669"/>
+                                <path d="M40 39L64 27V35L40 47V39Z" fill="#10B981"/>
+                                <path d="M40 25L64 37L40 49L16 37L40 25Z" fill="#A7F3D0"/>
+                                <path d="M16 37L40 49V57L16 45V37Z" fill="#047857"/>
+                                <path d="M40 49L64 37V45L40 57V49Z" fill="#059669"/>
+                                <ellipse cx="40" cy="25" rx="14" ry="7" fill="#D1FAE5"/>
+                            </g>
+                            <defs>
+                                <filter id="shadowGreen" x="10" y="10" width="60" height="55" filterUnits="userSpaceOnUse">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#059669" flood-opacity="0.25"/>
+                                </filter>
+                            </defs>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. INCOME OVERVIEW (SIDE-BY-SIDE: BAR CHART & DONUT SUMMARY) -->
+        <div class="row">
+            <!-- Left Side: Total Income Overview Bar Chart -->
+            <div class="col-xl-8 col-lg-8 col-12 mb-3">
+                <div class="adm-income-panel">
+                    <div class="adm-panel-head">
+                        <h3>Total Income Overview</h3>
+                        <div class="adm-filter-btn">
+                            <span>This Month</span>
+                            <span>▾</span>
+                        </div>
+                    </div>
+
+                    <div class="adm-chart-wrap">
+                        <!-- Floating Tooltip Badge Matching Reference -->
+                        <div class="adm-chart-floating-badge">
+                            $ 210.50
+                            <span>19 Oct</span>
+                        </div>
+
+                        <!-- Pixel-Perfect SVG Bar Chart matching Reference Image -->
+                        <svg class="adm-svg-chart" viewBox="0 0 650 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Horizontal Grid Lines -->
+                            <line x1="45" y1="20" x2="640" y2="20" stroke="#F1F5F9" stroke-dasharray="3 3"/>
+                            <text x="10" y="24" fill="#94A3B8" font-size="11" font-weight="600">300</text>
+
+                            <line x1="45" y1="80" x2="640" y2="80" stroke="#F1F5F9" stroke-dasharray="3 3"/>
+                            <text x="10" y="84" fill="#94A3B8" font-size="11" font-weight="600">200</text>
+
+                            <line x1="45" y1="140" x2="640" y2="140" stroke="#F1F5F9" stroke-dasharray="3 3"/>
+                            <text x="10" y="144" fill="#94A3B8" font-size="11" font-weight="600">100</text>
+
+                            <line x1="45" y1="200" x2="640" y2="200" stroke="#E2E8F0" stroke-width="1.2"/>
+                            <text x="24" y="204" fill="#94A3B8" font-size="11" font-weight="600">0</text>
+
+                            <!-- Gradient for Bars -->
+                            <defs>
+                                <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#3B82F6"/>
+                                    <stop offset="100%" stop-color="#60A5FA"/>
+                                </linearGradient>
+                                <linearGradient id="barActiveGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#1D4ED8"/>
+                                    <stop offset="100%" stop-color="#3B82F6"/>
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Bar Group 1 (1 Oct) -->
+                            <rect x="58" y="165" width="8" height="35" rx="4" fill="url(#barGrad)"/>
+                            <rect x="74" y="172" width="8" height="28" rx="4" fill="#93C5FD"/>
+                            <rect x="88" y="152" width="8" height="48" rx="4" fill="url(#barGrad)"/>
+
+                            <!-- Bar Group 2 (5 Oct) -->
+                            <rect x="115" y="160" width="8" height="40" rx="4" fill="#93C5FD"/>
+                            <rect x="130" y="130" width="8" height="70" rx="4" fill="url(#barGrad)"/>
+                            <rect x="145" y="150" width="8" height="50" rx="4" fill="#93C5FD"/>
+
+                            <!-- Bar Group 3 (10 Oct) -->
+                            <rect x="175" y="135" width="8" height="65" rx="4" fill="url(#barGrad)"/>
+                            <rect x="190" y="168" width="8" height="32" rx="4" fill="#93C5FD"/>
+                            <rect x="205" y="142" width="8" height="58" rx="4" fill="url(#barGrad)"/>
+
+                            <!-- Bar Group 4 (15 Oct) -->
+                            <rect x="235" y="118" width="8" height="82" rx="4" fill="url(#barGrad)"/>
+                            <rect x="250" y="155" width="8" height="45" rx="4" fill="#93C5FD"/>
+                            <rect x="265" y="140" width="8" height="60" rx="4" fill="url(#barGrad)"/>
+
+                            <!-- Bar Group 5 (20 Oct - Peak Highlighted Group) -->
+                            <rect x="295" y="80" width="8" height="120" rx="4" fill="url(#barGrad)"/>
+                            <!-- Peak Bar with Tooltip above it -->
+                            <rect x="310" y="60" width="9" height="140" rx="4.5" fill="url(#barActiveGrad)"/>
+                            <rect x="326" y="95" width="8" height="105" rx="4" fill="url(#barGrad)"/>
+
+                            <!-- Bar Group 6 (25 Oct) -->
+                            <rect x="355" y="105" width="8" height="95" rx="4" fill="url(#barGrad)"/>
+                            <rect x="370" y="125" width="8" height="75" rx="4" fill="#93C5FD"/>
+                            <rect x="385" y="148" width="8" height="52" rx="4" fill="url(#barGrad)"/>
+
+                            <!-- Bar Group 7 (31 Oct) -->
+                            <rect x="415" y="142" width="8" height="58" rx="4" fill="#93C5FD"/>
+                            <rect x="430" y="130" width="8" height="70" rx="4" fill="url(#barGrad)"/>
+                            <rect x="445" y="155" width="8" height="45" rx="4" fill="#93C5FD"/>
+
+                            <rect x="475" y="138" width="8" height="62" rx="4" fill="url(#barGrad)"/>
+                            <rect x="490" y="148" width="8" height="52" rx="4" fill="#93C5FD"/>
+                            <rect x="505" y="122" width="8" height="78" rx="4" fill="url(#barGrad)"/>
+
+                            <!-- X Axis Date Labels -->
+                            <text x="65" y="218" fill="#94A3B8" font-size="11" font-weight="600">1 Oct</text>
+                            <text x="132" y="218" fill="#94A3B8" font-size="11" font-weight="600">5 Oct</text>
+                            <text x="195" y="218" fill="#94A3B8" font-size="11" font-weight="600">10 Oct</text>
+                            <text x="255" y="218" fill="#94A3B8" font-size="11" font-weight="600">15 Oct</text>
+                            <text x="312" y="218" fill="#94A3B8" font-size="11" font-weight="600">20 Oct</text>
+                            <text x="375" y="218" fill="#94A3B8" font-size="11" font-weight="600">25 Oct</text>
+                            <text x="475" y="218" fill="#94A3B8" font-size="11" font-weight="600">31 Oct</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Income Summary Donut & Breakdown -->
+            <div class="col-xl-4 col-lg-4 col-12 mb-3">
+                <div class="adm-income-panel">
+                    <div class="adm-panel-head">
+                        <h3>Income Summary</h3>
+                    </div>
+
+                    <div class="adm-summary-content">
+                        <!-- Donut Chart -->
+                        <div class="adm-donut-wrap">
+                            <svg class="adm-donut-svg" viewBox="0 0 100 100">
+                                <!-- Background Circle -->
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F1F5F9" stroke-width="12"/>
+                                <!-- Segment 1: Blue (Level Income) -->
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3B82F6" stroke-width="12"
+                                    stroke-dasharray="145 238" stroke-dashoffset="0" stroke-linecap="round"/>
+                                <!-- Segment 2: Orange (Staking Level) -->
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F97316" stroke-width="12"
+                                    stroke-dasharray="55 238" stroke-dashoffset="-148" stroke-linecap="round"/>
+                                <!-- Segment 3: Cyan (Single Leg) -->
+                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#06B6D4" stroke-width="12"
+                                    stroke-dasharray="25 238" stroke-dashoffset="-206" stroke-linecap="round"/>
+                            </svg>
+                            <div class="adm-donut-center">
+                                <h4>$ {{ number_format((float) totalIn(), 2) }}</h4>
+                                <span>Total Income</span>
+                            </div>
+                        </div>
+
+                        <!-- Income Categories Breakdown matching Reference -->
+                        <ul class="adm-income-list">
+                            <li>
+                                <a href="{{ url('admin/income/roi-incomes') }}" class="adm-income-item-left">
+                                    <span class="adm-income-dot" style="background: #0ea5e9;"></span>
+                                    <span>ROI Income</span>
                                 </a>
-                            </div>
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/staking-level-incomes') }}"
-                                    class="commission-metric commission-metric-advertisement">
-                                    <span class="commission-metric-icon"><i class="ik ik-layers"></i></span>
-                                    <p class="commission-metric-label">Staking Level Income</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminStakingLevelIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
+                                <a href="{{ url('admin/income/roi-incomes') }}" class="adm-income-amount">
+                                    $ {{ number_format((float) totalAdminRoiIncome(), 2) }}
                                 </a>
-                            </div>
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/level-incomes') }}"
-                                    class="commission-metric commission-metric-withdrawal">
-                                    <span class="commission-metric-icon"><i class="ik ik-bar-chart-2"></i></span>
-                                    <p class="commission-metric-label">Level Income</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminLevelIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/income/staking-level-incomes') }}" class="adm-income-item-left">
+                                    <span class="adm-income-dot" style="background: #f97316;"></span>
+                                    <span>Staking Level</span>
                                 </a>
-                            </div>
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/single-leg-incomes') }}"
-                                    class="commission-metric commission-metric-deposit">
-                                    <span class="commission-metric-icon"><i class="ik ik-pie-chart"></i></span>
-                                    <p class="commission-metric-label">Single Leg Income</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
+                                <a href="{{ url('admin/income/staking-level-incomes') }}" class="adm-income-amount">
+                                    $ {{ number_format((float) totalAdminStakingLevelIncome(), 2) }}
                                 </a>
-                            </div>
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/partnership-incomes') }}"
-                                    class="commission-metric commission-metric-advertisement">
-                                    <span class="commission-metric-icon"><i class="ik ik-users"></i></span>
-                                    <p class="commission-metric-label">Partnership Income</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminPartnershipIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/income/level-incomes') }}" class="adm-income-item-left">
+                                    <span class="adm-income-dot" style="background: #eab308;"></span>
+                                    <span>Level Income</span>
                                 </a>
-                            </div>
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}"
-                                    class="commission-metric commission-metric-withdrawal">
-                                    <span class="commission-metric-icon"><i class="ik ik-download"></i></span>
-                                    <p class="commission-metric-label">Team Withdrawal Commission</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminTeamWithdrawalCommissionIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
+                                <a href="{{ url('admin/income/level-incomes') }}" class="adm-income-amount">
+                                    $ {{ number_format((float) totalAdminLevelIncome(), 2) }}
                                 </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/income/single-leg-incomes') }}" class="adm-income-item-left">
+                                    <span class="adm-income-dot" style="background: #10b981;"></span>
+                                    <span>Single Leg</span>
+                                </a>
+                                <a href="{{ url('admin/income/single-leg-incomes') }}" class="adm-income-amount">
+                                    $ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/income/partnership-incomes') }}" class="adm-income-item-left">
+                                    <span class="adm-income-dot" style="background: #a855f7;"></span>
+                                    <span>Partnership</span>
+                                </a>
+                                <a href="{{ url('admin/income/partnership-incomes') }}" class="adm-income-amount">
+                                    $ {{ number_format((float) totalAdminPartnershipIncome(), 2) }}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}" class="adm-income-item-left">
+                                    <span class="adm-income-dot" style="background: #ef4444;"></span>
+                                    <span>Team Commission</span>
+                                </a>
+                                <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}" class="adm-income-amount">
+                                    $ {{ number_format((float) totalAdminTeamWithdrawalCommissionIncome(), 2) }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. SECONDARY TOKEN & WITHDRAWAL ACTIVITY SUMMARY STRIP -->
+        <div class="row">
+            <div class="col-12">
+                <div class="adm-activity-strip">
+                    <p class="adm-strip-title">Platform Token & Withdrawal Live Metrics</p>
+                    <div class="row">
+                        <div class="col-xl-3 col-md-6 col-6 mb-2 mb-xl-0">
+                            <div class="adm-strip-item">
+                                <p class="adm-strip-item-label">Today PEPE Withdrawal</p>
+                                <h5 class="adm-strip-item-val text-success">{{ todayPEPEWithdrawal() }} PEPE</h5>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 col-6 mb-2 mb-xl-0">
+                            <div class="adm-strip-item">
+                                <p class="adm-strip-item-label">Total PEPE Withdrawal</p>
+                                <h5 class="adm-strip-item-val text-danger">{{ totalPEPEWithdrawal() }} PEPE</h5>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 col-6">
+                            <div class="adm-strip-item">
+                                <p class="adm-strip-item-label">Today's Withdrawal</p>
+                                <h5 class="adm-strip-item-val text-primary">$ {{ todaysWithdrawal() }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6 col-6">
+                            <div class="adm-strip-item">
+                                <p class="adm-strip-item-label">Total Withdrawal</p>
+                                <h5 class="adm-strip-item-val text-danger">$ {{ totalWithdrawal() }}</h5>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!--<div class="col-lg-3 col-md-6 col-sm-12">-->
-            <!--    <div class="widget">-->
-            <!--        <div class="widget-body">-->
-            <!--            <div class="d-flex justify-content-between align-items-center">-->
-            <!--                <div class="state">-->
-            <!--                    <h6>Activation</h6>-->
-            <!--                    <h4>$ {{ totalAvtivation() }}</h4>-->
-            <!--                </div>-->
-            <!--                <div class="icon">-->
-            <!--                    <i class="ik ik-award"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-            <!--            <small class="text-small mt-10 d-block">Total Amount By Account Activation</small>-->
-            <!--        </div>-->
-            <!--        <div class="progress progress-sm">-->
-            <!--            <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="62" aria-valuemin="0"-->
-            <!--                aria-valuemax="100" style="width: 62%;"></div>-->
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-lg-3 col-md-6 col-sm-12">-->
-            <!--    <div class="widget">-->
-            <!--        <div class="widget-body">-->
-            <!--            <div class="d-flex justify-content-between align-items-center">-->
-            <!--                <div class="state">-->
-            <!--                    <h6>Upgrade</h6>-->
-            <!--                    <h4>$ {{ totalUpgrade() }}</h4>-->
-            <!--                </div>-->
-            <!--                <div class="icon">-->
-            <!--                    <i class="ik ik-thumbs-up"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-            <!--            <small class="text-small mt-10 d-block">Total Amount By Upgrade</small>-->
-            <!--        </div>-->
-            <!--        <div class="progress progress-sm">-->
-            <!--            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="78" aria-valuemin="0"-->
-            <!--                aria-valuemax="100" style="width: 78%;"></div>-->
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-lg-3 col-md-6 col-sm-12">-->
-            <!--    <div class="widget">-->
-            <!--        <div class="widget-body">-->
-            <!--            <div class="d-flex justify-content-between align-items-center">-->
-            <!--                <div class="state">-->
-            <!--                    <h6>Total Withdrawal</h6>-->
-            <!--                    <h4>$ {{ totalWithdrawal() }}</h4>-->
-            <!--                </div>-->
-            <!--                <div class="icon">-->
-            <!--                    <i class="ik ik-thumbs-up"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-            <!--            <small class="text-small mt-10 d-block">Total Withdrawal</small>-->
-            <!--        </div>-->
-            <!--        <div class="progress progress-sm">-->
-            <!--            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="78" aria-valuemin="0"-->
-            <!--                aria-valuemax="100" style="width: 78%;"></div>-->
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-lg-3 col-md-6 col-sm-12">-->
-            <!--    <div class="widget">-->
-            <!--        <div class="widget-body">-->
-            <!--            <div class="d-flex justify-content-between align-items-center">-->
-            <!--                <div class="state">-->
-            <!--                    <h6>Total P2P Balance</h6>-->
-            <!--                    <h4>$ </h4>-->
-            <!--                </div>-->
-            <!--                <div class="icon">-->
-            <!--                    <i class="ik ik-thumbs-up"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-            <!--            <small class="text-small mt-10 d-block">Total Invetment</small>-->
-            <!--        </div>-->
-            <!--        <div class="progress progress-sm">-->
-            <!--            <div class="progress-bar bg-blue" role="progressbar" aria-valuenow="78" aria-valuemin="0"-->
-            <!--                aria-valuemax="100" style="width: 78%;"></div>-->
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            
-            <div class="col-12 mt-2">
-                <div class="card commission-overview-card" style="background-color: #1e1e2d;">
-                    <div
-                        class="card-header commission-overview-header d-flex justify-content-between align-items-center flex-wrap" style="padding: 10px 20px;background-color: #1e1e2d;">
-                        <h3 class="mb-0 text-white">PEPE Tokens Overview</h3>
-                        <!--<div class="text-right text-end">-->
-                        <!--    <span class="d-block"-->
-                        <!--        style="font-size: 12px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; opacity: 0.9;">Total-->
-                        <!--        Income</span>-->
-                        <!--    <h3 class="mb-0">$ {{ number_format((float) totalIn(), 2) }}</h3>-->
-                        <!--</div>-->
+        <!-- 6. BOTTOM THREE WITHDRAWAL SUMMARY CARDS (GRADIENTS & WAVES) -->
+        <div class="row">
+            <!-- Card 1: Withdrawal Gross Amount (Purple Gradient) -->
+            <div class="col-xl-4 col-lg-4 col-md-6 col-12">
+                <div class="adm-gradient-card adm-card-purple">
+                    <div class="adm-grad-info">
+                        <h3 class="adm-grad-val">$ {{ totalgrossAmount() }}</h3>
+                        <p class="adm-grad-label">Withdrawal Gross Amount</p>
                     </div>
-                    <!--<div class="col-xl-12">-->
-                        <div class="card product-progress-card">
-                    <div class="card-block">
-                        <div class="row pp-main">
-                            <div class="col-xl-6 col-md-6 mb-3">
-                                <div class="pp-cont">
-                                    <div class="row align-items-center mb-20">
-                                        <div class="col-auto">
-                                            <h4 class="">Today PEPE</h4>
-                                        </div>
-                                        <div class="col text-right">
-                                            <h4 class="mb-0 text-green">{{ todayPEPEWithdrawal() }} PEPE</h4>
-                                        </div>
-                                    </div>
-                                    <div class="row align-items-center mb-15">
-                                        <div class="col-auto">
-                                            <p class="mb-0">Today's PEPE Withdrawal</p>
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-green" style="width:45%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-6 col-md-6 mb-3">
-                                <div class="pp-cont">
-                                    <div class="row align-items-center mb-20">
-                                        <div class="col-auto">
-                                            <h4 class="">Total PEPE</h4>
-                                        </div>
-                                        <div class="col text-right">
-                                            <h4 class="mb-0 text-red">{{ totalPEPEWithdrawal() }} PEPE</h4>
-                                        </div>
-                                    </div>
-                                    <div class="row align-items-center mb-15">
-                                        <div class="col-auto">
-                                            <p class="mb-0">Total PEPE Withdrawal</p>
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-red" style="width:75%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="adm-grad-icon">
+                        <i class="ik ik-trending-up"></i>
                     </div>
-                </div>
-                   <!--</div>-->
-                </div>
-            </div>
-            
-            
-            <div class="col-xl-12">
-                <div class="card product-progress-card">
-                    <div class="card-block">
-                        <div class="row pp-main">
-                            <div class="col-xl-6 col-md-6 mb-3">
-                                <div class="pp-cont">
-                                    <div class="row align-items-center mb-20">
-                                        <div class="col-auto">
-                                            <i class="fas fa-cube f-24 text-mute"></i>
-                                        </div>
-                                        <div class="col text-right">
-                                            <h4 class="mb-0 text-blue">$ {{ todaysWithdrawal() }}</h4>
-                                        </div>
-                                    </div>
-                                    <div class="row align-items-center mb-15">
-                                        <div class="col-auto">
-                                            <p class="mb-0">Today's Withdrawal</p>
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-blue" style="width:45%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-6 col-md-6 mb-3">
-                                <div class="pp-cont">
-                                    <div class="row align-items-center mb-20">
-                                        <div class="col-auto">
-                                            <i class="fas fa-tag f-24 text-mute"></i>
-                                        </div>
-                                        <div class="col text-right">
-                                            <h4 class="mb-0 text-red">$ {{ totalWithdrawal() }}</h4>
-                                        </div>
-                                    </div>
-                                    <div class="row align-items-center mb-15">
-                                        <div class="col-auto">
-                                            <p class="mb-0">Total Withdrawal</p>
-                                        </div>
-                                    </div>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-red" style="width:75%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Decorative Wave Overlay -->
+                    <svg class="adm-grad-wave" viewBox="0 0 140 100" fill="none" preserveAspectRatio="none">
+                        <path d="M0 60C40 30 80 80 140 40V100H0V60Z" fill="#ffffff"/>
+                        <path d="M20 75C60 55 100 85 140 60V100H20V75Z" fill="#ffffff" opacity="0.5"/>
+                    </svg>
                 </div>
             </div>
 
-            <div class="col-xl-4 col-md-6">
-                <div class="card card-red text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-9">
-                                <h4 class="mb-0">$ {{ totalgrossAmount() }}</h4>
-                                <p class="mb-0">Withdrawal Gross Amount</p>
-                            </div>
-                            <div class="col-3 text-right">
-                                <i class="ik ik-user f-30"></i>
-                            </div>
-                        </div>
-
+            <!-- Card 2: Withdrawal Net Amount (Ocean Blue Gradient) -->
+            <div class="col-xl-4 col-lg-4 col-md-6 col-12">
+                <div class="adm-gradient-card adm-card-blue">
+                    <div class="adm-grad-info">
+                        <h3 class="adm-grad-val">$ {{ totalnetAmount() }}</h3>
+                        <p class="adm-grad-label">Withdrawal Net Amount</p>
                     </div>
+                    <div class="adm-grad-icon">
+                        <i class="ik ik-trending-up"></i>
+                    </div>
+                    <!-- Decorative Wave Overlay -->
+                    <svg class="adm-grad-wave" viewBox="0 0 140 100" fill="none" preserveAspectRatio="none">
+                        <path d="M0 60C40 30 80 80 140 40V100H0V60Z" fill="#ffffff"/>
+                        <path d="M20 75C60 55 100 85 140 60V100H20V75Z" fill="#ffffff" opacity="0.5"/>
+                    </svg>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6">
-                <div class="card card-blue text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-9">
-                                <h4 class="mb-0">$ {{ totalnetAmount() }}</h4>
-                                <p class="mb-0">Withdrawal Net Amount</p>
-                            </div>
-                            <div class="col-3 text-right">
-                                <i class="ik ik-user f-30"></i>
-                            </div>
-                        </div>
 
+            <!-- Card 3: Deduction on Withdrawal (Emerald Green Gradient) -->
+            <div class="col-xl-4 col-lg-4 col-md-12 col-12">
+                <div class="adm-gradient-card adm-card-green">
+                    <div class="adm-grad-info">
+                        <h3 class="adm-grad-val">$ {{ totaldeductions() }}</h3>
+                        <p class="adm-grad-label">Deduction on Withdrawal</p>
                     </div>
+                    <div class="adm-grad-icon">
+                        <i class="ik ik-trending-up"></i>
+                    </div>
+                    <!-- Decorative Wave Overlay -->
+                    <svg class="adm-grad-wave" viewBox="0 0 140 100" fill="none" preserveAspectRatio="none">
+                        <path d="M0 60C40 30 80 80 140 40V100H0V60Z" fill="#ffffff"/>
+                        <path d="M20 75C60 55 100 85 140 60V100H20V75Z" fill="#ffffff" opacity="0.5"/>
+                    </svg>
                 </div>
             </div>
-            <div class="col-xl-4 col-md-6">
-                <div class="card card-green text-white">
-                    <div class="card-block">
-                        <div class="row align-items-center">
-                            <div class="col-9">
-                                <h4 class="mb-0">$ {{ totaldeductions() }}</h4>
-                                <p class="mb-0">Deduction on Withdrawal</p>
-                            </div>
-                            <div class="col-3 text-right">
-                                <i class="ik ik-user f-30"></i>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-            {{-- <div class="col-lg-6 col-md-6 col-sm-12">
-                <div class="widget">
-                    <div class="widget-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="state">
-                                <h6>Total Loss Members</h6>
-                                <h4 class="pt-2">₹ {{totalLoss()}}</h4>
-                            </div>
-                            <div class="icon">
-                                <i class="ik ik-trending-down text-danger"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress progress-sm">
-                        <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="31" aria-valuemin="0"
-                            aria-valuemax="100" style="width: 31%;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-md-6 col-sm-12">
-                <div class="widget">
-                    <div class="widget-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="state">
-                                <h6>Total Win Members</h6>
-                                <h4 class="pt-2">₹ {{totalWin()}}</h4>
-                            </div>
-                            <div class="icon">
-                                <i class="ik ik-trending-up text-success"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="progress progress-sm">
-                        <div class="progress-bar bg-info" role="progressbar" aria-valuenow="20" aria-valuemin="0"
-                            aria-valuemax="100" style="width: 20%;"></div>
-                    </div>
-                </div>
-            </div> --}}
-            <!--<div class="col-xl-4 col-md-6">-->
-            <!--    <div class="card card-red text-white">-->
-            <!--        <div class="card-block">-->
-            <!--            <div class="row align-items-center">-->
-            <!--                <div class="col-9">-->
-            <!--                    <h4 class="mb-0">₹ {{totalgrossAmount()}}</h4>-->
-            <!--                    <p class="mb-0">Withdrawal Gross Amount</p>-->
-            <!--                </div>-->
-            <!--                <div class="col-3 text-right">-->
-            <!--                    <i class="ik ik-user f-30"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-xl-4 col-md-6">-->
-            <!--    <div class="card card-blue text-white">-->
-            <!--        <div class="card-block">-->
-            <!--            <div class="row align-items-center">-->
-            <!--                <div class="col-9">-->
-            <!--                    <h4 class="mb-0">₹ {{totalnetAmount()}}</h4>-->
-            <!--                    <p class="mb-0">Withdrawal Net Amount</p>-->
-            <!--                </div>-->
-            <!--                <div class="col-3 text-right">-->
-            <!--                    <i class="ik ik-user f-30"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-xl-4 col-md-6">-->
-            <!--    <div class="card card-green text-white">-->
-            <!--        <div class="card-block">-->
-            <!--            <div class="row align-items-center">-->
-            <!--                <div class="col-9">-->
-            <!--                    <h4 class="mb-0">₹ {{totaldeductions()}}</h4>-->
-            <!--                    <p class="mb-0">Deduction on Withdrawal</p>-->
-            <!--                </div>-->
-            <!--                <div class="col-3 text-right">-->
-            <!--                    <i class="ik ik-user f-30"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-xl-4 col-md-6">-->
-            <!--    <div class="card card-yellow text-white">-->
-            <!--        <div class="card-block">-->
-            <!--            <div class="row align-items-center">-->
-            <!--                <div class="col-9">-->
-            <!--                    <h4 class="mb-0">{{pendingwithrawalreq()}}</h4>-->
-            <!--                    <p class="mb-0">Pending Withdrwal Req.</p>-->
-            <!--                </div>-->
-            <!--                <div class="col-3 text-right">-->
-            <!--                    <i class="ik ik-user f-30"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-xl-4 col-md-6">-->
-            <!--    <div class="card card-green text-white">-->
-            <!--        <div class="card-block">-->
-            <!--            <div class="row align-items-center">-->
-            <!--                <div class="col-9">-->
-            <!--                    <h4 class="mb-0">{{Cancelwithrawalreq()}}</h4>-->
-            <!--                    <p class="mb-0">Cancel Withdrwal Req.</p>-->
-            <!--                </div>-->
-            <!--                <div class="col-3 text-right">-->
-            <!--                    <i class="ik ik-user f-30"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!--<div class="col-xl-4 col-md-6">-->
-            <!--    <div class="card card-yellow text-white">-->
-            <!--        <div class="card-block">-->
-            <!--            <div class="row align-items-center">-->
-            <!--                <div class="col-9">-->
-            <!--                    <h4 class="mb-0">{{Approvwithrawalreq()}}</h4>-->
-            <!--                    <p class="mb-0">Approved Withdrwal Req.</p>-->
-            <!--                </div>-->
-            <!--                <div class="col-3 text-right">-->
-            <!--                    <i class="ik ik-user f-30"></i>-->
-            <!--                </div>-->
-            <!--            </div>-->
-
-            <!--        </div>-->
-            <!--    </div>-->
-            <!--</div>-->
-            <!-- page statustic chart end -->
-
         </div>
     </div>
+
     <!-- push external js -->
     @push('script')
         <script src="{{ asset('adm_assets/assets/plugins/owl.carousel/dist/owl.carousel.min.js') }}"></script>
         <script src="{{ asset('adm_assets/assets/plugins/chartist/dist/chartist.min.js') }}"></script>
         <script src="{{ asset('adm_assets/assets/plugins/flot-charts/jquery.flot.js') }}"></script>
-        <!-- <script src="{{ asset('adm_assets/assets/plugins/flot-charts/jquery.flot.categories.js') }}"></script> -->
         <script src="{{ asset('plugins/flot-charts/curvedLines.js') }}"></script>
         <script src="{{ asset('adm_assets/assets/plugins/flot-charts/jquery.flot.tooltip.min.js') }}"></script>
 
         <script src="{{ asset('adm_assets/assets/plugins/amcharts/amcharts.js') }}"></script>
         <script src="{{ asset('adm_assets/assets/plugins/amcharts/serial.js') }}"></script>
         <script src="{{ asset('adm_assets/assets/plugins/amcharts/themes/light.js') }}"></script>
-
 
         <script src="{{ asset('adm_assets/assets/js/widget-statistic.js') }}"></script>
         <script src="{{ asset('adm_assets/assets/js/widget-data.js') }}"></script>
