@@ -45,7 +45,7 @@
                 </button>
             </div>
         @endif
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <ul class="mb-0 pl-3">
                     @foreach ($errors->all() as $error)
@@ -148,7 +148,7 @@
                             <div class="alert alert-info py-2 px-3 mb-3 d-flex justify-content-between align-items-center">
                                 <div>
                                     <small class="text-uppercase font-weight-bold d-block text-muted" style="font-size: 10px; letter-spacing: 0.5px;">{{ __('Active Default Setting') }}</small>
-                                    <strong class="text-primary">{{ $setting->lock_days ?? 30 }} {{ __('Days Lock') }}</strong> &bull; <strong>{{ number_format((float) ($setting->withdrawal_percent ?? 100), 1) }}% {{ __('Max Withdr.') }}</strong>
+                                    <strong class="text-primary">{{ $setting->lock_days ?? 90 }} {{ __('Days Lock') }}</strong> &bull; <strong>{{ number_format((float) ($setting->withdrawal_percent ?? 100), 1) }}% {{ __('Max Withdr.') }}</strong>
                                 </div>
                                 <span class="badge badge-success font-weight-bold px-2 py-1"><i class="ik ik-check-circle mr-1"></i>{{ __('Live') }}</span>
                             </div>
@@ -159,7 +159,7 @@
                                     <i class="ik ik-lock mr-1 text-warning"></i> {{ __('Condition A: Lock Period') }}
                                 </h6>
                                 <p class="small text-muted mb-2">
-                                    {{ __('During this period, withdrawal is completely blocked (0%) and next package purchase is locked. Applies to Package Details and verified Member Details.') }}
+                                    {{ __('During this period, withdrawal is completely blocked (0%) and next package purchase is locked. Applies to Staking Details and verified Member Details.') }}
                                 </p>
                                 <div class="form-group mb-0">
                                     <label for="lock_days" class="font-weight-bold">
@@ -170,15 +170,15 @@
                                             class="form-control font-weight-bold @error('lock_days') is-invalid @enderror"
                                             id="lock_days"
                                             name="lock_days"
-                                            value="{{ old('lock_days', $setting->lock_days ?? 30) }}"
-                                            placeholder="e.g. 30"
+                                            value="{{ old('lock_days', $setting->lock_days ?? 90) }}"
+                                            placeholder="e.g. 90"
                                             required>
                                         <div class="input-group-append">
                                             <span class="input-group-text font-weight-bold">{{ __('Days') }}</span>
                                         </div>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        {{ __('Example: 30 Days = Locked for 30 days. Day 31 unlocks.') }}
+                                        {{ __('Example: 90 Days = Locked for 90 days. Day 91 unlocks.') }}
                                     </small>
                                 </div>
                             </div>
@@ -201,14 +201,14 @@
                                             id="withdrawal_percent"
                                             name="withdrawal_percent"
                                             value="{{ old('withdrawal_percent', $setting->withdrawal_percent ?? 100.00) }}"
-                                            placeholder="e.g. 50"
+                                            placeholder="e.g. 100"
                                             required>
                                         <div class="input-group-append">
                                             <span class="input-group-text font-weight-bold">%</span>
                                         </div>
                                     </div>
                                     <small class="text-muted d-block mt-1">
-                                        {{ __('Example: 50% = Member can withdraw at most 50% of Trading Wallet after lock expires.') }}
+                                        {{ __('Example: 100% = Member can withdraw up to 100% of Trading Wallet after lock expires.') }}
                                     </small>
                                 </div>
                             </div>
@@ -220,11 +220,11 @@
                                 </h6>
                                 <div class="small" id="rulePreviewText">
                                     <div class="mb-1">
-                                        <span class="badge badge-warning text-dark font-weight-bold">Days 1 to <span class="dynLockDays">30</span></span>:
+                                        <span class="badge badge-warning text-dark font-weight-bold">Days 1 to <span class="dynLockDays">90</span></span>:
                                         <strong class="text-danger">0% Withdrawal + Package Locked</strong>
                                     </div>
                                     <div>
-                                        <span class="badge badge-success font-weight-bold">From Day <span class="dynUnlockDay">31</span>+</span>:
+                                        <span class="badge badge-success font-weight-bold">From Day <span class="dynUnlockDay">91</span>+</span>:
                                         <strong class="text-success">Max <span class="dynPercent">100</span>%</strong> Withdrawal & Next Package Allowed
                                     </div>
                                 </div>
@@ -255,7 +255,7 @@
                         <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap border-bottom">
                             <div>
                                 <h5 class="mb-0 font-weight-bold text-dark">
-                                    <i class="ik ik-users mr-2 text-primary"></i>{{ __('Matching Package Members (Package Details + Member Details)') }}
+                                    <i class="ik ik-users mr-2 text-primary"></i>{{ __('Matching Package Members (Staking Details + Member Details)') }}
                                 </h5>
                                 <small class="text-muted" id="tableSubheader">
                                     @if (!empty($dateFrom) && !empty($dateTo))
@@ -298,27 +298,32 @@
                                         @endphp
                                         @forelse ($displayItems as $item)
                                             @php
-                                                $pkg = $item instanceof \App\Models\PackageDetail ? $item : ($item->latestPackageDetail ?? null);
+                                                $stk = $item instanceof \App\Models\StakingDetail ? $item : ($item->latestStakingDetail ?? null);
                                                 $mem = $item instanceof \App\Models\MemberDetail ? $item : ($item->member ?? null);
-                                                $isLocked = ($pkg && $pkg->isLocked()) || ($mem && $mem->isTradingWalletLocked());
-                                                $remDays = max($pkg ? $pkg->remainingLockDays() : 0, $mem ? $mem->tradingWalletRemainingLockDays() : 0);
-                                                $lockedUntil = ($pkg && $pkg->locked_until) ? $pkg->locked_until : ($mem ? $mem->trading_wallet_locked_until : null);
-                                                $maxWithdrawable = $mem ? $mem->tradingWalletMaxWithdrawable() : 0.00;
-                                                $pkgId = $pkg ? $pkg->id : ($item->id ?? 0);
-                                                $memberId = $mem ? $mem->memberid : ($pkg ? $pkg->memberid : $item->memberid);
+
+                                                $activationTime = $stk ? ($stk->created_at ? \Carbon\Carbon::parse($stk->created_at) : ($stk->invest_date ? \Carbon\Carbon::parse($stk->invest_date) : null)) : null;
+                                                $lockDays = (int) ($setting->lock_days ?? 90);
+                                                $withPercent = (float) ($setting->withdrawal_percent ?? 100.00);
+
+                                                $lockedUntil = ($activationTime && $lockDays > 0) ? $activationTime->copy()->addDays($lockDays) : null;
+                                                $isLocked = $lockedUntil ? now()->lt($lockedUntil) : false;
+                                                $remDays = $isLocked ? (int) ceil(now()->diffInSeconds($lockedUntil, false) / 86400) : 0;
+
+                                                $stkId = $stk ? $stk->id : ($item->id ?? 0);
+                                                $memberId = $mem ? $mem->memberid : ($stk ? $stk->memberid : $item->memberid);
                                                 $memberName = $mem ? $mem->name : 'N/A';
                                                 $mobile = $mem ? $mem->mobile : '';
-                                                $pkgType = $pkg ? $pkg->package_type : 'Account Activation';
-                                                $pkgVal = $pkg ? (float) ($pkg->package_value ?? 0) : 0.00;
-                                                $pkgDate = $pkg && $pkg->created_at ? $pkg->created_at->format('d M Y') : ($item->created_at ? $item->created_at->format('d M Y') : 'N/A');
-                                                $tradingBal = $mem ? (float) ($mem->p2p_wallet ?? $mem->trading_wallet ?? 0.00) : 0.00;
-                                                $withPercent = $mem ? (float) ($mem->trading_wallet_withdrawal_percent ?? 100.00) : 100.00;
+                                                $pkgType = $stk ? ($stk->package ? 'Package '.$stk->package : 'Staking Package') : 'Staking Package';
+                                                $pkgVal = $stk ? (float) ($stk->invest_amount ?? 0) : 0.00;
+                                                $pkgDate = $activationTime ? $activationTime->format('d M Y') : 'N/A';
+                                                $tradingBal = $mem ? (float) ($mem->p2p_wallet ?? 0.00) : 0.00;
+                                                $maxWithdrawable = $isLocked ? 0.00 : max(0.00, round(($tradingBal * $withPercent) / 100.00, 2));
                                             @endphp
                                             <tr>
                                                 <td class="text-center">
                                                     <input type="checkbox"
                                                         name="selected_packages[]"
-                                                        value="{{ $pkgId }}"
+                                                        value="{{ $stkId }}"
                                                         class="member-checkbox package-checkbox"
                                                         checked
                                                         style="cursor: pointer; transform: scale(1.15);">
