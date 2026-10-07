@@ -741,7 +741,7 @@ class AdminController extends Controller
     public function savePackages(Request $request)
     {
         $validated = $request->validate([
-            'trading_wallet' => 'required|numeric|min:0',
+            'p2p_wallet' => 'required|numeric|min:0',
             'referral_bonus' => 'required|numeric|min:0',
             'team_trading_profit' => 'required|numeric|min:0',
             'team_performance_bonus' => 'required|numeric|min:0',
@@ -753,7 +753,7 @@ class AdminController extends Controller
             $distribution = new PackageDistribution;
         }
 
-        $distribution->trading_wallet = $validated['trading_wallet'];
+        $distribution->p2p_wallet = $validated['p2p_wallet'];
         $distribution->referral_bonus = $validated['referral_bonus'];
         $distribution->team_trading_profit = $validated['team_trading_profit'];
         $distribution->team_performance_bonus = $validated['team_performance_bonus'];

@@ -59,18 +59,18 @@
                             @csrf
 
                             <div class="form-group">
-                                <label for="trading_wallet">{{ __('Trading Wallet') }}</label>
+                                <label for="p2p_wallet">{{ __('Trading Wallet') }}</label>
                                 <div class="input-group">
                                     <input type="number" step="any" min="0"
-                                        class="form-control @error('trading_wallet') is-invalid @enderror"
-                                        id="trading_wallet" name="trading_wallet"
-                                        value="{{ old('trading_wallet', optional($distribution)->trading_wallet !== null ? number_format((float) $distribution->trading_wallet, 2, '.', '') : '') }}"
+                                        class="form-control @error('p2p_wallet') is-invalid @enderror"
+                                        id="p2p_wallet" name="p2p_wallet"
+                                        value="{{ old('p2p_wallet', optional($distribution)->p2p_wallet !== null ? number_format((float) $distribution->p2p_wallet, 2, '.', '') : '') }}"
                                         required>
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
-                                @error('trading_wallet')
+                                @error('p2p_wallet')
                                     <span class="text-danger small">{{ $message }}</span>
                                 @enderror
                             </div>
