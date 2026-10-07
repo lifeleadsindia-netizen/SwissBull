@@ -62,12 +62,12 @@
                                         <tr>
                                             <td>{{ $i }}</td>
                                             <td>
-                                                @if ($list['profile_image'] == '')
+                                                @if (!empty($list['profile_image']) && file_exists(public_path('uploads/' . $list['profile_image'])))
+                                                    <img src="{{ asset('uploads/' . $list['profile_image']) }}" onerror="this.onerror=null;this.src='{{ asset('uploads/avatar.jpg') }}';"
+                                                        class="table-user-thumb" alt="">
+                                                @else
                                                     <img src="{{ asset('uploads/avatar.jpg') }}" class="table-user-thumb"
                                                         alt="">
-                                                @else
-                                                    <img src="{{ asset('uploads') }}/{{ $list['profile_image'] }}"
-                                                        class="table-user-thumb" alt="">
                                                 @endif
                                             </td>
                                             <td>{{ $list['memberid'] }}</td>
