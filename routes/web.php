@@ -72,6 +72,18 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::post('/referral-bonus', [AdminController::class, 'saveReferralBonus'])->name('admin.saveReferralBonus');
     Route::post('/save-referral-bonus', [AdminController::class, 'saveReferralBonus']);
 
+    // Team Trading Profit Configuration
+    Route::get('/team-trading-profit', [AdminController::class, 'teamTradingProfit'])->name('admin.teamTradingProfit');
+    Route::get('/team_trading_profit', [AdminController::class, 'teamTradingProfit']);
+    Route::post('/team-trading-profit', [AdminController::class, 'saveTeamTradingProfit'])->name('admin.saveTeamTradingProfit');
+    Route::post('/save-team-trading-profit', [AdminController::class, 'saveTeamTradingProfit']);
+
+    // Daily Team Investment Share Configuration
+    Route::get('/daily-team-investment-share', [AdminController::class, 'dailyTeamInvestmentShare'])->name('admin.dailyTeamInvestmentShare');
+    Route::get('/daily_team_investment_share', [AdminController::class, 'dailyTeamInvestmentShare']);
+    Route::post('/daily-team-investment-share', [AdminController::class, 'saveDailyTeamInvestmentShare'])->name('admin.saveDailyTeamInvestmentShare');
+    Route::post('/save-daily-team-investment-share', [AdminController::class, 'saveDailyTeamInvestmentShare']);
+
     // Color Dashboard
     Route::get('/color-dashboard', [AdminController::class, 'colorDashboard']);
 

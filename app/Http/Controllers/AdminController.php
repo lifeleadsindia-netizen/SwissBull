@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AchiversImage;
 use App\Models\Admin;
+use App\Models\DailyTeamInvestmentShareConfiction;
 use App\Models\DashMessage;
 use App\Models\DirectIncome;
 use App\Models\ImportFund;
@@ -23,6 +24,7 @@ use App\Models\SetRate;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
+use App\Models\TeamTradingProfitConfiction;
 use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
@@ -927,6 +929,87 @@ class AdminController extends Controller
         session()->flash('successMsg', 'Referral Bonus configuration saved successfully.');
 
         return redirect()->route('admin.referralBonus');
+    }
+
+    /**
+     * Display Team Trading Profit dynamic configuration page.
+     */
+    public function teamTradingProfit()
+    {
+        $setting = TeamTradingProfitConfiction::getActiveSetting();
+
+        return view('admin.team-trading-profit', compact('setting'));
+    }
+
+    /**
+     * Save or update Team Trading Profit dynamic configuration.
+     */
+    public function saveTeamTradingProfit(Request $request)
+    {
+        $rules = [];
+        $messages = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $rules["level_{$i}_rate"] = 'required|numeric|min:0|max:100';
+            $messages["level_{$i}_rate.required"] = "Please enter Level-{$i} Rate (%).";
+            $messages["level_{$i}_rate.numeric"] = "Level-{$i} Rate must be a valid number.";
+            $messages["level_{$i}_rate.min"] = "Level-{$i} Rate cannot be negative.";
+            $messages["level_{$i}_rate.max"] = "Level-{$i} Rate cannot exceed 100%.";
+        }
+
+        $request->validate($rules, $messages);
+
+        $setting = TeamTradingProfitConfiction::getActiveSetting();
+        for ($i = 1; $i <= 10; $i++) {
+            $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
+        }
+        $setting->save();
+
+        session()->flash('successMsg', 'Team Trading Profit configuration saved successfully.');
+
+        return redirect()->route('admin.teamTradingProfit');
+    }
+
+    /**
+     * Display Daily Team Investment Share dynamic configuration page.
+     */
+    public function dailyTeamInvestmentShare()
+    {
+        $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
+
+        return view('admin.daily-team-investment-share', compact('setting'));
+    }
+
+    /**
+     * Save or update Daily Team Investment Share dynamic configuration.
+     */
+    public function saveDailyTeamInvestmentShare(Request $request)
+    {
+        $rules = [];
+        $messages = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $rules["level_{$i}_rate"] = 'required|numeric|min:0|max:100';
+            $rules["level_{$i}_directs"] = 'required|integer|min:0';
+            $messages["level_{$i}_rate.required"] = "Please enter Level-{$i} Rate (%).";
+            $messages["level_{$i}_rate.numeric"] = "Level-{$i} Rate must be a valid number.";
+            $messages["level_{$i}_rate.min"] = "Level-{$i} Rate cannot be negative.";
+            $messages["level_{$i}_rate.max"] = "Level-{$i} Rate cannot exceed 100%.";
+            $messages["level_{$i}_directs.required"] = "Please enter Level-{$i} Direct Referral requirement.";
+            $messages["level_{$i}_directs.integer"] = "Level-{$i} Direct Referral requirement must be a whole number.";
+            $messages["level_{$i}_directs.min"] = "Level-{$i} Direct Referral requirement cannot be negative.";
+        }
+
+        $request->validate($rules, $messages);
+
+        $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
+        for ($i = 1; $i <= 10; $i++) {
+            $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
+            $setting->{"level_{$i}_directs"} = (int) $request->input("level_{$i}_directs");
+        }
+        $setting->save();
+
+        session()->flash('successMsg', 'Daily Team Investment Share configuration saved successfully.');
+
+        return redirect()->route('admin.dailyTeamInvestmentShare');
     }
 
     public function achiversImages()
