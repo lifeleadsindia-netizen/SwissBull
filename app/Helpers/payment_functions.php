@@ -2,9 +2,10 @@
 
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
-use App\Models\RoiLevelIncome;
+use App\Models\DirectIncome;
 use App\Models\StakingDetail;
-use App\Models\StakingIncome;
+use App\Models\PackageDistribution;
+use App\Models\RoiLevelIncome;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
@@ -51,60 +52,60 @@ function p2pwalletTransfer($memberid, $amount, $type, $p2pwallet, $walletType, $
     }
 }
 
-function levelIncome($sponsorid, $memberid, $name, $_amount, $type)
-{
-    if ($sponsorid != 'Root') {
-        $limit = 11;
-        for ($i = 1; $i < $limit; $i++) {
-            $level = $i;
-            $rate = levelRate($level);
-            $amount = $_amount * $rate / 100;
+// function levelIncome($sponsorid, $memberid, $name, $_amount, $type)
+// {
+//     if ($sponsorid != 'Root') {
+//         $limit = 11;
+//         for ($i = 1; $i < $limit; $i++) {
+//             $level = $i;
+//             $rate = ;
+//             $amount = $_amount * $rate / 100;
 
-            if ($sponsorid != 'Root') {
-                $var = MemberDetail::where('memberid', $sponsorid)->first();
-                $status = $var->status;
-                $downline = $var->downline;
+//             if ($sponsorid != 'Root') {
+//                 $var = MemberDetail::where('memberid', $sponsorid)->first();
+//                 $status = $var->status;
+//                 $downline = $var->downline;
 
-                if ($amount > 0 && $status == 'Active') {
+//                 if ($amount > 0 && $status == 'Active') {
 
-                    if ($type == 'Account Activation') {
-                        $insert = new LevelIncome;
-                        $insert->package = $_amount;
-                    } else {
-                        $insert = new RoiLevelIncome;
-                        $insert->staking_income = $_amount;
-                    }
+//                     if ($type == 'Account Activation') {
+//                         $insert = new LevelIncome;
+//                         $insert->package = $_amount;
+//                     } else {
+//                         $insert = new RoiLevelIncome;
+//                         $insert->staking_income = $_amount;
+//                     }
 
-                    $insert->memberid = $sponsorid;
-                    $insert->level = $level;
-                    $insert->level_id = $memberid;
-                    $insert->amount = $amount;
-                    $insert->rate = $rate;
-                    $insert->name = $name;
-                    $insert->type = $type;
+//                     $insert->memberid = $sponsorid;
+//                     $insert->level = $level;
+//                     $insert->level_id = $memberid;
+//                     $insert->amount = $amount;
+//                     $insert->rate = $rate;
+//                     $insert->name = $name;
+//                     $insert->type = $type;
 
-                    if ($level == 1 && $downline >= 0 || $level == 2 && $downline >= 1 || $level == 3 && $downline >= 2 || $level == 4 && $downline >= 3 || $level == 5 && $downline >= 4 || $level == 6 && $downline >= 5 || $level == 7 && $downline >= 6 || $level == 8 && $downline >= 7 || $level == 9 && $downline >= 8 || $level == 10 && $downline >= 9) {
+//                     if ($level == 1 && $downline >= 4|| $level == 2 && $downline >= 2 || $level == 3 && $downline >= 2 || $level == 4 && $downline >= 2 || $level == 5 && $downline >= 2 || $level == 6 && $downline >= 2 || $level == 7 && $downline >= 2 || $level == 8 && $downline >= 2 || $level == 9 && $downline >= 2 || $level == 10 && $downline >= 2) {
 
-                        $insert->status = 'Paid';
-                        $wallet = $var->wallet;
-                        $var->wallet += $amount;
-                        $var->save();
+//                         $insert->status = 'Paid';
+//                         $wallet = $var->wallet;
+//                         $var->wallet += $amount;
+//                         $var->save();
 
-                        walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Level Income', ' '.$i.'Activation Level Income Amount Added into wallet.');
-                        $insert->status = 'Paid';
-                    } else {
-                        $insert->status = 'Flushed';
-                    }
-                    $insert->save();
-                }
-                $inc = MemberDetail::where('memberid', $sponsorid)->first();
-                $sponsorid = $inc['sponsorid'];
-            } else {
-                break;
-            }
-        }
-    }
-}
+//                         walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Level Income', ' '.$i.'Activation Level Income Amount Added into wallet.');
+//                         $insert->status = 'Paid';
+//                     } else {
+//                         $insert->status = 'Flushed';
+//                     }
+//                     $insert->save();
+//                 }
+//                 $inc = MemberDetail::where('memberid', $sponsorid)->first();
+//                 $sponsorid = $inc['sponsorid'];
+//             } else {
+//                 break;
+//             }
+//         }
+//     }
+// }
 
 function levelRate($level)
 {
@@ -220,3 +221,55 @@ function Income3xachieved($memberid)
 
     return $totalAmount;
 }
+
+function directIncome($sponsorid, $memberid, $name, $_amount, $type = 'Direct Income', $levelPercentages = [])
+{
+    if ($sponsorid != 'Root') {
+        $distribution = PackageDistribution::first();
+        $referral_bonus = $distribution ? (float) $distribution->referral_bonus : 10.0;
+
+        if (empty($levelPercentages)) {
+            $levelPercentages = [
+                1 => ($referral_bonus * 50) / 100,
+                2 => ($referral_bonus * 30) / 100,
+                3 => ($referral_bonus * 20) / 100,
+            ];
+        }
+
+        foreach ($levelPercentages as $level => $rate) {
+            $amount = $_amount * $rate / 100;
+
+            if ($sponsorid != 'Root') {
+                $var = MemberDetail::where('memberid', $sponsorid)->first();
+                if (! $var) {
+                    break;
+                }
+                $status = $var->status;
+
+                if ($amount > 0 && $status == 'Active') {
+                    $insert = new DirectIncome;
+                    $insert->memberid = $sponsorid;
+                    $insert->package = $_amount;
+                    $insert->amount = $amount;
+                    $insert->activatingid = $memberid;
+                    $insert->name = $name;
+                    $insert->status = 'Paid';
+                    $insert->type = $type;
+                    $insert->save();
+
+                    $wallet = $var->wallet;
+                    $var->wallet += $amount;
+                    $var->save();
+
+                    walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Direct Income', ' '.$level.' Direct Income Amount Added into wallet.');
+                }
+
+                $inc = MemberDetail::where('memberid', $sponsorid)->first();
+                $sponsorid = $inc ? $inc->sponsorid : 'Root';
+            } else {
+                break;
+            }
+        }
+    }
+}
+

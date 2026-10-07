@@ -74,6 +74,16 @@ class MemberDetailController extends Controller
         return view('member.dashboard')->with($result);
     }
 
+    public function tradingDashboard(Request $request)
+    {
+        $memberid = session('MEMBER_ID');
+        $country = session('country');
+        $result['country'] = Country::where('name', $country)->first();
+        $result['data'] = MemberDetail::where([['memberid', $memberid], ['country', $country]])->first();
+
+        return view('member.trading-dashboard')->with($result);
+    }
+
     public function logout(Request $request)
     {
         $request->session()->forget('address');
