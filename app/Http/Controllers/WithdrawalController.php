@@ -150,6 +150,7 @@ class WithdrawalController extends Controller
         $requestid = 'RQ'.time();
 
         $check = WithdrawalRequest::where('request_id', $requestid)->first();
+        
         if (! $check) {
             $mem = MemberDetail::where('memberid', $memberid)->first();
             $memberid = $mem->memberid;

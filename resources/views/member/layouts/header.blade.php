@@ -1588,6 +1588,17 @@
                             </ul>
                         </li>
 
+                        <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
+                                <i class="material-symbols-outlined notranslate" translate="no"
+                                    data-icon="account_balance_wallet">account_balance_wallet</i>
+                                <span class="nav-text">Trading Wallet</span>
+                            </a>
+                            <ul aria-expanded="false">
+                                <li><a href="{{ url('member/wallet/trading-withdrawal') }}">Trading Withdrawal</a></li>
+
+                            </ul>
+                        </li>
+
                         {{-- <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined">credit_card</i>
                                 <span class="nav-text">P2P Wallet</span>
