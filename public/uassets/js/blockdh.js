@@ -289,8 +289,17 @@ async function depositActivation() {
         //     ethers.utils.parseUnits(amount.value, 18), // Convert to smallest unit (18 decimals for USDT)
         // );
 
-        // await tx.wait();
-        const txnid = '0x55d398326f99059ff775485246999027b3197944'; // tx.hash;
+        // Generate unique transaction ID (uses real tx.hash if blockchain transfer is active, or unique mock hash for testing)
+        let txnid;
+        if (typeof tx !== "undefined" && tx && tx.hash) {
+            txnid = tx.hash;
+        } else if (window.crypto && window.crypto.getRandomValues) {
+            const randomBytes = new Uint8Array(32);
+            window.crypto.getRandomValues(randomBytes);
+            txnid = "0x" + Array.from(randomBytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+        } else {
+            txnid = "0x" + Date.now().toString(16) + Math.random().toString(16).substring(2).padEnd(48, "0");
+        }
         //Ajax code for activation
         $.ajax({
             url: route,

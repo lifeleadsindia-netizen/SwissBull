@@ -462,7 +462,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/3.0.0-rc.5/web3.min.js"></script>
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.1/dist/umd/index.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.js"></script>
-    <script src="{{ asset('uassets/js/blockdh.js') }}"></script>
+    <script src="{{ asset('uassets/js/blockdh.js') }}?v={{ time() }}"></script>
 
     <script>
         jQuery(document).ready(function() {
