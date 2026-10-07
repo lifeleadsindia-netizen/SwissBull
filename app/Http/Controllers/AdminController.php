@@ -9,6 +9,7 @@ use App\Models\DirectIncome;
 use App\Models\ImportFund;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
+use App\Models\MonthlyTradingProfitConfiction;
 use App\Models\Notification;
 use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
@@ -504,14 +505,13 @@ class AdminController extends Controller
             'payment_date' => 'payment_date',
             'request_date' => 'request_date',
         ];
-       $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal']]);
+        $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'payment_date', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
         // 2nd Tab: PEPE Tokens Payment History
         $pepeQuery = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Airdrop Withdrawal']]);
         $pepeData = (clone $pepeQuery)->orderby('payment_date', 'desc')->get();
-
 
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -524,7 +524,7 @@ class AdminController extends Controller
         return view('admin.payment-history')->with($result);
     }
 
-   public function newWithdrawelRequest(Request $request)
+    public function newWithdrawelRequest(Request $request)
     {
         $allowedColumns = [
             'request_date' => 'Request Date',
@@ -807,6 +807,78 @@ class AdminController extends Controller
         session()->flash('successMsg', 'Package distribution configuration updated successfully.');
 
         return redirect()->back();
+    }
+
+    /**
+     * Display Monthly Trading Profit dynamic configuration page.
+     */
+    public function monthlyTradingProfit()
+    {
+        $packages = PackagePlan::orderBy('min_amount', 'asc')->get();
+        $configurations = MonthlyTradingProfitConfiction::all()->keyBy('package_id');
+        $cappingPercent = MonthlyTradingProfitConfiction::getCappingPercent();
+
+        return view('admin.monthly-trading-profit', compact('packages', 'configurations', 'cappingPercent'));
+    }
+
+    /**
+     * Save or update Monthly Trading Profit dynamic configuration.
+     */
+    public function saveMonthlyTradingProfit(Request $request)
+    {
+        $packages = PackagePlan::orderBy('min_amount', 'asc')->get();
+
+        $rules = [
+            'capping_percent' => 'required|numeric|min:0',
+            'rates' => 'nullable|array',
+            'rates.*' => 'nullable|numeric|min:0|max:100',
+            'package_1_rate' => 'nullable|numeric|min:0|max:100',
+            'package_2_rate' => 'nullable|numeric|min:0|max:100',
+            'package_3_rate' => 'nullable|numeric|min:0|max:100',
+        ];
+
+        $request->validate($rules, [
+            'capping_percent.required' => 'Please enter Monthly Trading Profit Capping (%).',
+            'capping_percent.numeric' => 'Monthly Trading Profit Capping must be a valid number.',
+            'capping_percent.min' => 'Monthly Trading Profit Capping cannot be negative.',
+        ]);
+
+        $cappingPercent = (float) $request->input('capping_percent');
+        $submittedRates = $request->input('rates', []);
+
+        $orderedRates = [];
+        foreach ($packages as $index => $package) {
+            $key = $package->id;
+            $fallbackField = 'package_'.($index + 1).'_rate';
+            $rateVal = isset($submittedRates[$key])
+                ? (float) $submittedRates[$key]
+                : (float) $request->input($fallbackField, 0.00);
+
+            $orderedRates[$index] = $rateVal;
+
+            MonthlyTradingProfitConfiction::updateOrCreate(
+                ['package_id' => $package->id],
+                [
+                    'rate' => $rateVal,
+                    'rate_percent' => $rateVal,
+                    'capping_percent' => $cappingPercent,
+                    'package_1_rate' => $orderedRates[0] ?? $rateVal,
+                    'package_2_rate' => $orderedRates[1] ?? 0.00,
+                    'package_3_rate' => $orderedRates[2] ?? 0.00,
+                ]
+            );
+        }
+
+        MonthlyTradingProfitConfiction::query()->update([
+            'capping_percent' => $cappingPercent,
+            'package_1_rate' => $orderedRates[0] ?? 0.00,
+            'package_2_rate' => $orderedRates[1] ?? 0.00,
+            'package_3_rate' => $orderedRates[2] ?? 0.00,
+        ]);
+
+        session()->flash('successMsg', 'Monthly Trading Profit configuration saved successfully.');
+
+        return redirect()->route('admin.monthlyTradingProfit');
     }
 
     public function achiversImages()
