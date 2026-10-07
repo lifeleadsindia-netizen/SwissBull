@@ -777,18 +777,20 @@ body#app,
 }
 
 /* Income Summary Circular Donut Section */
+/* Income Summary Circular Donut Section */
 .adm-summary-content {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
     height: 100%;
 }
 
 .adm-donut-wrap {
     position: relative;
-    width: 155px;
-    height: 155px;
+    width: 145px;
+    height: 145px;
+    margin: 2px auto 6px auto;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -808,64 +810,101 @@ body#app,
 }
 
 .adm-donut-center h4 {
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 800;
     color: #0f172a;
     margin: 0;
     letter-spacing: -0.02em;
+    white-space: nowrap;
 }
 
 .adm-donut-center span {
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--adm-text-muted);
     font-weight: 600;
     display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 /* Income Legend List */
 .adm-income-list {
-    flex: 1;
+    width: 100%;
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .adm-income-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 7px 0;
+    padding: 0;
     border-bottom: 1px solid #f8fafc;
-    font-size: 12.5px;
 }
 
 .adm-income-list li:last-child {
     border-bottom: none;
 }
 
+.adm-income-item-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+.adm-income-item-link:hover {
+    background: #f8fafc;
+    transform: translateX(2px);
+}
+
 .adm-income-item-left {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     color: #334155;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 12.5px;
     text-decoration: none !important;
 }
 
 .adm-income-dot {
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     flex-shrink: 0;
 }
 
+.adm-income-item-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .adm-income-amount {
+    font-size: 13px;
     font-weight: 700;
     color: #0f172a;
     text-decoration: none !important;
+    white-space: nowrap;
 }
 
-.adm-income-item-left:hover {
+.adm-income-chevron {
+    font-size: 11px;
+    color: #94a3b8;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.adm-income-item-link:hover .adm-income-chevron {
+    color: var(--adm-blue);
+    transform: translateX(2px);
+}
+
+.adm-income-item-link:hover .adm-income-item-left {
     color: var(--adm-blue);
 }
 
