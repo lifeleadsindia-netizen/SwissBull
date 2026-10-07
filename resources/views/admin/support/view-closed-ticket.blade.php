@@ -50,7 +50,7 @@
                             @foreach ($tictext as $item)
                                 @if ($item['written_by'] == 'Member')
                                     <li class="chat-item">
-                                        <div class="chat-img"><img src="{{asset('uploads/avatar.jpg')}}" alt="user"></div>
+                                        <div class="chat-img"><img src="{{asset('uploads/avatar.jpg')}}" onerror="this.onerror=null;this.src='{{ asset('uploads/avatar.jpg') }}';" alt="user"></div>
                                         <div class="chat-content">
                                             <h6 class="font-medium">{{getName($support['memberid'])}}</h6>
                                             <div class="box bg-light-info">{{$item['text']}}</div>

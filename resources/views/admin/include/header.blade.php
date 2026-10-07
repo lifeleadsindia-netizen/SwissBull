@@ -1,4 +1,4 @@
-﻿<header class="header-top" header-theme="light">
+<header class="header-top" header-theme="light">
     <div class="container-fluid">
         <div class="d-flex justify-content-between">
             <div class="top-menu d-flex align-items-center">
@@ -12,7 +12,7 @@
                     <a class="dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
 
-                        <img class="avatar" src="{{ asset('uploads/avatar.jpg')}}" alt="">
+                        <img class="avatar" src="{{ asset('uploads/avatar.jpg')}}" onerror="this.onerror=null;this.src='{{ asset('uploads/avatar.jpg') }}';" alt="">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                         <a class="dropdown-item" href="{{url('admin/profile')}}"><i
