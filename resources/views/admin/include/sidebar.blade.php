@@ -1,4 +1,4 @@
-﻿<div class="app-sidebar colored">
+<div class="app-sidebar colored">
     <div class="sidebar-header">
         <a class="header-brand py-3" href="{{url('admin/dashboard')}}">
             <div class="logo-img text-center ">
@@ -40,6 +40,10 @@
 
                 <div class="nav-item {{ request()->is('*trading-wallet-control*') ? 'active' : '' }}">
                     <a href="{{ route('admin.tradingWalletControl') }}"><i class="ik ik-pocket"></i><span>{{ __('Trading Wallet Control') }}</span></a>
+                </div>
+
+                <div class="nav-item {{ request()->is('*monthly-trading-profit*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.monthlyTradingProfit') }}"><i class="ik ik-trending-up"></i><span>{{ __('Monthly Trading Profit') }}</span></a>
                 </div>
                 
                 <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
@@ -104,6 +108,8 @@
                             class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __(' Roi Income') }}</a>
                         <a href="{{ url('admin/income/roi-details') }}"
                             class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __(' Roi Details') }}</a>
+                        <a href="{{ route('admin.monthlyTradingProfit') }}"
+                            class="menu-item {{ request()->is('*monthly-trading-profit*') ? 'active' : '' }}">{{ __('Monthly Trading Profit') }}</a>
                     </div>
                 </div>
 

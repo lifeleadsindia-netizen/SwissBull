@@ -60,6 +60,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::post('/filter-trading-members', [AdminController::class, 'filterTradingMembers'])->name('admin.filterTradingMembers');
     Route::post('/get-trading-member', [AdminController::class, 'getTradingMember'])->name('admin.getTradingMember');
 
+    // Monthly Trading Profit Configuration
+    Route::get('/monthly-trading-profit', [AdminController::class, 'monthlyTradingProfit'])->name('admin.monthlyTradingProfit');
+    Route::get('/monthly_trading_profit', [AdminController::class, 'monthlyTradingProfit']);
+    Route::post('/monthly-trading-profit', [AdminController::class, 'saveMonthlyTradingProfit'])->name('admin.saveMonthlyTradingProfit');
+    Route::post('/save-monthly-trading-profit', [AdminController::class, 'saveMonthlyTradingProfit']);
+
     // Color Dashboard
     Route::get('/color-dashboard', [AdminController::class, 'colorDashboard']);
 
