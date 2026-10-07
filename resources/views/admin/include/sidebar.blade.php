@@ -45,6 +45,10 @@
                 <div class="nav-item {{ request()->is('*monthly-trading-profit*') ? 'active' : '' }}">
                     <a href="{{ route('admin.monthlyTradingProfit') }}"><i class="ik ik-trending-up"></i><span>{{ __('Monthly Trading Profit') }}</span></a>
                 </div>
+
+                <div class="nav-item {{ request()->is('*referral-bonus*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.referralBonus') }}"><i class="ik ik-users"></i><span>{{ __('Referral Bonus') }}</span></a>
+                </div>
                 
                 <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
                 <!--    <a href="{{ url('admin/setRate') }}"><i class="ik ik-sliders"></i><span>Set Rate</span> </a>-->

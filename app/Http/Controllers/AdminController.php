@@ -17,6 +17,7 @@ use App\Models\PackagePlan;
 use App\Models\PartnershipDetail;
 use App\Models\PartnershipIncome;
 use App\Models\PepeSetting;
+use App\Models\ReferralBonusConfiction;
 use App\Models\RoiLevelIncome;
 use App\Models\SetRate;
 use App\Models\SingleLegIncome;
@@ -879,6 +880,53 @@ class AdminController extends Controller
         session()->flash('successMsg', 'Monthly Trading Profit configuration saved successfully.');
 
         return redirect()->route('admin.monthlyTradingProfit');
+    }
+
+    /**
+     * Display Referral Bonus dynamic configuration page.
+     */
+    public function referralBonus()
+    {
+        $setting = ReferralBonusConfiction::getActiveSetting();
+
+        return view('admin.referral-bonus', compact('setting'));
+    }
+
+    /**
+     * Save or update Referral Bonus dynamic configuration.
+     */
+    public function saveReferralBonus(Request $request)
+    {
+        $rules = [
+            'level_1_rate' => 'required|numeric|min:0|max:100',
+            'level_2_rate' => 'required|numeric|min:0|max:100',
+            'level_3_rate' => 'required|numeric|min:0|max:100',
+        ];
+
+        $request->validate($rules, [
+            'level_1_rate.required' => 'Please enter Level-1 Rate (%).',
+            'level_1_rate.numeric' => 'Level-1 Rate must be a valid number.',
+            'level_1_rate.min' => 'Level-1 Rate cannot be negative.',
+            'level_1_rate.max' => 'Level-1 Rate cannot exceed 100%.',
+            'level_2_rate.required' => 'Please enter Level-2 Rate (%).',
+            'level_2_rate.numeric' => 'Level-2 Rate must be a valid number.',
+            'level_2_rate.min' => 'Level-2 Rate cannot be negative.',
+            'level_2_rate.max' => 'Level-2 Rate cannot exceed 100%.',
+            'level_3_rate.required' => 'Please enter Level-3 Rate (%).',
+            'level_3_rate.numeric' => 'Level-3 Rate must be a valid number.',
+            'level_3_rate.min' => 'Level-3 Rate cannot be negative.',
+            'level_3_rate.max' => 'Level-3 Rate cannot exceed 100%.',
+        ]);
+
+        $setting = ReferralBonusConfiction::getActiveSetting();
+        $setting->level_1_rate = (float) $request->input('level_1_rate');
+        $setting->level_2_rate = (float) $request->input('level_2_rate');
+        $setting->level_3_rate = (float) $request->input('level_3_rate');
+        $setting->save();
+
+        session()->flash('successMsg', 'Referral Bonus configuration saved successfully.');
+
+        return redirect()->route('admin.referralBonus');
     }
 
     public function achiversImages()

@@ -1,11 +1,11 @@
 <?php
 
+use App\Models\DirectIncome;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
-use App\Models\DirectIncome;
-use App\Models\StakingDetail;
-use App\Models\PackageDistribution;
+use App\Models\ReferralBonusConfiction;
 use App\Models\RoiLevelIncome;
+use App\Models\StakingDetail;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
@@ -229,15 +229,8 @@ function Income3xachieved($memberid)
 function directIncome($sponsorid, $memberid, $name, $_amount, $type = 'Direct Income', $levelPercentages = [])
 {
     if ($sponsorid != 'Root') {
-        $distribution = PackageDistribution::first();
-        $referral_bonus = $distribution ? (float) $distribution->referral_bonus : 10.0;
-
         if (empty($levelPercentages)) {
-            $levelPercentages = [
-                1 => ($referral_bonus * 50) / 100,
-                2 => ($referral_bonus * 30) / 100,
-                3 => ($referral_bonus * 20) / 100,
-            ];
+            $levelPercentages = ReferralBonusConfiction::getLevelRates();
         }
 
         foreach ($levelPercentages as $level => $rate) {
@@ -276,4 +269,3 @@ function directIncome($sponsorid, $memberid, $name, $_amount, $type = 'Direct In
         }
     }
 }
-
