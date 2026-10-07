@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.main')
+@extends('admin.layouts.main')
 @section('title', 'Dashboard')
 @section('content')
     <!-- push external head elements to head -->
@@ -556,54 +556,76 @@
                     </div>
                     <div class="card-body commission-overview-body" style="padding: 0px 20px;">
                         <div class="row">
+                            <!-- 1. Monthly Trading Profit -->
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/roi-incomes') }}"
+                                <a href="{{ url('admin/income/monthly-trading-profit') }}"
                                     class="commission-metric commission-metric-deposit">
                                     <span class="commission-metric-icon"><i class="ik ik-trending-up"></i></span>
-                                    <p class="commission-metric-label">Roi Income</p>
+                                    <p class="commission-metric-label">Monthly Trading Profit</p>
                                     <h4 class="commission-metric-value">
                                         $ {{ number_format((float) totalAdminRoiIncome(), 2) }}</h4>
                                     <span class="commission-metric-link">View Details <i
                                             class="ik ik-arrow-right"></i></span>
                                 </a>
                             </div>
+
+                            <!-- 2. Referral Bonus -->
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/staking-level-incomes') }}"
+                                <a href="{{ url('admin/income/referral-bonus') }}"
                                     class="commission-metric commission-metric-advertisement">
+                                    <span class="commission-metric-icon"><i class="ik ik-user-check"></i></span>
+                                    <p class="commission-metric-label">Referral Bonus</p>
+                                    <h4 class="commission-metric-value">
+                                        $ {{ number_format((float) totalAdminDirectIncome(), 2) }}</h4>
+                                    <span class="commission-metric-link">View Details <i
+                                            class="ik ik-arrow-right"></i></span>
+                                </a>
+                            </div>
+
+                            <!-- 3. Team Trading Profit -->
+                            <div class="col-xl-4 col-md-6 mb-3">
+                                <a href="{{ url('admin/income/team-trading-profit') }}"
+                                    class="commission-metric commission-metric-withdrawal">
                                     <span class="commission-metric-icon"><i class="ik ik-layers"></i></span>
-                                    <p class="commission-metric-label">Staking Level Income</p>
+                                    <p class="commission-metric-label">Team Trading Profit</p>
                                     <h4 class="commission-metric-value">
                                         $ {{ number_format((float) totalAdminStakingLevelIncome(), 2) }}</h4>
                                     <span class="commission-metric-link">View Details <i
                                             class="ik ik-arrow-right"></i></span>
                                 </a>
                             </div>
+
+                            <!-- 4. Daily Team Investment Share -->
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/level-incomes') }}"
-                                    class="commission-metric commission-metric-withdrawal">
+                                <a href="{{ url('admin/income/daily-team-investment-share') }}"
+                                    class="commission-metric commission-metric-deposit">
                                     <span class="commission-metric-icon"><i class="ik ik-bar-chart-2"></i></span>
-                                    <p class="commission-metric-label">Level Income</p>
+                                    <p class="commission-metric-label">Daily Team Investment Share</p>
                                     <h4 class="commission-metric-value">
                                         $ {{ number_format((float) totalAdminLevelIncome(), 2) }}</h4>
                                     <span class="commission-metric-link">View Details <i
                                             class="ik ik-arrow-right"></i></span>
                                 </a>
                             </div>
+
+                            <!-- 5. Hero of the Month -->
                             <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/single-leg-incomes') }}"
-                                    class="commission-metric commission-metric-deposit">
-                                    <span class="commission-metric-icon"><i class="ik ik-pie-chart"></i></span>
-                                    <p class="commission-metric-label">Single Leg Income</p>
+                                <a href="{{ url('admin/income/hero-of-the-month') }}"
+                                    class="commission-metric commission-metric-advertisement">
+                                    <span class="commission-metric-icon"><i class="ik ik-award"></i></span>
+                                    <p class="commission-metric-label">Hero of the Month</p>
                                     <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}</h4>
+                                        $ {{ number_format((float) totalAdminHeroOfTheMonthIncome(), 2) }}</h4>
                                     <span class="commission-metric-link">View Details <i
                                             class="ik ik-arrow-right"></i></span>
                                 </a>
                             </div>
+
+                            <!-- 6. Partnership Income -->
                             <div class="col-xl-4 col-md-6 mb-3">
                                 <a href="{{ url('admin/income/partnership-incomes') }}"
-                                    class="commission-metric commission-metric-advertisement">
-                                    <span class="commission-metric-icon"><i class="ik ik-users"></i></span>
+                                    class="commission-metric commission-metric-withdrawal">
+                                    <span class="commission-metric-icon"><i class="ik ik-briefcase"></i></span>
                                     <p class="commission-metric-label">Partnership Income</p>
                                     <h4 class="commission-metric-value">
                                         $ {{ number_format((float) totalAdminPartnershipIncome(), 2) }}</h4>
@@ -611,17 +633,31 @@
                                             class="ik ik-arrow-right"></i></span>
                                 </a>
                             </div>
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}"
-                                    class="commission-metric commission-metric-withdrawal">
-                                    <span class="commission-metric-icon"><i class="ik ik-download"></i></span>
-                                    <p class="commission-metric-label">Team Withdrawal Commission</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminTeamWithdrawalCommissionIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
-                                </a>
-                            </div>
+
+                            @if (totalAdminSingleLegIncome() > 0 || totalAdminTeamWithdrawalCommissionIncome() > 0)
+                                @if (totalAdminSingleLegIncome() > 0)
+                                    <div class="col-xl-6 col-md-6 mb-3">
+                                        <a href="{{ url('admin/income/single-leg-incomes') }}"
+                                            class="commission-metric commission-metric-deposit">
+                                            <span class="commission-metric-icon"><i class="ik ik-pie-chart"></i></span>
+                                            <p class="commission-metric-label">Single Leg Income</p>
+                                            <h4 class="commission-metric-value">$ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}</h4>
+                                            <span class="commission-metric-link">View Details <i class="ik ik-arrow-right"></i></span>
+                                        </a>
+                                    </div>
+                                @endif
+                                @if (totalAdminTeamWithdrawalCommissionIncome() > 0)
+                                    <div class="col-xl-6 col-md-6 mb-3">
+                                        <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}"
+                                            class="commission-metric commission-metric-withdrawal">
+                                            <span class="commission-metric-icon"><i class="ik ik-download"></i></span>
+                                            <p class="commission-metric-label">Team Withdrawal Commission</p>
+                                            <h4 class="commission-metric-value">$ {{ number_format((float) totalAdminTeamWithdrawalCommissionIncome(), 2) }}</h4>
+                                            <span class="commission-metric-link">View Details <i class="ik ik-arrow-right"></i></span>
+                                        </a>
+                                    </div>
+                                @endif
+                            @endif
                         </div>
                     </div>
                 </div>

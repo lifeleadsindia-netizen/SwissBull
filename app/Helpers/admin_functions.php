@@ -3,6 +3,7 @@
 use App\Models\Country;
 use App\Models\DailyIncome;
 use App\Models\DirectIncome;
+use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
@@ -100,9 +101,48 @@ function totalRoiIn()
     return $sum;
 }
 
+function totalAdminDirectIncome()
+{
+    return totalDirectIn();
+}
+
+function totalAdminHeroOfTheMonthIncome()
+{
+    $sum = HeroOfTheMonthReward::where('status', 'Paid')->sum('prize_amount');
+
+    return $sum;
+}
+
+function totalAdminMonthlyTradingProfit()
+{
+    return totalAdminRoiIncome();
+}
+
+function totalAdminReferralBonus()
+{
+    return totalAdminDirectIncome();
+}
+
+function totalAdminTeamTradingProfit()
+{
+    return totalAdminStakingLevelIncome();
+}
+
+function totalAdminDailyTeamInvestmentShare()
+{
+    return totalAdminLevelIncome();
+}
+
 function totalIn()
 {
-    $sum = totalAdminRoiIncome() + totalAdminStakingLevelIncome() + totalAdminLevelIncome() + totalAdminSingleLegIncome() + totalAdminPartnershipIncome() + totalAdminTeamWithdrawalCommissionIncome();
+    $sum = totalAdminRoiIncome()
+        + totalAdminDirectIncome()
+        + totalAdminStakingLevelIncome()
+        + totalAdminLevelIncome()
+        + totalAdminHeroOfTheMonthIncome()
+        + totalAdminPartnershipIncome()
+        + totalAdminSingleLegIncome()
+        + totalAdminTeamWithdrawalCommissionIncome();
 
     return $sum;
 }

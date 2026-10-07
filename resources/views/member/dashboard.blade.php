@@ -3269,9 +3269,9 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <!-- ROI Income -->
+                                        <!-- 1. Monthly Trading Profit -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/monthly-staking-income') }}"
+                                            <a href="{{ url('member/income/monthly-trading-profit') }}"
                                                 class="text-decoration-none">
                                                 <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
                                                     <div class="card-body p-4">
@@ -3280,7 +3280,7 @@
                                                                 <i class="la la-chart-line" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Monthly Staking Income</p>
+                                                                <p class="mb-1">Monthly Trading Profit</p>
                                                                 <h4 class="text-white">$
                                                                     {{ number_format((float) totalMemberRoiIncome($data['memberid']), 2) }}
                                                                 </h4>
@@ -3290,7 +3290,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>Up to 5% - 10% Monthly</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3301,18 +3301,50 @@
                                             </a>
                                         </div>
 
-                                        <!-- Staking Level Income -->
+                                        <!-- 2. Referral Bonus -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/staking-level-income') }}"
+                                            <a href="{{ url('member/income/referral-bonus') }}"
                                                 class="text-decoration-none">
                                                 <div class="widget-stat card dash-3d-card row-theme-2 h-100 mb-0">
+                                                    <div class="card-body p-4">
+                                                        <div class="media">
+                                                            <span class="me-3">
+                                                                <i class="la la-user-plus" style="font-size: 2rem;"></i>
+                                                            </span>
+                                                            <div class="media-body text-white">
+                                                                <p class="mb-1">Referral Bonus</p>
+                                                                <h4 class="text-white">$
+                                                                    {{ number_format((float) totalMemberDirectIncome($data['memberid']), 2) }}
+                                                                </h4>
+                                                                <div class="progress mb-2">
+                                                                    <div class="progress-bar progress-animated"
+                                                                        style="width: 65%"></div>
+                                                                </div>
+                                                                <small
+                                                                    class="d-flex justify-content-between align-items-center">
+                                                                    <span>L1: 5%, L2: 3%, L3: 2%</span>
+                                                                    <span>View Details <i
+                                                                            class="la la-arrow-right"></i></span>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <!-- 3. Team Trading Profit -->
+                                        <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
+                                            <a href="{{ url('member/income/team-trading-profit') }}"
+                                                class="text-decoration-none">
+                                                <div class="widget-stat card dash-3d-card row-theme-3 h-100 mb-0">
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
                                                                 <i class="la la-layer-group" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Staking Level Income</p>
+                                                                <p class="mb-1">Team Trading Profit</p>
                                                                 <h4 class="text-white">$
                                                                     {{ number_format((float) totalMemberStakingLevelIncome($data['memberid']), 2) }}
                                                                 </h4>
@@ -3322,7 +3354,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>L1–L10 Daily Profit</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3333,18 +3365,18 @@
                                             </a>
                                         </div>
 
-                                        <!-- Level Income -->
+                                        <!-- 4. Daily Team Investment Share -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/level-income') }}"
+                                            <a href="{{ url('member/income/daily-team-investment-share') }}"
                                                 class="text-decoration-none">
-                                                <div class="widget-stat card dash-3d-card row-theme-3 h-100 mb-0">
+                                                <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
                                                                 <i class="la la-bar-chart" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Level Income</p>
+                                                                <p class="mb-1">Daily Team Investment Share</p>
                                                                 <h4 class="text-white">$
                                                                     {{ number_format((float) totalMemberLevelIncome($data['memberid']), 2) }}
                                                                 </h4>
@@ -3354,7 +3386,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>L1–L10: 1% Each</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3365,28 +3397,28 @@
                                             </a>
                                         </div>
 
-                                        <!-- Single Leg Income -->
+                                        <!-- 5. Hero of the Month -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/single-leg-income') }}"
+                                            <a href="{{ url('member/income/hero-of-the-month') }}"
                                                 class="text-decoration-none">
-                                                <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
+                                                <div class="widget-stat card dash-3d-card row-theme-4 h-100 mb-0">
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
-                                                                <i class="la la-pie-chart" style="font-size: 2rem;"></i>
+                                                                <i class="la la-trophy" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Single Leg Income</p>
+                                                                <p class="mb-1">Hero of the Month</p>
                                                                 <h4 class="text-white">$
-                                                                    {{ number_format((float) totalMemberSingleLegIncome($data['memberid']), 2) }}
+                                                                    {{ number_format((float) totalMemberHeroOfTheMonthIncome($data['memberid']), 2) }}
                                                                 </h4>
                                                                 <div class="progress mb-2">
                                                                     <div class="progress-bar progress-animated"
-                                                                        style="width: 55%"></div>
+                                                                        style="width: 80%"></div>
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>2% Monthly Pool</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3397,7 +3429,7 @@
                                             </a>
                                         </div>
 
-                                        <!-- Partnership Income -->
+                                        <!-- 6. Partnership Income -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
                                             <a href="{{ url('member/income/partnership-income') }}"
                                                 class="text-decoration-none">
@@ -3405,7 +3437,7 @@
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
-                                                                <i class="la la-users" style="font-size: 2rem;"></i>
+                                                                <i class="la la-handshake" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
                                                                 <p class="mb-1">Partnership Income</p>
@@ -3418,7 +3450,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>Silver to Diamond 2%–8%</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3429,37 +3461,43 @@
                                             </a>
                                         </div>
 
-                                        <!-- Team Withdrawal Commission -->
-                                        <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/team-withdrawal-commission') }}"
-                                                class="text-decoration-none">
-                                                <div class="widget-stat card dash-3d-card row-theme-4 h-100 mb-0">
-                                                    <div class="card-body p-4">
-                                                        <div class="media">
-                                                            <span class="me-3">
-                                                                <i class="la la-arrow-down" style="font-size: 2rem;"></i>
-                                                            </span>
-                                                            <div class="media-body text-white">
-                                                                <p class="mb-1">Team Withdrawal Commission</p>
-                                                                <h4 class="text-white">$
-                                                                    {{ number_format((float) totalMemberTeamWithdrawalCommissionIncome($data['memberid']), 2) }}
-                                                                </h4>
-                                                                <div class="progress mb-2">
-                                                                    <div class="progress-bar progress-animated"
-                                                                        style="width: 50%"></div>
+                                        @if (totalMemberSingleLegIncome($data['memberid']) > 0 || totalMemberTeamWithdrawalCommissionIncome($data['memberid']) > 0)
+                                            <!-- Additional Legacy Earnings -->
+                                            @if (totalMemberSingleLegIncome($data['memberid']) > 0)
+                                                <div class="col-xl-6 col-md-6 col-sm-12 mb-3">
+                                                    <a href="{{ url('member/income/single-leg-income') }}" class="text-decoration-none">
+                                                        <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
+                                                            <div class="card-body p-3">
+                                                                <div class="media align-items-center">
+                                                                    <span class="me-3"><i class="la la-pie-chart" style="font-size: 1.5rem;"></i></span>
+                                                                    <div class="media-body text-white">
+                                                                        <small class="text-white-50">Single Leg Income</small>
+                                                                        <h5 class="text-white mb-0">$ {{ number_format((float) totalMemberSingleLegIncome($data['memberid']), 2) }}</h5>
+                                                                    </div>
                                                                 </div>
-                                                                <small
-                                                                    class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
-                                                                    <span>View Details <i
-                                                                            class="la la-arrow-right"></i></span>
-                                                                </small>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </a>
                                                 </div>
-                                            </a>
-                                        </div>
+                                            @endif
+                                            @if (totalMemberTeamWithdrawalCommissionIncome($data['memberid']) > 0)
+                                                <div class="col-xl-6 col-md-6 col-sm-12 mb-3">
+                                                    <a href="{{ url('member/income/team-withdrawal-commission') }}" class="text-decoration-none">
+                                                        <div class="widget-stat card dash-3d-card row-theme-4 h-100 mb-0">
+                                                            <div class="card-body p-3">
+                                                                <div class="media align-items-center">
+                                                                    <span class="me-3"><i class="la la-arrow-down" style="font-size: 1.5rem;"></i></span>
+                                                                    <div class="media-body text-white">
+                                                                        <small class="text-white-50">Team Withdrawal Commission</small>
+                                                                        <h5 class="text-white mb-0">$ {{ number_format((float) totalMemberTeamWithdrawalCommissionIncome($data['memberid']), 2) }}</h5>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>

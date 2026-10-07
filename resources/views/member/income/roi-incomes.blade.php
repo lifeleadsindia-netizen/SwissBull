@@ -1,5 +1,5 @@
 @extends('member.layouts.main')
-@section('title', 'Monthly Staking Income')
+@section('title', 'Monthly Trading Profit')
 @section('container')
 @include('member.income._income-styles')
 
@@ -8,16 +8,16 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
-            <h1><i class="fa-solid fa-chart-line me-2"></i>Monthly Staking Income</h1>
-            <p>Your staking return on investment earnings — credited automatically each cycle.</p>
+            <h1><i class="fa-solid fa-chart-line me-2"></i>Monthly Trading Profit</h1>
+            <p>Your package-based daily trading return on investment earnings — credited automatically up to your monthly tier limit.</p>
         </div>
 
         <div class="inc-card">
             <div class="inc-card-header">
                 <div class="inc-header-icon"><i class="fa-solid fa-percent"></i></div>
                 <div>
-                    <div class="inc-header-title">Monthly Staking Income History</div>
-                    <div class="inc-header-sub">All Monthly Staking installments credited to your account</div>
+                    <div class="inc-header-title">Monthly Trading Profit History</div>
+                    <div class="inc-header-sub">All daily trading profit installments credited to your account</div>
                 </div>
             </div>
             <div class="inc-table-shell">

@@ -1,5 +1,5 @@
 @extends('member.layouts.main')
-@section('title', 'Team Trading Profit')
+@section('title', 'Hero of the Month Rewards')
 @section('container')
 @include('member.income._income-styles')
 
@@ -8,16 +8,16 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
-            <h1><i class="fa-solid fa-layer-group me-2"></i>Team Trading Profit</h1>
-            <p>Team trading profit share calculated across 10 levels: L1-L2 (5%), L3-L4 (4%), L5-L6 (3%), L7-L8 (2%), L9-L10 (1%).</p>
+            <h1><i class="fa-solid fa-trophy me-2"></i>Hero of the Month</h1>
+            <p>2% monthly pool reward dedicated to the highest direct business performer of the month.</p>
         </div>
 
         <div class="inc-card">
             <div class="inc-card-header">
-                <div class="inc-header-icon"><i class="fa-solid fa-sitemap"></i></div>
+                <div class="inc-header-icon"><i class="fa-solid fa-award"></i></div>
                 <div>
-                    <div class="inc-header-title">Team Trading Profit History</div>
-                    <div class="inc-header-sub">Daily trading profit commissions earned from your downline team across 10 levels</div>
+                    <div class="inc-header-title">Hero of the Month Reward History</div>
+                    <div class="inc-header-sub">Monthly 2% pool distributions credited to your account</div>
                 </div>
             </div>
             <div class="inc-table-shell">
@@ -25,30 +25,30 @@
                     <thead>
                         <tr>
                             <th>S.No</th>
-                            <th>Date</th>
+                            <th>Month / Year</th>
                             <th>Member ID</th>
-                            <th>Level</th>
-                            <th>Level ID</th>
                             <th>Name</th>
-                            <th>Rate</th>
-                            <th>Staking Income</th>
-                            <th>Amount</th>
+                            <th>Direct Business</th>
+                            <th>Total Pool Turnover</th>
+                            <th>Pool Share</th>
+                            <th>Prize Amount</th>
+                            <th>Rank</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php $i = 1; @endphp
-                        @foreach ($sData as $list)
+                        @foreach ($hData as $list)
                             <tr>
                                 <td>{{ $i }}</td>
-                                <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}</td>
+                                <td><strong>{{ $list['month'] ?? $list['month_year'] ?? date('F Y', strtotime($list['created_at'])) }}</strong></td>
                                 <td>{{ $list['memberid'] }}</td>
-                                <td>Level {{ $list['level'] }}</td>
-                                <td>{{ $list['level_id'] }}</td>
-                                <td>{{ !empty($list['name']) ? $list['name'] : getName($list['level_id']) }}</td>
-                                <td>{{ $list['rate'] ?? levelRate($list['level']) }}%</td>
-                                <td>$ {{ number_format($list['staking_income'] ?? $list['package'] ?? 0, 2) }}</td>
-                                <td>$ {{ number_format($list['amount'], 2) }}</td>
+                                <td>{{ $list['member_name'] ?? getName($list['memberid']) }}</td>
+                                <td>$ {{ number_format((float) ($list['direct_business'] ?? 0), 2) }}</td>
+                                <td>$ {{ number_format((float) ($list['total_pool'] ?? $list['total_pool_business'] ?? 0), 2) }}</td>
+                                <td>{{ number_format((float) ($list['pool_percentage'] ?? $list['pool_rate'] ?? 2.0), 1) }}%</td>
+                                <td><strong class="text-success">$ {{ number_format((float) ($list['prize_amount'] ?? 0), 2) }}</strong></td>
+                                <td><span class="badge bg-warning text-dark font-weight-bold">#{{ $list['rank'] ?? 1 }} Hero</span></td>
                                 <td>
                                     @if ($list['status'] == 'Unpaid')
                                         <span class="inc-badge unpaid"><i class="fa-solid fa-clock"></i>{{ $list['status'] }}</span>

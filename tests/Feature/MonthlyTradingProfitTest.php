@@ -196,4 +196,10 @@ class MonthlyTradingProfitTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee(route('admin.monthlyTradingProfit'));
     }
+
+    protected function tearDown(): void
+    {
+        DB::table('monthly_trading_profit_confiction')->truncate();
+        parent::tearDown();
+    }
 }

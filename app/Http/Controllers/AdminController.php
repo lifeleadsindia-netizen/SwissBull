@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\DailyTeamInvestmentShareConfiction;
 use App\Models\DashMessage;
 use App\Models\DirectIncome;
+use App\Models\HeroOfTheMonthReward;
 use App\Models\ImportFund;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
@@ -1261,11 +1262,24 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
-            'pageTitle' => 'Direct Incomes',
-            'action' => url('admin/incomes/direct-incomes'),
+            'pageTitle' => 'Referral Bonus',
+            'action' => url('admin/income/referral-bonus'),
         ]);
 
-        return view('admin.income.singleleg-incomes')->with($result);
+        return view('admin.income.direct-incomes')->with($result);
+    }
+
+    public function heroRewards(Request $request)
+    {
+        $query = HeroOfTheMonthReward::query();
+        $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        $result = array_merge($filterMeta, [
+            'data' => $query->orderby('created_at', 'desc')->get(),
+            'pageTitle' => 'Hero of the Month Rewards',
+            'action' => url('admin/income/hero-of-the-month'),
+        ]);
+
+        return view('admin.income.hero-rewards')->with($result);
     }
 
     public function partnershipInc(Request $request)

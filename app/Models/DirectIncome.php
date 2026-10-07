@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class DirectIncome extends Model
 {
-    //
+    protected $guarded = [];
 }
