@@ -49,33 +49,50 @@ class DailyTeamInvestmentShareConfiction extends Model
     ];
 
     /**
+     * Calculate the direct referrals chain for 10 levels given a level 1 requirement.
+     * Formula: Level X = Level 1 + ((X - 1) * 2)
+     *
+     * @return array<int, int>
+     */
+    public static function calculateDirectsChain(int $level1Directs): array
+    {
+        $chain = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $chain[$i] = $level1Directs + (($i - 1) * 2);
+        }
+
+        return $chain;
+    }
+
+    /**
      * Get or create active singleton configuration.
      */
     public static function getActiveSetting(): self
     {
         $setting = static::first();
         if (! $setting) {
+            $chain = static::calculateDirectsChain(4);
             $setting = static::create([
                 'level_1_rate' => 1.00,
-                'level_1_directs' => 4,
+                'level_1_directs' => $chain[1],
                 'level_2_rate' => 1.00,
-                'level_2_directs' => 2,
+                'level_2_directs' => $chain[2],
                 'level_3_rate' => 1.00,
-                'level_3_directs' => 2,
+                'level_3_directs' => $chain[3],
                 'level_4_rate' => 1.00,
-                'level_4_directs' => 2,
+                'level_4_directs' => $chain[4],
                 'level_5_rate' => 1.00,
-                'level_5_directs' => 2,
+                'level_5_directs' => $chain[5],
                 'level_6_rate' => 1.00,
-                'level_6_directs' => 2,
+                'level_6_directs' => $chain[6],
                 'level_7_rate' => 1.00,
-                'level_7_directs' => 2,
+                'level_7_directs' => $chain[7],
                 'level_8_rate' => 1.00,
-                'level_8_directs' => 2,
+                'level_8_directs' => $chain[8],
                 'level_9_rate' => 1.00,
-                'level_9_directs' => 2,
+                'level_9_directs' => $chain[9],
                 'level_10_rate' => 1.00,
-                'level_10_directs' => 2,
+                'level_10_directs' => $chain[10],
             ]);
         }
 
@@ -92,11 +109,13 @@ class DailyTeamInvestmentShareConfiction extends Model
         $setting = static::getActiveSetting();
 
         $levels = [];
+        $level1Directs = (int) ($setting->level_1_directs ?? 4);
+        $chain = static::calculateDirectsChain($level1Directs);
+
         for ($i = 1; $i <= 10; $i++) {
-            $defaultDirects = ($i === 1) ? 4 : 2;
             $levels[$i] = [
                 'rate' => (float) ($setting->{"level_{$i}_rate"} ?? 1.00),
-                'directs' => (int) ($setting->{"level_{$i}_directs"} ?? $defaultDirects),
+                'directs' => (int) ($setting->{"level_{$i}_directs"} ?? $chain[$i]),
             ];
         }
 
