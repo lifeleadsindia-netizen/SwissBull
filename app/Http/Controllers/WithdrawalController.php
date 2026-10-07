@@ -72,108 +72,106 @@ class WithdrawalController extends Controller
     {
         return response()->json([
             'code' => 0,
-            'data' => 'd24e79c6af7fac60ab730094159fa1750c8de96287d5664300d5559f8c53ec8a',
+            'data' => 'd24e79c6af7asdfghjklcvbnm094159fa1750c8de96287d5665259f8c53ec8a',
         ]);
     }
 
-    public function withdrawal(Request $request)
-    {
-        $memberWallet = $request->post('memberWallet');
-        $memberid = $request->post('memberid');
-        $txnid = $request->post('txnid');
-        $amount = $request->post('amount');
-        $service = $amount / 100 * 15;
-        $netAmount = $amount - $service;
-        $date = date('Y-m-d H:i:s');
-        $requestid = 'RQ'.time();
-
-        $mem = MemberDetail::where('memberid', $memberid)->first();
-        $wallet = $mem->wallet;
-        $mem->wallet -= $amount;
-        $mem->save();
-
-        $var = new WithdrawalRequest;
-        $var->request_date = $date;
-        $var->payment_date = date('Y-m-d H:i:s');
-        $var->request_id = $requestid;
-        $var->txnid = $txnid;
-        $var->memberid = $memberid;
-        // $var->name = $mem->name;
-        $var->type = 'USDT';
-        $var->wallet_address = $memberWallet;
-        $var->gross_amount = $amount;
-        $var->service_charge = $service;
-        $var->net_amount = $netAmount;
-        $var->status = 'Approved';
-        $var->save();
-
-        walletTransfer($memberid, $amount, 'credit', $wallet, 'Withdrawal', ' $ '.$amount.' have been withdrawn by Member from wallet. Payment Id-'.$var->id);
-        // session()->flash('successMsg', 'Withdrawal request has been processed successfully. Amount has been added to wallet');
-    }
-
-    // public function initWithdrawal(Request $request)
+    // public function withdrawal(Request $request)
     // {
-    //     $request->validate([
-    //         'memberid' => 'required',
-    //         'amount' => 'required|numeric|min:10',
-    //     ]);
-    //     $amount = $request->post('amount');
+    //     $memberWallet = $request->post('memberWallet');
     //     $memberid = $request->post('memberid');
     //     $txnid = $request->post('txnid');
-
-    //     $memberData = MemberDetail::where('memberid', $memberid)->first();
-    //     $Status = $memberData['status'];
-    //     $wallet = $memberData['wallet'];
-
-    //     if ($amount < 10) {
-    //         session()->flash('failedMsg', 'Invalid Amount Entered. Amount must be equal and greater than $10');
-
-    //         return redirect()->back();
-    //     }
-
-    //     if ($amount > $wallet) {
-    //         session()->flash('failedMsg', 'Invalid Amount Entered. Amount can not be greater than wallet balance');
-
-    //         return redirect()->back();
-    //     }
-
-    //     if ($Status != 'Active') {
-    //         session()->flash('failedMsg', 'Your Account is not Active. Plase activate your account to withdraw money');
-
-    //         return redirect()->back();
-    //     }
-
-    //     $service = ($amount * 15) / 100;
+    //     $amount = $request->post('amount');
+    //     $service = $amount / 100 * 15;
     //     $netAmount = $amount - $service;
     //     $date = date('Y-m-d H:i:s');
     //     $requestid = 'RQ'.time();
 
-    //     $check = WithdrawalRequest::where('request_id', $requestid)->first();
-    //     if (! $check) {
-    //         $mem = MemberDetail::where('memberid', $memberid)->first();
-    //         $memberid = $mem->memberid;
-    //         $wallet = $mem->wallet;
-    //         $mem->wallet -= $amount;
-    //         $mem->save();
+    //     $mem = MemberDetail::where('memberid', $memberid)->first();
+    //     $wallet = $mem->wallet;
+    //     $mem->wallet -= $amount;
+    //     $mem->save();
 
-    //         $var = new WithdrawalRequest;
-    //         $var->request_date = date('Y-m-d H:i:s');
-    //         $var->request_id = $requestid;
-    //         $var->txnid = $txnid;
-    //         $var->memberid = $memberid;
-    //         $var->wallet_address = $mem->member_wallet;
-    //         $var->gross_amount = $amount;
-    //         $var->service_charge = $service;
-    //         $var->net_amount = $netAmount;
-    //         $var->save();
+    //     $var = new WithdrawalRequest;
+    //     $var->request_date = $date;
+    //     $var->payment_date = date('Y-m-d H:i:s');
+    //     $var->request_id = $requestid;
+    //     $var->txnid = $txnid;
+    //     $var->memberid = $memberid;
+    //     // $var->name = $mem->name;
+    //     $var->type = 'USDT';
+    //     $var->wallet_address = $memberWallet;
+    //     $var->gross_amount = $amount;
+    //     $var->service_charge = $service;
+    //     $var->net_amount = $netAmount;
+    //     $var->status = 'Approved';
+    //     $var->save();
 
-    //         walletTransfer($memberid, $amount, 'credit', $wallet, 'Withdrawal', ' $ '.$amount.' have been withdrawn by Member from wallet. Payment Id-'.$var->id);
-
-    //         session()->flash('successMsg', 'Withdrawal request has been created successfully. Amount will be transfered into wallet after transaction validation');
-
-    //         return redirect()->back();
-    //     }
+    //     walletTransfer($memberid, $amount, 'credit', $wallet, 'Withdrawal', ' $ '.$amount.' have been withdrawn by Member from wallet. Payment Id-'.$var->id);
+    //     // session()->flash('successMsg', 'Withdrawal request has been processed successfully. Amount has been added to wallet');
     // }
+
+    public function initWithdrawal(Request $request)
+    {
+        $request->validate([
+            'memberid' => 'required',
+            'amount' => 'required|numeric|min:10',
+        ]);
+        $amount = $request->post('amount');
+        $memberid = $request->post('memberid');
+        // $txnid = $request->post('txnid');
+
+        $memberData = MemberDetail::where('memberid', $memberid)->first();
+        $Status = $memberData['status'];
+        $wallet = $memberData['wallet'];
+
+        if ($amount < 10) {
+            session()->flash('failedMsg', 'Invalid Amount Entered. Amount must be equal and greater than $10');
+
+            return redirect()->back();
+        }
+
+        if ($amount > $wallet) {
+            session()->flash('failedMsg', 'Invalid Amount Entered. Amount can not be greater than wallet balance');
+
+            return redirect()->back();
+        }
+
+        if ($Status != 'Active') {
+            session()->flash('failedMsg', 'Your Account is not Active. Plase activate your account to withdraw money');
+
+            return redirect()->back();
+        }
+
+        $service = 0; // ($amount * 15) / 100;
+        $netAmount = $amount - $service;
+
+        $date = date('Y-m-d H:i:s');
+        $requestid = 'RQ'.time();
+
+        $check = WithdrawalRequest::where('request_id', $requestid)->first();
+        if (! $check) {
+            $mem = MemberDetail::where('memberid', $memberid)->first();
+            $memberid = $mem->memberid;
+            $wallet = $mem->wallet;
+            $mem->wallet -= $amount;
+            $mem->save();
+
+            $var = new WithdrawalRequest;
+            $var->request_date = date('Y-m-d H:i:s');
+            $var->request_id = $requestid;
+            $var->memberid = $memberid;
+            $var->wallet_address = $mem->member_wallet;
+            $var->gross_amount = $amount;
+            $var->service_charge = $service;
+            $var->net_amount = $amount;
+            $var->save();
+
+            walletTransfer($memberid, $amount, 'credit', $wallet, 'Withdrawal', ' $ '.$amount.' have been withdrawn by Member from wallet. Payment Id-'.$var->id);
+            session()->flash('successMsg', 'Withdrawal request has been created successfully. Amount will be transfered into wallet after transaction validation');
+            return redirect()->back();
+        }
+    }
 
     public function withdrlHistory()
     {
@@ -181,7 +179,7 @@ class WithdrawalController extends Controller
         $country = session('country');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
         $result['country'] = Country::where('name', $country)->first();
-        $result['reqdata'] = WithdrawalRequest::where('memberid', $memberid)->orderBy('created_at', 'desc')->get();
+        $result['reqdata'] = WithdrawalRequest::where([['memberid', $memberid],['type', 'Wallet']])->orderBy('created_at', 'desc')->get();
 
         return view('member.wallet.withdrawal-history')->with($result);
     }
@@ -604,6 +602,97 @@ class WithdrawalController extends Controller
         ));
     }
 
+    public function pepeWallet()
+    {
+        $memberid = session('MEMBER_ID');
+        $country = session('country');
+        $result['data'] = MemberDetail::where('memberid', $memberid)->first();
+        $result['country'] = Country::where('name', $country)->first();
+
+        // Calculate available PEPE tokens
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
+        $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
+            ->where('type', 'Airdrop Withdrawal')
+            ->where('status', 'Approved')
+            ->sum('gross_amount');
+            
+        $promoAvailable = max(0, $totalEarned - $totalRedeemed);
+        $walletBalance = (float) ($result['data']->pepe_wallet ?? 0);
+        $availablePepe = max($walletBalance, $promoAvailable);
+        
+        $result['availablePepe'] = $availablePepe;
+        $result['totalEarned'] = $totalEarned;
+        $result['totalRedeemed'] = $totalRedeemed;
+
+        return view('member.wallet.pepe-wallet')->with($result);
+    }
+
+    public function initPepeWithdrawalForm(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'memberid' => 'required',
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()->first()]);
+        }
+
+        $amount = (float) $request->post('amount');
+        $memberid = $request->post('memberid');
+
+        $memberData = MemberDetail::where('memberid', $memberid)->first();
+        $Status = $memberData['status'];
+        
+        // Calculate available PEPE tokens
+        $totalEarned = PepeRewardService::getTotalEarned($memberid);
+        $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
+            ->where('type', 'Airdrop Withdrawal')
+            ->where('status', 'Approved')
+            ->sum('gross_amount');
+            
+        $promoAvailable = max(0, $totalEarned - $totalRedeemed);
+        $walletBalance = (float) ($memberData->pepe_wallet ?? 0);
+        $availablePepe = max($walletBalance, $promoAvailable);
+
+        if ($amount <= 0) {
+            return response()->json(['success' => false, 'message' => 'Invalid Amount Entered.']);
+        }
+
+        if ($amount > $availablePepe) {
+            return response()->json(['success' => false, 'message' => 'Invalid Amount Entered. Amount can not be greater than PEPE wallet balance']);
+        }
+
+        if ($Status != 'Active') {
+            return response()->json(['success' => false, 'message' => 'Your Account is not Active. Please activate your account to withdraw.']);
+        }
+
+        $date = date('Y-m-d H:i:s');
+        $requestid = 'RQPEPE'.time();
+
+        $check = WithdrawalRequest::where('request_id', $requestid)->first();
+        if (! $check) {
+            $memberData->pepe_wallet = max(0, $memberData->pepe_wallet - $amount);
+            $memberData->save();
+
+            $var = new WithdrawalRequest;
+            $var->request_date = date('Y-m-d H:i:s');
+            $var->request_id = $requestid;
+            $var->memberid = $memberid;
+            $var->wallet_address = $memberData->member_wallet ?: $memberData->wallet_address;
+            $var->gross_amount = $amount;
+            $var->service_charge = 0;
+            $var->net_amount = $amount;
+            $var->type = 'Airdrop Withdrawal';
+            $var->save();
+
+            walletTransfer($memberid, $amount, 'credit', $availablePepe, 'Withdrawal', ' PEPE '.$amount.' have been withdrawn by Member from wallet. Payment Id-'.$var->id);
+            return response()->json(['success' => true, 'message' => 'PEPE Withdrawal request has been created successfully. Amount will be transfered after admin validation']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Request already processing.']);
+    }
+
     /**
      * Convert decimal token amount to wei (raw token units) string in pure PHP.
      */
@@ -655,7 +744,7 @@ class WithdrawalController extends Controller
     {
         return response()->json([
             'code' => 0,
-            'data' => 'd24e79c6af7fac60ab730094159fa1750c8de96287d5664300d5559f8c53ec8a',
+            'data' => 'd24e79c6af7fac60ab730094159fa1750c8sdfgj52100d5559f8c53ec8a',
         ]);
     }
 
@@ -747,5 +836,16 @@ class WithdrawalController extends Controller
             'data' => $withAmount,
             'message' => 'Trading Wallet withdrawal validated successfully.',
         ]);
+    }
+
+      public function wAcceptOnlinePepe($id)
+    {
+        $result['wdata'] = WithdrawalRequest::find($id);
+        $memberid = $result['wdata']['memberid'];
+        $option = $result['wdata']['payment_option'];
+        $result['udata'] = MemberDetail::where('memberid', $memberid)->first();
+        $result['wallet'] = $result['wdata']['wallet_address'];
+
+        return view('admin.withdrawal-accept-pepe')->with($result);
     }
 }

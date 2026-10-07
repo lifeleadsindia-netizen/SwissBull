@@ -155,9 +155,9 @@
                     <div class="submenu-content">
                         {{-- <a href="{{url('admin/package/fund-requests')}}" class="menu-item {{ ($segment1 == 'badges') ? 'active' : '' }}">{{ __('Fund Requests')}}</a>
                         <a href="{{url('admin/set-pay-mode')}}" class="menu-item {{ ($segment1 == 'badges') ? 'active' : '' }}">{{ __('Set Payment Mode')}} </a>--}}
-                        <!--<a href="{{url('admin/new-withdrawal-request')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('New Withdrawal Requests')}}</a>-->
+                        <a href="{{url('admin/new-withdrawal-request')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('New Withdrawal Requests')}}</a>
                         {{-- <a href="{{url('admin/exchange-withdrawal-request')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('New Exchange Requests')}}</a> --}}
-                        <!--<a href="{{url('admin/cancelled-request')}}" class="menu-item {{ ($segment1 == 'badges') ? 'active' : '' }}">{{ __('Cancelled Requests')}}</a>-->
+                        <a href="{{url('admin/cancelled-request')}}" class="menu-item {{ ($segment1 == 'badges') ? 'active' : '' }}">{{ __('Cancelled Requests')}}</a>
                         <a href="{{url('admin/payment-history')}}" class="menu-item {{ ($segment1 == 'badges') ? 'active' : '' }}">{{ __('Payment History')}}</a>
                         <!--<a href="{{url('admin/pepe-settings')}}" class="menu-item {{ request()->is('*pepe-settings*') ? 'active' : '' }}">{{ __('PEPE Token Settings')}}</a>-->
                     </div>

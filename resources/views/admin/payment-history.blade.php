@@ -75,8 +75,8 @@
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('Wallet Address') }}</th>
                                                 <th>{{ __('Type') }}</th>
-                                                <th>{{ __('Gross') }}</th>
-                                                <th>{{ __('Charges') }}</th>
+                                                {{-- <th>{{ __('Gross') }}</th> --}}
+                                                {{-- <th>{{ __('Charges') }}</th> --}}
                                                 <th>{{ __('Net ') }}</th>
                                                 <th>{{ __('Payment Date') }}</th>
                                                 <th>{{ __('Status') }}</th>
@@ -87,15 +87,15 @@
                                             @foreach ($data as $list)
                                                 <tr>
                                                     <td>{{ $i }}</td>
-                                                    <td>{{ $list['request_date'] }}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
                                                     <td>{{ $list['request_id'] }}</td>
                                                     <td>{{ $list['memberid'] }}</td>
                                                     <td>{{ $list['wallet_address'] }}</td>
                                                     <td><span
                                                             class="badge badge-{{ $list['type'] == 'Exchange' ? 'warning' : 'primary' }}">{{ $list['type'] }}</span>
                                                     </td>
-                                                    <td>$ {{ $list['gross_amount'] }}</td>
-                                                    <td>$ {{ $list['service_charge'] }}</td>
+                                                    {{-- <td>$ {{ $list['gross_amount'] }}</td> --}}
+                                                    {{-- <td>$ {{ $list['service_charge'] }}</td> --}}
                                                     <td>$ {{ $list['net_amount'] }}</td>
                                                     <td>{{ $list['payment_date'] }}</td>
                                                     <td><span class="badge badge-success">{{ $list['status'] }}</span></td>
@@ -119,7 +119,7 @@
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('BEP-20 Wallet Address') }}</th>
                                                 <th>{{ __('PEPE Tokens') }}</th>
-                                                <th>{{ __('Tx Hash') }}</th>
+                                                {{-- <th>{{ __('Tx Hash') }}</th> --}}
                                                 <th>{{ __('Payment Date') }}</th>
                                                 <th>{{ __('Status') }}</th>
                                             </tr>
@@ -129,7 +129,7 @@
                                             @forelse (($pepeData ?? []) as $list)
                                                 <tr>
                                                     <td>{{ $j }}</td>
-                                                    <td>{{ date('d-m-Y', strtotime($list['request_date'])) }}<br>{{ date('H:i:s', strtotime($list['request_date'])) }}
+                                                   <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
                                                     </td>
                                                     <td><span
                                                             class="badge badge-secondary">{{ $list['request_id'] }}</span>
@@ -144,7 +144,7 @@
                                                             {{ number_format($list['gross_amount'], 0) }} PEPE
                                                         </strong>
                                                     </td>
-                                                    <td>
+                                                    {{-- <td>
                                                         @if (!empty($list['txnid']))
                                                             <a href="{{ rtrim($pepeSettings->explorer_url ?? 'https://bscscan.com', '/') }}/tx/{{ $list['txnid'] }}"
                                                                 target="_blank" class="badge badge-primary text-white"
@@ -156,7 +156,7 @@
                                                         @else
                                                             <span class="text-muted small">-</span>
                                                         @endif
-                                                    </td>
+                                                    </td> --}}
                                                     <td>
                                                         {{ $list['payment_date'] ? date('d-m-Y H:i', strtotime($list['payment_date'])) : '-' }}
                                                     </td>

@@ -504,13 +504,14 @@ class AdminController extends Controller
             'payment_date' => 'payment_date',
             'request_date' => 'request_date',
         ];
-        $query = WithdrawalRequest::where('type', '!=', 'Airdrop Withdrawal');
+       $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'payment_date', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
         // 2nd Tab: PEPE Tokens Payment History
-        $pepeQuery = WithdrawalRequest::where('type', 'Airdrop Withdrawal');
+        $pepeQuery = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Airdrop Withdrawal']]);
         $pepeData = (clone $pepeQuery)->orderby('payment_date', 'desc')->get();
+
 
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -523,7 +524,7 @@ class AdminController extends Controller
         return view('admin.payment-history')->with($result);
     }
 
-    public function newWithdrawelRequest(Request $request)
+   public function newWithdrawelRequest(Request $request)
     {
         $allowedColumns = [
             'request_date' => 'Request Date',
@@ -546,7 +547,7 @@ class AdminController extends Controller
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pepeData' => $pepeData,
             'pageTitle' => 'New Withdrawal Requests',
-            'action' => url('admin/new-withdrawal-request'),
+            'action' => url('hdgteyusjasget/new-withdrawal-request'),
         ]);
 
         return view('admin.new-withdrawal-request')->with($result);

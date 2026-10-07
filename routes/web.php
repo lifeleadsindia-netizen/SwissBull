@@ -109,6 +109,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     // Route::get('/funds/add-flt-details', [AdminController::class, 'addFltDetails']);
 
     Route::get('/withdrawal/accept-online/{id}', [WithdrawalController::class, 'wAcceptOnline']);
+    Route::get('/withdrawal-accept-pepe/{id}', [WithdrawalController::class, 'wAcceptOnlinePepe']);
     Route::post('/withdrawalAccept', [WithdrawalController::class, 'withdrawalAccept'])->name('withdrawalAccept');
     Route::get('/withdrawal/cancel/{id}', [AdminController::class, 'wCancel']);
     Route::get('/withdrawal/accept/{id}', [AdminController::class, 'wAccept']);
@@ -132,8 +133,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::post('/updateDetails', [AdminController::class, 'updateDetails'])->name('updateDetails');
 
     Route::get('/payment-history', [AdminController::class, 'paymentHistory']);
-    // Route::get('/new-withdrawal-request', [AdminController::class, 'newWithdrawelRequest']);
-    // Route::get('/cancelled-request', [AdminController::class, 'cancelledRequest']);
+    Route::get('/new-withdrawal-request', [AdminController::class, 'newWithdrawelRequest']);
+    Route::get('/cancelled-request', [AdminController::class, 'cancelledRequest']);
     Route::get('/package-details', [AdminController::class, 'packageDetails']);
     Route::get('/transaction', [AdminController::class, 'transaction']);
 
@@ -260,7 +261,7 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
 
     // Withdrawal Section
     Route::get('/wallet/withdrawal', [WithdrawalController::class, 'mainWallets']);
-    // Route::post('initWithdrawal', [WithdrawalController::class, 'initWithdrawal'])->name('initWithdrawal');
+    Route::post('initWithdrawal', [WithdrawalController::class, 'initWithdrawal'])->name('initWithdrawal');
     Route::get('/wallet/all-transaction', [WithdrawalController::class, 'walletTransfer']);
     Route::get('/wallet/withdrawal-history', [WithdrawalController::class, 'withdrlHistory']);
     Route::post('balValidate', [WithdrawalController::class, 'balValidate'])->name('balValidate');
@@ -323,6 +324,8 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::post('/pepe/prepare-claim', [WithdrawalController::class, 'preparePepeClaimVoucher'])->name('member.pepe.prepareClaim');
     Route::post('/pepe/redeem', [WithdrawalController::class, 'redeemPepe'])->name('member.pepe.redeem');
     Route::get('/pepe/redeem-history', [WithdrawalController::class, 'pepeRedeemHistory'])->name('member.pepe.redeemHistory');
+    Route::get('/pepe/withdrawal', [WithdrawalController::class, 'pepeWallet'])->name('pepe.withdrawal');
+    Route::post('initPepeWithdrawalForm', [WithdrawalController::class, 'initPepeWithdrawalForm'])->name('initPepeWithdrawalForm');
 
     // Promotional Banners
     Route::get('/promotion-banners', [MemberDetailController::class, 'promotionalBanners'])->name('member.promotional-banners');
