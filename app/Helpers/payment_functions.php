@@ -199,10 +199,14 @@ function capping($memberid)
 
 function stakingCapping($memberid, $staking_id)
 {
-    $sum = StakingDetail::where([['memberid', $memberid], ['id', '<=', $staking_id]])->sum('invest_amount');
-    $cap = $sum * 2;
+    $staking = StakingDetail::where('id', $staking_id)->first();
+    if ($staking) {
+        return $staking->getMaxRoiAmount();
+    }
 
-    return $cap;
+    $sum = StakingDetail::where([['memberid', $memberid], ['id', '<=', $staking_id]])->sum('invest_amount');
+
+    return $sum * 2;
 }
 
 function Income3xachieved($memberid)

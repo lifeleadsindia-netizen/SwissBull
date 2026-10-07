@@ -8,9 +8,11 @@ use App\Models\Country;
 use App\Models\DashMessage;
 use App\Models\MemberDetail;
 use App\Models\MemberVideo;
+use App\Models\PackageDetail;
 use App\Models\PepeRewardLog;
 use App\Models\PepeSetting;
 use App\Models\PromotionBanner;
+use App\Models\StakingDetail;
 use App\Models\UplineMember;
 use App\Models\WhatsappReferral;
 use App\Models\WithdrawalRequest;
@@ -70,6 +72,43 @@ class MemberDetailController extends Controller
         $result['waLastDate'] = $lastWa ? $lastWa->created_at : null;
         $result['countries'] = Country::whereNotNull('phonecode')->where('phonecode', '!=', '')->orderBy('nicename', 'asc')->get();
         $result['pepeSettings'] = PepeSetting::getSettings();
+
+        // Phase 2 + Phase 3: Package, Staking & ROI Information
+        $result['activePackage'] = PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->latest('created_at')
+            ->first();
+
+        $latestStaking = StakingDetail::where('memberid', $memberid)
+            ->latest('created_at')
+            ->first();
+        $result['activeStaking'] = StakingDetail::where('memberid', $memberid)
+            ->where('status', 'Active')
+            ->latest('created_at')
+            ->first() ?? $latestStaking;
+
+        $totalInvestQuery = (float) PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->sum('invest_amount');
+
+        $result['totalInvestment'] = $totalInvestQuery > 0 ? $totalInvestQuery : (float) ($result['data']->self_biz ?? 0);
+
+        $result['totalPackageEarning'] = (float) PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->sum('total_earning');
+
+        $maxEarningQuery = (float) PackageDetail::where('memberid', $memberid)
+            ->whereIn('status', ['Active', 'Accepted'])
+            ->sum('max_earning');
+
+        $result['maxPackageEarning'] = $maxEarningQuery > 0
+            ? $maxEarningQuery
+            : ($result['totalInvestment'] > 0 ? $result['totalInvestment'] * 3.0 : 0.0);
+
+        $result['packageInvestments'] = PackageDetail::where('memberid', $memberid)
+            ->latest('created_at')
+            ->take(5)
+            ->get();
 
         return view('member.dashboard')->with($result);
     }

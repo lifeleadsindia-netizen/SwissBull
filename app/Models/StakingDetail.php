@@ -5,21 +5,58 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class StakingDetail extends Model
 {
     use HasFactory;
 
+    protected $table = 'staking_details';
+
+    protected $guarded = [];
+
     protected $casts = [
+        'invest_amount' => 'float',
+        'rate' => 'float',
+        'capping_percent' => 'float',
+        'max_amount' => 'float',
+        'total_earned' => 'float',
+        'installments' => 'integer',
+        'total_installments' => 'integer',
+        'invest_date' => 'datetime',
+        'activated_at' => 'datetime',
+        'last_roi_at' => 'datetime',
+        'deactivated_at' => 'datetime',
         'is_upgrade' => 'boolean',
     ];
 
     /**
-     * Relationship: Staking detail belongs to a member.
+     * Auto-populate default invest_date if not set.
      */
-    public function member()
+    protected static function booted(): void
+    {
+        static::creating(function (StakingDetail $staking) {
+            if (empty($staking->invest_date)) {
+                $staking->invest_date = now();
+            }
+        });
+    }
+
+    /**
+     * Relationship to the member.
+     */
+    public function member(): BelongsTo
     {
         return $this->belongsTo(MemberDetail::class, 'memberid', 'memberid');
+    }
+
+    /**
+     * Relationship to staking incomes credited to this package.
+     */
+    public function incomes(): HasMany
+    {
+        return $this->hasMany(StakingIncome::class, 'staking_id', 'id');
     }
 
     /**
@@ -27,6 +64,10 @@ class StakingDetail extends Model
      */
     public function getActivationDateAttribute(): ?Carbon
     {
+        if ($this->activated_at) {
+            return Carbon::parse($this->activated_at);
+        }
+
         if ($this->created_at) {
             return Carbon::parse($this->created_at);
         }
@@ -74,5 +115,107 @@ class StakingDetail extends Model
         }
 
         return (int) ceil(now()->diffInSeconds($this->locked_until, false) / 86400);
+    }
+
+    /**
+     * Get dynamic daily ROI rate from active PackagePlan (admin configured) or self.
+     */
+    public function getDailyRate(): float
+    {
+        $plan = PackagePlan::findByRange($this->package);
+        if (! $plan) {
+            $plan = PackagePlan::where('min_amount', '<=', (float) $this->invest_amount)
+                ->where(function ($q) {
+                    $q->whereNull('max_amount')->orWhere('max_amount', '>=', (float) $this->invest_amount);
+                })
+                ->first();
+        }
+
+        if ($plan && (float) $plan->return_percent > 0) {
+            return (float) $plan->return_percent;
+        }
+
+        return (float) ($this->rate > 0 ? $this->rate : 5.00);
+    }
+
+    /**
+     * Get dynamic capping percentage from active PackagePlan (admin configured) or self.
+     */
+    public function getCappingPercent(): float
+    {
+        $plan = PackagePlan::findByRange($this->package);
+        if (! $plan) {
+            $plan = PackagePlan::where('min_amount', '<=', (float) $this->invest_amount)
+                ->where(function ($q) {
+                    $q->whereNull('max_amount')->orWhere('max_amount', '>=', (float) $this->invest_amount);
+                })
+                ->first();
+        }
+
+        if ($plan && (float) $plan->max_return_percent > 0) {
+            return (float) $plan->max_return_percent;
+        }
+
+        return (float) ($this->capping_percent > 0 ? $this->capping_percent : 200.00);
+    }
+
+    /**
+     * Get dynamic maximum ROI amount based on package amount and dynamic capping percent.
+     */
+    public function getMaxRoiAmount(): float
+    {
+        $capPercent = $this->getCappingPercent();
+
+        return round((float) $this->invest_amount * ($capPercent / 100), 2);
+    }
+
+    /**
+     * Get total ROI earned by this package.
+     */
+    public function getTotalEarned(): float
+    {
+        $sum = (float) $this->incomes()->sum('amount');
+        $column = (float) ($this->total_earned ?? 0.0);
+
+        return round(max($sum, $column), 2);
+    }
+
+    /**
+     * Get remaining ROI eligible before reaching the cap.
+     */
+    public function remainingRoi(): float
+    {
+        $max = $this->getMaxRoiAmount();
+        $earned = $this->getTotalEarned();
+
+        return max(0.00, round($max - $earned, 2));
+    }
+
+    /**
+     * Check if package has reached or exceeded its ROI cap.
+     */
+    public function isCapped(): bool
+    {
+        return $this->remainingRoi() <= 0.00;
+    }
+
+    /**
+     * Check if package is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'Active';
+    }
+
+    /**
+     * Deactivate package upon reaching capping.
+     */
+    public function deactivate(): self
+    {
+        $this->status = 'Deactive';
+        $this->deactivated_at = $this->deactivated_at ?? now();
+        $this->save();
+
+        return $this;
     }
 }

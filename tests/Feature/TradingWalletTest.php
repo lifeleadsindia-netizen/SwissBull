@@ -17,6 +17,11 @@ class TradingWalletTest extends TestCase
         parent::setUp();
         $this->withoutMiddleware();
         view()->share('errors', new ViewErrorBag);
+
+        TradingWalletSetting::updateOrCreate(['id' => 1], [
+            'lock_days' => 90,
+            'withdrawal_percent' => 100.00,
+        ]);
     }
 
     /**

@@ -2858,7 +2858,244 @@
                                 </div>
                             </div>
                         </div>
+                    <!-- PACKAGE & INVESTMENT OVERVIEW (PHASE 2) -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card admin-pool-wrapper" style="border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, rgba(16, 20, 30, 0.98), rgba(10, 12, 18, 0.95)); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);">
+                                <div class="card-header d-flex justify-content-between align-items-center flex-wrap" style="background: linear-gradient(90deg, rgba(245, 158, 11, 0.18), rgba(255, 215, 0, 0.05)); border-bottom: 1px solid rgba(245, 158, 11, 0.25); padding: 1.2rem 1.5rem;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.2); color: #FFD700; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 1.25rem;">
+                                            <i class="fa-solid fa-gem"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="card-title mb-0 text-white font-weight-bold" style="font-size: 1.25rem; letter-spacing: 0.3px;">
+                                                Active Package &amp; Investment Details
+                                            </h4>
+                                            <small class="text-white-50" style="font-size: 0.8rem;">
+                                                Tiered package allocation &bull; 70% Trading Wallet credit
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
+                                        @if ($activePackage && $activePackage->isPackageActive())
+                                            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
+                                                <i class="fa-solid fa-circle-check me-1"></i> Package Active
+                                            </span>
+                                        @elseif ($activePackage && $activePackage->isExpired())
+                                            <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
+                                                <i class="fa-solid fa-clock-rotate-left me-1"></i> Package Expired
+                                            </span>
+                                        @else
+                                            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
+                                                <i class="fa-solid fa-circle-info me-1"></i> No Active Package
+                                            </span>
+                                        @endif
+                                        <a href="{{ url('/member/fund/import-flt') }}" class="btn btn-sm font-weight-bold" style="background: linear-gradient(135deg, #FFD700, #F59E0B); color: #000; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
+                                            <i class="fa-solid fa-plus-circle me-1"></i> New Investment
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-3">
+                                        <!-- Current Package Range & Investment -->
+                                        <div class="col-xl-3 col-md-6 col-sm-12">
+                                            <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px;">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Current Package</span>
+                                                    <span class="badge bg-warning text-dark font-weight-bold" style="font-size: 10px;">
+                                                        {{ $activePackage->package ?? ($data['package'] ?? 'Standard') }}
+                                                    </span>
+                                                </div>
+                                                <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem;">
+                                                    $ {{ number_format((float) ($activePackage->invest_amount ?? ($activePackage->package_value ?? $totalInvestment)), 2) }}
+                                                </h3>
+                                                <div class="d-flex align-items-center gap-1 text-warning mt-2" style="font-size: 0.78rem;">
+                                                    <i class="fa-solid fa-layer-group"></i>
+                                                    <span>Range: {{ $activePackage->package_range ?? ($data['package'] ?? '50 - 500 USDT') }}</span>
+                                                </div>
+                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Total Invested: $ {{ number_format((float) $totalInvestment, 2) }}</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Trading Wallet (70% Allocation) -->
+                                        <div class="col-xl-3 col-md-6 col-sm-12">
+                                            <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px;">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Trading Wallet</span>
+                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; font-size: 10px; font-weight: 700;">
+                                                        70% Allocated
+                                                    </span>
+                                                </div>
+                                                <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem; color: #10B981 !important;">
+                                                    $ {{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }}
+                                                </h3>
+                                                <div class="d-flex align-items-center gap-1 text-success mt-2" style="font-size: 0.78rem;">
+                                                    <i class="fa-solid fa-coins"></i>
+                                                    <span>Package Credit: $ {{ number_format((float) ($activePackage->trading_wallet_amount ?? (($activePackage->invest_amount ?? 0) * 0.70)), 2) }}</span>
+                                                </div>
+                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Available for trading &amp; withdrawal</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Total Earning & Max Earning Limit -->
+                                        <div class="col-xl-3 col-md-6 col-sm-12">
+                                            <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 14px;">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Earning Progress</span>
+                                                    @php
+                                                        $dynRate = isset($activeStaking) && $activeStaking ? $activeStaking->getDailyRate() : (float) ($activePackage->return_percent ?? 5.0);
+                                                        $dynCap = isset($activeStaking) && $activeStaking ? $activeStaking->getCappingPercent() : (float) ($activePackage->max_return_percent ?? 200.0);
+                                                        $maxEarn = isset($activeStaking) && $activeStaking ? $activeStaking->getMaxRoiAmount() : (float) ($activePackage->max_earning ?? $maxPackageEarning);
+                                                        $currEarn = isset($activeStaking) && $activeStaking ? $activeStaking->getTotalEarned() : (float) ($activePackage->total_earning ?? $totalPackageEarning);
+                                                        $remEarn = max(0.00, round($maxEarn - $currEarn, 2));
+                                                        $earnPercent = $maxEarn > 0 ? min(100, round(($currEarn / $maxEarn) * 100, 1)) : 0;
+                                                    @endphp
+                                                    <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60A5FA; font-size: 10px; font-weight: 700;">
+                                                        Limit: $ {{ number_format($maxEarn, 2) }}
+                                                    </span>
+                                                </div>
+                                                <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem;">
+                                                    $ {{ number_format($currEarn, 2) }}
+                                                </h3>
+                                                <div class="progress my-2" style="height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 6px;">
+                                                    <div class="progress-bar progress-animated" role="progressbar" style="width: {{ max(5, $earnPercent) }}%; background: linear-gradient(90deg, #3B82F6, #10B981); border-radius: 6px;"></div>
+                                                </div>
+                                                <div class="d-flex justify-content-between text-white-50" style="font-size: 0.72rem;">
+                                                    <span>Earned: {{ $earnPercent }}%</span>
+                                                    <span class="text-warning">Rem: $ {{ number_format($remEarn, 2) }}</span>
+                                                </div>
+                                                <div class="d-flex justify-content-between text-white-50 mt-1" style="font-size: 0.68rem;">
+                                                    <span>ROI: {{ number_format($dynRate, 1) }}%</span>
+                                                    <span>Cap: {{ number_format($dynCap, 0) }}%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Lock & Expiry Status -->
+                                        <div class="col-xl-3 col-md-6 col-sm-12">
+                                            <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 14px;">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Lock &amp; Expiry</span>
+                                                    @if (isset($data) && $data->isTradingWalletLocked())
+                                                        <span class="badge" style="background: rgba(245, 158, 11, 0.25); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 10px; font-weight: 700;">
+                                                            <i class="fa-solid fa-lock me-1"></i> Locked
+                                                        </span>
+                                                    @else
+                                                        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10px; font-weight: 700;">
+                                                            <i class="fa-solid fa-lock-open me-1"></i> Unlocked
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                @if (isset($data) && $data->isTradingWalletLocked())
+                                                    <h4 class="text-warning font-weight-bold mb-1" style="font-size: 1.15rem;">
+                                                        {{ $data->tradingWalletRemainingLockDays() }} Days Remaining
+                                                    </h4>
+                                                    <small class="text-white-50 d-block" style="font-size: 0.72rem;">Trading Lock Active</small>
+                                                @else
+                                                    <h4 class="text-success font-weight-bold mb-1" style="font-size: 1.15rem;">
+                                                        Trading Unlocked
+                                                    </h4>
+                                                    <small class="text-white-50 d-block" style="font-size: 0.72rem;">Full Trading Access</small>
+                                                @endif
+                                                <div class="mt-2 pt-2 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important; font-size: 0.72rem;">
+                                                    <div class="d-flex justify-content-between text-white-50 mb-1">
+                                                        <span>Activated:</span>
+                                                        <span class="text-white">
+                                                            @if (isset($activeStaking) && $activeStaking && $activeStaking->activated_at)
+                                                                {{ date('d-m-Y H:i', strtotime($activeStaking->activated_at)) }}
+                                                            @elseif ($activePackage && ($activePackage->activated_at || $activePackage->created_at))
+                                                                {{ date('d-m-Y H:i', strtotime($activePackage->activated_at ?? $activePackage->created_at)) }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between text-white-50 mb-1">
+                                                        <span>Last ROI:</span>
+                                                        <span class="text-white">
+                                                            @if (isset($activeStaking) && $activeStaking && $activeStaking->last_roi_at)
+                                                                {{ date('d-m-Y', strtotime($activeStaking->last_roi_at)) }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between text-white-50">
+                                                        <span>Status:</span>
+                                                        <span class="text-white">
+                                                            @if (isset($activeStaking) && $activeStaking && $activeStaking->status == 'Deactive')
+                                                                <span class="text-danger">Deactivated (Capped)</span>
+                                                            @elseif ($activePackage && $activePackage->expires_at)
+                                                                Expires: {{ date('d-m-Y', strtotime($activePackage->expires_at)) }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if (isset($packageInvestments) && $packageInvestments->count() > 0)
+                                        <div class="mt-3 pt-3 border-top" style="border-color: rgba(245, 158, 11, 0.15) !important;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="text-white font-weight-bold" style="font-size: 0.85rem;">
+                                                    <i class="fa-solid fa-list-check text-warning me-1"></i> Recent Investment Records
+                                                </span>
+                                                <a href="{{ url('/member/partnership/my-investment') }}" class="text-warning text-decoration-none" style="font-size: 0.75rem;">
+                                                    View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                                                </a>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-dark table-sm table-borderless align-middle mb-0" style="font-size: 0.75rem; background: transparent;">
+                                                    <thead>
+                                                        <tr class="text-white-50" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+                                                            <th>Date &amp; Time</th>
+                                                            <th>Package</th>
+                                                            <th>Deposit</th>
+                                                            <th>Trading Wallet (70%)</th>
+                                                            <th>Max Earning</th>
+                                                            <th>Lock / Expiry</th>
+                                                            <th>Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($packageInvestments as $pkg)
+                                                            <tr>
+                                                                <td class="text-white">{{ $pkg->activated_at ? date('d-m-Y H:i', strtotime($pkg->activated_at)) : date('d-m-Y H:i', strtotime($pkg->created_at)) }}</td>
+                                                                <td class="text-warning font-weight-bold">{{ $pkg->package_range ?? $pkg->package ?? 'Standard' }}</td>
+                                                                <td class="text-white font-weight-bold">$ {{ number_format((float) ($pkg->invest_amount ?? $pkg->package_value), 2) }}</td>
+                                                                <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)), 2) }}</td>
+                                                                <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->max_earning ?? (($pkg->invest_amount ?? $pkg->package_value) * 3.0)), 2) }}</td>
+                                                                <td class="text-white-50">
+                                                                    @if ($pkg->lock_days && $pkg->lock_days > 0)
+                                                                        <span class="badge bg-dark border border-secondary text-warning" style="font-size: 10px;">{{ $pkg->lock_days }}D Lock</span>
+                                                                    @else
+                                                                        <span class="badge bg-dark border border-secondary text-success" style="font-size: 10px;">None</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td>
+                                                                    @if ($pkg->isPackageActive())
+                                                                        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; font-size: 10px;">Active</span>
+                                                                    @elseif ($pkg->isExpired())
+                                                                        <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; font-size: 10px;">Expired</span>
+                                                                    @else
+                                                                        <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; font-size: 10px;">{{ $pkg->status }}</span>
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                     <!-- WALLETS ROW -->
                     <div class="row mb-2 transactions-row">
                         <!-- Fund Wallet -->

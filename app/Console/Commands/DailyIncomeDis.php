@@ -2,81 +2,28 @@
 
 namespace App\Console\Commands;
 
-use App\Models\MemberDetail;
-use App\Models\StakingDetail;
-use App\Models\StakingIncome;
+use App\Services\StakingRoiService;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('app:daily-income-dis')]
-#[Description('Command description')]
+#[Signature('app:daily-income-dis {date? : Optional calculation date in Y-m-d format}')]
+#[Description('Calculate and distribute daily staking ROI with dynamic rate and capping')]
 class DailyIncomeDis extends Command
 {
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(StakingRoiService $service): int
     {
-        // Monthly Income(Run Daily)
-        $stakings = StakingDetail::where('status', 'Active')->get();
-        // $stakings = StakingDetail::where([['status', 'Active'], ['invest_date', date('Y-m-d H:i:s')]])->get();
-        foreach ($stakings as $value) {
-            $memberid = $value->memberid;
-            $staking_id = $value->id;
-            $total_installments = $value->total_installments;
-            $installment = $value->installments + 1;
-            $rate = $value->rate;
-            if ($installment >= $total_installments) {
-                $value->status = 'Deactive';
-                $value->save();
-            }
-            $stak_amount = $value->invest_amount / 100 * $rate;
+        $targetDate = $this->argument('date');
+        $dateStr = $targetDate ?: today()->toDateString();
+        $this->info("Starting daily staking ROI distribution for date: {$dateStr}");
 
-            $memUpdate = MemberDetail::where('memberid', $memberid)->first();
-            $capping = stakingCapping($memberid, $staking_id);
-            $achieved = StakingIncome::where([['status', 'Paid'], ['memberid', $memberid]])->sum('amount');
-            $balance = $capping - $achieved;
-            if ($balance <= $stak_amount) {
-                $amount = $balance;
-            } else {
-                $amount = $stak_amount;
-            }
+        $result = $service->processDailyRoi($targetDate);
 
-            if ($amount > 0) {
+        $this->info("Completed: Processed {$result['processed']}, Credited {$result['credited']}, Deactivated {$result['deactivated']}, Skipped {$result['skipped']}, Total Paid: \${$result['total_amount']}");
 
-                $qry = new StakingIncome;
-                $qry->date = date('Y-m-d');
-                $qry->memberid = $memberid;
-                $qry->total_investment = $value->invest_amount;
-                $qry->rate = $rate;
-                $qry->amount = $amount;
-                $qry->installment = $installment;
-                $qry->status = 'Paid';
-                $qry->save();
-
-                $update = StakingDetail::where('id', $value->id)->first();
-                $update->installments += 1;
-                $update->invest_date = date('Y-m-d', strtotime('+30 days'));
-                if ($balance <= $stak_amount) {
-                    $update->status = 'Deactive';
-                }
-                $update->save();
-
-                $wallet = $memUpdate->wallet;
-                $memUpdate->wallet += $amount;
-                $memUpdate->save();
-
-                walletTransfer($memberid, $amount, 'debit', $wallet, 'Staking Income', 'Staking Income amount has been transfered into wallet.');
-
-                if ($installment == $total_installments) {
-                    $value->status = 'Deactive';
-                    $value->save();
-                }
-            } else {
-                $value->status = 'Deactive';
-                $value->save();
-            }
-        }
+        return Command::SUCCESS;
     }
 }

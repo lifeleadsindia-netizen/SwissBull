@@ -17,6 +17,10 @@ class DepositFundTest extends TestCase
         parent::setUp();
         $this->withoutMiddleware(PreventRequestForgery::class);
 
+        \App\Models\ImportFund::where('txnid', 'like', '0x_test_%')->delete();
+        \App\Models\PackageDetail::where('txnid', 'like', '0x_test_%')->delete();
+        \App\Models\StakingDetail::where('txnid', 'like', '0x_test_%')->delete();
+
         $this->memberId = 'TESTDEP'.rand(10000, 99999);
         MemberDetail::create([
             'memberid' => $this->memberId,
@@ -31,7 +35,9 @@ class DepositFundTest extends TestCase
 
     protected function tearDown(): void
     {
-        ImportFund::where('memberid', $this->memberId)->delete();
+        ImportFund::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
+        \App\Models\PackageDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
+        \App\Models\StakingDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
         WalletTransfer::where('memberid', $this->memberId)->delete();
         MemberDetail::where('memberid', $this->memberId)->delete();
         parent::tearDown();
@@ -316,13 +322,14 @@ class DepositFundTest extends TestCase
 
         $response->assertStatus(200);
 
+        $expectedCredited = round($depositAmount * 0.70, 2);
         $newBalance = (float) MemberDetail::where('memberid', $this->memberId)->value('p2p_wallet');
-        $this->assertEquals($initialBalance + $depositAmount, $newBalance);
+        $this->assertEquals($initialBalance + $expectedCredited, $newBalance);
 
         $this->assertDatabaseHas('wallet_transfers', [
             'memberid' => $this->memberId,
             'walletType' => 'Fund Added',
-            'debit' => $depositAmount,
+            'debit' => $expectedCredited,
         ]);
     }
 

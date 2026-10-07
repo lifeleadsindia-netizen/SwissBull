@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
+use App\Models\PackagePlan;
 use App\Models\StakingDetail;
 use App\Models\TradingWalletSetting;
 use Illuminate\Http\Request;
@@ -108,8 +109,15 @@ class InvestmentController extends Controller
             return redirect()->back();
         }
 
-        // Monthly Rate;
-        $rate = 5;
+        // Dynamic rate and capping from PackagePlan
+        $plan = PackagePlan::where('min_amount', '<=', (float) $amount)
+            ->where(function ($q) use ($amount) {
+                $q->whereNull('max_amount')->orWhere('max_amount', '>=', (float) $amount);
+            })
+            ->first();
+        $rate = $plan && (float) $plan->return_percent > 0 ? (float) $plan->return_percent : 5.0;
+        $cappingPercent = $plan && (float) $plan->max_return_percent > 0 ? (float) $plan->max_return_percent : 200.0;
+        $maxEarning = round($amount * ($cappingPercent / 100), 2);
 
         $staking = new StakingDetail;
         $staking->memberid = $memberid;
@@ -117,9 +125,13 @@ class InvestmentController extends Controller
         $staking->invest_amount = $amount;
         $staking->installments = 0;
         $staking->total_installments = 40;
-        $staking->package = $amount;
+        $staking->package = (string) $amount;
         $staking->rate = $rate;
+        $staking->capping_percent = $cappingPercent;
+        $staking->max_amount = $maxEarning;
+        $staking->total_earned = 0.00;
         $staking->status = 'Active';
+        $staking->activated_at = now();
         $staking->save();
 
         $setting = TradingWalletSetting::getActiveSetting();

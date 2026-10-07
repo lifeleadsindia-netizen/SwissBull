@@ -5,9 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Country;
 use App\Models\ImportFund;
 use App\Models\MemberDetail;
+use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
+use App\Models\PackagePlan;
+use App\Models\StakingDetail;
+use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class FundController extends Controller
@@ -26,6 +31,7 @@ class FundController extends Controller
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
         $result['country'] = Country::where('name', $country)->first();
         $result['addfundData'] = ImportFund::where([['memberid', $memberid], ['added_by', 'User']])->orderBy('created_at', 'desc')->get();
+        $result['packagePlans'] = PackagePlan::where('status', 'Active')->orderBy('min_amount', 'asc')->get();
 
         return view('member.fund.import-flt')->with($result);
     }
@@ -44,14 +50,14 @@ class FundController extends Controller
         $validator = Validator::make($request->all(), [
             'memberid' => 'required',
             'package' => 'required',
-            'amount' => 'required|numeric|gt:0',
+            'amount' => 'required|numeric|gte:50',
             'txnid' => 'required',
         ], [
             'memberid.required' => 'Member ID is required.',
             'package.required' => 'Please select a deposit package.',
             'amount.required' => 'Please enter deposit amount.',
             'amount.numeric' => 'Deposit amount must be a valid number.',
-            'amount.gt' => 'Deposit amount must be greater than zero.',
+            'amount.gte' => 'Minimum deposit amount is 50 USDT.',
             'txnid.required' => 'Transaction ID is required.',
         ]);
 
@@ -70,6 +76,8 @@ class FundController extends Controller
 
         $rawPackage = trim((string) $request->input('package'));
         $amount = (float) $request->input('amount');
+        $txnid = trim((string) $request->input('txnid'));
+        $memberid = trim((string) $request->input('memberid'));
 
         // Normalize package value
         $normalizedPackage = match ($rawPackage) {
@@ -92,27 +100,76 @@ class FundController extends Controller
             return redirect()->back();
         }
 
+        // Check for duplicate transaction ID to prevent double-crediting
+        $alreadyProcessed = ImportFund::where('txnid', $txnid)->exists()
+            || PackageDetail::where('txnid', $txnid)->exists()
+            || StakingDetail::where('txnid', $txnid)->exists();
+
+        if ($alreadyProcessed) {
+            $msg = 'This transaction ID has already been processed.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $msg,
+                ], 422);
+            }
+            session()->flash('FailedMsg', $msg);
+
+            return redirect()->back();
+        }
+
+        // Fetch dynamic package plan configuration if available
+        $plan = PackagePlan::findByRange($normalizedPackage);
+        if ($plan && $plan->status !== 'Active') {
+            $msg = 'Selected package is currently inactive. Please choose an active package.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $msg,
+                ], 422);
+            }
+            session()->flash('FailedMsg', $msg);
+
+            return redirect()->back();
+        }
+
         // Validate package range rules strictly
         $isValidRange = false;
         $rangeErrorMsg = '';
 
-        if ($normalizedPackage === '50-500') {
-            if ($amount >= 50 && $amount <= 500) {
+        if ($plan) {
+            $min = (float) $plan->min_amount;
+            $max = $plan->max_amount !== null ? (float) $plan->max_amount : null;
+
+            if ($amount >= $min && ($max === null || $amount <= $max)) {
                 $isValidRange = true;
             } else {
-                $rangeErrorMsg = 'For package 50 - 500, deposit amount must be between 50 and 500 USDT.';
+                if ($max !== null) {
+                    $rangeErrorMsg = "For package {$plan->name}, deposit amount must be between {$min} and {$max} USDT.";
+                } else {
+                    $rangeErrorMsg = "For package {$plan->name}, deposit amount must be at least {$min} USDT.";
+                }
             }
-        } elseif ($normalizedPackage === '600-5000') {
-            if ($amount >= 600 && $amount <= 5000) {
-                $isValidRange = true;
-            } else {
-                $rangeErrorMsg = 'For package 600 - 5000, deposit amount must be between 600 and 5000 USDT.';
-            }
-        } elseif ($normalizedPackage === '6000+') {
-            if ($amount >= 6000) {
-                $isValidRange = true;
-            } else {
-                $rangeErrorMsg = 'For package 6000 and above, deposit amount must be at least 6000 USDT.';
+        } else {
+            // Fallback to static boundaries
+            if ($normalizedPackage === '50-500') {
+                if ($amount >= 50 && $amount <= 500) {
+                    $isValidRange = true;
+                } else {
+                    $rangeErrorMsg = 'For package 50 - 500, deposit amount must be between 50 and 500 USDT.';
+                }
+            } elseif ($normalizedPackage === '600-5000') {
+                if ($amount >= 600 && $amount <= 5000) {
+                    $isValidRange = true;
+                } else {
+                    $rangeErrorMsg = 'For package 600 - 5000, deposit amount must be between 600 and 5000 USDT.';
+                }
+            } elseif ($normalizedPackage === '6000+') {
+                if ($amount >= 6000) {
+                    $isValidRange = true;
+                } else {
+                    $rangeErrorMsg = 'For package 6000 and above, deposit amount must be at least 6000 USDT.';
+                }
             }
         }
 
@@ -128,48 +185,135 @@ class FundController extends Controller
             return redirect()->back();
         }
 
-        $memberid = $request->input('memberid');
-        $txnid = $request->input('txnid');
-        $data = MemberDetail::where('memberid', $memberid)->first();
+        $distributionConfig = PackageDistribution::getDistributionConfig();
+        $p2pWalletPercent = $plan ? (float) ($plan->trading_wallet_percent ?: 70.0) : (float) ($distributionConfig['p2p_wallet'] ?? 70.0);
+        $returnPercent = $plan ? (float) ($plan->return_percent ?: 5.0) : 5.0;
+        $maxReturnPercent = $plan ? (float) ($plan->max_return_percent ?: 200.0) : 200.0;
+        $lockDays = $plan ? (int) ($plan->lock_days ?: 30) : 30;
+        $durationDays = $plan ? (int) ($plan->duration_days ?: 1200) : 1200;
 
-        if (! $data) {
-            $msg = 'Invalid Member ID.';
+        $tradingWalletAmount = round($amount * ($p2pWalletPercent / 100), 2);
+        $maxEarning = round($amount * ($maxReturnPercent / 100), 2);
+        $orderId = 'OD'.time().rand(10, 99);
+
+        try {
+            DB::transaction(function () use (
+                $memberid,
+                $amount,
+                $normalizedPackage,
+                $txnid,
+                $orderId,
+                $tradingWalletAmount,
+                $returnPercent,
+                $maxReturnPercent,
+                $maxEarning,
+                $lockDays,
+                $durationDays
+            ) {
+                $member = MemberDetail::where('memberid', $memberid)->lockForUpdate()->first();
+                if (! $member) {
+                    throw new \InvalidArgumentException('Invalid Member ID.');
+                }
+
+                // 1. Create Deposit Record
+                $importFund = new ImportFund;
+                $importFund->memberid = $memberid;
+                $importFund->orderid = $orderId;
+                $importFund->package = $normalizedPackage;
+                $importFund->amount = $amount;
+                $importFund->txnid = $txnid;
+                $importFund->type = 'Add';
+                $importFund->mode = 'Online';
+                $importFund->status = 'Approved';
+                $importFund->added_by = 'User';
+                $importFund->wallet_type = 'Wallet';
+                $importFund->save();
+
+                // 2. Create Package Detail / Investment Record
+                $packageDetail = new PackageDetail;
+                $packageDetail->memberid = $memberid;
+                $packageDetail->package_type = 'Investment Package';
+                $packageDetail->package_range = $normalizedPackage;
+                $packageDetail->package_value = $amount;
+                $packageDetail->invest_amount = $amount;
+                $packageDetail->trading_wallet_amount = $tradingWalletAmount;
+                $packageDetail->order_id = $orderId;
+                $packageDetail->txnid = $txnid;
+                $packageDetail->payment_mode = 'USDT (BEP-20)';
+                $packageDetail->status = 'Active';
+                $packageDetail->activated_at = now();
+                $packageDetail->expires_at = now()->addDays($durationDays);
+                $packageDetail->return_percent = $returnPercent;
+                $packageDetail->total_earning = 0.00;
+                $packageDetail->max_earning = $maxEarning;
+                $packageDetail->max_return_percent = $maxReturnPercent;
+                $packageDetail->lock_days = $lockDays;
+                $packageDetail->lock_applied_at = now();
+                $packageDetail->locked_until = $lockDays > 0 ? now()->addDays($lockDays) : null;
+                $packageDetail->save();
+
+                // 2b. Create / Activate Staking Detail Record (Phase 2 + Phase 3 Staking ROI)
+                $stakingDetail = new StakingDetail;
+                $stakingDetail->memberid = $memberid;
+                $stakingDetail->invest_date = now();
+                $stakingDetail->invest_amount = $amount;
+                $stakingDetail->package = $normalizedPackage;
+                $stakingDetail->txnid = $txnid;
+                $stakingDetail->order_id = $orderId;
+                $stakingDetail->installments = 0;
+                $stakingDetail->total_installments = $durationDays;
+                $stakingDetail->rate = $returnPercent;
+                $stakingDetail->capping_percent = $maxReturnPercent;
+                $stakingDetail->max_amount = $maxEarning;
+                $stakingDetail->total_earned = 0.00;
+                $stakingDetail->status = 'Active';
+                $stakingDetail->activated_at = now();
+                $stakingDetail->save();
+
+                // 3. Update Member Trading Wallet (70% Allocation) and Member Status
+                $oldWallet = (float) $member->p2p_wallet;
+                $member->p2p_wallet = $oldWallet + $tradingWalletAmount;
+                $member->package = $amount;
+                $member->self_biz = ((float) $member->self_biz) + $amount;
+
+                if (in_array($member->status, ['Temp', 'Deactive'])) {
+                    $member->status = 'Active';
+                    $member->activated_at = $member->activated_at ?? now();
+                }
+
+                $setting = TradingWalletSetting::getActiveSetting();
+                $withdrawalPercent = (float) ($setting->withdrawal_percent ?? 100.00);
+                $member->applyTradingWalletLock($lockDays, $withdrawalPercent);
+                $member->save();
+
+                // 4. Record Wallet Ledger Entry (70% Trading Wallet allocation)
+                p2pwalletTransfer(
+                    $memberid,
+                    $tradingWalletAmount,
+                    'debit',
+                    $oldWallet,
+                    'Fund Added',
+                    "{$amount} USDT deposit: 70% ({$tradingWalletAmount} USDT) allocated to Trading Wallet"
+                );
+            });
+        } catch (\InvalidArgumentException $e) {
+            $msg = $e->getMessage();
             if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => $msg,
-                ], 422);
+                return response()->json(['status' => false, 'message' => $msg], 422);
+            }
+            session()->flash('FailedMsg', $msg);
+
+            return redirect()->back();
+        } catch (\Throwable $e) {
+            $msg = 'An error occurred while processing your deposit: '.$e->getMessage();
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['status' => false, 'message' => $msg], 500);
             }
             session()->flash('FailedMsg', $msg);
 
             return redirect()->back();
         }
 
-        $var = new ImportFund;
-        $var->memberid = $memberid;
-        $var->orderid = 'OD'.time();
-        $var->package = $normalizedPackage;
-        $var->amount = $amount;
-        $var->txnid = $txnid;
-        $var->type = 'Add';
-        $var->mode = 'Online';
-        $var->status = 'Approved';
-        $var->added_by = 'User';
-        $var->wallet_type = 'Wallet';
-        $var->save();
-
-        // Read Package Distribution percentage configuration dynamically from Database
-        // Database is the source of truth (Admin can update values).
-        // Current implementation: P2P Wallet = 70%.
-        // Remaining columns (referral_bonus, team_trading_profit, team_performance_bonus, hero_of_the_month)
-        // are kept prepared in configuration for future income/distribution logic.
-        $distributionConfig = PackageDistribution::getDistributionConfig();
-        $p2pWalletPercent = $distributionConfig['p2p_wallet'];
-
-        $wallet = $data->p2p_wallet;
-        $data->p2p_wallet += $amount * $p2pWalletPercent / 100;
-        $data->save();
-        p2pwalletTransfer($memberid, $amount, 'debit', $wallet, 'Fund Added', ''.$amount.' USDT added to wallet');
         session()->flash('successMsg', 'Your requested funds have been imported successfully.');
 
         if ($request->ajax() || $request->wantsJson()) {

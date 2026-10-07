@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -10,6 +11,20 @@ class SetPackagesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(PreventRequestForgery::class);
+    }
+
+    protected function tearDown(): void
+    {
+        DB::table('package_distributions')->updateOrInsert(['id' => 1], [
+            'trading_wallet' => 70.00,
+            'p2p_wallet' => 70.00,
+            'referral_bonus' => 10.00,
+            'team_trading_profit' => 8.00,
+            'team_performance_bonus' => 10.00,
+            'hero_of_the_month' => 2.00,
+        ]);
+        parent::tearDown();
     }
 
     public function test_guest_cannot_access_set_packages_page(): void

@@ -12,6 +12,7 @@ use App\Models\MemberDetail;
 use App\Models\Notification;
 use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
+use App\Models\PackagePlan;
 use App\Models\PartnershipDetail;
 use App\Models\PartnershipIncome;
 use App\Models\PepeSetting;
@@ -482,7 +483,7 @@ class AdminController extends Controller
 
     public function packageDetails(Request $request)
     {
-        $query = PackageDetail::where('status', 'Accepted');
+        $query = PackageDetail::whereIn('status', ['Accepted', 'Active']);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -734,31 +735,73 @@ class AdminController extends Controller
     public function setPackages()
     {
         $distribution = PackageDistribution::first();
+        $packagePlans = PackagePlan::orderBy('min_amount', 'asc')->get();
 
-        return view('admin.set-packages', compact('distribution'));
+        return view('admin.set-packages', compact('distribution', 'packagePlans'));
     }
 
     public function savePackages(Request $request)
     {
-        $validated = $request->validate([
-            'p2p_wallet' => 'required|numeric|min:0',
+        $rules = [
+            'p2p_wallet' => 'nullable|numeric|min:0',
+            'trading_wallet' => 'nullable|numeric|min:0',
             'referral_bonus' => 'required|numeric|min:0',
             'team_trading_profit' => 'required|numeric|min:0',
             'team_performance_bonus' => 'required|numeric|min:0',
             'hero_of_the_month' => 'required|numeric|min:0',
-        ]);
+            'plans' => 'nullable|array',
+            'plans.*.id' => 'required_with:plans|exists:package_plans,id',
+            'plans.*.name' => 'required_with:plans|string|max:100',
+            'plans.*.min_amount' => 'required_with:plans|numeric|min:0',
+            'plans.*.max_amount' => 'nullable|numeric',
+            'plans.*.trading_wallet_percent' => 'nullable|numeric|min:0|max:100',
+            'plans.*.return_percent' => 'nullable|numeric|min:0',
+            'plans.*.max_return_percent' => 'nullable|numeric|min:0',
+            'plans.*.lock_days' => 'nullable|integer|min:0',
+            'plans.*.duration_days' => 'nullable|integer|min:0',
+            'plans.*.status' => 'nullable|in:Active,Inactive',
+        ];
+
+        // Ensure at least one of p2p_wallet or trading_wallet is present
+        if (! $request->filled('p2p_wallet') && ! $request->filled('trading_wallet')) {
+            $rules['trading_wallet'] = 'required|numeric|min:0';
+        }
+
+        $validated = $request->validate($rules);
+
+        $tradingWalletVal = $validated['p2p_wallet'] ?? $validated['trading_wallet'] ?? 70.00;
 
         $distribution = PackageDistribution::first();
         if (! $distribution) {
             $distribution = new PackageDistribution;
         }
 
-        $distribution->p2p_wallet = $validated['p2p_wallet'];
+        $distribution->p2p_wallet = $tradingWalletVal;
+        $distribution->trading_wallet = $tradingWalletVal;
         $distribution->referral_bonus = $validated['referral_bonus'];
         $distribution->team_trading_profit = $validated['team_trading_profit'];
         $distribution->team_performance_bonus = $validated['team_performance_bonus'];
         $distribution->hero_of_the_month = $validated['hero_of_the_month'];
         $distribution->save();
+
+        if (! empty($validated['plans'])) {
+            foreach ($validated['plans'] as $planData) {
+                $plan = PackagePlan::find($planData['id']);
+                if ($plan) {
+                    $plan->update([
+                        'name' => $planData['name'],
+                        'min_amount' => $planData['min_amount'],
+                        'max_amount' => (isset($planData['max_amount']) && $planData['max_amount'] !== '' && $planData['max_amount'] !== null) ? $planData['max_amount'] : null,
+                        'trading_wallet_percent' => $planData['trading_wallet_percent'] ?? 70.00,
+                        'return_percent' => $planData['return_percent'] ?? 5.00,
+                        'max_return_percent' => $planData['max_return_percent'] ?? 200.00,
+                        'lock_days' => $planData['lock_days'] ?? 30,
+                        'duration_days' => $planData['duration_days'] ?? 1200,
+                        'status' => $planData['status'] ?? 'Active',
+                    ]);
+                }
+            }
+        }
 
         session()->flash('successMsg', 'Package distribution configuration updated successfully.');
 
