@@ -9,10 +9,10 @@
             <div class="row align-items-end">
                 <div class="col-lg-8">
                     <div class="page-header-title">
-                        <i class="ik ik-edit bg-blue"></i>
+                        <i class="ik ik-bar-chart-2 bg-blue"></i>
                         <div class="d-inline">
-                            <h5>{{ __('Level Income') }}</h5>
-                            <span>{{ __('Level Income details') }}</span>
+                            <h5>{{ __('Daily Team Investment Share') }}</h5>
+                            <span>{{ __('Daily Team Investment Share (1% across 10 levels) distribution records') }}</span>
                         </div>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                                 <a href="#"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Admin') }}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('Level Income') }}</li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('Daily Team Investment Share') }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -40,7 +40,7 @@
                 @endif
                 <div class="card">
                     <div class="card-header">
-                        <h3>{{ __('Level Income') }}</h3>
+                        <h3>{{ __('Daily Team Investment Share') }}</h3>
                     </div>
                     <div class="card-body px-5 " style="overflow: auto">
                         <div class="responsive">

@@ -1,0 +1,1081 @@
+/* ========================================================
+   SWISSBULL ADMIN PANEL - GLOBAL BUBBLE BACKGROUND & STYLES
+   File: public/admin.css
+   ======================================================== */
+
+:root {
+    --adm-bg: #f0f6fd;
+    --adm-card-bg: rgba(255, 255, 255, 0.94);
+    --adm-border: rgba(226, 232, 240, 0.85);
+    --adm-border-hover: #cbd5e1;
+    --adm-text-main: #0f172a;
+    --adm-text-muted: #64748b;
+    --adm-text-light: #94a3b8;
+    
+    --adm-blue: #3b82f6;
+    --adm-blue-light: #eff6ff;
+    --adm-cyan: #0ea5e9;
+    --adm-cyan-light: #f0f9ff;
+    --adm-green: #10b981;
+    --adm-green-light: #ecfdf5;
+    --adm-amber: #f59e0b;
+    --adm-amber-light: #fffbeb;
+    --adm-red: #ef4444;
+    --adm-red-light: #fef2f2;
+    --adm-purple: #8b5cf6;
+    --adm-purple-light: #f5f3ff;
+    
+    --adm-radius: 16px;
+    --adm-shadow-sm: 0 4px 20px -2px rgba(18, 38, 63, 0.05);
+    --adm-shadow-hover: 0 10px 25px -4px rgba(18, 38, 63, 0.08);
+}
+
+/* ========================================================
+   GLOBAL SHARED BACKGROUND (ENTIRE ADMIN PANEL)
+   ======================================================== */
+body#app,
+.wrapper,
+.page-wrap {
+    background-color: var(--adm-bg) !important;
+    background-image: url('admin-bg.png') !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--adm-text-main);
+    overflow-x: hidden !important;
+    max-width: 100vw;
+}
+
+@media (max-width: 768px) {
+    body#app,
+    .wrapper,
+    .page-wrap {
+        background-attachment: scroll !important;
+    }
+}
+
+/* Ensure the main content area exposes the global background */
+.wrapper .page-wrap .main-content {
+    background: transparent !important;
+}
+
+/* Desktop Sidebar Clearance without altering sidebar colors/layout */
+@media (min-width: 992px) {
+    .wrapper .page-wrap .main-content {
+        padding-left: 260px !important;
+        padding-right: 25px !important;
+        padding-top: 25px !important;
+        padding-bottom: 40px !important;
+        margin-top: 60px !important;
+        min-height: calc(100vh - 60px) !important;
+        transition: padding 0.3s ease !important;
+    }
+    .wrapper.nav-collapsed .page-wrap .main-content {
+        padding-left: 85px !important;
+    }
+    .wrapper .header-top {
+        padding-left: 255px !important;
+    }
+    .wrapper.nav-collapsed .header-top {
+        padding-left: 75px !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .wrapper .page-wrap .main-content {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        padding-top: 20px !important;
+        padding-bottom: 30px !important;
+        margin-top: 60px !important;
+        width: 100% !important;
+    }
+    .wrapper .header-top {
+        padding-left: 0 !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .wrapper .page-wrap .main-content {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        padding-top: 16px !important;
+        padding-bottom: 24px !important;
+    }
+}
+
+/* ========================================================
+   PREMIUM SOFT-GLASS / GLASSMORPHISM ADMIN SIDEBAR
+   (Inspired by reference image over blue bubble background)
+   ======================================================== */
+.wrapper .page-wrap .app-sidebar,
+.wrapper .page-wrap .app-sidebar.colored {
+    background: rgba(255, 255, 255, 0.68) !important;
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 4px 0 28px 0 rgba(31, 38, 135, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+    z-index: 1040 !important;
+}
+
+/* Sidebar Header / Logo Area */
+.wrapper .page-wrap .app-sidebar .sidebar-header,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-header {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
+    height: 60px !important;
+    padding: 12px 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.app-sidebar .sidebar-header .header-brand {
+    color: #0f172a !important;
+}
+
+.app-sidebar .sidebar-header .header-brand-img {
+    filter: none !important;
+    max-height: 42px !important;
+}
+
+.app-sidebar .sidebar-header .nav-close {
+    color: #475569 !important;
+    font-size: 20px !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Sidebar Scrollable Content */
+.wrapper .page-wrap .app-sidebar .sidebar-content,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content {
+    background: transparent !important;
+    padding: 12px 4px !important;
+}
+
+/* Custom Soft Scrollbar for Sidebar */
+.app-sidebar .sidebar-content::-webkit-scrollbar {
+    width: 4px;
+}
+.app-sidebar .sidebar-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.app-sidebar .sidebar-content::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+}
+.app-sidebar .sidebar-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+}
+
+/* Navigation Menu Items */
+.navigation-main {
+    padding: 0 4px !important;
+}
+
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item {
+    margin: 3px 6px !important;
+    border: none !important;
+    position: relative !important;
+}
+
+/* Menu Item Links */
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item > a,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item > a {
+    color: #334155 !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    padding: 10px 14px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    position: relative !important;
+}
+
+/* Menu Icons */
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item > a i,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item > a i {
+    font-size: 17px !important;
+    margin-right: 12px !important;
+    width: 20px !important;
+    text-align: center !important;
+    color: #64748b !important;
+    transition: color 0.22s ease, transform 0.22s ease !important;
+}
+
+/* Dropdown Right Arrow Indicator */
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.has-sub > a::before,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.has-sub > a::before {
+    color: #94a3b8 !important;
+    right: 12px !important;
+    font-size: 12px !important;
+}
+
+/* Hover State */
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item > a:hover,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item > a:hover {
+    color: #1d4ed8 !important;
+    background: rgba(255, 255, 255, 0.82) !important;
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08) !important;
+    transform: translateX(2px) !important;
+}
+
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item > a:hover i,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item > a:hover i {
+    color: #2563eb !important;
+    transform: scale(1.08) !important;
+}
+
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.has-sub > a:hover::before,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.has-sub > a:hover::before {
+    color: #2563eb !important;
+}
+
+/* Active State (Matching the Blue Accent in Reference Image) */
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.active > a,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.active > a {
+    color: #2563eb !important;
+    background: rgba(37, 99, 235, 0.12) !important;
+    border-color: rgba(37, 99, 235, 0.22) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12) !important;
+}
+
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.active > a i,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.active > a i {
+    color: #2563eb !important;
+}
+
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.has-sub.active > a::before,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.has-sub.active > a::before {
+    color: #2563eb !important;
+}
+
+/* Remove old harsh indicator lines */
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.open::after,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.active::after {
+    display: none !important;
+}
+
+/* Submenu Dropdown Container */
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content {
+    background: rgba(255, 255, 255, 0.58) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.65) !important;
+    border-radius: 12px !important;
+    margin: 4px 4px 6px 4px !important;
+    padding: 6px 4px !important;
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.05) !important;
+}
+
+/* Submenu Links */
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content .menu-item,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content .menu-item {
+    color: #475569 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 8px 12px 8px 30px !important;
+    border-radius: 8px !important;
+    margin: 2px 0 !important;
+    display: block !important;
+    transition: all 0.2s ease !important;
+}
+
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content .menu-item:hover,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content .menu-item:hover {
+    color: #1d4ed8 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    padding-left: 33px !important;
+}
+
+.wrapper .page-wrap .app-sidebar .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content .menu-item.active,
+.wrapper .page-wrap .app-sidebar.colored .sidebar-content .nav-container .navigation-main .nav-item.has-sub .submenu-content .menu-item.active {
+    color: #2563eb !important;
+    font-weight: 700 !important;
+    background: rgba(37, 99, 235, 0.12) !important;
+}
+
+/* Collapsed Sidebar on Hover Support */
+.wrapper.nav-collapsed .page-wrap .app-sidebar:hover {
+    background: rgba(255, 255, 255, 0.88) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    box-shadow: 8px 0 32px rgba(31, 38, 135, 0.12) !important;
+}
+
+/* Header Top with Subtle Blur */
+.wrapper .header-top {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Global Footer with Subtle Blur */
+.wrapper .page-wrap .footer {
+    background: rgba(255, 255, 255, 0.88) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-top: 1px solid rgba(226, 232, 240, 0.6) !important;
+}
+
+/* ========================================================
+   GLOBAL CARD & CONTENT READABILITY (ALL ADMIN PAGES)
+   ======================================================== */
+.wrapper .main-content .card {
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 4px 20px -2px rgba(18, 38, 63, 0.05) !important;
+    border-radius: 12px;
+}
+
+.wrapper .main-content .card .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
+}
+
+.wrapper .main-content .card .card-footer {
+    background: transparent !important;
+    border-top: 1px solid rgba(226, 232, 240, 0.6) !important;
+}
+
+/* Tables Readability */
+.wrapper .main-content .table {
+    background: transparent !important;
+}
+
+.wrapper .main-content .table tr {
+    background: transparent !important;
+}
+
+/* Dashboard Container & Grid Reset */
+.adm-dashboard-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+.adm-dashboard-container .row {
+    margin-left: -9px;
+    margin-right: -9px;
+}
+
+.adm-dashboard-container .row > [class*="col-"] {
+    padding-left: 9px;
+    padding-right: 9px;
+}
+
+/* Top Dashboard Header */
+.adm-dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.adm-dash-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.adm-dash-subtitle {
+    font-size: 13.5px;
+    color: var(--adm-text-muted);
+    margin: 4px 0 0 0;
+}
+
+.adm-date-badge {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--adm-border);
+    border-radius: 12px;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.adm-date-badge i {
+    font-size: 16px;
+    color: #475569;
+}
+
+.adm-date-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.adm-date-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.adm-date-val .chevron {
+    font-size: 10px;
+    color: #64748b;
+}
+
+.adm-date-sub {
+    font-size: 11px;
+    color: var(--adm-text-light);
+    font-weight: 500;
+}
+
+/* ========================================================
+   TOP 4 STATISTICS CARDS
+   ======================================================== */
+.adm-stat-card {
+    background: var(--adm-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--adm-border);
+    border-radius: var(--adm-radius);
+    padding: 18px 20px;
+    box-shadow: var(--adm-shadow-sm);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 18px;
+    min-height: 146px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.adm-stat-card:hover {
+    box-shadow: var(--adm-shadow-hover);
+    border-color: var(--adm-border-hover);
+    transform: translateY(-2px);
+}
+
+.adm-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.adm-stat-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.adm-stat-indicator {
+    width: 4px;
+    height: 34px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.adm-stat-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.adm-stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.adm-stat-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.adm-stat-num {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+    margin: 0 0 5px 0;
+    letter-spacing: -0.03em;
+}
+
+.adm-stat-badge {
+    font-size: 11.5px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Mini Bar Indicator matching Reference Image */
+.adm-stat-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3.5px;
+    height: 32px;
+}
+
+.adm-stat-bars span {
+    width: 5px;
+    border-radius: 3px;
+    display: block;
+    transition: height 0.3s ease;
+}
+
+/* Colors for Card 1: Total Members */
+.adm-stat-blue .adm-stat-indicator { background: var(--adm-blue); }
+.adm-stat-blue .adm-stat-icon { background: var(--adm-blue-light); color: var(--adm-blue); }
+.adm-stat-blue .adm-stat-badge { color: var(--adm-green); }
+.adm-stat-blue .adm-stat-bars span { background: var(--adm-blue); }
+.adm-stat-blue .adm-stat-bars span:nth-child(1) { height: 10px; opacity: 0.7; }
+.adm-stat-blue .adm-stat-bars span:nth-child(2) { height: 16px; opacity: 0.85; }
+.adm-stat-blue .adm-stat-bars span:nth-child(3) { height: 22px; opacity: 0.95; }
+.adm-stat-blue .adm-stat-bars span:nth-child(4) { height: 30px; opacity: 1; }
+
+/* Colors for Card 2: Total Active */
+.adm-stat-cyan .adm-stat-indicator { background: var(--adm-cyan); }
+.adm-stat-cyan .adm-stat-icon { background: var(--adm-cyan-light); color: var(--adm-cyan); }
+.adm-stat-cyan .adm-stat-badge { color: var(--adm-cyan); }
+.adm-stat-cyan .adm-stat-bars span { background: var(--adm-green); }
+.adm-stat-cyan .adm-stat-bars span:nth-child(1) { height: 12px; opacity: 0.7; }
+.adm-stat-cyan .adm-stat-bars span:nth-child(2) { height: 18px; opacity: 0.85; }
+.adm-stat-cyan .adm-stat-bars span:nth-child(3) { height: 24px; opacity: 0.95; }
+.adm-stat-cyan .adm-stat-bars span:nth-child(4) { height: 30px; opacity: 1; }
+
+/* Colors for Card 3: Total Inactive */
+.adm-stat-amber .adm-stat-indicator { background: var(--adm-amber); }
+.adm-stat-amber .adm-stat-icon { background: var(--adm-amber-light); color: var(--adm-amber); }
+.adm-stat-amber .adm-stat-badge { color: var(--adm-amber); }
+.adm-stat-amber .adm-stat-bars span { background: var(--adm-amber); }
+.adm-stat-amber .adm-stat-bars span:nth-child(1) { height: 8px; opacity: 0.7; }
+.adm-stat-amber .adm-stat-bars span:nth-child(2) { height: 15px; opacity: 0.85; }
+.adm-stat-amber .adm-stat-bars span:nth-child(3) { height: 22px; opacity: 0.95; }
+.adm-stat-amber .adm-stat-bars span:nth-child(4) { height: 28px; opacity: 1; }
+
+/* Colors for Card 4: Total Blocked */
+.adm-stat-red .adm-stat-indicator { background: var(--adm-red); }
+.adm-stat-red .adm-stat-icon { background: var(--adm-red-light); color: var(--adm-red); }
+.adm-stat-red .adm-stat-badge { color: var(--adm-red); }
+.adm-stat-red .adm-stat-bars span { background: var(--adm-red); }
+.adm-stat-red .adm-stat-bars span:nth-child(1) { height: 6px; opacity: 0.7; }
+.adm-stat-red .adm-stat-bars span:nth-child(2) { height: 12px; opacity: 0.85; }
+.adm-stat-red .adm-stat-bars span:nth-child(3) { height: 18px; opacity: 0.95; }
+.adm-stat-red .adm-stat-bars span:nth-child(4) { height: 26px; opacity: 1; }
+
+/* Hidden container so legacy Chartist scripts don't break */
+.adm-legacy-chart-holder {
+    display: none !important;
+}
+
+/* ========================================================
+   THREE WALLET BALANCE CARDS
+   ======================================================== */
+.adm-wallet-card {
+    background: var(--adm-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--adm-border);
+    border-radius: var(--adm-radius);
+    padding: 22px 24px;
+    box-shadow: var(--adm-shadow-sm);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+    min-height: 128px;
+}
+
+.adm-wallet-card:hover {
+    box-shadow: var(--adm-shadow-hover);
+    border-color: var(--adm-border-hover);
+    transform: translateY(-2px);
+}
+
+.adm-wallet-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.adm-wallet-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin: 0 0 6px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.adm-wallet-val {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.025em;
+    word-break: break-word;
+}
+
+.adm-wallet-sub {
+    font-size: 12px;
+    color: var(--adm-text-light);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* 3D Isometric Illustration Containers */
+.adm-wallet-graphic {
+    width: 68px;
+    height: 68px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease;
+}
+
+.adm-wallet-card:hover .adm-wallet-graphic {
+    transform: scale(1.06);
+}
+
+.adm-wallet-graphic svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.08));
+}
+
+/* ========================================================
+   INCOME OVERVIEW & INCOME SUMMARY (SIDE-BY-SIDE)
+   ======================================================== */
+.adm-income-panel {
+    background: var(--adm-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--adm-border);
+    border-radius: var(--adm-radius);
+    padding: 22px 24px;
+    box-shadow: var(--adm-shadow-sm);
+    margin-bottom: 18px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.adm-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.adm-panel-head h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.015em;
+}
+
+.adm-filter-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Bar Chart Container matching Reference Image */
+.adm-chart-wrap {
+    width: 100%;
+    position: relative;
+    padding-top: 15px;
+}
+
+.adm-chart-floating-badge {
+    position: absolute;
+    top: 0;
+    left: 47%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+    z-index: 5;
+}
+
+.adm-chart-floating-badge span {
+    display: block;
+    font-size: 9.5px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.adm-chart-floating-badge::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #0f172a;
+}
+
+/* Custom SVG Bar Chart */
+.adm-svg-chart {
+    width: 100%;
+    height: 230px;
+}
+
+/* Income Summary Circular Donut Section */
+/* Income Summary Circular Donut Section */
+.adm-summary-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    height: 100%;
+}
+
+.adm-donut-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 4px auto 10px auto;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.adm-donut-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.adm-donut-center {
+    position: absolute;
+    width: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    padding: 0 4px;
+}
+
+.adm-donut-center h4 {
+    font-size: clamp(14px, 3.8vw, 17.5px);
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    max-width: 126px;
+}
+
+.adm-donut-center span {
+    font-size: 10px;
+    color: var(--adm-text-muted);
+    font-weight: 700;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+
+/* Income Legend List */
+.adm-income-list {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.adm-income-list li {
+    padding: 0;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.adm-income-list li:last-child {
+    border-bottom: none;
+}
+
+.adm-income-item-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+.adm-income-item-link:hover {
+    background: #f8fafc;
+    transform: translateX(2px);
+}
+
+.adm-income-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #334155;
+    font-weight: 600;
+    font-size: 12.5px;
+    text-decoration: none !important;
+}
+
+.adm-income-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.adm-income-item-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.adm-income-amount {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.adm-income-chevron {
+    font-size: 11px;
+    color: #94a3b8;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.adm-income-item-link:hover .adm-income-chevron {
+    color: var(--adm-blue);
+    transform: translateX(2px);
+}
+
+.adm-income-item-link:hover .adm-income-item-left {
+    color: var(--adm-blue);
+}
+
+/* ========================================================
+   BOTTOM THREE WITHDRAWAL SUMMARY CARDS
+   ======================================================== */
+.adm-gradient-card {
+    border-radius: var(--adm-radius);
+    padding: 24px;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.12);
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+}
+
+.adm-gradient-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.18);
+}
+
+.adm-card-purple {
+    background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #a855f7 100%);
+}
+
+.adm-card-blue {
+    background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
+}
+
+.adm-card-green {
+    background: linear-gradient(135deg, #047857 0%, #10b981 50%, #34d399 100%);
+}
+
+.adm-grad-info {
+    position: relative;
+    z-index: 2;
+}
+
+.adm-grad-val {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.02em;
+}
+
+.adm-grad-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.88);
+    font-weight: 500;
+    margin: 0;
+}
+
+.adm-grad-icon {
+    position: relative;
+    z-index: 2;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Wavy Background Overlay on Gradient Cards */
+.adm-grad-wave {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 140px;
+    height: 100%;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Secondary Token & Withdrawal Strip */
+.adm-activity-strip {
+    background: var(--adm-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--adm-border);
+    border-radius: var(--adm-radius);
+    padding: 16px 20px;
+    box-shadow: var(--adm-shadow-sm);
+    margin-bottom: 18px;
+}
+
+.adm-strip-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    margin: 0 0 12px 0;
+}
+
+.adm-strip-item {
+    padding: 6px 12px;
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 10px;
+    border: 1px solid #f1f5f9;
+}
+
+.adm-strip-item-label {
+    font-size: 11.5px;
+    color: var(--adm-text-muted);
+    margin: 0;
+}
+
+.adm-strip-item-val {
+    font-size: 15px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* ========================================================
+   RESPONSIVENESS & MEDIA QUERIES
+   ======================================================== */
+@media (max-width: 1199.98px) {
+    .adm-stat-num { font-size: 28px; }
+    .adm-wallet-val { font-size: 23px; }
+    .adm-grad-val { font-size: 23px; }
+    .adm-donut-wrap { width: 130px; height: 130px; }
+    .adm-donut-center h4 { font-size: 16px; }
+}
+
+@media (max-width: 991.98px) {
+    .adm-summary-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .adm-income-list {
+        width: 100%;
+    }
+    .adm-donut-wrap {
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .adm-dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+    .adm-dash-title { font-size: 22px; }
+    .adm-stat-card { min-height: 135px; padding: 16px; }
+    .adm-stat-num { font-size: 26px; }
+    .adm-wallet-card { padding: 18px; }
+    .adm-wallet-val { font-size: 21px; }
+    .adm-income-panel { padding: 18px; }
+    .adm-gradient-card { padding: 20px; }
+}
+
+@media (max-width: 575.98px) {
+    .adm-stat-title { font-size: 12px; }
+    .adm-stat-num { font-size: 24px; }
+    .adm-wallet-card { padding: 15px; }
+    .adm-wallet-graphic { width: 52px; height: 52px; }
+    .adm-date-badge { width: 100%; justify-content: space-between; }
+    .adm-chart-floating-badge { left: 50%; }
+}

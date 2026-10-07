@@ -9,10 +9,10 @@
             <div class="row align-items-end">
                 <div class="col-lg-8">
                     <div class="page-header-title">
-                        <i class="ik ik-edit bg-blue"></i>
+                        <i class="ik ik-layers bg-blue"></i>
                         <div class="d-inline">
-                            <h5>{{ __('Staking Level Income')}}</h5>
-                            <span>{{ __('Staking Level Income details')}}</span>
+                            <h5>{{ __('Team Trading Profit')}}</h5>
+                            <span>{{ __('Team Trading Profit (L1–L10) distribution records')}}</span>
                         </div>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                                 <a href="#"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Admin')}}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('Staking Level Income')}}</li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('Team Trading Profit')}}</li>
                         </ol>
                     </nav>
                 </div>
@@ -39,7 +39,7 @@
                 <div class="alert alert-primary">{{session('wMessage')}}</div>
                 @endif
                 <div class="card">
-                    <div class="card-header"><h3>{{ __('Staking Level Income')}}</h3></div>
+                    <div class="card-header"><h3>{{ __('Team Trading Profit')}}</h3></div>
                     <div class="card-body px-5 " style="overflow: auto">
                         <div class="responsive">
                             <table id="data_table" class="table">

@@ -23,3 +23,4 @@ Schedule::command('app:daily-income-dis')->everyMinute()->timezone('UTC');
 Schedule::command('app:single-leg-income')->everyThreeMinutes()->timezone('UTC');
 Schedule::command('app:daily-part-team-biz-update')->daily()->timezone('UTC');
 Schedule::command('app:partnership-income-dis')->daily()->timezone('UTC');
+Schedule::command('app:hero-of-the-month-dis')->monthlyOn(1, '00:05')->timezone('UTC');

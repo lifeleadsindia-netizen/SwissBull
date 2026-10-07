@@ -1,5 +1,5 @@
 @extends('member.layouts.main')
-@section('title', 'Staking Level Income')
+@section('title', 'Team Trading Profit')
 @section('container')
 @include('member.income._income-styles')
 
@@ -8,16 +8,16 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
-            <h1><i class="fa-solid fa-layer-group me-2"></i>Staking Level Income</h1>
-            <p>Team staking-based level commissions earned through your downline network.</p>
+            <h1><i class="fa-solid fa-layer-group me-2"></i>Team Trading Profit</h1>
+            <p>Team trading profit share calculated across 10 levels: L1-L2 (5%), L3-L4 (4%), L5-L6 (3%), L7-L8 (2%), L9-L10 (1%).</p>
         </div>
 
         <div class="inc-card">
             <div class="inc-card-header">
                 <div class="inc-header-icon"><i class="fa-solid fa-sitemap"></i></div>
                 <div>
-                    <div class="inc-header-title">Staking Level Income History</div>
-                    <div class="inc-header-sub">Level commissions from your team's staking activity</div>
+                    <div class="inc-header-title">Team Trading Profit History</div>
+                    <div class="inc-header-sub">Daily trading profit commissions earned from your downline team across 10 levels</div>
                 </div>
             </div>
             <div class="inc-table-shell">

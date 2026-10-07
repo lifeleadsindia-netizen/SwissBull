@@ -2895,7 +2895,7 @@
                                 </div>
                             </div>
                         </div>
-                    <!-- PACKAGE & INVESTMENT OVERVIEW (PHASE 2) -->
+                    <!-- PACKAGE & INVESTMENT OVERVIEW (PHASE 2 & TRADING WALLET LOCK) -->
                     <div class="row mb-4">
                         <div class="col-12">
                             <div class="card admin-pool-wrapper" style="border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, rgba(16, 20, 30, 0.98), rgba(10, 12, 18, 0.95)); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);">
@@ -2909,22 +2909,32 @@
                                                 Active Package &amp; Investment Details
                                             </h4>
                                             <small class="text-white-50" style="font-size: 0.8rem;">
-                                                Tiered package allocation &bull; 70% Trading Wallet credit
+                                                Tiered package allocation &bull; 70% Trading Wallet credit &bull; Dynamic Capping Return
                                             </small>
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
-                                        @if ($activePackage && $activePackage->isPackageActive())
+                                    <div class="d-flex align-items-center gap-2 mt-2 mt-md-0 flex-wrap">
+                                        @if (isset($isFundLocked) && $isFundLocked)
+                                            <span id="headerLockStatusBadge" class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.45); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
+                                                <i class="fa-solid fa-lock me-1"></i> Fund Locked
+                                            </span>
+                                        @else
+                                            <span id="headerLockStatusBadge" class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.45); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
+                                                <i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked
+                                            </span>
+                                        @endif
+
+                                        @if (isset($packageStatus) && $packageStatus === 'Active')
                                             <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
                                                 <i class="fa-solid fa-circle-check me-1"></i> Package Active
                                             </span>
-                                        @elseif ($activePackage && $activePackage->isExpired())
+                                        @elseif (isset($packageStatus) && $packageStatus === 'Expired')
                                             <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
                                                 <i class="fa-solid fa-clock-rotate-left me-1"></i> Package Expired
                                             </span>
                                         @else
                                             <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
-                                                <i class="fa-solid fa-circle-info me-1"></i> No Active Package
+                                                <i class="fa-solid fa-circle-info me-1"></i> {{ $packageStatus ?? 'No Active Package' }}
                                             </span>
                                         @endif
                                         <a href="{{ url('/member/fund/import-flt') }}" class="btn btn-sm font-weight-bold" style="background: linear-gradient(135deg, #FFD700, #F59E0B); color: #000; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
@@ -2933,140 +2943,152 @@
                                     </div>
                                 </div>
                                 <div class="card-body p-4">
+                                    <!-- PROMINENT TRADING WALLET LOCK STATUS BANNER -->
+                                    <div id="tradingWalletLockBanner" class="p-3 mb-4 rounded-3 {{ (isset($isFundLocked) && $isFundLocked) ? 'banner-locked' : 'banner-unlocked' }}"
+                                         style="background: {{ (isset($isFundLocked) && $isFundLocked) ? 'linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.10))' : 'linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.25))' }}; border: 1px solid {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)' }};">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div id="bannerLockIconBox" class="rounded-circle d-flex align-items-center justify-content-center"
+                                                     style="width: 42px; height: 42px; background: {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(239, 68, 68, 0.25)' : 'rgba(16, 185, 129, 0.25)' }}; color: {{ (isset($isFundLocked) && $isFundLocked) ? '#EF4444' : '#10B981' }}; font-size: 1.15rem;">
+                                                    <i id="bannerLockIcon" class="fa-solid {{ (isset($isFundLocked) && $isFundLocked) ? 'fa-lock' : 'fa-lock-open' }}"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <h5 id="bannerLockTitle" class="mb-0 font-weight-bold" style="color: {{ (isset($isFundLocked) && $isFundLocked) ? '#FCA5A5' : '#6EE7B7' }};">
+                                                            {{ $fundLockTitle ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Locked' : 'Fund Unlocked') }}
+                                                        </h5>
+                                                        <span id="bannerUnlocksInBadge" class="badge" style="background: {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(245, 158, 11, 0.25)' : 'rgba(16, 185, 129, 0.25)' }}; color: {{ (isset($isFundLocked) && $isFundLocked) ? '#FBBF24' : '#34D399' }}; border: 1px solid {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(245, 158, 11, 0.4)' : 'rgba(16, 185, 129, 0.4)' }}; font-size: 11px;">
+                                                            {{ $fundUnlocksInText ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Unlocks In '.($remainingLockDays ?? 0).' Days' : 'Fund Unlocked') }}
+                                                        </span>
+                                                    </div>
+                                                    <p id="bannerReturnMessage" class="mb-0 text-white-50 mt-1" style="font-size: 0.85rem;">
+                                                        {{ $fundLockReturnMessage ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Locked, You are eligible for total return of '.number_format((float) ($maxReturnPercent ?? 200), 0).'% Returns' : 'You are eligible for total return of '.number_format((float) ($maxReturnPercent ?? 200), 0).'% Returns') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-3 ms-auto ms-md-0 flex-wrap">
+                                                <div class="text-end">
+                                                    <small class="text-white-50 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;">Unlock Date &amp; Time</small>
+                                                    <span id="bannerUnlockDateTime" class="text-white font-weight-bold" style="font-size: 0.85rem;">
+                                                        {{ $unlockDateTime ?? 'Unlocked' }}
+                                                    </span>
+                                                </div>
+                                                <div class="text-end">
+                                                    <small class="text-white-50 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;">Remaining Lock Time</small>
+                                                    <span id="liveCountdownDisplay" class="badge font-weight-bold px-3 py-2"
+                                                          style="background: #000; color: {{ (isset($isFundLocked) && $isFundLocked) ? '#F59E0B' : '#10B981' }}; border: 1px solid {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(245, 158, 11, 0.5)' : 'rgba(16, 185, 129, 0.5)' }}; font-size: 12px; font-family: monospace;">
+                                                        {{ (isset($isFundLocked) && $isFundLocked) ? ($remainingLockDays ?? 0).' Days' : 'Unlocked' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 4 STAT METRICS CARDS -->
                                     <div class="row g-3">
-                                        <!-- Current Package Range & Investment -->
+                                        <!-- 1. Investment Card -->
                                         <div class="col-xl-3 col-md-6 col-sm-12">
                                             <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px;">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Current Package</span>
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Investment</span>
                                                     <span class="badge bg-warning text-dark font-weight-bold" style="font-size: 10px;">
-                                                        {{ $activePackage->package ?? ($data['package'] ?? 'Standard') }}
+                                                        {{ $activePackage->package_range ?? ($activePackage->package ?? ($data['package'] ?? 'Standard')) }}
                                                     </span>
                                                 </div>
                                                 <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem;">
-                                                    $ {{ number_format((float) ($activePackage->invest_amount ?? ($activePackage->package_value ?? $totalInvestment)), 2) }}
+                                                    $ {{ number_format((float) ($activePackageInvestAmount ?? ($activePackage->invest_amount ?? ($activePackage->package_value ?? $totalInvestment))), 2) }}
                                                 </h3>
                                                 <div class="d-flex align-items-center gap-1 text-warning mt-2" style="font-size: 0.78rem;">
                                                     <i class="fa-solid fa-layer-group"></i>
-                                                    <span>Range: {{ $activePackage->package_range ?? ($data['package'] ?? '50 - 500 USDT') }}</span>
+                                                    <span>Status: <strong class="text-white">{{ $packageStatus ?? 'Active' }}</strong></span>
                                                 </div>
-                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Total Invested: $ {{ number_format((float) $totalInvestment, 2) }}</small>
+                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Total Invested: $ {{ number_format((float) ($totalInvestment ?? 0), 2) }}</small>
                                             </div>
                                         </div>
 
-                                        <!-- Trading Wallet (70% Allocation) -->
+                                        <!-- 2. Trading Wallet Card -->
                                         <div class="col-xl-3 col-md-6 col-sm-12">
                                             <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 14px;">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                                     <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Trading Wallet</span>
-                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; font-size: 10px; font-weight: 700;">
-                                                        70% Allocated
+                                                    <span id="tradingWalletLockCardBadge" class="badge" style="background: {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)' }}; color: {{ (isset($isFundLocked) && $isFundLocked) ? '#EF4444' : '#10B981' }}; font-size: 10px; font-weight: 700; border: 1px solid {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)' }};">
+                                                        {{ $lockStatus ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Locked' : 'Fund Unlocked') }}
                                                     </span>
                                                 </div>
                                                 <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem; color: #10B981 !important;">
-                                                    $ {{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }}
+                                                    $ {{ number_format((float) ($tradingWalletBalance ?? ($data['p2p_wallet'] ?? 0)), 2) }}
                                                 </h3>
                                                 <div class="d-flex align-items-center gap-1 text-success mt-2" style="font-size: 0.78rem;">
                                                     <i class="fa-solid fa-coins"></i>
-                                                    <span>Package Credit: $ {{ number_format((float) ($activePackage->trading_wallet_amount ?? (($activePackage->invest_amount ?? 0) * 0.70)), 2) }}</span>
+                                                    <span>70% Allocated: $ {{ number_format((float) ($activePackage->trading_wallet_amount ?? (($activePackageInvestAmount ?? ($totalInvestment ?? 0)) * 0.70)), 2) }}</span>
                                                 </div>
-                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Available for trading &amp; withdrawal</small>
+                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Available for trading &amp; withdrawal after unlock</small>
                                             </div>
                                         </div>
 
-                                        <!-- Total Earning & Max Earning Limit -->
+                                        <!-- 3. Total Earning & Max Earning -->
                                         <div class="col-xl-3 col-md-6 col-sm-12">
                                             <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 14px;">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Earning Progress</span>
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Earning &amp; Capping</span>
                                                     @php
-                                                        $dynRate = isset($activeStaking) && $activeStaking ? $activeStaking->getDailyRate() : (float) ($activePackage->return_percent ?? 5.0);
-                                                        $dynCap = isset($activeStaking) && $activeStaking ? $activeStaking->getCappingPercent() : (float) ($activePackage->max_return_percent ?? 200.0);
-                                                        $maxEarn = isset($activeStaking) && $activeStaking ? $activeStaking->getMaxRoiAmount() : (float) ($activePackage->max_earning ?? $maxPackageEarning);
-                                                        $currEarn = isset($activeStaking) && $activeStaking ? $activeStaking->getTotalEarned() : (float) ($activePackage->total_earning ?? $totalPackageEarning);
-                                                        $remEarn = max(0.00, round($maxEarn - $currEarn, 2));
-                                                        $earnPercent = $maxEarn > 0 ? min(100, round(($currEarn / $maxEarn) * 100, 1)) : 0;
+                                                        $tEarn = (float) ($totalEarning ?? ($totalPackageEarning ?? 0));
+                                                        $mEarn = (float) ($maxEarning ?? ($maxPackageEarning ?? 0));
+                                                        $earnPercent = $mEarn > 0 ? min(100, round(($tEarn / $mEarn) * 100, 1)) : 0;
                                                     @endphp
                                                     <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60A5FA; font-size: 10px; font-weight: 700;">
-                                                        Limit: $ {{ number_format($maxEarn, 2) }}
+                                                        Max Return: {{ number_format((float) ($maxReturnPercent ?? 200), 0) }}%
                                                     </span>
                                                 </div>
                                                 <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem;">
-                                                    $ {{ number_format($currEarn, 2) }}
+                                                    $ {{ number_format($tEarn, 2) }}
                                                 </h3>
                                                 <div class="progress my-2" style="height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 6px;">
                                                     <div class="progress-bar progress-animated" role="progressbar" style="width: {{ max(5, $earnPercent) }}%; background: linear-gradient(90deg, #3B82F6, #10B981); border-radius: 6px;"></div>
                                                 </div>
                                                 <div class="d-flex justify-content-between text-white-50" style="font-size: 0.72rem;">
                                                     <span>Earned: {{ $earnPercent }}%</span>
-                                                    <span class="text-warning">Rem: $ {{ number_format($remEarn, 2) }}</span>
+                                                    <span class="text-warning">Max: $ {{ number_format($mEarn, 2) }}</span>
                                                 </div>
                                                 <div class="d-flex justify-content-between text-white-50 mt-1" style="font-size: 0.68rem;">
-                                                    <span>ROI: {{ number_format($dynRate, 1) }}%</span>
-                                                    <span>Cap: {{ number_format($dynCap, 0) }}%</span>
+                                                    <span>Rem: $ {{ number_format((float) ($remainingEligibility ?? max(0, $mEarn - $tEarn)), 2) }}</span>
+                                                    <span>Daily ROI: {{ number_format((float) ($dailyRoiPercent ?? 5.0), 1) }}%</span>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Lock & Expiry Status -->
+                                        <!-- 4. Lock & Unlock Details -->
                                         <div class="col-xl-3 col-md-6 col-sm-12">
                                             <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 14px;">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Lock &amp; Expiry</span>
-                                                    @if (isset($data) && $data->isTradingWalletLocked())
-                                                        <span class="badge" style="background: rgba(245, 158, 11, 0.25); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 10px; font-weight: 700;">
-                                                            <i class="fa-solid fa-lock me-1"></i> Locked
-                                                        </span>
-                                                    @else
-                                                        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10px; font-weight: 700;">
-                                                            <i class="fa-solid fa-lock-open me-1"></i> Unlocked
-                                                        </span>
-                                                    @endif
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Lock Status</span>
+                                                    <span id="cardLockStatusBadge" class="badge" style="background: {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(239, 68, 68, 0.25)' : 'rgba(16, 185, 129, 0.25)' }}; color: {{ (isset($isFundLocked) && $isFundLocked) ? '#EF4444' : '#10B981' }}; border: 1px solid {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)' }}; font-size: 10px; font-weight: 700;">
+                                                        <i class="fa-solid {{ (isset($isFundLocked) && $isFundLocked) ? 'fa-lock' : 'fa-lock-open' }} me-1"></i> {{ $lockStatus ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Locked' : 'Fund Unlocked') }}
+                                                    </span>
                                                 </div>
-                                                @if (isset($data) && $data->isTradingWalletLocked())
-                                                    <h4 class="text-warning font-weight-bold mb-1" style="font-size: 1.15rem;">
-                                                        {{ $data->tradingWalletRemainingLockDays() }} Days Remaining
-                                                    </h4>
-                                                    <small class="text-white-50 d-block" style="font-size: 0.72rem;">Trading Lock Active</small>
-                                                @else
-                                                    <h4 class="text-success font-weight-bold mb-1" style="font-size: 1.15rem;">
-                                                        Trading Unlocked
-                                                    </h4>
-                                                    <small class="text-white-50 d-block" style="font-size: 0.72rem;">Full Trading Access</small>
-                                                @endif
+                                                <h4 id="cardUnlocksInHeader" class="mb-1 font-weight-bold" style="font-size: 1.15rem; color: {{ (isset($isFundLocked) && $isFundLocked) ? '#FBBF24' : '#34D399' }};">
+                                                    {{ $fundUnlocksInText ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Unlocks In '.($remainingLockDays ?? 0).' Days' : 'Fund Unlocked') }}
+                                                </h4>
+                                                <small id="cardLockSubtext" class="text-white-50 d-block" style="font-size: 0.72rem;">
+                                                    {{ (isset($isFundLocked) && $isFundLocked) ? 'Trading Wallet Locked (Condition A Active)' : 'Trading Unlocked - Full Access' }}
+                                                </small>
                                                 <div class="mt-2 pt-2 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important; font-size: 0.72rem;">
                                                     <div class="d-flex justify-content-between text-white-50 mb-1">
-                                                        <span>Activated:</span>
-                                                        <span class="text-white">
-                                                            @if (isset($activeStaking) && $activeStaking && $activeStaking->activated_at)
-                                                                {{ date('d-m-Y H:i', strtotime($activeStaking->activated_at)) }}
-                                                            @elseif ($activePackage && ($activePackage->activated_at || $activePackage->created_at))
-                                                                {{ date('d-m-Y H:i', strtotime($activePackage->activated_at ?? $activePackage->created_at)) }}
-                                                            @else
-                                                                -
-                                                            @endif
+                                                        <span>Unlock Date:</span>
+                                                        <span id="cardUnlockDateVal" class="text-white font-weight-bold">
+                                                            {{ $unlockDateTime ?? 'Unlocked' }}
                                                         </span>
                                                     </div>
                                                     <div class="d-flex justify-content-between text-white-50 mb-1">
-                                                        <span>Last ROI:</span>
-                                                        <span class="text-white">
-                                                            @if (isset($activeStaking) && $activeStaking && $activeStaking->last_roi_at)
-                                                                {{ date('d-m-Y', strtotime($activeStaking->last_roi_at)) }}
-                                                            @else
-                                                                -
-                                                            @endif
+                                                        <span>Max Return:</span>
+                                                        <span class="text-warning font-weight-bold">
+                                                            {{ number_format((float) ($maxReturnPercent ?? 200), 0) }}% Returns
                                                         </span>
                                                     </div>
                                                     <div class="d-flex justify-content-between text-white-50">
-                                                        <span>Status:</span>
-                                                        <span class="text-white">
-                                                            @if (isset($activeStaking) && $activeStaking && $activeStaking->status == 'Deactive')
-                                                                <span class="text-danger">Deactivated (Capped)</span>
-                                                            @elseif ($activePackage && $activePackage->expires_at)
-                                                                Expires: {{ date('d-m-Y', strtotime($activePackage->expires_at)) }}
-                                                            @else
-                                                                -
-                                                            @endif
+                                                        <span>Live Timer:</span>
+                                                        <span id="cardLiveTimerVal" class="text-warning font-weight-bold font-monospace">
+                                                            {{ (isset($isFundLocked) && $isFundLocked) ? ($remainingLockDays ?? 0).' Days' : 'Unlocked' }}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -3078,7 +3100,7 @@
                                         <div class="mt-3 pt-3 border-top" style="border-color: rgba(245, 158, 11, 0.15) !important;">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <span class="text-white font-weight-bold" style="font-size: 0.85rem;">
-                                                    <i class="fa-solid fa-list-check text-warning me-1"></i> Recent Investment Records
+                                                    <i class="fa-solid fa-list-check text-warning me-1"></i> Package Investments &amp; Individual Lock Status
                                                 </span>
                                                 <a href="{{ url('/member/partnership/my-investment') }}" class="text-warning text-decoration-none" style="font-size: 0.75rem;">
                                                     View All <i class="fa-solid fa-arrow-right ms-1"></i>
@@ -3088,28 +3110,43 @@
                                                 <table class="table table-dark table-sm table-borderless align-middle mb-0" style="font-size: 0.75rem; background: transparent;">
                                                     <thead>
                                                         <tr class="text-white-50" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
-                                                            <th>Date &amp; Time</th>
+                                                            <th>Activation Date</th>
                                                             <th>Package</th>
                                                             <th>Deposit</th>
                                                             <th>Trading Wallet (70%)</th>
                                                             <th>Max Earning</th>
-                                                            <th>Lock / Expiry</th>
+                                                            <th>Max Return %</th>
+                                                            <th>Lock Status</th>
+                                                            <th>Unlock Date / Remaining</th>
                                                             <th>Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         @foreach ($packageInvestments as $pkg)
                                                             <tr>
-                                                                <td class="text-white">{{ $pkg->activated_at ? date('d-m-Y H:i', strtotime($pkg->activated_at)) : date('d-m-Y H:i', strtotime($pkg->created_at)) }}</td>
-                                                                <td class="text-warning font-weight-bold">{{ $pkg->package_range ?? $pkg->package ?? 'Standard' }}</td>
+                                                                <td class="text-white">{{ $pkg->activated_at ? date('d-m-Y H:i', strtotime($pkg->activated_at)) : ($pkg->created_at ? date('d-m-Y H:i', strtotime($pkg->created_at)) : '-') }}</td>
+                                                                <td class="text-warning font-weight-bold">{{ $pkg->package_range ?? ($pkg->package ?? 'Standard') }}</td>
                                                                 <td class="text-white font-weight-bold">$ {{ number_format((float) ($pkg->invest_amount ?? $pkg->package_value), 2) }}</td>
                                                                 <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)), 2) }}</td>
                                                                 <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->max_earning ?? (($pkg->invest_amount ?? $pkg->package_value) * 3.0)), 2) }}</td>
-                                                                <td class="text-white-50">
-                                                                    @if ($pkg->lock_days && $pkg->lock_days > 0)
-                                                                        <span class="badge bg-dark border border-secondary text-warning" style="font-size: 10px;">{{ $pkg->lock_days }}D Lock</span>
+                                                                <td class="text-warning font-weight-bold">{{ number_format((float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 200)), 0) }}%</td>
+                                                                <td>
+                                                                    @if ($pkg->is_locked)
+                                                                        <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4); font-size: 10px;">
+                                                                            <i class="fa-solid fa-lock me-1"></i> Fund Locked
+                                                                        </span>
                                                                     @else
-                                                                        <span class="badge bg-dark border border-secondary text-success" style="font-size: 10px;">None</span>
+                                                                        <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10px;">
+                                                                            <i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked
+                                                                        </span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="text-white-50">
+                                                                    @if ($pkg->is_locked)
+                                                                        <div class="text-warning font-weight-bold">Fund Unlocks In {{ $pkg->remaining_lock_days }} Days</div>
+                                                                        <small class="text-white-50" style="font-size: 10px;">{{ $pkg->unlock_datetime }}</small>
+                                                                    @else
+                                                                        <span class="text-success font-weight-bold">Fund Unlocked</span>
                                                                     @endif
                                                                 </td>
                                                                 <td>
@@ -3232,9 +3269,9 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <!-- ROI Income -->
+                                        <!-- 1. Monthly Trading Profit -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/monthly-staking-income') }}"
+                                            <a href="{{ url('member/income/monthly-trading-profit') }}"
                                                 class="text-decoration-none">
                                                 <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
                                                     <div class="card-body p-4">
@@ -3243,7 +3280,7 @@
                                                                 <i class="la la-chart-line" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Monthly Staking Income</p>
+                                                                <p class="mb-1">Monthly Trading Profit</p>
                                                                 <h4 class="text-white">$
                                                                     {{ number_format((float) totalMemberRoiIncome($data['memberid']), 2) }}
                                                                 </h4>
@@ -3253,7 +3290,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>Up to 5% - 10% Monthly</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3264,18 +3301,50 @@
                                             </a>
                                         </div>
 
-                                        <!-- Staking Level Income -->
+                                        <!-- 2. Referral Bonus -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/staking-level-income') }}"
+                                            <a href="{{ url('member/income/referral-bonus') }}"
                                                 class="text-decoration-none">
                                                 <div class="widget-stat card dash-3d-card row-theme-2 h-100 mb-0">
+                                                    <div class="card-body p-4">
+                                                        <div class="media">
+                                                            <span class="me-3">
+                                                                <i class="la la-user-plus" style="font-size: 2rem;"></i>
+                                                            </span>
+                                                            <div class="media-body text-white">
+                                                                <p class="mb-1">Referral Bonus</p>
+                                                                <h4 class="text-white">$
+                                                                    {{ number_format((float) totalMemberDirectIncome($data['memberid']), 2) }}
+                                                                </h4>
+                                                                <div class="progress mb-2">
+                                                                    <div class="progress-bar progress-animated"
+                                                                        style="width: 65%"></div>
+                                                                </div>
+                                                                <small
+                                                                    class="d-flex justify-content-between align-items-center">
+                                                                    <span>L1: 5%, L2: 3%, L3: 2%</span>
+                                                                    <span>View Details <i
+                                                                            class="la la-arrow-right"></i></span>
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <!-- 3. Team Trading Profit -->
+                                        <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
+                                            <a href="{{ url('member/income/team-trading-profit') }}"
+                                                class="text-decoration-none">
+                                                <div class="widget-stat card dash-3d-card row-theme-3 h-100 mb-0">
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
                                                                 <i class="la la-layer-group" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Staking Level Income</p>
+                                                                <p class="mb-1">Team Trading Profit</p>
                                                                 <h4 class="text-white">$
                                                                     {{ number_format((float) totalMemberStakingLevelIncome($data['memberid']), 2) }}
                                                                 </h4>
@@ -3285,7 +3354,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>L1–L10 Daily Profit</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3296,18 +3365,18 @@
                                             </a>
                                         </div>
 
-                                        <!-- Level Income -->
+                                        <!-- 4. Daily Team Investment Share -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/level-income') }}"
+                                            <a href="{{ url('member/income/daily-team-investment-share') }}"
                                                 class="text-decoration-none">
-                                                <div class="widget-stat card dash-3d-card row-theme-3 h-100 mb-0">
+                                                <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
                                                                 <i class="la la-bar-chart" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Level Income</p>
+                                                                <p class="mb-1">Daily Team Investment Share</p>
                                                                 <h4 class="text-white">$
                                                                     {{ number_format((float) totalMemberLevelIncome($data['memberid']), 2) }}
                                                                 </h4>
@@ -3317,7 +3386,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>L1–L10: 1% Each</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3328,28 +3397,28 @@
                                             </a>
                                         </div>
 
-                                        <!-- Single Leg Income -->
+                                        <!-- 5. Hero of the Month -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/single-leg-income') }}"
+                                            <a href="{{ url('member/income/hero-of-the-month') }}"
                                                 class="text-decoration-none">
-                                                <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
+                                                <div class="widget-stat card dash-3d-card row-theme-4 h-100 mb-0">
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
-                                                                <i class="la la-pie-chart" style="font-size: 2rem;"></i>
+                                                                <i class="la la-trophy" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
-                                                                <p class="mb-1">Single Leg Income</p>
+                                                                <p class="mb-1">Hero of the Month</p>
                                                                 <h4 class="text-white">$
-                                                                    {{ number_format((float) totalMemberSingleLegIncome($data['memberid']), 2) }}
+                                                                    {{ number_format((float) totalMemberHeroOfTheMonthIncome($data['memberid']), 2) }}
                                                                 </h4>
                                                                 <div class="progress mb-2">
                                                                     <div class="progress-bar progress-animated"
-                                                                        style="width: 55%"></div>
+                                                                        style="width: 80%"></div>
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>2% Monthly Pool</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3360,7 +3429,7 @@
                                             </a>
                                         </div>
 
-                                        <!-- Partnership Income -->
+                                        <!-- 6. Partnership Income -->
                                         <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
                                             <a href="{{ url('member/income/partnership-income') }}"
                                                 class="text-decoration-none">
@@ -3368,7 +3437,7 @@
                                                     <div class="card-body p-4">
                                                         <div class="media">
                                                             <span class="me-3">
-                                                                <i class="la la-users" style="font-size: 2rem;"></i>
+                                                                <i class="la la-handshake" style="font-size: 2rem;"></i>
                                                             </span>
                                                             <div class="media-body text-white">
                                                                 <p class="mb-1">Partnership Income</p>
@@ -3381,7 +3450,7 @@
                                                                 </div>
                                                                 <small
                                                                     class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
+                                                                    <span>Silver to Diamond 2%–8%</span>
                                                                     <span>View Details <i
                                                                             class="la la-arrow-right"></i></span>
                                                                 </small>
@@ -3392,37 +3461,24 @@
                                             </a>
                                         </div>
 
-                                        <!-- Team Withdrawal Commission -->
-                                        <div class="col-xl-4 col-md-6 col-sm-12 mb-3">
-                                            <a href="{{ url('member/income/team-withdrawal-commission') }}"
-                                                class="text-decoration-none">
-                                                <div class="widget-stat card dash-3d-card row-theme-4 h-100 mb-0">
-                                                    <div class="card-body p-4">
-                                                        <div class="media">
-                                                            <span class="me-3">
-                                                                <i class="la la-arrow-down" style="font-size: 2rem;"></i>
-                                                            </span>
-                                                            <div class="media-body text-white">
-                                                                <p class="mb-1">Team Withdrawal Commission</p>
-                                                                <h4 class="text-white">$
-                                                                    {{ number_format((float) totalMemberTeamWithdrawalCommissionIncome($data['memberid']), 2) }}
-                                                                </h4>
-                                                                <div class="progress mb-2">
-                                                                    <div class="progress-bar progress-animated"
-                                                                        style="width: 50%"></div>
+                                        @if (totalMemberSingleLegIncome($data['memberid']) > 0)
+                                            <!-- Additional Single Leg Earnings -->
+                                            <div class="col-xl-6 col-md-6 col-sm-12 mb-3">
+                                                <a href="{{ url('member/income/single-leg-income') }}" class="text-decoration-none">
+                                                    <div class="widget-stat card dash-3d-card row-theme-1 h-100 mb-0">
+                                                        <div class="card-body p-3">
+                                                            <div class="media align-items-center">
+                                                                <span class="me-3"><i class="la la-pie-chart" style="font-size: 1.5rem;"></i></span>
+                                                                <div class="media-body text-white">
+                                                                    <small class="text-white-50">Single Leg Income</small>
+                                                                    <h5 class="text-white mb-0">$ {{ number_format((float) totalMemberSingleLegIncome($data['memberid']), 2) }}</h5>
                                                                 </div>
-                                                                <small
-                                                                    class="d-flex justify-content-between align-items-center">
-                                                                    <span>Total Earned</span>
-                                                                    <span>View Details <i
-                                                                            class="la la-arrow-right"></i></span>
-                                                                </small>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </a>
-                                        </div>
+                                                </a>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -3806,8 +3862,151 @@
                     function isMobileView() {
                         return window.innerWidth <= 768;
                     }
+                });
+            </script>
 
-                })
+            <!-- TRADING WALLET LIVE COUNTDOWN & AUTO-UNLOCK TRANSITION -->
+            <script>
+                (function($) {
+                    window.tradingWalletLockConfig = {
+                        isLocked: {{ (isset($isFundLocked) && $isFundLocked) ? 'true' : 'false' }},
+                        unlockTimestamp: {{ (isset($unlockTimestamp) && $unlockTimestamp) ? $unlockTimestamp : 'null' }},
+                        maxReturnPercent: {{ (float) ($maxReturnPercent ?? 200) }},
+                        remainingDays: {{ (int) ($remainingLockDays ?? 0) }},
+                        unlockDateTime: "{{ $unlockDateTime ?? 'Unlocked' }}",
+                        statusUrl: "{{ route('member.tradingWalletStatus') }}"
+                    };
+
+                    function startTradingWalletCountdown() {
+                        var cfg = window.tradingWalletLockConfig;
+                        if (!cfg || !cfg.unlockTimestamp || !cfg.isLocked) {
+                            return;
+                        }
+
+                        var liveDisplay = document.getElementById('liveCountdownDisplay');
+                        var cardTimer = document.getElementById('cardLiveTimerVal');
+                        var banner = document.getElementById('tradingWalletLockBanner');
+                        var bannerTitle = document.getElementById('bannerLockTitle');
+                        var bannerBadge = document.getElementById('bannerUnlocksInBadge');
+                        var bannerReturnMsg = document.getElementById('bannerReturnMessage');
+                        var bannerIconBox = document.getElementById('bannerLockIconBox');
+                        var bannerIcon = document.getElementById('bannerLockIcon');
+                        var headerBadge = document.getElementById('headerLockStatusBadge');
+                        var cardBadge = document.getElementById('cardLockStatusBadge');
+                        var cardHeader = document.getElementById('cardUnlocksInHeader');
+                        var cardSubtext = document.getElementById('cardLockSubtext');
+                        var walletCardBadge = document.getElementById('tradingWalletLockCardBadge');
+
+                        function applyUnlockedState() {
+                            cfg.isLocked = false;
+                            var maxReturnText = Math.round(cfg.maxReturnPercent) + '% Returns';
+
+                            if (liveDisplay) {
+                                liveDisplay.style.color = '#10B981';
+                                liveDisplay.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+                                liveDisplay.innerHTML = '<i class="fa-solid fa-lock-open me-1"></i> Unlocked';
+                            }
+                            if (cardTimer) {
+                                cardTimer.className = 'text-success font-weight-bold font-monospace';
+                                cardTimer.innerText = 'Unlocked';
+                            }
+                            if (banner) {
+                                banner.classList.remove('banner-locked');
+                                banner.classList.add('banner-unlocked');
+                                banner.style.background = 'linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.25))';
+                                banner.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                            }
+                            if (bannerTitle) {
+                                bannerTitle.style.color = '#6EE7B7';
+                                bannerTitle.innerText = 'Fund Unlocked';
+                            }
+                            if (bannerBadge) {
+                                bannerBadge.style.background = 'rgba(16, 185, 129, 0.25)';
+                                bannerBadge.style.color = '#34D399';
+                                bannerBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                                bannerBadge.innerText = 'Fund Unlocked';
+                            }
+                            if (bannerReturnMsg) {
+                                bannerReturnMsg.innerText = 'You are eligible for total return of ' + maxReturnText;
+                            }
+                            if (bannerIconBox) {
+                                bannerIconBox.style.background = 'rgba(16, 185, 129, 0.25)';
+                                bannerIconBox.style.color = '#10B981';
+                            }
+                            if (bannerIcon) {
+                                bannerIcon.className = 'fa-solid fa-lock-open';
+                            }
+                            if (headerBadge) {
+                                headerBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+                                headerBadge.style.color = '#10B981';
+                                headerBadge.style.borderColor = 'rgba(16, 185, 129, 0.45)';
+                                headerBadge.innerHTML = '<i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked';
+                            }
+                            if (cardBadge) {
+                                cardBadge.style.background = 'rgba(16, 185, 129, 0.25)';
+                                cardBadge.style.color = '#10B981';
+                                cardBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                                cardBadge.innerHTML = '<i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked';
+                            }
+                            if (cardHeader) {
+                                cardHeader.style.color = '#34D399';
+                                cardHeader.innerText = 'Fund Unlocked';
+                            }
+                            if (cardSubtext) {
+                                cardSubtext.innerText = 'Trading Unlocked - Full Access';
+                            }
+                            if (walletCardBadge) {
+                                walletCardBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+                                walletCardBadge.style.color = '#10B981';
+                                walletCardBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                                walletCardBadge.innerText = 'Fund Unlocked';
+                            }
+                        }
+
+                        function tick() {
+                            var now = Date.now();
+                            var diff = cfg.unlockTimestamp - now;
+
+                            if (diff <= 0) {
+                                applyUnlockedState();
+                                if (cfg.statusUrl) {
+                                    $.get(cfg.statusUrl).done(function(res) {
+                                        if (res && res.status && res.data && !res.data.is_locked) {
+                                            applyUnlockedState();
+                                        }
+                                    });
+                                }
+                                return;
+                            }
+
+                            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                            var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                            var timeStr = days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
+                            var daysStr = 'Fund Unlocks In ' + (days > 0 ? days : '<1') + ' Days';
+
+                            if (liveDisplay) liveDisplay.innerText = timeStr;
+                            if (cardTimer) cardTimer.innerText = timeStr;
+                            if (bannerBadge) bannerBadge.innerText = daysStr;
+                            if (cardHeader) cardHeader.innerText = daysStr;
+                        }
+
+                        tick();
+                        var timerInterval = setInterval(function() {
+                            if (!cfg.isLocked) {
+                                clearInterval(timerInterval);
+                                return;
+                            }
+                            tick();
+                        }, 1000);
+                    }
+
+                    $(document).ready(function() {
+                        startTradingWalletCountdown();
+                    });
+                })(jQuery);
             </script>
 
         @endsection

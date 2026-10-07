@@ -60,6 +60,30 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::post('/filter-trading-members', [AdminController::class, 'filterTradingMembers'])->name('admin.filterTradingMembers');
     Route::post('/get-trading-member', [AdminController::class, 'getTradingMember'])->name('admin.getTradingMember');
 
+    // Monthly Trading Profit Configuration
+    Route::get('/monthly-trading-profit', [AdminController::class, 'monthlyTradingProfit'])->name('admin.monthlyTradingProfit');
+    Route::get('/monthly_trading_profit', [AdminController::class, 'monthlyTradingProfit']);
+    Route::post('/monthly-trading-profit', [AdminController::class, 'saveMonthlyTradingProfit'])->name('admin.saveMonthlyTradingProfit');
+    Route::post('/save-monthly-trading-profit', [AdminController::class, 'saveMonthlyTradingProfit']);
+
+    // Referral Bonus Configuration
+    Route::get('/referral-bonus', [AdminController::class, 'referralBonus'])->name('admin.referralBonus');
+    Route::get('/referral_bonus', [AdminController::class, 'referralBonus']);
+    Route::post('/referral-bonus', [AdminController::class, 'saveReferralBonus'])->name('admin.saveReferralBonus');
+    Route::post('/save-referral-bonus', [AdminController::class, 'saveReferralBonus']);
+
+    // Team Trading Profit Configuration
+    Route::get('/team-trading-profit', [AdminController::class, 'teamTradingProfit'])->name('admin.teamTradingProfit');
+    Route::get('/team_trading_profit', [AdminController::class, 'teamTradingProfit']);
+    Route::post('/team-trading-profit', [AdminController::class, 'saveTeamTradingProfit'])->name('admin.saveTeamTradingProfit');
+    Route::post('/save-team-trading-profit', [AdminController::class, 'saveTeamTradingProfit']);
+
+    // Daily Team Investment Share Configuration
+    Route::get('/daily-team-investment-share', [AdminController::class, 'dailyTeamInvestmentShare'])->name('admin.dailyTeamInvestmentShare');
+    Route::get('/daily_team_investment_share', [AdminController::class, 'dailyTeamInvestmentShare']);
+    Route::post('/daily-team-investment-share', [AdminController::class, 'saveDailyTeamInvestmentShare'])->name('admin.saveDailyTeamInvestmentShare');
+    Route::post('/save-daily-team-investment-share', [AdminController::class, 'saveDailyTeamInvestmentShare']);
+
     // Color Dashboard
     Route::get('/color-dashboard', [AdminController::class, 'colorDashboard']);
 
@@ -78,11 +102,17 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::get('/achv-image/delete/{id}', [AdminController::class, 'achiversImagesDelete']);
 
     // income routes
+    Route::get('/income/monthly-trading-profit', [AdminController::class, 'roiInc'])->name('admin.income.monthlyTradingProfit');
     Route::get('/income/roi-incomes', [AdminController::class, 'roiInc']);
     Route::get('/income/roi-details', [AdminController::class, 'roiDetails']);
 
-    Route::get('/income/level-incomes', [AdminController::class, 'levelInc']);
+    Route::get('/income/referral-bonus', [AdminController::class, 'directIncomes'])->name('admin.income.referralBonus');
+    Route::get('/income/direct-incomes', [AdminController::class, 'directIncomes'])->name('admin.income.direct');
+    Route::get('/income/team-trading-profit', [AdminController::class, 'stakLevelInc'])->name('admin.income.teamTradingProfit');
     Route::get('/income/staking-level-incomes', [AdminController::class, 'stakLevelInc']);
+    Route::get('/income/daily-team-investment-share', [AdminController::class, 'levelInc'])->name('admin.income.dailyTeamInvestmentShare');
+    Route::get('/income/level-incomes', [AdminController::class, 'levelInc']);
+    Route::get('/income/hero-of-the-month', [AdminController::class, 'heroRewards'])->name('admin.income.heroOfTheMonth');
     Route::get('/income/single-leg-incomes', [AdminController::class, 'singleLegInc']);
     Route::get('/income/partnership-incomes', [AdminController::class, 'partnershipInc']);
     Route::get('/income/partnership-details', [AdminController::class, 'partnershipDetails']);
@@ -218,9 +248,9 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::get('/activation-detail', [ActivationController::class, 'activationDetail'])->name('activationDetail');
 
     //  Staking Routes
-    Route::get('/Staking/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
-    Route::post('/createInvestment', [InvestmentController::class, 'createInvestment'])->name('createInvestment');
-    Route::get('/Staking/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
+    // Route::get('/Staking/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
+    // Route::post('/createInvestment', [InvestmentController::class, 'createInvestment'])->name('createInvestment');
+    // Route::get('/Staking/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
 
     // Partnership Investment Routes
     Route::get('/partnership/create-investment', [PartnershipController::class, 'partCreateInvestment']);
@@ -252,12 +282,19 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::get('/p2p-history', [FundController::class, 'p2pHistory']);
 
     // Income Section
+    Route::get('/income/monthly-trading-profit', [IncomeController::class, 'roiIncome'])->name('member.monthlyTradingProfit');
     Route::get('/income/monthly-staking-income', [IncomeController::class, 'roiIncome']);
+    Route::get('/income/referral-bonus', [IncomeController::class, 'directIncome'])->name('member.referralBonus');
+    Route::get('/income/direct-income', [IncomeController::class, 'directIncome'])->name('member.directIncome');
+    Route::get('/income/team-trading-profit', [IncomeController::class, 'stakingLevelIncome'])->name('member.teamTradingProfit');
     Route::get('/income/staking-level-income', [IncomeController::class, 'stakingLevelIncome']);
+    Route::get('/income/daily-team-investment-share', [IncomeController::class, 'levelIncome'])->name('member.dailyTeamInvestmentShare');
     Route::get('/income/level-income', [IncomeController::class, 'levelIncome']);
+    Route::get('/income/hero-of-the-month', [IncomeController::class, 'heroIncome'])->name('member.heroOfTheMonth');
+    Route::get('/income/partnership-income', [IncomeController::class, 'partnershipIncome'])->name('member.partnershipIncome');
+    Route::get('/income/partnership/investment-incomes', [IncomeController::class, 'partnershipIncome']);
     Route::get('/income/single-leg-income', [IncomeController::class, 'singleLegIncome']);
     Route::get('/income/single-leg-details', [MemberDetailController::class, 'singlrLegDetails'])->name('member.single-leg-details');
-    Route::get('/income/partnership/investment-incomes', [IncomeController::class, 'partnershipIncome']);
     Route::get('/income/team-withdrawal-commission', [IncomeController::class, 'withdrawalCommissionIncome']);
 
     // Withdrawal Section
@@ -274,7 +311,7 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::post('getPrivateKeyPepe', [WithdrawalController::class, 'getPrivateKeyPepe'])->name('getPrivateKeyPepe');
     Route::post('initiatePepeWithdrawal', [WithdrawalController::class, 'initiatePepeWithdrawal'])->name('initiatePepeWithdrawal');
 
-    // Trading Wallet withdrawal validation
+    // Trading Wallet withdrawal validation & live dashboard status
     Route::post('tradingWalletValidate', [WithdrawalController::class, 'tradingWalletValidate'])->name('tradingWalletValidate');
     Route::get('/wallet/trading-withdrawal', [WithdrawalController::class, 'tradingWithdrawal']);
     Route::post('initiateTradingWithdrawal', [WithdrawalController::class, 'initiateTradingWithdrawal'])->name('initiateTradingWithdrawal');

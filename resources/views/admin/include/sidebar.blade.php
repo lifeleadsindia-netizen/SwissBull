@@ -1,4 +1,4 @@
-﻿<div class="app-sidebar colored">
+<div class="app-sidebar colored">
     <div class="sidebar-header">
         <a class="header-brand py-3" href="{{url('admin/dashboard')}}">
             <div class="logo-img text-center ">
@@ -34,12 +34,16 @@
                     <a href="{{ url('admin/notification') }}"><i class="ik ik-bell"></i><span>Notification</span> </a>
                 </div>
 
-                <div class="nav-item {{ (request()->is('*set-packages*') || request()->is('*set_packages*')) ? 'active' : '' }}">
-                    <a href="{{ route('admin.setPackages') }}"><i class="ik ik-sliders"></i><span>{{ __('Set Packages') }}</span></a>
-                </div>
-
-                <div class="nav-item {{ request()->is('*trading-wallet-control*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.tradingWalletControl') }}"><i class="ik ik-pocket"></i><span>{{ __('Trading Wallet Control') }}</span></a>
+                <div class="nav-item {{ (request()->is('*set-packages*') || request()->is('*set_packages*') || request()->is('*trading-wallet-control*') || request()->is('*monthly-trading-profit*') || request()->is('*referral-bonus*') || request()->is('*team-trading-profit*') || request()->is('*daily-team-investment-share*')) ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-sliders"></i><span>{{ __('Plan & Income Configuration') }}</span></a>
+                    <div class="submenu-content">
+                        <a href="{{ route('admin.setPackages') }}" class="menu-item {{ (request()->is('*set-packages*') || request()->is('*set_packages*')) ? 'active' : '' }}">{{ __('Set Packages') }}</a>
+                        <a href="{{ route('admin.tradingWalletControl') }}" class="menu-item {{ request()->is('*trading-wallet-control*') ? 'active' : '' }}">{{ __('Trading Wallet Control') }}</a>
+                        <a href="{{ route('admin.monthlyTradingProfit') }}" class="menu-item {{ request()->is('*monthly-trading-profit*') ? 'active' : '' }}">{{ __('Monthly Trading Profit') }}</a>
+                        <a href="{{ route('admin.referralBonus') }}" class="menu-item {{ request()->is('*referral-bonus*') ? 'active' : '' }}">{{ __('Referral Bonus') }}</a>
+                        <a href="{{ route('admin.teamTradingProfit') }}" class="menu-item {{ request()->is('*team-trading-profit*') ? 'active' : '' }}">{{ __('Team Trading Profit') }}</a>
+                        <a href="{{ route('admin.dailyTeamInvestmentShare') }}" class="menu-item {{ request()->is('*daily-team-investment-share*') ? 'active' : '' }}">{{ __('Daily Team Investment Share') }}</a>
+                    </div>
                 </div>
                 
                 <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
@@ -75,7 +79,6 @@
                         <a href="{{url('admin/member-details')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('Members Details')}}</a>
                         {{-- <a href="{{url('admin/member-security')}}" class="menu-item {{ ($segment1 == 'badges') ? 'active' : '' }}">{{ __('Members Security')}}</a> --}}
                         <a href="{{url('admin/account-control')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('Account Control')}}</a>
-                        <a href="{{ route('admin.tradingWalletControl') }}" class="menu-item {{ request()->is('*trading-wallet-control*') ? 'active' : '' }}">{{ __('Trading Wallet Control') }}</a>
                         <a href="{{ url('admin/wallet-address') }}"
                             class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __('Member Wallet Address') }}</a>
                         <a href="{{url('admin/package-details')}}" class="menu-item {{ ($segment1 == 'alerts') ? 'active' : '' }}">{{ __('Package Details')}}</a>
@@ -96,32 +99,30 @@
                 
                 
                  <div
-                    class="nav-item {{ $segment1 == 'alerts' || $segment1 == 'buttons' || $segment1 == 'badges' || $segment1 == 'navigation' ? 'active open' : '' }} has-sub">
+                    class="nav-item {{ (request()->is('*roi*') || request()->is('*monthly-trading-profit*') || $segment1 == 'alerts' || $segment1 == 'buttons' || $segment1 == 'badges' || $segment1 == 'navigation') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-credit-card"></i><span>{{ __('ROI Section') }}</span></a>
                     <div class="submenu-content">
-
-                        <a href="{{ url('admin/income/roi-incomes') }}"
-                            class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __(' Roi Income') }}</a>
+                        <a href="{{ url('admin/income/monthly-trading-profit') }}"
+                            class="menu-item {{ (request()->is('*monthly-trading-profit') || request()->is('*roi-incomes*')) ? 'active' : '' }}">{{ __('Monthly Trading Profit') }}</a>
                         <a href="{{ url('admin/income/roi-details') }}"
-                            class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __(' Roi Details') }}</a>
+                            class="menu-item {{ request()->is('*roi-details*') ? 'active' : '' }}">{{ __('Trading Profit Details') }}</a>
                     </div>
                 </div>
 
-
                 <div
-                    class="nav-item {{ $segment1 == 'alerts' || $segment1 == 'buttons' || $segment1 == 'badges' || $segment1 == 'navigation' ? 'active open' : '' }} has-sub">
+                    class="nav-item {{ (request()->is('*income*') || request()->is('*referral-bonus*') || $segment1 == 'alerts' || $segment1 == 'buttons' || $segment1 == 'badges' || $segment1 == 'navigation') ? 'active open' : '' }} has-sub">
                     <a href="#"><i class="ik ik-dollar-sign"></i><span>{{ __('Income Section') }}</span></a>
                     <div class="submenu-content">
-
-                        <a href="{{ url('admin/income/staking-level-incomes') }}"
-                            class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __('Staking Level Income') }}</a>
-                        <a href="{{ url('admin/income/level-incomes') }}"
-                            class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __('Level Income') }}</a>
+                        <a href="{{ url('admin/income/referral-bonus') }}"
+                            class="menu-item {{ (request()->is('*referral-bonus*') || request()->is('*direct-incomes*')) ? 'active' : '' }}">{{ __('Referral Bonus') }}</a>
+                        <a href="{{ url('admin/income/team-trading-profit') }}"
+                            class="menu-item {{ (request()->is('*team-trading-profit*') || request()->is('*staking-level-incomes*')) ? 'active' : '' }}">{{ __('Team Trading Profit') }}</a>
+                        <a href="{{ url('admin/income/daily-team-investment-share') }}"
+                            class="menu-item {{ (request()->is('*daily-team-investment-share*') || request()->is('*level-incomes*')) ? 'active' : '' }}">{{ __('Daily Team Investment Share') }}</a>
+                        <a href="{{ url('admin/income/hero-of-the-month') }}"
+                            class="menu-item {{ request()->is('*hero-of-the-month*') ? 'active' : '' }}">{{ __('Hero of the Month') }}</a>
                         <a href="{{ url('admin/income/single-leg-incomes') }}"
-                            class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __('Single Leg Income') }}</a>
-                        <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}"
-                            class="menu-item {{ $segment1 == 'badges' ? 'active' : '' }}">{{ __('Team Withdrawal Commission') }}</a>
-
+                            class="menu-item {{ request()->is('*single-leg-incomes*') ? 'active' : '' }}">{{ __('Single Leg Income') }}</a>
                     </div>
                 </div>
 

@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\AchiversImage;
 use App\Models\Admin;
+use App\Models\DailyTeamInvestmentShareConfiction;
 use App\Models\DashMessage;
 use App\Models\DirectIncome;
+use App\Models\HeroOfTheMonthReward;
 use App\Models\ImportFund;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
+use App\Models\MonthlyTradingProfitConfiction;
 use App\Models\Notification;
 use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
@@ -16,11 +19,13 @@ use App\Models\PackagePlan;
 use App\Models\PartnershipDetail;
 use App\Models\PartnershipIncome;
 use App\Models\PepeSetting;
+use App\Models\ReferralBonusConfiction;
 use App\Models\RoiLevelIncome;
 use App\Models\SetRate;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
+use App\Models\TeamTradingProfitConfiction;
 use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
@@ -504,14 +509,13 @@ class AdminController extends Controller
             'payment_date' => 'payment_date',
             'request_date' => 'request_date',
         ];
-       $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal']]);
+        $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'payment_date', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
         // 2nd Tab: PEPE Tokens Payment History
         $pepeQuery = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Airdrop Withdrawal']]);
         $pepeData = (clone $pepeQuery)->orderby('payment_date', 'desc')->get();
-
 
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -524,7 +528,7 @@ class AdminController extends Controller
         return view('admin.payment-history')->with($result);
     }
 
-   public function newWithdrawelRequest(Request $request)
+    public function newWithdrawelRequest(Request $request)
     {
         $allowedColumns = [
             'request_date' => 'Request Date',
@@ -809,6 +813,216 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Display Monthly Trading Profit dynamic configuration page.
+     */
+    public function monthlyTradingProfit()
+    {
+        $packages = PackagePlan::orderBy('min_amount', 'asc')->get();
+        $configurations = MonthlyTradingProfitConfiction::all()->keyBy('package_id');
+        $cappingPercent = MonthlyTradingProfitConfiction::getCappingPercent();
+
+        return view('admin.monthly-trading-profit', compact('packages', 'configurations', 'cappingPercent'));
+    }
+
+    /**
+     * Save or update Monthly Trading Profit dynamic configuration.
+     */
+    public function saveMonthlyTradingProfit(Request $request)
+    {
+        $packages = PackagePlan::orderBy('min_amount', 'asc')->get();
+
+        $rules = [
+            'capping_percent' => 'required|numeric|min:0',
+            'rates' => 'nullable|array',
+            'rates.*' => 'nullable|numeric|min:0|max:100',
+            'package_1_rate' => 'nullable|numeric|min:0|max:100',
+            'package_2_rate' => 'nullable|numeric|min:0|max:100',
+            'package_3_rate' => 'nullable|numeric|min:0|max:100',
+        ];
+
+        $request->validate($rules, [
+            'capping_percent.required' => 'Please enter Monthly Trading Profit Capping (%).',
+            'capping_percent.numeric' => 'Monthly Trading Profit Capping must be a valid number.',
+            'capping_percent.min' => 'Monthly Trading Profit Capping cannot be negative.',
+        ]);
+
+        $cappingPercent = (float) $request->input('capping_percent');
+        $submittedRates = $request->input('rates', []);
+
+        $orderedRates = [];
+        foreach ($packages as $index => $package) {
+            $key = $package->id;
+            $fallbackField = 'package_'.($index + 1).'_rate';
+            $rateVal = isset($submittedRates[$key])
+                ? (float) $submittedRates[$key]
+                : (float) $request->input($fallbackField, 0.00);
+
+            $orderedRates[$index] = $rateVal;
+
+            MonthlyTradingProfitConfiction::updateOrCreate(
+                ['package_id' => $package->id],
+                [
+                    'rate' => $rateVal,
+                    'rate_percent' => $rateVal,
+                    'capping_percent' => $cappingPercent,
+                    'package_1_rate' => $orderedRates[0] ?? $rateVal,
+                    'package_2_rate' => $orderedRates[1] ?? 0.00,
+                    'package_3_rate' => $orderedRates[2] ?? 0.00,
+                ]
+            );
+        }
+
+        MonthlyTradingProfitConfiction::query()->update([
+            'capping_percent' => $cappingPercent,
+            'package_1_rate' => $orderedRates[0] ?? 0.00,
+            'package_2_rate' => $orderedRates[1] ?? 0.00,
+            'package_3_rate' => $orderedRates[2] ?? 0.00,
+        ]);
+
+        session()->flash('successMsg', 'Monthly Trading Profit configuration saved successfully.');
+
+        return redirect()->route('admin.monthlyTradingProfit');
+    }
+
+    /**
+     * Display Referral Bonus dynamic configuration page.
+     */
+    public function referralBonus()
+    {
+        $setting = ReferralBonusConfiction::getActiveSetting();
+
+        return view('admin.referral-bonus', compact('setting'));
+    }
+
+    /**
+     * Save or update Referral Bonus dynamic configuration.
+     */
+    public function saveReferralBonus(Request $request)
+    {
+        $rules = [
+            'level_1_rate' => 'required|numeric|min:0|max:100',
+            'level_2_rate' => 'required|numeric|min:0|max:100',
+            'level_3_rate' => 'required|numeric|min:0|max:100',
+        ];
+
+        $request->validate($rules, [
+            'level_1_rate.required' => 'Please enter Level-1 Rate (%).',
+            'level_1_rate.numeric' => 'Level-1 Rate must be a valid number.',
+            'level_1_rate.min' => 'Level-1 Rate cannot be negative.',
+            'level_1_rate.max' => 'Level-1 Rate cannot exceed 100%.',
+            'level_2_rate.required' => 'Please enter Level-2 Rate (%).',
+            'level_2_rate.numeric' => 'Level-2 Rate must be a valid number.',
+            'level_2_rate.min' => 'Level-2 Rate cannot be negative.',
+            'level_2_rate.max' => 'Level-2 Rate cannot exceed 100%.',
+            'level_3_rate.required' => 'Please enter Level-3 Rate (%).',
+            'level_3_rate.numeric' => 'Level-3 Rate must be a valid number.',
+            'level_3_rate.min' => 'Level-3 Rate cannot be negative.',
+            'level_3_rate.max' => 'Level-3 Rate cannot exceed 100%.',
+        ]);
+
+        $setting = ReferralBonusConfiction::getActiveSetting();
+        $setting->level_1_rate = (float) $request->input('level_1_rate');
+        $setting->level_2_rate = (float) $request->input('level_2_rate');
+        $setting->level_3_rate = (float) $request->input('level_3_rate');
+        $setting->save();
+
+        session()->flash('successMsg', 'Referral Bonus configuration saved successfully.');
+
+        return redirect()->route('admin.referralBonus');
+    }
+
+    /**
+     * Display Team Trading Profit dynamic configuration page.
+     */
+    public function teamTradingProfit()
+    {
+        $setting = TeamTradingProfitConfiction::getActiveSetting();
+
+        return view('admin.team-trading-profit', compact('setting'));
+    }
+
+    /**
+     * Save or update Team Trading Profit dynamic configuration.
+     */
+    public function saveTeamTradingProfit(Request $request)
+    {
+        $rules = [];
+        $messages = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $rules["level_{$i}_rate"] = 'required|numeric|min:0|max:100';
+            $messages["level_{$i}_rate.required"] = "Please enter Level-{$i} Rate (%).";
+            $messages["level_{$i}_rate.numeric"] = "Level-{$i} Rate must be a valid number.";
+            $messages["level_{$i}_rate.min"] = "Level-{$i} Rate cannot be negative.";
+            $messages["level_{$i}_rate.max"] = "Level-{$i} Rate cannot exceed 100%.";
+        }
+
+        $request->validate($rules, $messages);
+
+        $setting = TeamTradingProfitConfiction::getActiveSetting();
+        for ($i = 1; $i <= 10; $i++) {
+            $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
+        }
+        $setting->save();
+
+        session()->flash('successMsg', 'Team Trading Profit configuration saved successfully.');
+
+        return redirect()->route('admin.teamTradingProfit');
+    }
+
+    /**
+     * Display Daily Team Investment Share dynamic configuration page.
+     */
+    public function dailyTeamInvestmentShare()
+    {
+        $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
+
+        return view('admin.daily-team-investment-share', compact('setting'));
+    }
+
+    /**
+     * Save or update Daily Team Investment Share dynamic configuration.
+     */
+    public function saveDailyTeamInvestmentShare(Request $request)
+    {
+        $rules = [
+            'level_1_directs' => 'required|integer|min:0',
+        ];
+        $messages = [
+            'level_1_directs.required' => 'Please enter Level-1 Direct Referral requirement.',
+            'level_1_directs.integer' => 'Level-1 Direct Referral requirement must be a whole number.',
+            'level_1_directs.min' => 'Level-1 Direct Referral requirement cannot be negative.',
+        ];
+
+        for ($i = 1; $i <= 10; $i++) {
+            $rules["level_{$i}_rate"] = 'required|numeric|min:0|max:100';
+            $messages["level_{$i}_rate.required"] = "Please enter Level-{$i} Rate (%).";
+            $messages["level_{$i}_rate.numeric"] = "Level-{$i} Rate must be a valid number.";
+            $messages["level_{$i}_rate.min"] = "Level-{$i} Rate cannot be negative.";
+            $messages["level_{$i}_rate.max"] = "Level-{$i} Rate cannot exceed 100%.";
+
+            if ($i > 1) {
+                $rules["level_{$i}_directs"] = 'nullable|integer|min:0';
+            }
+        }
+
+        $request->validate($rules, $messages);
+
+        $level1Directs = (int) $request->input('level_1_directs');
+        $directsChain = DailyTeamInvestmentShareConfiction::calculateDirectsChain($level1Directs);
+
+        $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
+        for ($i = 1; $i <= 10; $i++) {
+            $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
+            $setting->{"level_{$i}_directs"} = $directsChain[$i];
+        }
+        $setting->save();
+
+        session()->flash('successMsg', 'Daily Team Investment Share configuration saved successfully.');
+
+        return redirect()->route('admin.dailyTeamInvestmentShare');
+    }
+
     public function achiversImages()
     {
         $result['data'] = AchiversImage::all();
@@ -1058,11 +1272,24 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
-            'pageTitle' => 'Direct Incomes',
-            'action' => url('admin/incomes/direct-incomes'),
+            'pageTitle' => 'Referral Bonus',
+            'action' => url('admin/income/referral-bonus'),
         ]);
 
-        return view('admin.income.singleleg-incomes')->with($result);
+        return view('admin.income.direct-incomes')->with($result);
+    }
+
+    public function heroRewards(Request $request)
+    {
+        $query = HeroOfTheMonthReward::query();
+        $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        $result = array_merge($filterMeta, [
+            'data' => $query->orderby('created_at', 'desc')->get(),
+            'pageTitle' => 'Hero of the Month Rewards',
+            'action' => url('admin/income/hero-of-the-month'),
+        ]);
+
+        return view('admin.income.hero-rewards')->with($result);
     }
 
     public function partnershipInc(Request $request)

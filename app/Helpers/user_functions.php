@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Country;
+use App\Models\DirectIncome;
+use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PartnershipIncome;
@@ -26,21 +28,21 @@ function getName($memberid)
 {
     $member = MemberDetail::where('memberid', $memberid)->first();
 
-    return $member->name;
+    return $member ? $member->name : ($memberid ?? 'N/A');
 }
 
 function getMobile($memberid)
 {
     $member = MemberDetail::where('memberid', $memberid)->first();
 
-    return $member->mobile;
+    return $member ? $member->mobile : '';
 }
 
 function getMobileCode($memberid)
 {
     $member = MemberDetail::where('memberid', $memberid)->first();
 
-    return $member->phonecode;
+    return $member ? $member->phonecode : '';
 }
 
 function updateDownline($sponsorid)
@@ -170,9 +172,49 @@ function totalMemberTeamWithdrawalCommissionIncome($memberid)
     return $sum;
 }
 
+function totalMemberDirectIncome($memberid)
+{
+    $sum = DirectIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
+
+    return $sum;
+}
+
+function totalMemberHeroOfTheMonthIncome($memberid)
+{
+    $sum = HeroOfTheMonthReward::where([['memberid', $memberid], ['status', 'Paid']])->sum('prize_amount');
+
+    return $sum;
+}
+
+function totalMemberMonthlyTradingProfit($memberid)
+{
+    return totalMemberRoiIncome($memberid);
+}
+
+function totalMemberReferralBonus($memberid)
+{
+    return totalMemberDirectIncome($memberid);
+}
+
+function totalMemberTeamTradingProfit($memberid)
+{
+    return totalMemberStakingLevelIncome($memberid);
+}
+
+function totalMemberDailyTeamInvestmentShare($memberid)
+{
+    return totalMemberLevelIncome($memberid);
+}
+
 function totalIncome($memberid)
 {
-    $sum = totalMemberRoiIncome($memberid) + totalMemberStakingLevelIncome($memberid) + totalMemberLevelIncome($memberid) + totalMemberSingleLegIncome($memberid) + totalMemberPartnershipIncome($memberid) + totalMemberTeamWithdrawalCommissionIncome($memberid);
+    $sum = totalMemberRoiIncome($memberid)
+        + totalMemberDirectIncome($memberid)
+        + totalMemberStakingLevelIncome($memberid)
+        + totalMemberLevelIncome($memberid)
+        + totalMemberHeroOfTheMonthIncome($memberid)
+        + totalMemberPartnershipIncome($memberid)
+        + totalMemberSingleLegIncome($memberid);
 
     return $sum;
 }

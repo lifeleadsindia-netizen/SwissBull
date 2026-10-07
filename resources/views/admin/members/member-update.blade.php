@@ -50,10 +50,10 @@
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-4">
-                                        @if ($data['profile_image']== NULL)
-                                          <img  src="{{ asset('uploads/avatar.jpg')}}" alt="" style="width: 90%">
+                                        @if (!empty($data['profile_image']) && file_exists(public_path('uploads/' . $data['profile_image'])))
+                                          <img  src="{{ asset('uploads')}}/{{$data['profile_image']}}" onerror="this.onerror=null;this.src='{{ asset('uploads/avatar.jpg') }}';" alt="" style="width: 90%">
                                         @else
-                                          <img  src="{{ asset('uploads')}}/{{$data['profile_image']}}" alt="" style="width: 90%">
+                                          <img  src="{{ asset('uploads/avatar.jpg')}}" alt="" style="width: 90%">
                                         @endif
                                         <img src=""/>
                                     </div>
