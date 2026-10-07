@@ -23,7 +23,7 @@ class TradingWalletSetting extends Model
         $setting = static::first();
         if (! $setting) {
             $setting = static::create([
-                'lock_days' => 30,
+                'lock_days' => 90,
                 'withdrawal_percent' => 100.00,
             ]);
         }
@@ -36,7 +36,7 @@ class TradingWalletSetting extends Model
      */
     public static function getDefaultLockDays(): int
     {
-        return (int) (static::getActiveSetting()->lock_days ?? 30);
+        return (int) (static::getActiveSetting()->lock_days ?? 90);
     }
 
     /**

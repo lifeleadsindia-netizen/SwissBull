@@ -9,19 +9,10 @@ class MemberDetail extends Model
 {
     protected $guarded = [];
 
-    protected $attributes = [
-        'trading_wallet_lock_days' => 0,
-        'trading_wallet_withdrawal_percent' => 100.00,
-    ];
-
     protected $casts = [
         'file_read' => 'array',
         'pepe_wallet' => 'float',
         'p2p_wallet' => 'float',
-        'trading_wallet_lock_days' => 'integer',
-        'trading_wallet_lock_applied_at' => 'datetime',
-        'trading_wallet_locked_until' => 'datetime',
-        'trading_wallet_withdrawal_percent' => 'float',
     ];
 
     public function whatsappReferrals()
@@ -30,7 +21,23 @@ class MemberDetail extends Model
     }
 
     /**
-     * Relationship: Member has many package details.
+     * Relationship: Member has many staking details (Package/Activation source).
+     */
+    public function stakingDetails()
+    {
+        return $this->hasMany(StakingDetail::class, 'memberid', 'memberid');
+    }
+
+    /**
+     * Relationship: Member's latest staking detail.
+     */
+    public function latestStakingDetail()
+    {
+        return $this->hasOne(StakingDetail::class, 'memberid', 'memberid')->latestOfMany('created_at');
+    }
+
+    /**
+     * Relationship: Member has many package details (Preserved for other modules).
      */
     public function packageDetails()
     {
@@ -62,22 +69,61 @@ class MemberDetail extends Model
     }
 
     /**
-     * Check if the member's trading wallet is currently locked.
-     * Verifies member lock date or active package lock in package_details.
+     * Accessor: Default lock days from active setting.
+     */
+    public function getTradingWalletLockDaysAttribute(): int
+    {
+        return TradingWalletSetting::getDefaultLockDays();
+    }
+
+    /**
+     * Accessor: Default maximum withdrawal percentage from active setting.
+     */
+    public function getTradingWalletWithdrawalPercentAttribute(): float
+    {
+        return TradingWalletSetting::getDefaultWithdrawalPercent();
+    }
+
+    /**
+     * Accessor: Dynamic locked until timestamp.
+     */
+    public function getTradingWalletLockedUntilAttribute(): ?Carbon
+    {
+        return $this->tradingWalletLockedUntil();
+    }
+
+    /**
+     * Get the latest unlock timestamp across member's staking details.
+     */
+    public function tradingWalletLockedUntil(): ?Carbon
+    {
+        $stakings = $this->relationLoaded('stakingDetails')
+            ? $this->stakingDetails
+            : $this->stakingDetails()->get();
+
+        $latest = null;
+        foreach ($stakings as $stk) {
+            $unl = $stk->locked_until;
+            if ($unl && (! $latest || $unl->gt($latest))) {
+                $latest = $unl;
+            }
+        }
+
+        return $latest;
+    }
+
+    /**
+     * Check if the member's trading wallet is currently locked based on staking_details.
      */
     public function isTradingWalletLocked(): bool
     {
-        if ($this->trading_wallet_locked_until && now()->lt($this->trading_wallet_locked_until)) {
-            return true;
-        }
+        $stakings = $this->relationLoaded('stakingDetails')
+            ? $this->stakingDetails
+            : $this->stakingDetails()->get();
 
-        if ($this->relationLoaded('packageDetails')) {
-            return $this->packageDetails->contains(function ($pkg) {
-                return $pkg->locked_until && now()->lt($pkg->locked_until);
-            });
-        }
-
-        return $this->packageDetails()->where('locked_until', '>', now())->exists();
+        return $stakings->contains(function ($stk) {
+            return $stk->isLocked();
+        });
     }
 
     /**
@@ -85,24 +131,12 @@ class MemberDetail extends Model
      */
     public function tradingWalletRemainingLockDays(): int
     {
-        if (! $this->isTradingWalletLocked()) {
+        $lockedUntil = $this->tradingWalletLockedUntil();
+        if (! $lockedUntil || now()->gte($lockedUntil)) {
             return 0;
         }
 
-        $latestLockedUntil = $this->trading_wallet_locked_until;
-        $pkgLockedUntil = $this->packageDetails()->where('locked_until', '>', now())->max('locked_until');
-        if ($pkgLockedUntil) {
-            $pkgCarbon = Carbon::parse($pkgLockedUntil);
-            if (! $latestLockedUntil || $pkgCarbon->gt($latestLockedUntil)) {
-                $latestLockedUntil = $pkgCarbon;
-            }
-        }
-
-        if (! $latestLockedUntil) {
-            return 0;
-        }
-
-        return (int) ceil(now()->diffInSeconds($latestLockedUntil, false) / 86400);
+        return (int) ceil(now()->diffInSeconds($lockedUntil, false) / 86400);
     }
 
     /**
@@ -114,7 +148,7 @@ class MemberDetail extends Model
             return 0.00;
         }
 
-        $percent = $this->trading_wallet_withdrawal_percent ?? 100.00;
+        $percent = TradingWalletSetting::getDefaultWithdrawalPercent();
         $balance = (float) ($this->p2p_wallet ?? 0.00);
         $max = ($balance * (float) $percent) / 100.00;
 
@@ -132,10 +166,10 @@ class MemberDetail extends Model
             return false;
         }
 
-        // CONDITION A: Trading Wallet Lock
+        // CONDITION A: Trading Wallet Lock (sourced from staking_details)
         if ($this->isTradingWalletLocked()) {
             $remaining = $this->tradingWalletRemainingLockDays();
-            $until = $this->trading_wallet_locked_until ? $this->trading_wallet_locked_until->format('d M Y') : 'lock expiry';
+            $until = $this->tradingWalletLockedUntil() ? $this->tradingWalletLockedUntil()->format('d M Y') : 'lock expiry';
             $errorMessage = "Trading Wallet is locked for {$remaining} more day(s) (until {$until}). Withdrawal is not allowed during the lock period.";
 
             return false;
@@ -152,7 +186,7 @@ class MemberDetail extends Model
         // CONDITION B: Maximum Withdrawal Percentage (Post-lock)
         $maxWithdrawable = $this->tradingWalletMaxWithdrawable();
         if ($amount > $maxWithdrawable) {
-            $percent = $this->trading_wallet_withdrawal_percent ?? 100.00;
+            $percent = TradingWalletSetting::getDefaultWithdrawalPercent();
             $errorMessage = 'Requested amount ($'.number_format($amount, 2).") exceeds the maximum allowed withdrawal limit of {$percent}% ($".number_format($maxWithdrawable, 2).') from your Trading Wallet.';
 
             return false;
@@ -169,14 +203,7 @@ class MemberDetail extends Model
     {
         if ($this->isTradingWalletLocked()) {
             $remaining = $this->tradingWalletRemainingLockDays();
-            $latestLockedUntil = $this->trading_wallet_locked_until;
-            if (! $latestLockedUntil) {
-                $pkgLockedUntil = $this->packageDetails()->where('locked_until', '>', now())->max('locked_until');
-                if ($pkgLockedUntil) {
-                    $latestLockedUntil = Carbon::parse($pkgLockedUntil);
-                }
-            }
-            $until = $latestLockedUntil instanceof Carbon ? $latestLockedUntil->format('d M Y') : ($latestLockedUntil ? Carbon::parse($latestLockedUntil)->format('d M Y') : 'lock expiry');
+            $until = $this->tradingWalletLockedUntil() ? $this->tradingWalletLockedUntil()->format('d M Y') : 'lock expiry';
             $errorMessage = "Package purchase is locked. You cannot purchase or apply for another package during the active Lock Period ({$remaining} day(s) remaining until {$until}).";
 
             return false;
@@ -186,18 +213,11 @@ class MemberDetail extends Model
     }
 
     /**
-     * Apply Trading Wallet Lock and Withdrawal Percentage to the member.
+     * Apply Trading Wallet Lock and Withdrawal Percentage.
+     * Maintains backwards compatibility without altering member_details schema.
      */
     public function applyTradingWalletLock(?int $lockDays = null, ?float $withdrawalPercent = null, ?Carbon $appliedAt = null): void
     {
-        $setting = TradingWalletSetting::getActiveSetting();
-        $lockDays = $lockDays !== null ? $lockDays : $setting->lock_days;
-        $withdrawalPercent = $withdrawalPercent !== null ? $withdrawalPercent : $setting->withdrawal_percent;
-        $appliedAt = $appliedAt ?? now();
-
-        $this->trading_wallet_lock_days = $lockDays;
-        $this->trading_wallet_lock_applied_at = $appliedAt;
-        $this->trading_wallet_locked_until = $lockDays > 0 ? $appliedAt->copy()->addDays($lockDays) : null;
-        $this->trading_wallet_withdrawal_percent = $withdrawalPercent;
+        // Lock calculation is anchored dynamically to staking_details.created_at + TradingWalletSetting.
     }
 }
