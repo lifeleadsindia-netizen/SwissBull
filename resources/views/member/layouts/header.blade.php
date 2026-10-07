@@ -1434,6 +1434,13 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ url('/member/trading-dashboard') }}" aria-expanded="false">
+                                <i class="material-symbols-outlined notranslate" translate="no"
+                                    data-icon="candlestick_chart">candlestick_chart</i>
+                                <span class="nav-text">Trading Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ url('/member/notifications') }}" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="notifications">notifications</i>

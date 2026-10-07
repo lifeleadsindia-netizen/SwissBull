@@ -206,6 +206,7 @@ Route::post('/verify_register_otp', [MemberDetailController::class, 'verifyRegis
 Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
 
     Route::get('/dashboard', [MemberDetailController::class, 'dashboard']);
+    Route::get('/trading-dashboard', [MemberDetailController::class, 'tradingDashboard'])->name('member.tradingDashboard');
     Route::get('/tour', [MemberDetailController::class, 'tour']);
     Route::get('/logout', [MemberDetailController::class, 'logout']);
 
