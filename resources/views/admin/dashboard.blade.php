@@ -364,49 +364,49 @@
                         $partVal = (float) totalAdminPartnershipIncome();
                         $slegVal = (float) totalAdminSingleLegIncome();
 
-                        // Circumference for r=38 is ~238.8
-                        $circ = 238.8;
+                        // Circumference for r=48 is ~301.6
+                        $circ = 301.6;
                         if ($totVal > 0) {
-                            $lenRoi = max(6, ($roiVal / $totVal) * $circ);
-                            $lenDir = max(6, ($dirVal / $totVal) * $circ);
-                            $lenStk = max(6, ($stkVal / $totVal) * $circ);
-                            $lenLvl = max(6, ($lvlVal / $totVal) * $circ);
-                            $lenHero = max(6, ($heroVal / $totVal) * $circ);
-                            $lenPart = max(6, ($partVal / $totVal) * $circ);
+                            $lenRoi = max(8, ($roiVal / $totVal) * $circ);
+                            $lenDir = max(8, ($dirVal / $totVal) * $circ);
+                            $lenStk = max(8, ($stkVal / $totVal) * $circ);
+                            $lenLvl = max(8, ($lvlVal / $totVal) * $circ);
+                            $lenHero = max(8, ($heroVal / $totVal) * $circ);
+                            $lenPart = max(8, ($partVal / $totVal) * $circ);
                         } else {
-                            $lenRoi = 45;
-                            $lenDir = 40;
-                            $lenStk = 38;
-                            $lenLvl = 38;
-                            $lenHero = 35;
-                            $lenPart = 35;
+                            $lenRoi = 55;
+                            $lenDir = 50;
+                            $lenStk = 48;
+                            $lenLvl = 45;
+                            $lenHero = 45;
+                            $lenPart = 40;
                         }
                     @endphp
 
                     <div class="adm-summary-content">
                         <!-- Donut Chart -->
                         <div class="adm-donut-wrap">
-                            <svg class="adm-donut-svg" viewBox="0 0 100 100">
+                            <svg class="adm-donut-svg" viewBox="0 0 120 120">
                                 <!-- Background Circle -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F1F5F9" stroke-width="12"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F1F5F9" stroke-width="8"/>
                                 <!-- Segment 1: Blue (Monthly Trading Profit) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3B82F6" stroke-width="12"
-                                    stroke-dasharray="{{ number_format($lenRoi, 1) }} 238.8" stroke-dashoffset="0" stroke-linecap="round"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#3B82F6" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenRoi, 1) }} 301.6" stroke-dashoffset="0" stroke-linecap="round"/>
                                 <!-- Segment 2: Orange (Referral Bonus) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F97316" stroke-width="12"
-                                    stroke-dasharray="{{ number_format($lenDir, 1) }} 238.8" stroke-dashoffset="-{{ number_format($lenRoi + 4, 1) }}" stroke-linecap="round"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F97316" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenDir, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + 4, 1) }}" stroke-linecap="round"/>
                                 <!-- Segment 3: Emerald (Team Trading Profit) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#10B981" stroke-width="12"
-                                    stroke-dasharray="{{ number_format($lenStk, 1) }} 238.8" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + 8, 1) }}" stroke-linecap="round"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#10B981" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenStk, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + 8, 1) }}" stroke-linecap="round"/>
                                 <!-- Segment 4: Amber (Daily Team Investment Share) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F59E0B" stroke-width="12"
-                                    stroke-dasharray="{{ number_format($lenLvl, 1) }} 238.8" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + 12, 1) }}" stroke-linecap="round"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F59E0B" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenLvl, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + 12, 1) }}" stroke-linecap="round"/>
                                 <!-- Segment 5: Purple (Hero of the Month) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#8B5CF6" stroke-width="12"
-                                    stroke-dasharray="{{ number_format($lenHero, 1) }} 238.8" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + 16, 1) }}" stroke-linecap="round"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#8B5CF6" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenHero, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + 16, 1) }}" stroke-linecap="round"/>
                                 <!-- Segment 6: Pink (Partnership Income) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#EC4899" stroke-width="12"
-                                    stroke-dasharray="{{ number_format($lenPart, 1) }} 238.8" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + $lenHero + 20, 1) }}" stroke-linecap="round"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#EC4899" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenPart, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + $lenHero + 20, 1) }}" stroke-linecap="round"/>
                             </svg>
                             <div class="adm-donut-center">
                                 <h4>$ {{ number_format((float) totalIn(), 2) }}</h4>

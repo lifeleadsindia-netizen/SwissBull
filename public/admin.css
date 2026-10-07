@@ -788,9 +788,9 @@ body#app,
 
 .adm-donut-wrap {
     position: relative;
-    width: 145px;
-    height: 145px;
-    margin: 2px auto 6px auto;
+    width: 180px;
+    height: 180px;
+    margin: 4px auto 10px auto;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -805,26 +805,35 @@ body#app,
 
 .adm-donut-center {
     position: absolute;
+    width: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     pointer-events: none;
+    padding: 0 4px;
 }
 
 .adm-donut-center h4 {
-    font-size: 18px;
+    font-size: clamp(14px, 3.8vw, 17.5px);
     font-weight: 800;
     color: #0f172a;
     margin: 0;
+    line-height: 1.2;
     letter-spacing: -0.02em;
     white-space: nowrap;
+    max-width: 126px;
 }
 
 .adm-donut-center span {
-    font-size: 10.5px;
+    font-size: 10px;
     color: var(--adm-text-muted);
-    font-weight: 600;
+    font-weight: 700;
     display: block;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
 }
 
 /* Income Legend List */
