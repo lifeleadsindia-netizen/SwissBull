@@ -313,7 +313,8 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
 
     // Trading Wallet withdrawal validation & live dashboard status
     Route::post('tradingWalletValidate', [WithdrawalController::class, 'tradingWalletValidate'])->name('tradingWalletValidate');
-    Route::get('trading-wallet/status', [MemberDetailController::class, 'getTradingWalletStatus'])->name('member.tradingWalletStatus');
+    Route::get('/wallet/trading-withdrawal', [WithdrawalController::class, 'tradingWithdrawal']);
+    Route::post('initiateTradingWithdrawal', [WithdrawalController::class, 'initiateTradingWithdrawal'])->name('initiateTradingWithdrawal');
 
     // Geneology Section
     Route::get('/team/geneology', [MemberDetailController::class, 'geneology'])->name('member.team.geneology');

@@ -6,12 +6,14 @@ use App\Models\Country;
 use App\Models\MemberDetail;
 use App\Models\PepeSetting;
 use App\Models\SingleLegIncome;
+use App\Models\StakingDetail;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalRequest;
 use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class WithdrawalController extends Controller
 {
@@ -150,6 +152,7 @@ class WithdrawalController extends Controller
         $requestid = 'RQ'.time();
 
         $check = WithdrawalRequest::where('request_id', $requestid)->first();
+
         if (! $check) {
             $mem = MemberDetail::where('memberid', $memberid)->first();
             $memberid = $mem->memberid;
@@ -169,6 +172,7 @@ class WithdrawalController extends Controller
 
             walletTransfer($memberid, $amount, 'credit', $wallet, 'Withdrawal', ' $ '.$amount.' have been withdrawn by Member from wallet. Payment Id-'.$var->id);
             session()->flash('successMsg', 'Withdrawal request has been created successfully. Amount will be transfered into wallet after transaction validation');
+
             return redirect()->back();
         }
     }
@@ -179,7 +183,7 @@ class WithdrawalController extends Controller
         $country = session('country');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
         $result['country'] = Country::where('name', $country)->first();
-        $result['reqdata'] = WithdrawalRequest::where([['memberid', $memberid],['type', 'Wallet']])->orderBy('created_at', 'desc')->get();
+        $result['reqdata'] = WithdrawalRequest::where([['memberid', $memberid], ['type', 'Wallet']])->orderBy('created_at', 'desc')->get();
 
         return view('member.wallet.withdrawal-history')->with($result);
     }
@@ -615,11 +619,11 @@ class WithdrawalController extends Controller
             ->where('type', 'Airdrop Withdrawal')
             ->where('status', 'Approved')
             ->sum('gross_amount');
-            
+
         $promoAvailable = max(0, $totalEarned - $totalRedeemed);
         $walletBalance = (float) ($result['data']->pepe_wallet ?? 0);
         $availablePepe = max($walletBalance, $promoAvailable);
-        
+
         $result['availablePepe'] = $availablePepe;
         $result['totalEarned'] = $totalEarned;
         $result['totalRedeemed'] = $totalRedeemed;
@@ -629,7 +633,7 @@ class WithdrawalController extends Controller
 
     public function initPepeWithdrawalForm(Request $request)
     {
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'memberid' => 'required',
             'amount' => 'required|numeric|min:1',
         ]);
@@ -643,14 +647,14 @@ class WithdrawalController extends Controller
 
         $memberData = MemberDetail::where('memberid', $memberid)->first();
         $Status = $memberData['status'];
-        
+
         // Calculate available PEPE tokens
         $totalEarned = PepeRewardService::getTotalEarned($memberid);
         $totalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
             ->where('status', 'Approved')
             ->sum('gross_amount');
-            
+
         $promoAvailable = max(0, $totalEarned - $totalRedeemed);
         $walletBalance = (float) ($memberData->pepe_wallet ?? 0);
         $availablePepe = max($walletBalance, $promoAvailable);
@@ -687,6 +691,7 @@ class WithdrawalController extends Controller
             $var->save();
 
             walletTransfer($memberid, $amount, 'credit', $availablePepe, 'Withdrawal', ' PEPE '.$amount.' have been withdrawn by Member from wallet. Payment Id-'.$var->id);
+
             return response()->json(['success' => true, 'message' => 'PEPE Withdrawal request has been created successfully. Amount will be transfered after admin validation']);
         }
 
@@ -805,6 +810,18 @@ class WithdrawalController extends Controller
         ]);
     }
 
+    public function tradingWithdrawal(Request $request)
+    {
+        $memberid = session('MEMBER_ID');
+        $country = session('country');
+        $result['data'] = MemberDetail::where('memberid', $memberid)->first();
+        $result['country'] = Country::where('name', $country)->first();
+        $result['staking_details'] = StakingDetail::where('memberid', $memberid)->orderBy('id', 'desc')->get();
+        $result['trading_settings'] = \App\Models\TradingWalletSetting::getActiveSetting();
+
+        return view('member.wallet.trading-withdrawal')->with($result);
+    }
+
     /**
      * Validate Trading Wallet withdrawal request based on Lock Period (Condition A) and Max Percentage (Condition B).
      */
@@ -838,7 +855,88 @@ class WithdrawalController extends Controller
         ]);
     }
 
-      public function wAcceptOnlinePepe($id)
+    public function initiateTradingWithdrawal(Request $request)
+    {
+        $memberWallet = $request->post('memberWallet');
+        $memberid = $request->post('memberid') ?? session('MEMBER_ID');
+        $amount = (float) $request->post('amount');
+        $stakingId = $request->post('staking_id');
+
+        $mem = MemberDetail::where('memberid', $memberid)->first();
+        if (! $mem) {
+            return response()->json([
+                'code' => 0,
+                'status' => 'error',
+                'message' => 'Member account not found.',
+            ], 404);
+        }
+
+        $staking = \App\Models\StakingDetail::find($stakingId);
+        if (! $staking) {
+            return response()->json([
+                'code' => 0,
+                'status' => 'error',
+                'message' => 'Staking package not found.',
+            ]);
+        }
+
+        if ($staking->isLocked()) {
+            $remaining = $staking->remainingLockDays();
+            $until = $staking->locked_until ? $staking->locked_until->format('d M Y') : 'lock expiry';
+            return response()->json([
+                'code' => 0,
+                'status' => 'error',
+                'message' => "This Trading Amount is locked for {$remaining} more day(s) (until {$until}).",
+            ]);
+        }
+
+        if ($staking->trading_wallet_amount < $amount || $amount <= 0) {
+            return response()->json([
+                'code' => 0,
+                'status' => 'error',
+                'message' => 'Insufficient trading balance in this specific staking package.',
+            ]);
+        }
+
+        $service = 0; // Configured to 0 for now. Adjust if needed.
+        $netAmount = $amount - $service;
+        $date = date('Y-m-d H:i:s');
+        $requestid = 'TRD'.time();
+        $txnid = $request->post('txnid') ?? '0x'.str_pad(bin2hex(random_bytes(32)), 64, '0', STR_PAD_LEFT);
+
+        $mem->p2p_wallet = max(0, $mem->p2p_wallet - $amount);
+        $mem->save();
+
+        if ($staking) {
+            $staking->status = 'Deactive';
+            $staking->save();
+        }
+
+        $var = new WithdrawalRequest();
+        $var->request_date = $date;
+        $var->payment_date = date('Y-m-d H:i:s');
+        $var->request_id = $requestid;
+        $var->txnid = $txnid;
+        $var->memberid = $memberid;
+        $var->type = 'Trading Withdrawal';
+        $var->wallet_address = $memberWallet ?? $mem->member_wallet ?? $mem->wallet_address;
+        $var->gross_amount = $amount;
+        $var->service_charge = $service;
+        $var->net_amount = $netAmount;
+        $var->status = 'Pending';
+        $var->save();
+
+        walletTransfer($memberid, $amount, 'debit', $mem->p2p_wallet, 'Withdrawal', ' $'.$amount.' have been withdrawn by Member from Trading wallet.');
+
+        return response()->json([
+            'code' => 1,
+            'status' => 'success',
+            'message' => 'Trading Withdrawal request has been processed successfully.',
+            'new_balance' => (float) $mem->p2p_wallet,
+        ]);
+    }
+
+    public function wAcceptOnlinePepe($id)
     {
         $result['wdata'] = WithdrawalRequest::find($id);
         $memberid = $result['wdata']['memberid'];
