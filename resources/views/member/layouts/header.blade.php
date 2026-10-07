@@ -1529,18 +1529,6 @@
                                 </li>
                             </ul>
                         </li> --}}
-                        <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
-                                <i class="material-symbols-outlined notranslate" translate="no"
-                                    data-icon="">stack</i>
-                                <span class="nav-text">Staking</span>
-                            </a>
-                            <ul aria-expanded="false">
-                                <li><a href="{{ url('member/Staking/create') }}">Create Staking</a>
-                                </li>
-                                <li><a href="{{ url('member/Staking/details') }}">Staking History</a>
-                                </li>
-                            </ul>
-                        </li>
 
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
