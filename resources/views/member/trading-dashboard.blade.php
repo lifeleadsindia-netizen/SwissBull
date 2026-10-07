@@ -176,8 +176,8 @@
             <!-- 3. FOREX CROSS RATES & FOREX HEATMAP (50% - 50% SIDE BY SIDE) -->
             <div class="row">
                 <!-- Forex Currency Cross Rates (50% Width) -->
-                <div class="col-xl-6 col-lg-6 col-12">
-                    <div class="card trading-card h-100">
+                <div class="col-xl-12 col-lg-6 col-12 mb-4">
+                    <div class="card trading-card h-100 mb-0">
                         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div class="d-flex align-items-center">
                                 <span class="me-2 text-warning fs-4">
@@ -193,7 +193,7 @@
                             </span>
                         </div>
                         <div class="card-body p-2 p-md-3">
-                            <div class="tradingview-widget-container" style="height: 480px; width: 100%; border-radius: 12px; overflow: hidden;">
+                            <div class="tradingview-widget-container" style="height: 580px; min-height: 520px; width: 100%; border-radius: 12px; overflow: hidden;">
                                 <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
                                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-cross-rates.js" async>
                                 {
@@ -220,8 +220,8 @@
                 </div>
 
                 <!-- Forex Heatmap (50% Width) -->
-                <div class="col-xl-6 col-lg-6 col-12">
-                    <div class="card trading-card h-100">
+                <div class="col-xl-12 col-lg-6 col-12 mb-4">
+                    <div class="card trading-card h-100 mb-0">
                         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div class="d-flex align-items-center">
                                 <span class="me-2 text-warning fs-4">
@@ -237,7 +237,7 @@
                             </span>
                         </div>
                         <div class="card-body p-2 p-md-3">
-                            <div class="tradingview-widget-container" style="height: 480px; width: 100%; border-radius: 12px; overflow: hidden;">
+                            <div class="tradingview-widget-container" style="height: 580px; min-height: 520px; width: 100%; border-radius: 12px; overflow: hidden;">
                                 <div class="tradingview-widget-container__widget" style="height: 100%; width: 100%;"></div>
                                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js" async>
                                 {
