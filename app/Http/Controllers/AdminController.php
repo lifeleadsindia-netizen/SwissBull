@@ -509,7 +509,8 @@ class AdminController extends Controller
             'payment_date' => 'payment_date',
             'request_date' => 'request_date',
         ];
-        $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal']]);
+        // 1st Tab: USDT
+        $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal'], ['type', '!=', 'Trading Withdrawal']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'payment_date', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
@@ -517,9 +518,14 @@ class AdminController extends Controller
         $pepeQuery = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Airdrop Withdrawal']]);
         $pepeData = (clone $pepeQuery)->orderby('payment_date', 'desc')->get();
 
+        // 3rd Tab: Trading Withdrawal History
+        $tradingQuery = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Trading Withdrawal']]);
+        $tradingData = (clone $tradingQuery)->orderby('payment_date', 'desc')->get();
+
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pepeData' => $pepeData,
+            'tradingData' => $tradingData,
             'pepeSettings' => PepeSetting::getSettings(),
             'pageTitle' => 'Payment History',
             'action' => url('admin/payment-history'),
@@ -538,8 +544,8 @@ class AdminController extends Controller
             'request_date' => 'request_date',
             'created_at' => 'created_at',
         ];
-        // 1st Tab: USDT Requests (exclude Exchange and PEPE)
-        $query = WithdrawalRequest::where([['status', 'Pending'], ['type', '!=', 'Exchange'], ['type', '!=', 'Airdrop Withdrawal']]);
+        // 1st Tab: USDT Requests (exclude Exchange, PEPE, and Trading)
+        $query = WithdrawalRequest::where([['status', 'Pending'], ['type', '!=', 'Exchange'], ['type', '!=', 'Airdrop Withdrawal'], ['type', '!=', 'Trading Withdrawal']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'request_date', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
@@ -547,9 +553,14 @@ class AdminController extends Controller
         $pepeQuery = WithdrawalRequest::where([['status', 'Pending'], ['type', 'Airdrop Withdrawal']]);
         $pepeData = (clone $pepeQuery)->orderby('created_at', 'desc')->get();
 
+        // 3rd Tab: Trading Withdrawal Requests
+        $tradingQuery = WithdrawalRequest::where([['status', 'Pending'], ['type', 'Trading Withdrawal']]);
+        $tradingData = (clone $tradingQuery)->orderby('created_at', 'desc')->get();
+
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pepeData' => $pepeData,
+            'tradingData' => $tradingData,
             'pageTitle' => 'New Withdrawal Requests',
             'action' => url('hdgteyusjasget/new-withdrawal-request'),
         ]);
@@ -569,7 +580,7 @@ class AdminController extends Controller
             'request_date' => 'request_date',
         ];
         // 1st Tab: USDT Cancelled Requests
-        $query = WithdrawalRequest::where([['status', 'Cancelled'], ['type', '!=', 'Airdrop Withdrawal']]);
+        $query = WithdrawalRequest::where([['status', 'Cancelled'], ['type', '!=', 'Airdrop Withdrawal'], ['type', '!=', 'Trading Withdrawal']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'updated_at', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
@@ -577,9 +588,14 @@ class AdminController extends Controller
         $pepeQuery = WithdrawalRequest::where([['status', 'Cancelled'], ['type', 'Airdrop Withdrawal']]);
         $pepeData = (clone $pepeQuery)->orderby('updated_at', 'desc')->get();
 
+        // 3rd Tab: Trading Withdrawal Cancelled Requests
+        $tradingQuery = WithdrawalRequest::where([['status', 'Cancelled'], ['type', 'Trading Withdrawal']]);
+        $tradingData = (clone $tradingQuery)->orderby('updated_at', 'desc')->get();
+
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pepeData' => $pepeData,
+            'tradingData' => $tradingData,
             'pageTitle' => 'Cancelled Withdrawal Requests',
             'action' => url('admin/cancelled-request'),
         ]);
@@ -610,6 +626,35 @@ class AdminController extends Controller
                 $qry->save();
             }
             session()->flash('wMessage', 'PEPE Redeem request has been rejected and '.number_format($amount, 0).' PEPE refunded back to member wallet!');
+
+            return redirect()->back();
+        }
+
+        if ($var->type === 'Trading Withdrawal') {
+            // Extract staking id from request_id: TRD-12-1678234324
+            $stakingId = null;
+            if (preg_match('/^TRD-(\d+)-/', $var->request_id, $matches)) {
+                $stakingId = $matches[1];
+                $staking = StakingDetail::find($stakingId);
+            } else {
+                // Fallback for older requests created without stakingId in request_id
+                $staking = StakingDetail::where('memberid', $memberid)
+                    ->where('status', 'Deactive')
+                    ->orderBy('updated_at', 'desc')
+                    ->first();
+            }
+
+            if (isset($staking)) {
+                $staking->status = 'Active';
+                $staking->save();
+            }
+
+            if ($qry) {
+                $qry->trading_wallet += $amount;
+                $qry->save();
+                walletTransfer($memberid, $amount, 'credit', $qry->trading_wallet, 'Withdrawal Request Cancelled', ' $ '.$amount.' have been added to trading wallet due to withdrawal request cancellation');
+            }
+            session()->flash('wMessage', 'Trading Withdrawal request has been rejected and $'.number_format($amount, 2).' refunded back to trading wallet!');
 
             return redirect()->back();
         }
@@ -646,6 +691,13 @@ class AdminController extends Controller
         // If PEPE Token redeem, bypass USDT referral commission
         if ($var->type === 'Airdrop Withdrawal') {
             session()->flash('wMessage', 'PEPE Token redeem request for '.number_format($var->gross_amount, 0).' PEPE has been accepted successfully!');
+
+            return redirect()->back();
+        }
+
+        // If Trading Withdrawal, bypass USDT referral commission
+        if ($var->type === 'Trading Withdrawal') {
+            session()->flash('wMessage', 'Trading Withdrawal request for $'.number_format($var->gross_amount, 2).' has been accepted successfully!');
 
             return redirect()->back();
         }
