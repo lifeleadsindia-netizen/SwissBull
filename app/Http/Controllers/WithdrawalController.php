@@ -871,7 +871,7 @@ class WithdrawalController extends Controller
             ], 404);
         }
 
-        $staking = \App\Models\StakingDetail::find($stakingId);
+        $staking = StakingDetail::find($stakingId);
         if (! $staking) {
             return response()->json([
                 'code' => 0,
@@ -904,7 +904,7 @@ class WithdrawalController extends Controller
         $requestid = 'TRD'.time();
         $txnid = $request->post('txnid') ?? '0x'.str_pad(bin2hex(random_bytes(32)), 64, '0', STR_PAD_LEFT);
 
-        $mem->p2p_wallet = max(0, $mem->p2p_wallet - $amount);
+        $mem->trading_wallet = max(0, $mem->trading_wallet - $amount);
         $mem->save();
 
         if ($staking) {
@@ -926,13 +926,13 @@ class WithdrawalController extends Controller
         $var->status = 'Pending';
         $var->save();
 
-        walletTransfer($memberid, $amount, 'debit', $mem->p2p_wallet, 'Withdrawal', ' $'.$amount.' have been withdrawn by Member from Trading wallet.');
+        walletTransfer($memberid, $amount, 'debit', $mem->trading_wallet, 'Withdrawal', ' $'.$amount.' have been withdrawn by Member from Trading wallet.');
 
         return response()->json([
             'code' => 1,
             'status' => 'success',
             'message' => 'Trading Withdrawal request has been processed successfully.',
-            'new_balance' => (float) $mem->p2p_wallet,
+            'new_balance' => (float) $mem->trading_wallet,
         ]);
     }
 
