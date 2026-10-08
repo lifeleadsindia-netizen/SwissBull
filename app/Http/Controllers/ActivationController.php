@@ -77,7 +77,8 @@ class ActivationController extends Controller
         $member->applyTradingWalletLock($setting->lock_days, $setting->withdrawal_percent);
         $member->save();
 
-        levelIncome($sponsorid, $memberid, $name, $amount, 'Account Activation');
+        directIncome($sponsorid, $memberid, $name, $amount, 'Referral Bonus');
+        levelIncome($sponsorid, $memberid, $name, $amount, 'Daily Team Investment Share');
         walletTransfer($memberid, $amount, 'credit', $wallet, 'Activate account', '$ '.$amount.' deducted for account activation.');
 
         session()->flash('successMsg', 'Account activated successfully.');

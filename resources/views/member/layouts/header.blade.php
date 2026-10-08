@@ -1548,16 +1548,12 @@
                                 <span class="nav-text">Income Section</span>
                             </a>
                             <ul aria-expanded="false">
-                                <li><a href="{{ url('member/income/monthly-staking-income') }}">Monthly Staking
-                                        Income</a>
-                                </li>
-                                <li><a href="{{ url('member/income/staking-level-income') }}">Staking Level
-                                        Income</a>
-                                </li>
-                                <li><a href="{{ url('member/income/level-income') }}">Level Income</a>
-                                </li>
-                                <li><a href="{{ url('member/income/team-withdrawal-commission') }}">Team Withdrawal
-                                        Commission</a></li>
+                                <li><a href="{{ url('member/income/monthly-trading-profit') }}">Monthly Trading Profit</a></li>
+                                <li><a href="{{ url('member/income/referral-bonus') }}">Referral Bonus</a></li>
+                                <li><a href="{{ url('member/income/team-trading-profit') }}">Team Trading Profit</a></li>
+                                <li><a href="{{ url('member/income/daily-team-investment-share') }}">Daily Team Investment Share</a></li>
+                                <li><a href="{{ url('member/income/hero-of-the-month') }}">Hero of the Month</a></li>
+                                <li><a href="{{ url('member/income/partnership-income') }}">Partnership Income</a></li>
                             </ul>
                         </li>
 

@@ -118,7 +118,8 @@ class StakingDetail extends Model
     }
 
     /**
-     * Get dynamic daily ROI rate from active PackagePlan (admin configured) or self.
+     * Get dynamic daily ROI rate from MonthlyTradingProfitConfiction, active PackagePlan, or PDF tiers.
+     * Tiers: $50–500 => 5%, $600–5,000 => 7%, $6,000+ => 10%.
      */
     public function getDailyRate(): float
     {
@@ -131,18 +132,41 @@ class StakingDetail extends Model
                 ->first();
         }
 
-        if ($plan && (float) $plan->return_percent > 0) {
-            return (float) $plan->return_percent;
+        if ($plan) {
+            $configuredRate = MonthlyTradingProfitConfiction::getRateForPackage($plan->id);
+            if ($configuredRate > 0) {
+                return $configuredRate;
+            }
+
+            if ((float) $plan->return_percent > 0) {
+                return (float) $plan->return_percent;
+            }
         }
 
-        return (float) ($this->rate > 0 ? $this->rate : 5.00);
+        if ($this->rate > 0) {
+            return (float) $this->rate;
+        }
+
+        $amt = (float) $this->invest_amount;
+        if ($amt >= 6000) {
+            return 10.00;
+        } elseif ($amt >= 600) {
+            return 7.00;
+        }
+
+        return 5.00;
     }
 
     /**
-     * Get dynamic capping percentage from active PackagePlan (admin configured) or self.
+     * Get dynamic capping percentage from MonthlyTradingProfitConfiction, active PackagePlan, or self.
      */
     public function getCappingPercent(): float
     {
+        $configuredCapping = MonthlyTradingProfitConfiction::getCappingPercent();
+        if ($configuredCapping > 0) {
+            return $configuredCapping;
+        }
+
         $plan = PackagePlan::findByRange($this->package);
         if (! $plan) {
             $plan = PackagePlan::where('min_amount', '<=', (float) $this->invest_amount)
@@ -157,6 +181,21 @@ class StakingDetail extends Model
         }
 
         return (float) ($this->capping_percent > 0 ? $this->capping_percent : 200.00);
+    }
+
+    /**
+     * Get 70% Trading Wallet base amount for profit calculations.
+     */
+    public function getTradingWalletBase(): float
+    {
+        if ($this->txnid) {
+            $pkg = PackageDetail::where('txnid', $this->txnid)->first();
+            if ($pkg && (float) $pkg->trading_wallet_amount > 0) {
+                return (float) $pkg->trading_wallet_amount;
+            }
+        }
+
+        return round((float) $this->invest_amount * 0.70, 2);
     }
 
     /**

@@ -1,5 +1,5 @@
 @extends('member.layouts.main')
-@section('title', 'Level Income')
+@section('title', 'Daily Team Investment Share')
 @section('container')
 @include('member.income._income-styles')
 
@@ -8,16 +8,16 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
-            <h1><i class="fa-solid fa-diagram-successor me-2"></i>Level Income</h1>
-            <p>Commissions earned from your downline team's package activations across levels.</p>
+            <h1><i class="fa-solid fa-diagram-successor me-2"></i>Daily Team Investment Share</h1>
+            <p>1% share from downline team investment across 10 levels (Requires 4 direct referrals for L1, +2 for each additional level).</p>
         </div>
 
         <div class="inc-card">
             <div class="inc-card-header">
                 <div class="inc-header-icon"><i class="fa-solid fa-network-wired"></i></div>
                 <div>
-                    <div class="inc-header-title">Level Income History</div>
-                    <div class="inc-header-sub">Level-wise commission records from team activity</div>
+                    <div class="inc-header-title">Daily Team Investment Share History</div>
+                    <div class="inc-header-sub">Level-wise team investment share earnings across 10 levels</div>
                 </div>
             </div>
             <div class="inc-table-shell">

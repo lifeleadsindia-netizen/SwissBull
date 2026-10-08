@@ -1,5 +1,5 @@
 @extends('member.layouts.main')
-@section('title', 'Team Trading Profit')
+@section('title', 'Referral Bonus')
 @section('container')
 @include('member.income._income-styles')
 
@@ -8,16 +8,16 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
-            <h1><i class="fa-solid fa-layer-group me-2"></i>Team Trading Profit</h1>
-            <p>Team trading profit share calculated across 10 levels: L1-L2 (5%), L3-L4 (4%), L5-L6 (3%), L7-L8 (2%), L9-L10 (1%).</p>
+            <h1><i class="fa-solid fa-user-plus me-2"></i>Referral Bonus</h1>
+            <p>Direct referral commissions earned from your 3-tier sponsor network: Level 1 (5%), Level 2 (3%), Level 3 (2%).</p>
         </div>
 
         <div class="inc-card">
             <div class="inc-card-header">
-                <div class="inc-header-icon"><i class="fa-solid fa-sitemap"></i></div>
+                <div class="inc-header-icon"><i class="fa-solid fa-users-line"></i></div>
                 <div>
-                    <div class="inc-header-title">Team Trading Profit History</div>
-                    <div class="inc-header-sub">Daily trading profit commissions earned from your downline team across 10 levels</div>
+                    <div class="inc-header-title">Referral Bonus History</div>
+                    <div class="inc-header-sub">All direct referral commissions credited to your account</div>
                 </div>
             </div>
             <div class="inc-table-shell">
@@ -27,28 +27,31 @@
                             <th>S.No</th>
                             <th>Date</th>
                             <th>Member ID</th>
-                            <th>Level</th>
-                            <th>Level ID</th>
-                            <th>Name</th>
+                            <th>From Member</th>
+                            <th>Package Amount</th>
                             <th>Rate</th>
-                            <th>Staking Income</th>
                             <th>Amount</th>
+                            <th>Type</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php $i = 1; @endphp
-                        @foreach ($sData as $list)
+                        @foreach ($dData as $list)
+                            @php
+                                $pkg = (float) ($list['package'] ?? 0);
+                                $amt = (float) ($list['amount'] ?? 0);
+                                $rate = $pkg > 0 ? round(($amt / $pkg) * 100, 1) : 0;
+                            @endphp
                             <tr>
                                 <td>{{ $i }}</td>
                                 <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}</td>
                                 <td>{{ $list['memberid'] }}</td>
-                                <td>Level {{ $list['level'] }}</td>
-                                <td>{{ $list['level_id'] }}</td>
-                                <td>{{ !empty($list['name']) ? $list['name'] : getName($list['level_id']) }}</td>
-                                <td>{{ $list['rate'] ?? levelRate($list['level']) }}%</td>
-                                <td>$ {{ number_format($list['staking_income'] ?? $list['package'] ?? 0, 2) }}</td>
-                                <td>$ {{ number_format($list['amount'], 2) }}</td>
+                                <td>{{ $list['activatingid'] ?? 'N/A' }} ({{ $list['name'] ?? '' }})</td>
+                                <td>$ {{ number_format($pkg, 2) }}</td>
+                                <td>{{ $rate > 0 ? $rate.'%' : 'Standard' }}</td>
+                                <td>$ {{ number_format($amt, 2) }}</td>
+                                <td><span class="badge bg-primary">{{ $list['type'] ?? 'Referral Bonus' }}</span></td>
                                 <td>
                                     @if ($list['status'] == 'Unpaid')
                                         <span class="inc-badge unpaid"><i class="fa-solid fa-clock"></i>{{ $list['status'] }}</span>

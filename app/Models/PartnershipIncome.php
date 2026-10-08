@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class PartnershipIncome extends Model
 {
-    //
+    protected $guarded = [];
 }
