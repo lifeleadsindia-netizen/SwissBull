@@ -36,7 +36,7 @@
                                 <i class="fas fa-eye me-1"></i> In-App Online Viewer
                             </span>
                         </div>
-                        <h3 class="text-white fw-bold mb-2">Math Wallet Official Business Presentations</h3>
+                        <h3 class="text-white fw-bold mb-2">SYNC TRADE Official Business Presentations</h3>
                         <p class="text-light-50 mb-3"
                             style="font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,0.75);">
                             Access the complete verified business plan in <strong>English</strong>, <strong>Chinese
@@ -195,7 +195,7 @@
                                         </button>
 
                                         <!-- WhatsApp Share with Prospect -->
-                                        <a href="https://wa.me/?text={{ rawurlencode("📊 *Math Wallet Official Business Plan ({$pdf['language']} Edition)*\n\nTake a look at the comprehensive presentation deck:\n👉 Direct PDF: " . $pdf['url'] . "\n\n🚀 Join my team using this link:\n👉 " . $referralLink) }}"
+                                        <a href="https://wa.me/?text={{ rawurlencode("📊 *SYNC TRADE Official Business Plan ({$pdf['language']} Edition)*\n\nTake a look at the comprehensive presentation deck:\n👉 Direct PDF: " . $pdf['url'] . "\n\n🚀 Join my team using this link:\n👉 " . $referralLink) }}"
                                             target="_blank" class="btn btn-sm btn-success" style="font-size: 11.5px;"
                                             title="Share to WhatsApp">
                                             <i class="fab fa-whatsapp"></i>
@@ -234,7 +234,7 @@
                             style="width: 32px; height: 32px; font-size: 18px;">🇬🇧</span>
                         <div>
                             <h5 class="modal-title text-white fw-bold mb-0" id="modalPdfTitle">Business Plan Preview</h5>
-                            <small class="text-white-50" id="modalPdfFilename">Math Wallet English.pdf</small>
+                            <small class="text-white-50" id="modalPdfFilename">SYNC TRADE English.pdf</small>
                         </div>
                     </div>
                     <div class="d-flex align-items-center gap-2">
@@ -546,7 +546,7 @@
             document.getElementById('modalMobileFallbackLink').href = livePdfUrl;
 
             // WhatsApp share link
-            const waText = "📊 *Math Wallet Official Business Plan (" + pdf.language +
+            const waText = "📊 *SYNC TRADE Official Business Plan (" + pdf.language +
                 " Edition)*\n\nTake a look at the comprehensive presentation deck:\n👉 Direct PDF: " + livePdfUrl +
                 "\n\n🚀 Join my team using this link:\n👉 " + liveReferralUrl;
             document.getElementById('modalWaShareBtn').href = "https://wa.me/?text=" + encodeURIComponent(waText);

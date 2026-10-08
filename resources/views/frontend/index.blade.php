@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Math Wallet — Your Gateway to the Multi-Chain World</title>
+    <title>SYNC TRADE — Your Gateway to the Multi-Chain World</title>
     
     <!-- FAVICONS ICON -->
     <link rel="icon" type="image/png" href="{{ asset('logo/favicon/favicon-96x96.png') }}" sizes="96x96" />
@@ -15,7 +15,7 @@
     <link rel="manifest" href="{{ asset('logo/favicon/site.webmanifest') }}" />
     
     <meta name="description"
-        content="Math Wallet is a multi-platform universal crypto wallet supporting 100+ blockchains and 3000+ tokens. Self-custodial, multi-chain, DApp-ready.">
+        content="SYNC TRADE is a multi-platform universal crypto wallet supporting 100+ blockchains and 3000+ tokens. Self-custodial, multi-chain, DApp-ready.">
     <meta name="theme-color" content="#080A14">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
@@ -998,7 +998,7 @@
     <section class="sec">
         <div class="wrap">
             <div style="text-align:center;margin-bottom:46px" data-aos="fade-up">
-                <div class="kick gtext2">Why Math Wallet</div>
+                <div class="kick gtext2">Why SYNC TRADE</div>
                 <h2 class="h-title" style="font-size:clamp(1.8rem,4.4vw,2.5rem);margin-top:10px">One wallet. Every
                     chain.</h2>
             </div>
@@ -1114,7 +1114,7 @@
             <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
                 <div class="eco tilt" data-aos="fade-up">
                     <div class="fic-soft"><i class="fa-solid fa-wallet"></i></div>
-                    <h4 class="disp" style="font-weight:600;font-size:16px;margin:16px 0 6px">Math Wallet</h4>
+                    <h4 class="disp" style="font-weight:600;font-size:16px;margin:16px 0 6px">SYNC TRADE</h4>
                     <p class="sub" style="font-size:13.5px;line-height:1.55;margin:0">The multi-chain universal wallet
                         at the heart of it all.</p>
                 </div>
@@ -1235,7 +1235,7 @@
             </div>
             <div
                 style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;margin-top:44px;padding-top:26px;border-top:1px solid var(--line)">
-                <span class="sub" style="font-size:13px">© 2026 Math Wallet. All rights reserved.</span>
+                <span class="sub" style="font-size:13px">© {{ date('Y') }} SYNC TRADE. All rights reserved.</span>
                 <span class="sub" style="font-size:13px">Powering the future of digital finance.</span>
             </div>
         </div>

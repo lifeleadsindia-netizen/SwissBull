@@ -700,7 +700,7 @@ class MemberDetailController extends Controller
             ];
             $user['to'] = $email;
             $fromAddress = config('mail.from.address', 'support@mathwallet.live');
-            $fromName = config('mail.from.name', config('detailsApp.name', 'Math Wallet'));
+            $fromName = config('mail.from.name', config('detailsApp.name', 'SYNC TRADE'));
 
             Mail::send([
                 'html' => 'member.mails.register-otp',
@@ -799,7 +799,7 @@ class MemberDetailController extends Controller
                 'id' => $b->id,
                 'filename' => basename($b->image_path),
                 'title' => $b->title,
-                'tag' => $b->tag ?: 'Math Wallet Official',
+                'tag' => $b->tag ?: 'SYNC TRADE Official',
                 'url' => $b->image_url,
                 'download_url' => route('member.promotional-banners.download', ['filename' => $b->id]),
                 'external_link' => $b->external_link,

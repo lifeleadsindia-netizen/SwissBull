@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.main')
+@extends('admin.layouts.main')
 @section('title', 'Plan Videos Management')
 @section('content')
     @push('head')
@@ -150,7 +150,7 @@
                                 <label class="form-label font-weight-bold">{{ __('Video Title') }} <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control" name="title" id="video_title"
-                                    placeholder="e.g. Official Math Wallet Compensation Plan" required>
+                                    placeholder="e.g. Official SYNC TRADE Compensation Plan" required>
                             </div>
 
                             <div class="form-group mb-3">

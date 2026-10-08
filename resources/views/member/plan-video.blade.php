@@ -9,7 +9,7 @@
                 <div class="welcome-text">
                     <h4 class="text-white font-weight-bold mb-1">Plan Videos</h4>
                     <p class="mb-0 text-muted" style="font-size: 13px;">Official video presentations explaining the complete
-                        Math Wallet business plan, staking, and ecosystem benefits.</p>
+                        SYNC TRADE business plan, staking, and ecosystem benefits.</p>
                 </div>
                 <div class="justify-content-sm-end mt-2 mt-sm-0 d-flex">
                     <ol class="breadcrumb mb-0">
@@ -124,7 +124,7 @@
                                         </button>
 
                                         <!-- Share on WhatsApp with Referral Link -->
-                                        <a href="https://wa.me/?text={{ rawurlencode("🎬 *Watch Math Wallet Official Plan Presentation Video* 🚀\n\nUnderstand the complete system and start earning:\n👉 Watch Video: " . $video['url'] . "\n\n👉 Register & Join my team:\n" . $referralLink) }}"
+                                        <a href="https://wa.me/?text={{ rawurlencode("🎬 *Watch SYNC TRADE Official Plan Presentation Video* 🚀\n\nUnderstand the complete system and start earning:\n👉 Watch Video: " . $video['url'] . "\n\n👉 Register & Join my team:\n" . $referralLink) }}"
                                             id="theaterWaShareBtn"
                                             target="_blank" class="btn btn-sm btn-success fw-bold d-flex align-items-center"
                                             style="font-size: 12px;">
@@ -523,7 +523,7 @@
 
             // Update Secondary Action Links
             document.getElementById('theaterNewTabBtn').href = item.url;
-            const waShareText = encodeURIComponent("🎬 *Watch Math Wallet Official Plan Video* 🚀\n\n" + item.title + "\n👉 Watch Video: " + item.url + "\n\n👉 Register & Join my team:\n" + memberReferralUrl);
+            const waShareText = encodeURIComponent("🎬 *Watch SYNC TRADE Official Plan Video* 🚀\n\n" + item.title + "\n👉 Watch Video: " + item.url + "\n\n👉 Register & Join my team:\n" + memberReferralUrl);
             document.getElementById('theaterWaShareBtn').href = "https://wa.me/?text=" + waShareText;
 
             // Smoothly scroll up to theater if on mobile

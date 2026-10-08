@@ -124,7 +124,7 @@
                                         </button>
 
                                         <!-- Share on WhatsApp with Referral Link -->
-                                        <a href="https://wa.me/?text={{ rawurlencode("🎓 *Math Wallet Official Tutorial Guide* 💡\n\n" . $video['title'] . "\n👉 Watch Tutorial: " . $video['url'] . "\n\n👉 Register using my referral link:\n" . $referralLink) }}"
+                                        <a href="https://wa.me/?text={{ rawurlencode("🎓 *SYNC TRADE Official Tutorial Guide* 💡\n\n" . $video['title'] . "\n👉 Watch Tutorial: " . $video['url'] . "\n\n👉 Register using my referral link:\n" . $referralLink) }}"
                                             id="theaterWaShareBtn"
                                             target="_blank" class="btn btn-sm btn-success fw-bold d-flex align-items-center"
                                             style="font-size: 12px;">
@@ -523,7 +523,7 @@
 
             // Update Secondary Action Links
             document.getElementById('theaterNewTabBtn').href = item.url;
-            const waShareText = encodeURIComponent("🎓 *Math Wallet Official Tutorial Guide* 💡\n\n" + item.title + "\n👉 Watch Tutorial: " + item.url + "\n\n👉 Register & Join my team:\n" + memberReferralUrl);
+            const waShareText = encodeURIComponent("🎓 *SYNC TRADE Official Tutorial Guide* 💡\n\n" + item.title + "\n👉 Watch Tutorial: " + item.url + "\n\n👉 Register & Join my team:\n" + memberReferralUrl);
             document.getElementById('theaterWaShareBtn').href = "https://wa.me/?text=" + waShareText;
 
             // Smoothly scroll up to theater if on mobile

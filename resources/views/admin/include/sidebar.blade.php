@@ -1,4 +1,4 @@
-<div class="app-sidebar colored">
+﻿<div class="app-sidebar colored">
     <div class="sidebar-header">
         <a class="header-brand py-3" href="{{url('admin/dashboard')}}">
             <div class="logo-img text-center ">
@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="nav-item {{ (request()->is('*set-packages*') || request()->is('*set_packages*') || request()->is('*trading-wallet-control*') || request()->is('*monthly-trading-profit*') || request()->is('*referral-bonus*') || request()->is('*team-trading-profit*') || request()->is('*daily-team-investment-share*')) ? 'active open' : '' }} has-sub">
-                    <a href="#"><i class="ik ik-sliders"></i><span>{{ __('Plan & Income Configuration') }}</span></a>
+                    <a href="#"><i class="ik ik-sliders"></i><span>{{ __('Plan & Income') }}<br>{{ __('Configuration') }}</span></a>
                     <div class="submenu-content">
                         <a href="{{ route('admin.setPackages') }}" class="menu-item {{ (request()->is('*set-packages*') || request()->is('*set_packages*')) ? 'active' : '' }}">{{ __('Set Packages') }}</a>
                         <a href="{{ route('admin.tradingWalletControl') }}" class="menu-item {{ request()->is('*trading-wallet-control*') ? 'active' : '' }}">{{ __('Trading Wallet Control') }}</a>

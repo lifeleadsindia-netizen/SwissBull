@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.main')
+@extends('admin.layouts.main')
 @section('title', 'Promotion Banners Management')
 @section('content')
     @push('head')
@@ -151,7 +151,7 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label font-weight-bold">{{ __('Tag / Category') }}</label>
-                            <input type="text" class="form-control" name="tag" id="banner_tag" placeholder="e.g. Math Wallet Ecosystem">
+                            <input type="text" class="form-control" name="tag" id="banner_tag" placeholder="e.g. SYNC TRADE Ecosystem">
                         </div>
 
                         <div class="form-group mb-3">
