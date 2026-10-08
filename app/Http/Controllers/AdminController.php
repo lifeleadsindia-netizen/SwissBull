@@ -66,7 +66,7 @@ class AdminController extends Controller
                 // Mail::send('admin.mails.login-mail', $mailData, function ($message) use ($user) {
 
                 //     $message->to($user['to']);
-                //     $message->subject('Math Wallet Admin Login OTP');
+                //     $message->subject('SYNC TRADE Admin Login OTP');
                 // });
             }
             session()->flash('OtpMsg', 'Your OTP has been send to admin email');
@@ -101,7 +101,7 @@ class AdminController extends Controller
             Mail::send('admin.mails.forget-password-mail', $mailData, function ($message) use ($user) {
 
                 $message->to($user['to']);
-                $message->subject('Math Wallet Admin Account Password');
+                $message->subject('SYNC TRADE Admin Account Password');
             });
         }
         session()->flash('succMsg', 'Your Account Password has been sent to your registered email.');

@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>{{ config('detailsApp.name', 'Math Wallet') }} - Email Verification OTP</title>
+    <title>{{ config('detailsApp.name', 'SYNC TRADE') }} - Email Verification OTP</title>
     <style type="text/css">
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
         table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
@@ -44,7 +44,7 @@
                     <tr>
                         <td class="header-bg">
                             @if(file_exists(public_path('logo/logo.png')))
-                                <img src="{{ $message->embed(public_path('logo/logo.png')) }}" alt="{{ config('detailsApp.name', 'Math Wallet') }}" width="70" style="max-width: 70px; height: auto; margin-bottom: 10px;" />
+                                <img src="{{ $message->embed(public_path('logo/logo.png')) }}" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}" width="70" style="max-width: 70px; height: auto; margin-bottom: 10px;" />
                             @endif
                             <div class="header-title">Email Verification</div>
                             <div class="header-sub">Verify your email to complete registration</div>
@@ -57,7 +57,7 @@
                             <div class="badge">Verification Required</div>
                             <h2 class="greeting">Hello,</h2>
                             <p class="info-text">
-                                Thank you for choosing <strong>{{ config('detailsApp.name', 'Math Wallet') }}</strong>. Please use the following One-Time Password (OTP) to verify your email address and activate your account:
+                                Thank you for choosing <strong>{{ config('detailsApp.name', 'SYNC TRADE') }}</strong>. Please use the following One-Time Password (OTP) to verify your email address and activate your account:
                             </p>
                             
                             <!-- OTP Box -->
@@ -69,7 +69,7 @@
                             
                             <!-- Security Notice -->
                             <div class="notice-box">
-                                <strong>⚠️ Security Reminder:</strong> Never share this OTP with anyone, including {{ config('detailsApp.name', 'Math Wallet') }} representatives. We will never ask for your password or OTP.
+                                <strong>⚠️ Security Reminder:</strong> Never share this OTP with anyone, including {{ config('detailsApp.name', 'SYNC TRADE') }} representatives. We will never ask for your password or OTP.
                             </div>
                             
                             <!-- Platform Portal -->
@@ -93,11 +93,11 @@
                             </p>
                             @if(file_exists(public_path('logo/logo-dark.png')))
                                 <div style="margin: 12px 0;">
-                                    <img src="{{ $message->embed(public_path('logo/logo-dark.png')) }}" alt="{{ config('detailsApp.name', 'Math Wallet') }}" width="60" style="max-width: 60px; height: auto; opacity: 0.75;" />
+                                    <img src="{{ $message->embed(public_path('logo/logo-dark.png')) }}" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}" width="60" style="max-width: 60px; height: auto; opacity: 0.75;" />
                                 </div>
                             @endif
                             <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 11px;">
-                                © {{ date('Y') }} {{ config('detailsApp.name', 'Math Wallet') }}. All rights reserved.
+                                © {{ date('Y') }} {{ config('detailsApp.name', 'SYNC TRADE') }}. All rights reserved.
                             </p>
                         </td>
                     </tr>

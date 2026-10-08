@@ -144,7 +144,7 @@ class UserAccessController extends Controller
                     Mail::send('member.mails.mail', $mailData, function ($message) use ($user) {
 
                         $message->to($user['to']);
-                        $message->subject('Math Wallet Member Login Credentials');
+                        $message->subject('SYNC TRADE Member Login Credentials');
                     });
                 }
                 $request->session()->put('name', $request->post('name'));
