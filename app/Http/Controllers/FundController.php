@@ -259,6 +259,7 @@ class FundController extends Controller
                 $stakingDetail->invest_amount = $amount;
                 $stakingDetail->package = $normalizedPackage;
                 $stakingDetail->txnid = $txnid;
+                $stakingDetail->trading_wallet_amount = $tradingWalletAmount;
                 $stakingDetail->order_id = $orderId;
                 $stakingDetail->installments = 0;
                 $stakingDetail->total_installments = $durationDays;

@@ -248,9 +248,9 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::get('/activation-detail', [ActivationController::class, 'activationDetail'])->name('activationDetail');
 
     //  Staking Routes
-    Route::get('/Staking/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
-    Route::post('/createInvestment', [InvestmentController::class, 'createInvestment'])->name('createInvestment');
-    Route::get('/Staking/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
+    // Route::get('/Staking/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
+    // Route::post('/createInvestment', [InvestmentController::class, 'createInvestment'])->name('createInvestment');
+    // Route::get('/Staking/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
 
     // Partnership Investment Routes
     Route::get('/partnership/create-investment', [PartnershipController::class, 'partCreateInvestment']);
@@ -313,7 +313,8 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
 
     // Trading Wallet withdrawal validation & live dashboard status
     Route::post('tradingWalletValidate', [WithdrawalController::class, 'tradingWalletValidate'])->name('tradingWalletValidate');
-    Route::get('trading-wallet/status', [MemberDetailController::class, 'getTradingWalletStatus'])->name('member.tradingWalletStatus');
+    Route::get('/wallet/trading-withdrawal', [WithdrawalController::class, 'tradingWithdrawal']);
+    Route::post('initiateTradingWithdrawal', [WithdrawalController::class, 'initiateTradingWithdrawal'])->name('initiateTradingWithdrawal');
 
     // Geneology Section
     Route::get('/team/geneology', [MemberDetailController::class, 'geneology'])->name('member.team.geneology');

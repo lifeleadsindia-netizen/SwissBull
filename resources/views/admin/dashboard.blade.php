@@ -259,6 +259,9 @@
                         </div>
                     </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 18031a8b211e5282068ba717206fef2c9b05f1d3
 
                     <div class="adm-chart-wrap">
                         <!-- Floating Tooltip Badge Matching Reference -->
@@ -352,23 +355,62 @@
                 <div class="adm-income-panel">
                     <div class="adm-panel-head">
                         <h3>Income Summary</h3>
+                        <span class="badge bg-light text-muted px-2 py-1" style="font-size: 11px; font-weight: 600; border-radius: 6px;">Total: ${{ number_format((float) totalIn(), 2) }}</span>
                     </div>
+
+                    @php
+                        $totVal = (float) totalIn();
+                        $roiVal = (float) totalAdminRoiIncome();
+                        $dirVal = (float) totalAdminDirectIncome();
+                        $stkVal = (float) totalAdminStakingLevelIncome();
+                        $lvlVal = (float) totalAdminLevelIncome();
+                        $heroVal = (float) totalAdminHeroOfTheMonthIncome();
+                        $partVal = (float) totalAdminPartnershipIncome();
+                        $slegVal = (float) totalAdminSingleLegIncome();
+
+                        // Circumference for r=48 is ~301.6
+                        $circ = 301.6;
+                        if ($totVal > 0) {
+                            $lenRoi = max(8, ($roiVal / $totVal) * $circ);
+                            $lenDir = max(8, ($dirVal / $totVal) * $circ);
+                            $lenStk = max(8, ($stkVal / $totVal) * $circ);
+                            $lenLvl = max(8, ($lvlVal / $totVal) * $circ);
+                            $lenHero = max(8, ($heroVal / $totVal) * $circ);
+                            $lenPart = max(8, ($partVal / $totVal) * $circ);
+                        } else {
+                            $lenRoi = 55;
+                            $lenDir = 50;
+                            $lenStk = 48;
+                            $lenLvl = 45;
+                            $lenHero = 45;
+                            $lenPart = 40;
+                        }
+                    @endphp
 
                     <div class="adm-summary-content">
                         <!-- Donut Chart -->
                         <div class="adm-donut-wrap">
-                            <svg class="adm-donut-svg" viewBox="0 0 100 100">
+                            <svg class="adm-donut-svg" viewBox="0 0 120 120">
                                 <!-- Background Circle -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F1F5F9" stroke-width="12"/>
-                                <!-- Segment 1: Blue (Level Income) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#3B82F6" stroke-width="12"
-                                    stroke-dasharray="145 238" stroke-dashoffset="0" stroke-linecap="round"/>
-                                <!-- Segment 2: Orange (Staking Level) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#F97316" stroke-width="12"
-                                    stroke-dasharray="55 238" stroke-dashoffset="-148" stroke-linecap="round"/>
-                                <!-- Segment 3: Cyan (Single Leg) -->
-                                <circle cx="50" cy="50" r="38" fill="transparent" stroke="#06B6D4" stroke-width="12"
-                                    stroke-dasharray="25 238" stroke-dashoffset="-206" stroke-linecap="round"/>
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F1F5F9" stroke-width="8"/>
+                                <!-- Segment 1: Blue (Monthly Trading Profit) -->
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#3B82F6" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenRoi, 1) }} 301.6" stroke-dashoffset="0" stroke-linecap="round"/>
+                                <!-- Segment 2: Orange (Referral Bonus) -->
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F97316" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenDir, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + 4, 1) }}" stroke-linecap="round"/>
+                                <!-- Segment 3: Emerald (Team Trading Profit) -->
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#10B981" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenStk, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + 8, 1) }}" stroke-linecap="round"/>
+                                <!-- Segment 4: Amber (Daily Team Investment Share) -->
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F59E0B" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenLvl, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + 12, 1) }}" stroke-linecap="round"/>
+                                <!-- Segment 5: Purple (Hero of the Month) -->
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#8B5CF6" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenHero, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + 16, 1) }}" stroke-linecap="round"/>
+                                <!-- Segment 6: Pink (Partnership Income) -->
+                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#EC4899" stroke-width="8"
+                                    stroke-dasharray="{{ number_format($lenPart, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + $lenHero + 20, 1) }}" stroke-linecap="round"/>
                             </svg>
                             <div class="adm-donut-center">
                                 <h4>$ {{ number_format((float) totalIn(), 2) }}</h4>
@@ -376,62 +418,94 @@
                             </div>
                         </div>
 
-                        <!-- Income Categories Breakdown matching Reference -->
+                        <!-- 6 Incomes Breakdown List matching PDF Plan -->
                         <ul class="adm-income-list">
                             <li>
-                                <a href="{{ url('admin/income/roi-incomes') }}" class="adm-income-item-left">
-                                    <span class="adm-income-dot" style="background: #0ea5e9;"></span>
-                                    <span>ROI Income</span>
-                                </a>
-                                <a href="{{ url('admin/income/roi-incomes') }}" class="adm-income-amount">
-                                    $ {{ number_format((float) totalAdminRoiIncome(), 2) }}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url('admin/income/staking-level-incomes') }}" class="adm-income-item-left">
-                                    <span class="adm-income-dot" style="background: #f97316;"></span>
-                                    <span>Staking Level</span>
-                                </a>
-                                <a href="{{ url('admin/income/staking-level-incomes') }}" class="adm-income-amount">
-                                    $ {{ number_format((float) totalAdminStakingLevelIncome(), 2) }}
+                                <a href="{{ url('admin/income/monthly-trading-profit') }}" class="adm-income-item-link">
+                                    <div class="adm-income-item-left">
+                                        <span class="adm-income-dot" style="background: #3B82F6; box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);"></span>
+                                        <span class="adm-income-label">Monthly Trading Profit</span>
+                                    </div>
+                                    <div class="adm-income-item-right">
+                                        <span class="adm-income-amount">$ {{ number_format($roiVal, 2) }}</span>
+                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                    </div>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url('admin/income/level-incomes') }}" class="adm-income-item-left">
-                                    <span class="adm-income-dot" style="background: #eab308;"></span>
-                                    <span>Level Income</span>
-                                </a>
-                                <a href="{{ url('admin/income/level-incomes') }}" class="adm-income-amount">
-                                    $ {{ number_format((float) totalAdminLevelIncome(), 2) }}
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url('admin/income/single-leg-incomes') }}" class="adm-income-item-left">
-                                    <span class="adm-income-dot" style="background: #10b981;"></span>
-                                    <span>Single Leg</span>
-                                </a>
-                                <a href="{{ url('admin/income/single-leg-incomes') }}" class="adm-income-amount">
-                                    $ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}
+                                <a href="{{ url('admin/income/referral-bonus') }}" class="adm-income-item-link">
+                                    <div class="adm-income-item-left">
+                                        <span class="adm-income-dot" style="background: #F97316; box-shadow: 0 0 6px rgba(249, 115, 22, 0.4);"></span>
+                                        <span class="adm-income-label">Referral Bonus</span>
+                                    </div>
+                                    <div class="adm-income-item-right">
+                                        <span class="adm-income-amount">$ {{ number_format($dirVal, 2) }}</span>
+                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                    </div>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url('admin/income/partnership-incomes') }}" class="adm-income-item-left">
-                                    <span class="adm-income-dot" style="background: #a855f7;"></span>
-                                    <span>Partnership</span>
-                                </a>
-                                <a href="{{ url('admin/income/partnership-incomes') }}" class="adm-income-amount">
-                                    $ {{ number_format((float) totalAdminPartnershipIncome(), 2) }}
+                                <a href="{{ url('admin/income/team-trading-profit') }}" class="adm-income-item-link">
+                                    <div class="adm-income-item-left">
+                                        <span class="adm-income-dot" style="background: #10B981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);"></span>
+                                        <span class="adm-income-label">Team Trading Profit</span>
+                                    </div>
+                                    <div class="adm-income-item-right">
+                                        <span class="adm-income-amount">$ {{ number_format($stkVal, 2) }}</span>
+                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                    </div>
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}" class="adm-income-item-left">
-                                    <span class="adm-income-dot" style="background: #ef4444;"></span>
-                                    <span>Team Commission</span>
-                                </a>
-                                <a href="{{ url('admin/income/team-withdrawal-commission-incomes') }}" class="adm-income-amount">
-                                    $ {{ number_format((float) totalAdminTeamWithdrawalCommissionIncome(), 2) }}
+                                <a href="{{ url('admin/income/daily-team-investment-share') }}" class="adm-income-item-link">
+                                    <div class="adm-income-item-left">
+                                        <span class="adm-income-dot" style="background: #F59E0B; box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);"></span>
+                                        <span class="adm-income-label">Daily Team Investment Share</span>
+                                    </div>
+                                    <div class="adm-income-item-right">
+                                        <span class="adm-income-amount">$ {{ number_format($lvlVal, 2) }}</span>
+                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                    </div>
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ url('admin/income/hero-of-the-month') }}" class="adm-income-item-link">
+                                    <div class="adm-income-item-left">
+                                        <span class="adm-income-dot" style="background: #8B5CF6; box-shadow: 0 0 6px rgba(139, 92, 246, 0.4);"></span>
+                                        <span class="adm-income-label">Hero of the Month</span>
+                                    </div>
+                                    <div class="adm-income-item-right">
+                                        <span class="adm-income-amount">$ {{ number_format($heroVal, 2) }}</span>
+                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('admin/income/partnership-incomes') }}" class="adm-income-item-link">
+                                    <div class="adm-income-item-left">
+                                        <span class="adm-income-dot" style="background: #EC4899; box-shadow: 0 0 6px rgba(236, 72, 153, 0.4);"></span>
+                                        <span class="adm-income-label">Partnership Income</span>
+                                    </div>
+                                    <div class="adm-income-item-right">
+                                        <span class="adm-income-amount">$ {{ number_format($partVal, 2) }}</span>
+                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            @if ($slegVal > 0)
+                            <li>
+                                <a href="{{ url('admin/income/single-leg-incomes') }}" class="adm-income-item-link">
+                                    <div class="adm-income-item-left">
+                                        <span class="adm-income-dot" style="background: #06B6D4; box-shadow: 0 0 6px rgba(6, 182, 212, 0.4);"></span>
+                                        <span class="adm-income-label">Single Leg Income</span>
+                                    </div>
+                                    <div class="adm-income-item-right">
+                                        <span class="adm-income-amount">$ {{ number_format($slegVal, 2) }}</span>
+                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            @endif
                         </ul>
                     </div>
                 </div>
@@ -467,6 +541,7 @@
                                 <p class="adm-strip-item-label">Total Withdrawal</p>
                                 <h5 class="adm-strip-item-val text-danger">$ {{ totalWithdrawal() }}</h5>
                             </div>
+<<<<<<< HEAD
 =======
                     <div class="card-body commission-overview-body" style="padding: 0px 20px;">
                         <div class="row">
@@ -560,6 +635,8 @@
                                 </div>
                             @endif
 >>>>>>> 2813b871e89c2034f7174bfbe269b81a8f8ab7bf
+=======
+>>>>>>> 18031a8b211e5282068ba717206fef2c9b05f1d3
                         </div>
                     </div>
                 </div>
