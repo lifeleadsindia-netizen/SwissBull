@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
+use App\Models\MonthlyTradingProfitConfiction;
 use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
 use App\Models\PackagePlan;
@@ -18,7 +19,37 @@ class InvestmentController extends Controller
     {
         $memberid = session('MEMBER_ID');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
-        $result['packagePlans'] = PackagePlan::where('status', 'Active')->orderBy('min_amount', 'asc')->get();
+
+        $distributionConfig = PackageDistribution::getDistributionConfig();
+        $globalTradingPercent = (float) ($distributionConfig['trading_wallet'] ?? $distributionConfig['p2p_wallet'] ?? 70.0);
+        $globalCappingPercent = MonthlyTradingProfitConfiction::getCappingPercent();
+
+        $packagePlans = PackagePlan::where('status', 'Active')->orderBy('min_amount', 'asc')->get();
+
+        foreach ($packagePlans as $plan) {
+            // 1. Dynamic Daily ROI rate: MonthlyTradingProfitConfiction has precedence, else plan rate
+            $configuredRate = MonthlyTradingProfitConfiction::getRateForPackage($plan->id);
+            if ($configuredRate > 0) {
+                $plan->return_percent = $configuredRate;
+            }
+
+            // 2. Dynamic Capping %: MonthlyTradingProfitConfiction has precedence, else plan capping
+            if ($globalCappingPercent > 0) {
+                $plan->max_return_percent = $globalCappingPercent;
+            }
+
+            // 3. Dynamic Trading Wallet %:
+            if ($plan->trading_wallet_percent && (float) $plan->trading_wallet_percent !== 70.0) {
+                $plan->trading_wallet_percent = (float) $plan->trading_wallet_percent;
+            } else {
+                $plan->trading_wallet_percent = $globalTradingPercent > 0 ? $globalTradingPercent : 70.0;
+            }
+        }
+
+        $result['packagePlans'] = $packagePlans;
+        $result['globalTradingPercent'] = $globalTradingPercent > 0 ? $globalTradingPercent : 70.0;
+        $result['globalCappingPercent'] = $globalCappingPercent > 0 ? $globalCappingPercent : 200.0;
+        $result['activeStakings'] = StakingDetail::where('memberid', $memberid)->orderBy('created_at', 'desc')->get();
 
         return view('member.investment.create-investment', $result);
     }
@@ -150,17 +181,6 @@ class InvestmentController extends Controller
             return redirect()->back();
         }
 
-        // Lock verification
-        $lockError = null;
-        if (! $member->canPurchasePackage($lockError)) {
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json(['status' => false, 'message' => $lockError], 422);
-            }
-            session()->flash('failedMsg', $lockError);
-
-            return redirect()->back();
-        }
-
         // Staking balance verification: Staking is funded strictly from Fund Wallet (p2p_wallet)
         if ((float) $member->p2p_wallet < $amount) {
             $msg = 'Insufficient Fund Wallet (P2P Wallet) balance. Available: $'.number_format((float) $member->p2p_wallet, 2);
@@ -173,9 +193,24 @@ class InvestmentController extends Controller
         }
 
         $distributionConfig = PackageDistribution::getDistributionConfig();
-        $tradingWalletPercent = $plan ? (float) ($plan->trading_wallet_percent ?: 70.0) : (float) ($distributionConfig['p2p_wallet'] ?? 70.0);
-        $returnPercent = $plan ? (float) ($plan->return_percent ?: 5.0) : 5.0;
-        $maxReturnPercent = $plan ? (float) ($plan->max_return_percent ?: 200.0) : 200.0;
+        $globalTradingPercent = (float) ($distributionConfig['trading_wallet'] ?? $distributionConfig['p2p_wallet'] ?? 70.0);
+        $globalCappingPercent = MonthlyTradingProfitConfiction::getCappingPercent();
+        $configuredRate = $plan ? MonthlyTradingProfitConfiction::getRateForPackage($plan->id) : 0.0;
+
+        if ($plan && $plan->trading_wallet_percent && (float) $plan->trading_wallet_percent !== 70.0) {
+            $tradingWalletPercent = (float) $plan->trading_wallet_percent;
+        } else {
+            $tradingWalletPercent = $globalTradingPercent > 0 ? $globalTradingPercent : 70.0;
+        }
+
+        $returnPercent = $configuredRate > 0
+            ? $configuredRate
+            : ($plan ? (float) ($plan->return_percent ?: 5.0) : 5.0);
+
+        $maxReturnPercent = $globalCappingPercent > 0
+            ? $globalCappingPercent
+            : ($plan ? (float) ($plan->max_return_percent ?: 200.0) : 200.0);
+
         $lockDays = $plan ? (int) ($plan->lock_days ?: 90) : 90;
         $durationDays = $plan ? (int) ($plan->duration_days ?: 1200) : 1200;
 
@@ -192,6 +227,7 @@ class InvestmentController extends Controller
                 $orderId,
                 $txnid,
                 $tradingWalletAmount,
+                $tradingWalletPercent,
                 $returnPercent,
                 $maxReturnPercent,
                 $maxEarning,
@@ -239,6 +275,7 @@ class InvestmentController extends Controller
                 $stakingDetail->invest_date = now();
                 $stakingDetail->invest_amount = $amount;
                 $stakingDetail->package = $normalizedPackage;
+                $stakingDetail->trading_wallet_amount = $tradingWalletAmount;
                 $stakingDetail->txnid = $txnid;
                 $stakingDetail->order_id = $orderId;
                 $stakingDetail->installments = 0;
@@ -287,14 +324,14 @@ class InvestmentController extends Controller
                     "{$amount} USDT deducted from Fund Wallet for {$normalizedPackage} package staking"
                 );
 
-                // Add 70% to Trading Wallet (debit = addition)
+                // Add dynamic % to Trading Wallet (debit = addition)
                 walletTransfer(
                     $memberid,
                     $tradingWalletAmount,
                     'debit',
                     $oldTradingWallet,
                     'Trading Wallet',
-                    "{$tradingWalletAmount} USDT (70% of {$amount} USDT staking) credited to Trading Wallet"
+                    "{$tradingWalletAmount} USDT ({$tradingWalletPercent}% of {$amount} USDT staking) credited to Trading Wallet"
                 );
 
                 // 6. Referral Bonus & Team Investment Share

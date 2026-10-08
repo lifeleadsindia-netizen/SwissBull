@@ -153,9 +153,11 @@ class DepositFundTest extends TestCase
 
     public function test_package_distribution_configuration_reads_from_database(): void
     {
+        $dist = PackageDistribution::first();
+        $expectedP2p = $dist ? (float) ($dist->p2p_wallet ?? 70.0) : 70.0;
         $config = PackageDistribution::getDistributionConfig();
 
-        $this->assertEquals(70.0, $config['p2p_wallet']);
+        $this->assertEquals($expectedP2p, $config['p2p_wallet']);
         $this->assertArrayHasKey('referral_bonus', $config);
         $this->assertArrayHasKey('team_trading_profit', $config);
         $this->assertArrayHasKey('team_performance_bonus', $config);

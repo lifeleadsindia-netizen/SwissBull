@@ -4,10 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
-use App\Models\PackagePlan;
 use App\Models\StakingDetail;
 use App\Models\TradingWalletSetting;
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Tests\TestCase;
 
@@ -264,5 +262,33 @@ class MemberDashboardLockTest extends TestCase
                 'fund_lock_return_message' => 'Fund Locked, You are eligible for total return of 200% Returns',
             ],
         ]);
+    }
+
+    /**
+     * Test that member dashboard loads without TypeError when package_range is null.
+     */
+    public function test_member_dashboard_loads_when_package_range_is_null(): void
+    {
+        PackageDetail::create([
+            'memberid' => $this->memberId,
+            'package_type' => 'Account Activation',
+            'package_range' => null,
+            'package_value' => 30.00,
+            'invest_amount' => 30.00,
+            'trading_wallet_amount' => 0.00,
+            'order_id' => 'ORD_ACT_'.time(),
+            'txnid' => '0x_act_'.time(),
+            'status' => 'Accepted',
+            'activated_at' => now(),
+            'total_earning' => 0.00,
+            'max_earning' => 0.00,
+        ]);
+
+        $response = $this->withSession([
+            'MEMBER_ID' => $this->memberId,
+            'country' => 'India',
+        ])->get('/member/dashboard');
+
+        $response->assertStatus(200);
     }
 }

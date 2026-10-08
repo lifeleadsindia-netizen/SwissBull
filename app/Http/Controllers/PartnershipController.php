@@ -49,12 +49,6 @@ class PartnershipController extends Controller
             return redirect()->back();
         }
 
-        $lockError = null;
-        if (! $member->canPurchasePackage($lockError)) {
-            session()->flash('failedMsg', $lockError);
-
-            return redirect()->back();
-        }
 
         if ($member->p2p_wallet < $amount) {
             session()->flash('failedMsg', 'Insufficient wallet balance.');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
+use App\Models\TradingWalletSetting;
 use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 
@@ -37,13 +38,6 @@ class ActivationController extends Controller
 
         if ($member->p2p_wallet < $amount) {
             session()->flash('failedMsg', 'Insufficient wallet balance.');
-
-            return redirect()->back();
-        }
-
-        $lockError = null;
-        if ($member->status == 'Active' && ! $member->canPurchasePackage($lockError)) {
-            session()->flash('failedMsg', $lockError);
 
             return redirect()->back();
         }

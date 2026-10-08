@@ -223,7 +223,7 @@ class MemberDetailController extends Controller
                 }
             }
 
-            $pkgPlan = PackagePlan::findByRange($pkg->package_range);
+            $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
             $pkgMaxReturn = $pkgPlan ? (float) $pkgPlan->max_return_percent : (float) ($pkg->max_return_percent ?: $maxReturnPercent);
 
             $pkg->is_locked = $pkgIsLocked;
@@ -403,7 +403,7 @@ class MemberDetailController extends Controller
                 }
             }
 
-            $pkgPlan = PackagePlan::findByRange($pkg->package_range);
+            $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
             $pkgMaxReturn = $pkgPlan ? (float) $pkgPlan->max_return_percent : (float) ($pkg->max_return_percent ?: $maxReturnPercent);
 
             $processedPackages[] = [

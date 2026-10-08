@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\DirectIncome;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
+use App\Models\MonthlyTradingProfitConfiction;
 use App\Models\PackageDetail;
+use App\Models\PackageDistribution;
 use App\Models\StakingDetail;
 use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
@@ -120,10 +122,12 @@ class StakingPackageInvestmentTest extends TestCase
         $response->assertJson(['status' => false]);
     }
 
-    public function test_staking_deducts_p2p_wallet_and_credits_70_percent_to_trading_wallet(): void
+    public function test_staking_deducts_p2p_wallet_and_credits_dynamic_percent_to_trading_wallet(): void
     {
+        $distributionConfig = PackageDistribution::getDistributionConfig();
+        $tradingPercent = (float) ($distributionConfig['trading_wallet'] ?? 70.0);
         $stakeAmount = 100.00;
-        $expectedTradingWallet = 70.00; // 70% of 100
+        $expectedTradingWallet = round($stakeAmount * ($tradingPercent / 100), 2);
         $expectedP2PBalance = 400.00; // 500 - 100
 
         $response = $this->withSession(['MEMBER_ID' => $this->memberId])
@@ -145,7 +149,7 @@ class StakingPackageInvestmentTest extends TestCase
         $pkg = PackageDetail::where('memberid', $this->memberId)->latest()->first();
         $this->assertNotNull($pkg);
         $this->assertEquals(100.00, (float) $pkg->invest_amount);
-        $this->assertEquals(70.00, (float) $pkg->trading_wallet_amount);
+        $this->assertEquals($expectedTradingWallet, (float) $pkg->trading_wallet_amount);
         $this->assertEquals('Active', $pkg->status);
 
         // Verify Staking Detail record
@@ -153,6 +157,7 @@ class StakingPackageInvestmentTest extends TestCase
         $this->assertNotNull($staking);
         $this->assertEquals(100.00, (float) $staking->invest_amount);
         $this->assertEquals('50-500', $staking->package);
+        $this->assertEquals($expectedTradingWallet, (float) $staking->trading_wallet_amount);
         $this->assertEquals('Active', $staking->status);
 
         // Verify Wallet Ledger records
@@ -165,8 +170,67 @@ class StakingPackageInvestmentTest extends TestCase
         $this->assertDatabaseHas('wallet_transfers', [
             'memberid' => $this->memberId,
             'walletType' => 'Trading Wallet',
-            'debit' => 70.00, // Inflow to Trading Wallet
+            'debit' => $expectedTradingWallet, // Inflow to Trading Wallet
         ]);
+    }
+
+    public function test_admin_changes_percentages_and_member_panel_reflects_dynamically(): void
+    {
+        $origDist = PackageDistribution::first()?->only(['trading_wallet', 'p2p_wallet']);
+        $origProfit = MonthlyTradingProfitConfiction::first()?->only([
+            'capping_percent', 'rate', 'package_1_rate', 'package_2_rate', 'package_3_rate',
+        ]);
+
+        try {
+            // 1. Admin configures custom package distribution (60% trading wallet)
+            PackageDistribution::query()->update([
+                'trading_wallet' => 60.00,
+                'p2p_wallet' => 60.00,
+            ]);
+
+            // 2. Admin configures custom Monthly Trading Profit (6.5% rate and 300% capping)
+            MonthlyTradingProfitConfiction::query()->update([
+                'capping_percent' => 300.00,
+                'rate' => 6.50,
+                'package_1_rate' => 6.50,
+                'package_2_rate' => 8.50,
+                'package_3_rate' => 12.00,
+            ]);
+
+            // 3. Member panel Staking page renders with updated dynamic percentages
+            $response = $this->withSession(['MEMBER_ID' => $this->memberId])
+                ->get('/member/Staking/create');
+
+            $response->assertStatus(200);
+            $response->assertSee('6.5% Daily ROI, 300% Cap');
+            $response->assertSeeText('60% Credited to Trading Wallet');
+
+            // 4. Staking created with dynamic percentages
+            $investResponse = $this->withSession(['MEMBER_ID' => $this->memberId])
+                ->postJson(route('createInvestment'), [
+                    'memberid' => $this->memberId,
+                    'package' => '50-500',
+                    'amount' => 100.00,
+                ]);
+
+            $investResponse->assertStatus(200);
+            $investResponse->assertJson(['status' => true]);
+
+            $member = MemberDetail::where('memberid', $this->memberId)->first();
+            $this->assertEquals(60.00, (float) $member->trading_wallet);
+
+            $staking = StakingDetail::where('memberid', $this->memberId)->latest()->first();
+            $this->assertEquals(6.50, (float) $staking->rate);
+            $this->assertEquals(300.00, (float) $staking->capping_percent);
+            $this->assertEquals(300.00, (float) $staking->max_amount);
+        } finally {
+            if ($origDist) {
+                PackageDistribution::query()->update($origDist);
+            }
+            if ($origProfit) {
+                MonthlyTradingProfitConfiction::query()->update($origProfit);
+            }
+        }
     }
 
     public function test_staking_applies_trading_wallet_lock_and_incomes(): void
@@ -184,15 +248,25 @@ class StakingPackageInvestmentTest extends TestCase
         $this->assertTrue($member->isTradingWalletLocked());
         $this->assertGreaterThan(0, $member->tradingWalletRemainingLockDays());
 
-        // Second package purchase during active lock should be blocked
+        // Second package purchase is allowed: Every package has individual returns and expiry
         $secondResponse = $this->withSession(['MEMBER_ID' => $this->memberId])
             ->postJson(route('createInvestment'), [
                 'memberid' => $this->memberId,
                 'package' => '50-500',
-                'amount' => 100.00,
+                'amount' => 150.00,
             ]);
 
-        $secondResponse->assertStatus(422);
-        $secondResponse->assertJson(['status' => false]);
+        $secondResponse->assertStatus(200);
+        $secondResponse->assertJson(['status' => true]);
+
+        // Verify multiple packages tracked individually
+        $stakings = StakingDetail::where('memberid', $this->memberId)->orderBy('id', 'asc')->get();
+        $this->assertCount(2, $stakings);
+        $this->assertEquals(100.00, (float) $stakings[0]->invest_amount);
+        $this->assertEquals(150.00, (float) $stakings[1]->invest_amount);
+        $this->assertEquals('Active', $stakings[0]->status);
+        $this->assertEquals('Active', $stakings[1]->status);
+        $this->assertEquals(200.00, (float) $stakings[0]->max_amount); // 100 * 200%
+        $this->assertEquals(300.00, (float) $stakings[1]->max_amount); // 150 * 200%
     }
 }

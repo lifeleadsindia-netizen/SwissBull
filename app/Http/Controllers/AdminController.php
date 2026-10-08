@@ -793,17 +793,32 @@ class AdminController extends Controller
             foreach ($validated['plans'] as $planData) {
                 $plan = PackagePlan::find($planData['id']);
                 if ($plan) {
+                    $planTradingWallet = (isset($planData['trading_wallet_percent']) && $planData['trading_wallet_percent'] !== '')
+                        ? (float) $planData['trading_wallet_percent']
+                        : $tradingWalletVal;
+
                     $plan->update([
                         'name' => $planData['name'],
                         'min_amount' => $planData['min_amount'],
                         'max_amount' => (isset($planData['max_amount']) && $planData['max_amount'] !== '' && $planData['max_amount'] !== null) ? $planData['max_amount'] : null,
-                        'trading_wallet_percent' => $planData['trading_wallet_percent'] ?? 70.00,
+                        'trading_wallet_percent' => $planTradingWallet,
                         'return_percent' => $planData['return_percent'] ?? 5.00,
                         'max_return_percent' => $planData['max_return_percent'] ?? 200.00,
                         'lock_days' => $planData['lock_days'] ?? 30,
                         'duration_days' => $planData['duration_days'] ?? 1200,
                         'status' => $planData['status'] ?? 'Active',
                     ]);
+
+                    if (isset($planData['return_percent']) || isset($planData['max_return_percent'])) {
+                        MonthlyTradingProfitConfiction::updateOrCreate(
+                            ['package_id' => $plan->id],
+                            [
+                                'rate' => (float) ($planData['return_percent'] ?? 5.00),
+                                'rate_percent' => (float) ($planData['return_percent'] ?? 5.00),
+                                'capping_percent' => (float) ($planData['max_return_percent'] ?? 200.00),
+                            ]
+                        );
+                    }
                 }
             }
         }
@@ -871,6 +886,13 @@ class AdminController extends Controller
                     'package_3_rate' => $orderedRates[2] ?? 0.00,
                 ]
             );
+
+            if ($rateVal > 0 || $cappingPercent > 0) {
+                $package->update([
+                    'return_percent' => $rateVal > 0 ? $rateVal : $package->return_percent,
+                    'max_return_percent' => $cappingPercent > 0 ? $cappingPercent : $package->max_return_percent,
+                ]);
+            }
         }
 
         MonthlyTradingProfitConfiction::query()->update([

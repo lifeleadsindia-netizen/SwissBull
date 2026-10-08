@@ -61,11 +61,12 @@ class StakingRoiService
             $maxAmount = $staking->getMaxRoiAmount();
             $totalEarned = $staking->getTotalEarned();
 
-            // 4. Check remaining eligible maximum ROI
+            // 4. Check remaining eligible maximum ROI and duration installments
             $remainingCap = max(0.00, round($maxAmount - $totalEarned, 2));
+            $isInstallmentsComplete = ($staking->total_installments > 0 && (int) $staking->installments >= (int) $staking->total_installments);
 
-            if ($remainingCap <= 0.00) {
-                // Maximum cap has already been reached — deactivate package automatically
+            if ($remainingCap <= 0.00 || $isInstallmentsComplete) {
+                // Maximum cap or duration has already been reached — deactivate package automatically
                 $staking->status = 'Deactive';
                 $staking->deactivated_at = $staking->deactivated_at ?? now();
                 $staking->total_earned = $totalEarned;

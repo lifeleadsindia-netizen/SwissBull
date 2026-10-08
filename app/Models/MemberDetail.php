@@ -220,18 +220,11 @@ class MemberDetail extends Model
 
     /**
      * Check if the member is permitted to purchase or apply for a package.
-     * Restriction 2: Blocked during active Lock Period.
+     * Every package operates independently with its own individual returns and expiry.
+     * Multiple package purchases are allowed.
      */
     public function canPurchasePackage(?string &$errorMessage = null): bool
     {
-        if ($this->isTradingWalletLocked()) {
-            $remaining = $this->tradingWalletRemainingLockDays();
-            $until = $this->tradingWalletLockedUntil() ? $this->tradingWalletLockedUntil()->format('d M Y') : 'lock expiry';
-            $errorMessage = "Package purchase is locked. You cannot purchase or apply for another package during the active Lock Period ({$remaining} day(s) remaining until {$until}).";
-
-            return false;
-        }
-
         return true;
     }
 

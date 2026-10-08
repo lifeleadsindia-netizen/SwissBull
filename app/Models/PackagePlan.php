@@ -31,8 +31,12 @@ class PackagePlan extends Model
     /**
      * Find plan by package_range string.
      */
-    public static function findByRange(string $range): ?self
+    public static function findByRange(?string $range): ?self
     {
+        if ($range === null || trim($range) === '') {
+            return null;
+        }
+
         $normalized = match (trim($range)) {
             '50-500', '50 - 500' => '50-500',
             '600-5000', '600 - 5000' => '600-5000',

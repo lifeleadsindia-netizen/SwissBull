@@ -18,6 +18,7 @@ class StakingDetail extends Model
 
     protected $casts = [
         'invest_amount' => 'float',
+        'trading_wallet_amount' => 'float',
         'rate' => 'float',
         'capping_percent' => 'float',
         'max_amount' => 'float',
@@ -32,13 +33,18 @@ class StakingDetail extends Model
     ];
 
     /**
-     * Auto-populate default invest_date if not set.
+     * Auto-populate default invest_date and trading_wallet_amount if not set.
      */
     protected static function booted(): void
     {
         static::creating(function (StakingDetail $staking) {
             if (empty($staking->invest_date)) {
                 $staking->invest_date = now();
+            }
+            if ((empty($staking->trading_wallet_amount) || (float) $staking->trading_wallet_amount === 0.0) && ! empty($staking->invest_amount)) {
+                $plan = PackagePlan::findByRange($staking->package);
+                $percent = $plan && (float) $plan->trading_wallet_percent > 0 ? (float) $plan->trading_wallet_percent : 70.0;
+                $staking->trading_wallet_amount = round(((float) $staking->invest_amount) * ($percent / 100), 2);
             }
         });
     }
