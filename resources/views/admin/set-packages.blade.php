@@ -52,15 +52,15 @@
             </div>
 
             <div class="col-12">
-                <form action="{{ route('admin.savePackages') }}" method="POST">
-                    @csrf
-                    <input type="hidden" id="trading_wallet" name="trading_wallet"
-                        value="{{ old('trading_wallet', optional($distribution)->trading_wallet !== null ? number_format((float) $distribution->trading_wallet, 2, '.', '') : (optional($distribution)->p2p_wallet !== null ? number_format((float) $distribution->p2p_wallet, 2, '.', '') : '70.00')) }}">
+                <div class="row">
+                    {{-- Left Column: Package Distribution % --}}
+                    <div class="col-xl-5 col-lg-5 col-md-12 mb-4">
+                        <form action="{{ route('admin.savePackages') }}" method="POST" id="formPackageDistribution">
+                            @csrf
+                            <input type="hidden" id="trading_wallet" name="trading_wallet"
+                                value="{{ old('trading_wallet', optional($distribution)->trading_wallet !== null ? number_format((float) $distribution->trading_wallet, 2, '.', '') : (optional($distribution)->p2p_wallet !== null ? number_format((float) $distribution->p2p_wallet, 2, '.', '') : '70.00')) }}">
 
-                    <div class="row">
-                        {{-- Left Column: Package Distribution % --}}
-                        <div class="col-xl-5 col-lg-5 col-md-12 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
+                            <div class="card shadow-sm border-0">
                                 <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
                                     <h3 class="mb-0 text-white font-weight-bold"><i class="ik ik-pie-chart mr-2"></i>{{ __('Package Distribution (%)') }}</h3>
                                     <span class="badge badge-light text-primary font-weight-bold">100% Pool</span>
@@ -89,58 +89,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="referral_bonus" class="font-weight-bold text-dark">{{ __('Referral Bonus') }}</label>
-                                        <div class="input-group">
-                                            <input type="number" step="any" min="0" max="100"
-                                                class="form-control @error('referral_bonus') is-invalid @enderror"
-                                                id="referral_bonus" name="referral_bonus"
-                                                value="{{ old('referral_bonus', optional($distribution)->referral_bonus !== null ? number_format((float) $distribution->referral_bonus, 2, '.', '') : '10.00') }}"
-                                                required>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text font-weight-bold bg-light">%</span>
-                                            </div>
-                                        </div>
-                                        @error('referral_bonus')
-                                            <span class="text-danger small">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="team_trading_profit" class="font-weight-bold text-dark">{{ __('Team Trading Profit') }}</label>
-                                        <div class="input-group">
-                                            <input type="number" step="any" min="0" max="100"
-                                                class="form-control @error('team_trading_profit') is-invalid @enderror"
-                                                id="team_trading_profit" name="team_trading_profit"
-                                                value="{{ old('team_trading_profit', optional($distribution)->team_trading_profit !== null ? number_format((float) $distribution->team_trading_profit, 2, '.', '') : '8.00') }}"
-                                                required>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text font-weight-bold bg-light">%</span>
-                                            </div>
-                                        </div>
-                                        @error('team_trading_profit')
-                                            <span class="text-danger small">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="team_performance_bonus" class="font-weight-bold text-dark">{{ __('Team Performance Bonus') }}</label>
-                                        <div class="input-group">
-                                            <input type="number" step="any" min="0" max="100"
-                                                class="form-control @error('team_performance_bonus') is-invalid @enderror"
-                                                id="team_performance_bonus" name="team_performance_bonus"
-                                                value="{{ old('team_performance_bonus', optional($distribution)->team_performance_bonus !== null ? number_format((float) $distribution->team_performance_bonus, 2, '.', '') : '10.00') }}"
-                                                required>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text font-weight-bold bg-light">%</span>
-                                            </div>
-                                        </div>
-                                        @error('team_performance_bonus')
-                                            <span class="text-danger small">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-
-                                    <div class="form-group">
+                                    <div class="form-group mb-4">
                                         <label for="hero_of_the_month" class="font-weight-bold text-dark">{{ __('Hero of the Month') }}</label>
                                         <div class="input-group">
                                             <input type="number" step="any" min="0" max="100"
@@ -156,20 +105,29 @@
                                             <span class="text-danger small">{{ $message }}</span>
                                         @enderror
                                     </div>
+
+                                    <div class="text-center pt-2">
+                                        <button type="submit" class="btn btn-primary px-4 shadow">
+                                            <i class="ik ik-save mr-2"></i>{{ __('Save / Update') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
+                    </div>
 
-                        {{-- Right Column: Dynamic Package Plans & Ranges --}}
-                        <div class="col-xl-7 col-lg-7 col-md-12 mb-4">
-                            <div class="card h-100 shadow-sm border-0">
+                    {{-- Right Column: Dynamic Package Plans & Ranges --}}
+                    <div class="col-xl-7 col-lg-7 col-md-12 mb-4">
+                        <form action="{{ route('admin.savePackages') }}" method="POST" id="formPackagePlans">
+                            @csrf
+                            <div class="card shadow-sm border-0">
                                 <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between">
                                     <h3 class="mb-0 text-white font-weight-bold"><i class="ik ik-layers mr-2"></i>{{ __('Package Plans & Investment Tiers') }}</h3>
                                     <span class="badge badge-success font-weight-bold">3 Tiers Configured</span>
                                 </div>
                                 <div class="card-body">
                                     <p class="text-muted small mb-3">
-                                        {{ __('Manage min/max deposit limits, individual return rates, maximum earning capping, and lock periods for each package range.') }}
+                                        {{ __('Manage package titles, min/max deposit limits, and active status for each package range.') }}
                                     </p>
 
                                     @if(isset($packagePlans) && $packagePlans->count() > 0)
@@ -190,50 +148,33 @@
                                                 </div>
 
                                                 <div class="row">
-                                                    <div class="col-md-6 form-group mb-2">
+                                                    <div class="col-md-6 form-group mb-0">
                                                         <label class="small text-muted mb-1">{{ __('Package Title') }}</label>
                                                         <input type="text" class="form-control form-control-sm" name="plans[{{ $index }}][name]" value="{{ $plan->name }}" required>
                                                     </div>
-                                                    <div class="col-md-3 form-group mb-2">
+                                                    <div class="col-md-3 form-group mb-0">
                                                         <label class="small text-muted mb-1">{{ __('Min Deposit ($)') }}</label>
                                                         <input type="number" step="any" min="0" class="form-control form-control-sm" name="plans[{{ $index }}][min_amount]" value="{{ $plan->min_amount }}" required>
                                                     </div>
-                                                    <div class="col-md-3 form-group mb-2">
+                                                    <div class="col-md-3 form-group mb-0">
                                                         <label class="small text-muted mb-1">{{ __('Max Deposit ($)') }}</label>
                                                         <input type="number" step="any" min="0" class="form-control form-control-sm" name="plans[{{ $index }}][max_amount]" value="{{ $plan->max_amount }}" placeholder="Unlimited">
-                                                    </div>
-                                                    <div class="col-md-3 form-group mb-2">
-                                                        <label class="small text-muted mb-1">{{ __('Trading Wallet %') }}</label>
-                                                        <input type="number" step="any" min="0" max="100" class="form-control form-control-sm" name="plans[{{ $index }}][trading_wallet_percent]" value="{{ $plan->trading_wallet_percent }}">
-                                                    </div>
-                                                    <div class="col-md-3 form-group mb-2">
-                                                        <label class="small text-muted mb-1">{{ __('Return Rate %') }}</label>
-                                                        <input type="number" step="any" min="0" class="form-control form-control-sm" name="plans[{{ $index }}][return_percent]" value="{{ $plan->return_percent }}">
-                                                    </div>
-                                                    <div class="col-md-3 form-group mb-2">
-                                                        <label class="small text-muted mb-1">{{ __('Max Return Limit %') }}</label>
-                                                        <input type="number" step="any" min="0" class="form-control form-control-sm" name="plans[{{ $index }}][max_return_percent]" value="{{ $plan->max_return_percent }}">
-                                                    </div>
-                                                    <div class="col-md-3 form-group mb-2">
-                                                        <label class="small text-muted mb-1">{{ __('Lock Period (Days)') }}</label>
-                                                        <input type="number" min="0" class="form-control form-control-sm" name="plans[{{ $index }}][lock_days]" value="{{ $plan->lock_days }}">
                                                     </div>
                                                 </div>
                                             </div>
                                         @endforeach
                                     @endif
+
+                                    <div class="text-center pt-2">
+                                        <button type="submit" class="btn btn-primary px-4 shadow">
+                                            <i class="ik ik-save mr-2"></i>{{ __('Save / Update') }}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {{-- Submit Button --}}
-                        <div class="col-12 text-center my-3">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow">
-                                <i class="ik ik-save mr-2"></i>{{ __('Save / Update All Package Settings') }}
-                            </button>
-                        </div>
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

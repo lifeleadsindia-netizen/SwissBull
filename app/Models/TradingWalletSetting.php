@@ -13,6 +13,7 @@ class TradingWalletSetting extends Model
     protected $casts = [
         'lock_days' => 'integer',
         'withdrawal_percent' => 'float',
+        'status' => 'string',
     ];
 
     /**
@@ -25,6 +26,7 @@ class TradingWalletSetting extends Model
             $setting = static::create([
                 'lock_days' => 90,
                 'withdrawal_percent' => 100.00,
+                'status' => 'on',
             ]);
         }
 
@@ -45,5 +47,49 @@ class TradingWalletSetting extends Model
     public static function getDefaultWithdrawalPercent(): float
     {
         return (float) (static::getActiveSetting()->withdrawal_percent ?? 100.00);
+    }
+
+    /**
+     * Get current status ('on' or 'off').
+     */
+    public static function getStatus(): string
+    {
+        return strtolower((string) (static::getActiveSetting()->status ?? 'on'));
+    }
+
+    /**
+     * Check if status is set to on.
+     */
+    public function isOn(): bool
+    {
+        $status = strtolower((string) ($this->status ?? 'on'));
+
+        return $status === 'on' || $status === 'lock';
+    }
+
+    /**
+     * Check if status is set to off.
+     */
+    public function isOff(): bool
+    {
+        $status = strtolower((string) ($this->status ?? 'on'));
+
+        return $status === 'off' || $status === 'unlock';
+    }
+
+    /**
+     * Check if status is set to on (legacy alias for isLocked).
+     */
+    public function isLocked(): bool
+    {
+        return $this->isOn();
+    }
+
+    /**
+     * Check if status is set to off (legacy alias for isUnlocked).
+     */
+    public function isUnlocked(): bool
+    {
+        return $this->isOff();
     }
 }
