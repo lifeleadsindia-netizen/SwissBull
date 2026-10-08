@@ -1651,8 +1651,8 @@ class AdminController extends Controller
             $isLocked = $lockedUntil ? now()->lt($lockedUntil) : false;
             $remDays = $isLocked ? (int) ceil(now()->diffInSeconds($lockedUntil, false) / 86400) : 0;
 
-            // CHANGE 2: Backend balance is member_details.p2p_wallet, mapped to Trading Wallet
-            $p2pBalance = (float) ($mem->p2p_wallet ?? 0.00);
+            // CHANGE 2: Backend balance is member_details.trading_wallet, mapped to Trading Wallet
+            $p2pBalance = (float) ($mem->trading_wallet ?? 0.00);
             $maxWithdrawable = $isLocked ? 0.00 : max(0.00, round(($p2pBalance * $withPercent) / 100.00, 2));
 
             $pkgName = $stk->package ? 'Package '.$stk->package : 'Staking Package';
@@ -1812,7 +1812,7 @@ class AdminController extends Controller
         $isLocked = $lockedUntil ? now()->lt($lockedUntil) : false;
         $remDays = $isLocked ? (int) ceil(now()->diffInSeconds($lockedUntil, false) / 86400) : 0;
 
-        $p2pBalance = (float) ($member->p2p_wallet ?? 0.00);
+        $p2pBalance = (float) ($member->trading_wallet ?? 0.00);
         $maxWithdrawable = $isLocked ? 0.00 : max(0.00, round(($p2pBalance * $withPercent) / 100.00, 2));
 
         $regDate = $member->created_at ? Carbon::parse($member->created_at)->format('d M Y') : 'N/A';
