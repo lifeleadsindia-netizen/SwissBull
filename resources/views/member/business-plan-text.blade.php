@@ -51,7 +51,7 @@
                             </span>
                         </div>
 
-                        <h3 class="text-white fw-bold mb-2" style="font-size: clamp(18px, 4.5vw, 24px);">Math Wallet Official Business Plan</h3>
+                        <h3 class="text-white fw-bold mb-2" style="font-size: clamp(18px, 4.5vw, 24px);">SYNC TRADE Official Business Plan</h3>
 
                         <!-- Exact Text from Document Intro -->
                         <div class="plan-intro-callout p-3 rounded-3 mb-3">
@@ -78,7 +78,7 @@
                                     <button type="button" class="btn btn-warning btn-sm px-3 fw-bold flex-grow-1 flex-sm-grow-0 d-inline-flex align-items-center justify-content-center" onclick="copyReferralLink()">
                                         <i class="far fa-copy me-1"></i> <span id="copyBtnText">Copy Link</span>
                                     </button>
-                                    <a href="https://wa.me/?text={{ rawurlencode("📊 *Math Wallet Official Business Plan*\n\nReview the complete earnings and staking model:\n👉 Join our team: " . $referralLink) }}" target="_blank" class="btn btn-success btn-sm px-3 flex-grow-1 flex-sm-grow-0 d-inline-flex align-items-center justify-content-center">
+                                    <a href="https://wa.me/?text={{ rawurlencode("📊 *SYNC TRADE Official Business Plan*\n\nReview the complete earnings and staking model:\n👉 Join our team: " . $referralLink) }}" target="_blank" class="btn btn-success btn-sm px-3 flex-grow-1 flex-sm-grow-0 d-inline-flex align-items-center justify-content-center">
                                         <i class="fab fa-whatsapp me-1"></i> Share
                                     </a>
                                 </div>
@@ -885,7 +885,7 @@
             <!-- BOTTOM CALL-TO-ACTION & BACK NAVIGATION -->
             <!-- ============================================================ -->
             <div class="bottom-action-card p-3 p-md-4 rounded-4 mb-5 text-center">
-                <h4 class="text-white fw-bold mb-2" style="font-size: clamp(16px, 4.5vw, 20px);">Ready to Build and Earn with Math Wallet?</h4>
+                <h4 class="text-white fw-bold mb-2" style="font-size: clamp(16px, 4.5vw, 20px);">Ready to Build and Earn with SYNC TRADE?</h4>
                 <p class="text-white-50 mb-4 mx-auto" style="max-width: 650px; font-size: 13.5px; word-break: break-word;">
                     Take advantage of the verified 15-stage single-leg system, daily promotional airdrops, and sustainable staking returns. Share your link with your team today!
                 </p>
