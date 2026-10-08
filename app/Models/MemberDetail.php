@@ -54,19 +54,19 @@ class MemberDetail extends Model
     }
 
     /**
-     * Accessor: Trading Wallet balance.
+     * Accessor: Trading Wallet balance is sourced directly from P2P Wallet.
      */
     public function getTradingWalletAttribute(): float
     {
-        return (float) ($this->attributes['trading_wallet'] ?? 0.00);
+        return (float) ($this->attributes['p2p_wallet'] ?? $this->attributes['trading_wallet'] ?? 0.00);
     }
 
     /**
-     * Mutator: Setting Trading Wallet balance.
+     * Mutator: Setting Trading Wallet balance directly to P2P Wallet.
      */
     public function setTradingWalletAttribute($value): void
     {
-        $this->attributes['trading_wallet'] = (float) $value;
+        $this->attributes['p2p_wallet'] = (float) $value;
     }
 
     /**

@@ -747,47 +747,47 @@ class AdminController extends Controller
 
     public function savePackages(Request $request)
     {
-        $rules = [
-            'p2p_wallet' => 'nullable|numeric|min:0',
-            'trading_wallet' => 'nullable|numeric|min:0',
-            'referral_bonus' => 'required|numeric|min:0',
-            'team_trading_profit' => 'required|numeric|min:0',
-            'team_performance_bonus' => 'required|numeric|min:0',
-            'hero_of_the_month' => 'required|numeric|min:0',
-            'plans' => 'nullable|array',
-            'plans.*.id' => 'required_with:plans|exists:package_plans,id',
-            'plans.*.name' => 'required_with:plans|string|max:100',
-            'plans.*.min_amount' => 'required_with:plans|numeric|min:0',
-            'plans.*.max_amount' => 'nullable|numeric',
-            'plans.*.trading_wallet_percent' => 'nullable|numeric|min:0|max:100',
-            'plans.*.return_percent' => 'nullable|numeric|min:0',
-            'plans.*.max_return_percent' => 'nullable|numeric|min:0',
-            'plans.*.lock_days' => 'nullable|integer|min:0',
-            'plans.*.duration_days' => 'nullable|integer|min:0',
-            'plans.*.status' => 'nullable|in:Active,Inactive',
-        ];
+        $hasDistribution = $request->filled('p2p_wallet') || $request->filled('trading_wallet') || $request->filled('hero_of_the_month');
+        $hasPlans = $request->has('plans');
 
-        // Ensure at least one of p2p_wallet or trading_wallet is present
-        if (! $request->filled('p2p_wallet') && ! $request->filled('trading_wallet')) {
-            $rules['trading_wallet'] = 'required|numeric|min:0';
+        $rules = [];
+
+        // Validate Distribution when submitted (or when neither is present)
+        if ($hasDistribution || ! $hasPlans) {
+            $rules['p2p_wallet'] = 'nullable|numeric|min:0';
+            $rules['trading_wallet'] = 'nullable|numeric|min:0';
+            $rules['hero_of_the_month'] = 'required|numeric|min:0';
+
+            if (! $request->filled('p2p_wallet') && ! $request->filled('trading_wallet')) {
+                $rules['trading_wallet'] = 'required|numeric|min:0';
+            }
+        }
+
+        // Validate Plans when submitted
+        if ($hasPlans) {
+            $rules['plans'] = 'required|array';
+            $rules['plans.*.id'] = 'required|exists:package_plans,id';
+            $rules['plans.*.name'] = 'required|string|max:100';
+            $rules['plans.*.min_amount'] = 'required|numeric|min:0';
+            $rules['plans.*.max_amount'] = 'nullable|numeric';
+            $rules['plans.*.status'] = 'nullable|in:Active,Inactive';
         }
 
         $validated = $request->validate($rules);
 
-        $tradingWalletVal = $validated['p2p_wallet'] ?? $validated['trading_wallet'] ?? 70.00;
+        if ($hasDistribution || ! $hasPlans) {
+            $tradingWalletVal = $validated['p2p_wallet'] ?? $validated['trading_wallet'] ?? 70.00;
 
-        $distribution = PackageDistribution::first();
-        if (! $distribution) {
-            $distribution = new PackageDistribution;
+            $distribution = PackageDistribution::first();
+            if (! $distribution) {
+                $distribution = new PackageDistribution;
+            }
+
+            $distribution->p2p_wallet = $tradingWalletVal;
+            $distribution->trading_wallet = $tradingWalletVal;
+            $distribution->hero_of_the_month = $validated['hero_of_the_month'];
+            $distribution->save();
         }
-
-        $distribution->p2p_wallet = $tradingWalletVal;
-        $distribution->trading_wallet = $tradingWalletVal;
-        $distribution->referral_bonus = $validated['referral_bonus'];
-        $distribution->team_trading_profit = $validated['team_trading_profit'];
-        $distribution->team_performance_bonus = $validated['team_performance_bonus'];
-        $distribution->hero_of_the_month = $validated['hero_of_the_month'];
-        $distribution->save();
 
         if (! empty($validated['plans'])) {
             foreach ($validated['plans'] as $planData) {
@@ -802,10 +802,10 @@ class AdminController extends Controller
                         'min_amount' => $planData['min_amount'],
                         'max_amount' => (isset($planData['max_amount']) && $planData['max_amount'] !== '' && $planData['max_amount'] !== null) ? $planData['max_amount'] : null,
                         'trading_wallet_percent' => $planTradingWallet,
-                        'return_percent' => $planData['return_percent'] ?? 5.00,
-                        'max_return_percent' => $planData['max_return_percent'] ?? 200.00,
-                        'lock_days' => $planData['lock_days'] ?? 30,
-                        'duration_days' => $planData['duration_days'] ?? 1200,
+                        'return_percent' => $planData['return_percent'] ?? $plan->return_percent ?? 5.00,
+                        'max_return_percent' => $planData['max_return_percent'] ?? $plan->max_return_percent ?? 200.00,
+                        'lock_days' => $planData['lock_days'] ?? $plan->lock_days ?? 30,
+                        'duration_days' => $planData['duration_days'] ?? $plan->duration_days ?? 1200,
                         'status' => $planData['status'] ?? 'Active',
                     ]);
 
@@ -823,7 +823,14 @@ class AdminController extends Controller
             }
         }
 
-        session()->flash('successMsg', 'Package distribution configuration updated successfully.');
+        $msg = 'Package configuration updated successfully.';
+        if ($hasDistribution && ! $hasPlans) {
+            $msg = 'Package distribution configuration updated successfully.';
+        } elseif ($hasPlans && ! $hasDistribution) {
+            $msg = 'Package investment tiers updated successfully.';
+        }
+
+        session()->flash('successMsg', $msg);
 
         return redirect()->back();
     }
@@ -1601,34 +1608,17 @@ class AdminController extends Controller
     }
 
     /**
-     * Show Trading Wallet Control management page with date-based package & member selection and active settings.
-     * Records are sourced from Staking Details verified with Member Details.
+     * Show Trading Wallet Control management page with exactly 2 cards:
+     * Card 1: 90-Day Delivery / Locking Code Configuration
+     * Card 2: Lock / Unlock control
      */
     public function tradingWalletControl(Request $request)
     {
-        $dateFrom = $request->query('date_from');
-        $dateTo = $request->query('date_to');
-
         $setting = TradingWalletSetting::getActiveSetting();
+        $rawStatus = strtolower((string) ($setting->status ?? 'on'));
+        $currentStatus = in_array($rawStatus, ['on', 'lock']) ? 'on' : 'off';
 
-        $stakings = collect();
-        if ($dateFrom && $dateTo) {
-            $start = Carbon::parse($dateFrom)->startOfDay();
-            $end = Carbon::parse($dateTo)->endOfDay();
-
-            // Sourced from Staking Details verified against Member Details
-            $stakings = StakingDetail::with('member')
-                ->whereHas('member')
-                ->where('status', '!=', 'Rejected')
-                ->whereBetween('created_at', [$start, $end])
-                ->orderBy('created_at', 'desc')
-                ->get();
-        }
-
-        $packages = $stakings;
-        $members = $stakings;
-
-        return view('admin.trading-wallet-control', compact('packages', 'members', 'stakings', 'dateFrom', 'dateTo', 'setting'));
+        return view('admin.trading-wallet-control', compact('setting', 'currentStatus'));
     }
 
     /**
@@ -1713,86 +1703,67 @@ class AdminController extends Controller
     }
 
     /**
-     * Apply Trading Wallet Lock and Post-Lock Maximum Withdrawal Percentage:
-     * - Data comes from Staking Details and Member Details.
-     * - Relationship between Staking Details Entry -> Corresponding Member Details Entry is verified.
-     * - Default/Current-Day Mode: Updates active setting in trading_wallet_settings.
-     * - Selected Mode: Validates selection and updates active settings.
-     * - Lock calculation is anchored to actual activation timestamp (staking_details.created_at).
+     * Apply Trading Wallet Control settings:
+     * - Card 1: Update locking-code / delivery days (lock_days)
+     * - Card 2: Set status ('lock' or 'unlock')
+     * - Preserves legacy parameters for backwards compatibility.
      */
     public function applyTradingWalletControl(Request $request)
     {
-        $action = $request->input('action');
-        $selectedPackages = $request->input('selected_packages', $request->input('selected_stakings', []));
-        $selectedMembers = $request->input('selected_members', []);
-
-        $hasSelection = (is_array($selectedPackages) && count($selectedPackages) > 0)
-            || (is_array($selectedMembers) && count($selectedMembers) > 0);
-
-        $rules = [
-            'date_from' => 'nullable|date',
-            'date_to' => 'nullable|date',
-            'lock_days' => 'required|integer|min:0',
-            'withdrawal_percent' => 'required|numeric|min:0|max:100',
-        ];
-
-        if ($action === 'apply_selected' || ($action !== 'save_current_setting' && $hasSelection)) {
-            if (! $hasSelection) {
-                return redirect()->back()->withErrors([
-                    'selected_packages' => 'Please select at least one package entry using the checkboxes.',
-                ]);
-            }
-        }
-
-        $request->validate($rules, [
-            'lock_days.required' => 'Please enter the lock period in days.',
-            'lock_days.integer' => 'Lock days must be a whole number.',
-            'lock_days.min' => 'Lock days cannot be negative.',
-            'withdrawal_percent.required' => 'Please enter the maximum withdrawal percentage limit.',
-            'withdrawal_percent.numeric' => 'Withdrawal percentage must be a valid number.',
-            'withdrawal_percent.min' => 'Withdrawal percentage must be at least 0%.',
-            'withdrawal_percent.max' => 'Withdrawal percentage cannot exceed 100%.',
-        ]);
-
-        $lockDays = (int) $request->input('lock_days');
-        $withdrawalPercent = (float) $request->input('withdrawal_percent');
-
-        // Update singleton setting in trading_wallet_settings
         $setting = TradingWalletSetting::getActiveSetting();
-        $setting->lock_days = $lockDays;
-        $setting->withdrawal_percent = $withdrawalPercent;
-        $setting->save();
 
-        if ($action === 'save_current_setting' || ! $hasSelection) {
-            $today = Carbon::today();
-            $todayStakingsCount = StakingDetail::whereHas('member')
-                ->whereDate('created_at', $today)
-                ->count();
+        // Card 1: Locking Days / Delivery Days Configuration
+        if ($request->has('lock_days')) {
+            $request->validate([
+                'lock_days' => 'required|integer|min:0',
+                'withdrawal_percent' => 'nullable|numeric|min:0|max:100',
+            ], [
+                'lock_days.required' => 'Please enter the locking period in days.',
+                'lock_days.integer' => 'Locking period must be a whole number of days.',
+                'lock_days.min' => 'Locking period cannot be negative.',
+            ]);
 
-            session()->flash('successMsg', "Active Lock Period updated to {$lockDays} days ({$withdrawalPercent}% max withdrawal). {$todayStakingsCount} current-day (today's) package entry/entries updated. Historical entries remain unchanged.");
-        } else {
-            // Apply to selected staking records
-            $stakingQuery = StakingDetail::with('member')->whereHas('member');
+            $lockDays = (int) $request->input('lock_days');
+            $setting->lock_days = $lockDays;
 
-            if (! empty($selectedPackages)) {
-                $stakingQuery->whereIn('id', $selectedPackages);
-            } elseif (! empty($selectedMembers)) {
-                $stakingQuery->whereIn('memberid', $selectedMembers);
+            if ($request->filled('withdrawal_percent')) {
+                $setting->withdrawal_percent = (float) $request->input('withdrawal_percent');
             }
 
-            $stakingsToUpdate = $stakingQuery->get();
-            $updatedCount = $stakingsToUpdate->count();
-            $memberCount = $stakingsToUpdate->pluck('memberid')->unique()->count();
+            $setting->save();
 
-            session()->flash('successMsg', "Trading Wallet Control applied successfully to {$updatedCount} package entry/entries across {$memberCount} verified member(s): {$lockDays} days lock with {$withdrawalPercent}% post-lock maximum withdrawal limit.");
+            session()->flash('successMsg', "Locking period updated to {$lockDays} days successfully.");
+
+            return redirect()->route('admin.tradingWalletControl');
         }
 
-        $redirectUrl = route('admin.tradingWalletControl');
-        if ($request->filled('date_from') && $request->filled('date_to')) {
-            $redirectUrl .= '?date_from='.urlencode($request->input('date_from')).'&date_to='.urlencode($request->input('date_to'));
+        // Card 2: ON / OFF Status Control
+        if ($request->has('status')) {
+            $request->validate([
+                'status' => 'required|in:on,off,lock,unlock',
+            ], [
+                'status.required' => 'Please select a status action.',
+                'status.in' => 'Status must be either on or off.',
+            ]);
+
+            $rawStatus = strtolower($request->input('status'));
+            $status = in_array($rawStatus, ['on', 'lock']) ? 'on' : 'off';
+            $setting->status = $status;
+            $setting->save();
+
+            session()->flash('successMsg', "Trading wallet status updated to {$status} successfully.");
+
+            return redirect()->route('admin.tradingWalletControl');
         }
 
-        return redirect($redirectUrl);
+        // Fallback for withdrawal_percent alone or other legacy saves
+        if ($request->filled('withdrawal_percent')) {
+            $setting->withdrawal_percent = (float) $request->input('withdrawal_percent');
+            $setting->save();
+            session()->flash('successMsg', 'Trading wallet settings updated successfully.');
+        }
+
+        return redirect()->route('admin.tradingWalletControl');
     }
 
     /**

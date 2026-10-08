@@ -83,9 +83,12 @@ class TradingWalletTest extends TestCase
     }
 
     /**
-     * Admin Trading Wallet Control UI loads successfully with 90 days / 100% and "Trading Wallet" terminology.
+     * Admin Trading Wallet Control UI renders with exactly 2 cards:
+     * Card 1: 90-Day Delivery / Locking Code Configuration
+     * Card 2: Lock / Unlock
+     * Date selection and old sections are completely removed.
      */
-    public function test_trading_wallet_control_admin_page_renders_with_90_days_and_100_percent(): void
+    public function test_trading_wallet_control_admin_page_renders_simplified_two_cards_only(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
             ->get('/admin/trading-wallet-control');
@@ -93,12 +96,104 @@ class TradingWalletTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('admin.trading-wallet-control');
         $response->assertSee('Trading Wallet Control');
-        $response->assertSee('Trading Wallet');
-        $response->assertSee('90 Days Lock');
-        $response->assertSee('100.0% Max Withdr.');
-        $response->assertSee('Lock Period (Days)');
-        $response->assertSee('Maximum Withdrawal Allowed (%)');
-        $response->assertSee('Matching Package Members (Staking Details + Member Details)');
+        $response->assertSee('90-Day Delivery / Locking Code Configuration');
+        $response->assertSee('ON / OFF');
+        $response->assertSee('Current Status');
+        $response->assertSee('name="lock_days"', false);
+        $response->assertSee('id="btnSaveLockDays"', false);
+        $response->assertSee('id="btnStatusOn"', false);
+        $response->assertSee('id="btnStatusOff"', false);
+
+        // Date selection and old sections completely removed
+        $response->assertDontSee('Date Selection');
+        $response->assertDontSee('Package Date From');
+        $response->assertDontSee('Package Date To');
+        $response->assertDontSee('Quick Date Presets');
+        $response->assertDontSee('Fetch Matching Package Members');
+        $response->assertDontSee('Matching Package Members (Staking Details + Member Details)');
+        $response->assertDontSee('Condition A: Lock Period');
+        $response->assertDontSee('Condition B: Post-Lock Withdrawal %');
+        $response->assertDontSee('Rule Logic Preview');
+        $response->assertDontSee('btnFilterMembers');
+        $response->assertDontSee('btnQuickDate');
+        $response->assertDontSee('checkAll');
+    }
+
+    /**
+     * Admin can set locking days (e.g. 90) and save; persists on refresh.
+     */
+    public function test_admin_can_save_locking_days_and_persists(): void
+    {
+        $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->post('/admin/apply-trading-wallet-control', [
+                'lock_days' => 90,
+            ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('/admin/trading-wallet-control');
+        $response->assertSessionHas('successMsg');
+
+        $setting = TradingWalletSetting::getActiveSetting();
+        $this->assertEquals(90, (int) $setting->lock_days);
+
+        // Refresh / GET confirm 90 persists
+        $get = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->get('/admin/trading-wallet-control');
+        $get->assertStatus(200);
+        $get->assertSee('value="90"', false);
+    }
+
+    /**
+     * Admin can set status to 'on' and verify persistence.
+     */
+    public function test_admin_can_turn_on_trading_wallet_and_status_persists(): void
+    {
+        $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->post('/admin/apply-trading-wallet-control', [
+                'status' => 'on',
+            ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('/admin/trading-wallet-control');
+        $response->assertSessionHas('successMsg');
+
+        $setting = TradingWalletSetting::getActiveSetting();
+        $this->assertEquals('on', $setting->status);
+        $this->assertTrue($setting->isOn());
+        $this->assertFalse($setting->isOff());
+
+        // Refresh / GET confirm status persists
+        $get = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->get('/admin/trading-wallet-control');
+        $get->assertStatus(200);
+        $get->assertSee('ON');
+        $get->assertDontSee('LOCKED');
+    }
+
+    /**
+     * Admin can set status to 'off' and verify persistence.
+     */
+    public function test_admin_can_turn_off_trading_wallet_and_status_persists(): void
+    {
+        $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->post('/admin/apply-trading-wallet-control', [
+                'status' => 'off',
+            ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect('/admin/trading-wallet-control');
+        $response->assertSessionHas('successMsg');
+
+        $setting = TradingWalletSetting::getActiveSetting();
+        $this->assertEquals('off', $setting->status);
+        $this->assertFalse($setting->isOn());
+        $this->assertTrue($setting->isOff());
+
+        // Refresh / GET confirm status persists
+        $get = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
+            ->get('/admin/trading-wallet-control');
+        $get->assertStatus(200);
+        $get->assertSee('OFF');
     }
 
     /**
