@@ -28,5 +28,5 @@
 @stack('head')
 
 <link rel="stylesheet" href="{{ asset('adm_assets/assets/css/style.css') }}">
-<link rel="stylesheet" href="{{ asset('admin.css') }}">
+<link rel="stylesheet" href="{{ asset('admin.css') }}?v={{ filemtime(public_path('admin.css')) }}">
 

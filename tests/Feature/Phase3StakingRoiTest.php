@@ -17,11 +17,15 @@ use Tests\TestCase;
 class Phase3StakingRoiTest extends TestCase
 {
     private string $memberId;
+    private array $backupTradingProfitConfig = [];
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->withoutMiddleware(PreventRequestForgery::class);
+
+        $this->backupTradingProfitConfig = \Illuminate\Support\Facades\DB::table('monthly_trading_profit_confiction')->get()->toArray();
+        \Illuminate\Support\Facades\DB::table('monthly_trading_profit_confiction')->truncate();
 
         $this->memberId = 'P3MEM'.rand(10000, 99999);
 
@@ -64,6 +68,13 @@ class Phase3StakingRoiTest extends TestCase
         PackagePlan::where('package_range', '50-500')->update(['return_percent' => 5.0, 'max_return_percent' => 200.0, 'lock_days' => 90]);
         PackagePlan::where('package_range', '600-5000')->update(['return_percent' => 7.0, 'max_return_percent' => 200.0, 'lock_days' => 90]);
         PackagePlan::where('package_range', '6000+')->update(['return_percent' => 10.0, 'max_return_percent' => 300.0, 'lock_days' => 90]);
+
+        if (! empty($this->backupTradingProfitConfig)) {
+            \Illuminate\Support\Facades\DB::table('monthly_trading_profit_confiction')->truncate();
+            foreach ($this->backupTradingProfitConfig as $row) {
+                \Illuminate\Support\Facades\DB::table('monthly_trading_profit_confiction')->insert((array) $row);
+            }
+        }
 
         parent::tearDown();
     }

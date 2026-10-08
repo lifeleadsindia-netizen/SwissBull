@@ -116,113 +116,10 @@ function notifyAlert(title, text, icon) {
     }
 }
 
-function updatePackageBehavior() {
-    if (!packageSelect || !amount) return;
-    const selected = packageSelect.value;
-    if (selected === "50-500") {
-        amount.placeholder = "Enter amount (50 - 500)";
-        if (amountHint) {
-            amountHint.style.display = "block";
-            amountHint.style.color = "#F59E0B";
-            amountHint.textContent = "Allowed range: 50 to 500 USDT";
-        }
-    } else if (selected === "600-5000") {
-        amount.placeholder = "Enter amount (600 - 5000)";
-        if (amountHint) {
-            amountHint.style.display = "block";
-            amountHint.style.color = "#F59E0B";
-            amountHint.textContent = "Allowed range: 600 to 5000 USDT";
-        }
-    } else if (selected === "6000+") {
-        amount.placeholder = "Enter amount (6000 and above)";
-        if (amountHint) {
-            amountHint.style.display = "block";
-            amountHint.style.color = "#F59E0B";
-            amountHint.textContent = "Allowed range: 6000 USDT and above";
-        }
-    } else {
-        amount.placeholder = "Select a package first";
-        if (amountHint) {
-            amountHint.style.display = "none";
-            amountHint.textContent = "";
-        }
-    }
-}
 
-if (packageSelect) {
-    packageSelect.addEventListener("change", function () {
-        updatePackageBehavior();
-    });
-}
-
-if (amount) {
-    amount.addEventListener("input", function () {
-        if (!packageSelect) return;
-        const selected = packageSelect.value;
-        const val = parseFloat(amount.value);
-        if (!selected) {
-            if (amountHint) {
-                amountHint.style.display = "block";
-                amountHint.style.color = "#EF4444";
-                amountHint.textContent = "Please select a package first.";
-            }
-            return;
-        }
-        if (!amount.value || isNaN(val)) {
-            updatePackageBehavior();
-            return;
-        }
-
-        if (selected === "50-500") {
-            if (val < 50 || val > 500) {
-                if (amountHint) {
-                    amountHint.style.display = "block";
-                    amountHint.style.color = "#EF4444";
-                    amountHint.textContent = "Amount must be between 50 and 500 USDT.";
-                }
-            } else {
-                if (amountHint) {
-                    amountHint.style.display = "block";
-                    amountHint.style.color = "#10B981";
-                    amountHint.textContent = "Valid amount for Package 1 (50 - 500 USDT).";
-                }
-            }
-        } else if (selected === "600-5000") {
-            if (val < 600 || val > 5000) {
-                if (amountHint) {
-                    amountHint.style.display = "block";
-                    amountHint.style.color = "#EF4444";
-                    amountHint.textContent = "Amount must be between 600 and 5000 USDT.";
-                }
-            } else {
-                if (amountHint) {
-                    amountHint.style.display = "block";
-                    amountHint.style.color = "#10B981";
-                    amountHint.textContent = "Valid amount for Package 2 (600 - 5000 USDT).";
-                }
-            }
-        } else if (selected === "6000+") {
-            if (val < 6000) {
-                if (amountHint) {
-                    amountHint.style.display = "block";
-                    amountHint.style.color = "#EF4444";
-                    amountHint.textContent = "Amount must be at least 6000 USDT.";
-                }
-            } else {
-                if (amountHint) {
-                    amountHint.style.display = "block";
-                    amountHint.style.color = "#10B981";
-                    amountHint.textContent = "Valid amount for Package 3 (6000+ USDT).";
-                }
-            }
-        }
-    });
-}
 
 async function depositActivation() {
     try {
-        const selectedPkg = (packageSelect && packageSelect.value) ? packageSelect.value : "Deposit";
-
         if (!amount || !amount.value) {
             return notifyAlert("No Amount", "Please enter amount to deposit", "error");
         }
@@ -231,7 +128,6 @@ async function depositActivation() {
         if (isNaN(enteredAmount) || enteredAmount <= 0) {
             return notifyAlert("Invalid", "Please enter a valid positive amount", "error");
         }
-
         // if (!window.ethereum)
         //     return notifyAlert("Not Connected", "Please connect wallet", "error");
 
@@ -285,7 +181,6 @@ async function depositActivation() {
             type: "POST",
             data: {
                 memberid: memberid ? memberid.value : "",
-                package: selectedPkg,
                 amount: amount.value,
                 txnid: txnid,
                 _token: csrf ? csrf.value : "",
