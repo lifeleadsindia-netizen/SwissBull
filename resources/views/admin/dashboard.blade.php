@@ -9,6 +9,64 @@
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/chartist/dist/chartist.min.css') }}">
     @endpush
 
+    @php
+        // 1. Members Data
+        $totalMembers = (int) totalMembersadmin();
+        $activeMembers = (int) totalActiveMembers();
+        $inactiveMembers = (int) totalTempMembers();
+        $blockedMembers = (int) totalblockedMembers();
+
+        $activePercent = $totalMembers > 0 ? round(($activeMembers / $totalMembers) * 100, 1) : 0;
+        $inactivePercent = $totalMembers > 0 ? round(($inactiveMembers / $totalMembers) * 100, 1) : 0;
+        $blockedPercent = $totalMembers > 0 ? round(($blockedMembers / $totalMembers) * 100, 1) : 0;
+
+        // 2. Wallets Data
+        $walletBalance = (float) totalWalletBalance();
+        $fundWalletBalance = (float) totalFundWalletBalance();
+        $pepeWalletBalance = (float) totalPEPEWalletBalance();
+
+        // 3. Incomes Data
+        $totVal = (float) totalIn();
+        $roiVal = (float) totalAdminRoiIncome();
+        $dirVal = (float) totalAdminDirectIncome();
+        $stkVal = (float) totalAdminStakingLevelIncome();
+        $lvlVal = (float) totalAdminLevelIncome();
+        $heroVal = (float) totalAdminHeroOfTheMonthIncome();
+        $partVal = (float) totalAdminPartnershipIncome();
+        $slegVal = (float) totalAdminSingleLegIncome();
+
+        // 4. Dynamic Income Overview Chart Data
+        $chartData = adminIncomeOverviewChartData();
+        $groupCenters = [73, 130, 190, 250, 310, 370, 480];
+
+        // 5. Donut Segments Calculation
+        $circ = 301.6;
+        $incomeCategories = [
+            ['name' => 'Monthly Trading Profit', 'val' => $roiVal, 'color' => '#3B82F6', 'url' => url('admin/income/monthly-trading-profit')],
+            ['name' => 'Referral Bonus', 'val' => $dirVal, 'color' => '#F97316', 'url' => url('admin/income/referral-bonus')],
+            ['name' => 'Team Trading Profit', 'val' => $stkVal, 'color' => '#10B981', 'url' => url('admin/income/team-trading-profit')],
+            ['name' => 'Daily Team Investment Share', 'val' => $lvlVal, 'color' => '#F59E0B', 'url' => url('admin/income/daily-team-investment-share')],
+            ['name' => 'Hero of the Month', 'val' => $heroVal, 'color' => '#8B5CF6', 'url' => url('admin/income/hero-of-the-month')],
+            ['name' => 'Partnership Income', 'val' => $partVal, 'color' => '#EC4899', 'url' => url('admin/income/partnership-incomes')],
+        ];
+        if ($slegVal > 0) {
+            $incomeCategories[] = ['name' => 'Single Leg Income', 'val' => $slegVal, 'color' => '#06B6D4', 'url' => url('admin/income/single-leg-incomes')];
+        }
+
+        $donutOffset = 0;
+        foreach ($incomeCategories as &$cat) {
+            if ($totVal > 0 && $cat['val'] > 0) {
+                $cat['len'] = max(4, round(($cat['val'] / $totVal) * $circ, 1));
+                $cat['offset'] = $donutOffset;
+                $donutOffset += $cat['len'] + 3;
+            } else {
+                $cat['len'] = 0;
+                $cat['offset'] = 0;
+            }
+        }
+        unset($cat);
+    @endphp
+
     <div class="adm-dashboard-container">
         <!-- 1. DASHBOARD HEADER AREA -->
         <div class="adm-dash-header">
@@ -45,16 +103,16 @@
                     </div>
                     <div class="adm-stat-bottom">
                         <div>
-                            <h2 class="adm-stat-num">{{ totalMembersadmin() }}</h2>
+                            <h2 class="adm-stat-num">{{ $totalMembers }}</h2>
                             <span class="adm-stat-badge">
-                                <i class="ik ik-trending-up"></i> + 12%
+                                <i class="ik ik-trending-up"></i> {{ $activePercent }}% Active
                             </span>
                         </div>
                         <div class="adm-stat-bars">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
+                            <span style="height: {{ max(4, min(18, round(($activeMembers / max(1, $totalMembers)) * 18))) }}px;"></span>
+                            <span style="height: {{ max(4, min(18, round(($inactiveMembers / max(1, $totalMembers)) * 18))) }}px;"></span>
+                            <span style="height: {{ max(4, min(18, round(($blockedMembers / max(1, $totalMembers)) * 18))) }}px;"></span>
+                            <span style="height: 18px;"></span>
                         </div>
                     </div>
                     <!-- Hidden container to keep legacy chart script intact -->
@@ -76,8 +134,10 @@
                     </div>
                     <div class="adm-stat-bottom">
                         <div>
-                            <h2 class="adm-stat-num">{{ totalActiveMembers() }}</h2>
-                            <span class="adm-stat-badge">Active Members</span>
+                            <h2 class="adm-stat-num">{{ $activeMembers }}</h2>
+                            <span class="adm-stat-badge">
+                                <i class="ik ik-user-check"></i> {{ $activePercent }}%
+                            </span>
                         </div>
                         <div class="adm-stat-bars">
                             <span></span>
@@ -105,9 +165,9 @@
                     </div>
                     <div class="adm-stat-bottom">
                         <div>
-                            <h2 class="adm-stat-num">{{ totalTempMembers() }}</h2>
+                            <h2 class="adm-stat-num">{{ $inactiveMembers }}</h2>
                             <span class="adm-stat-badge">
-                                <i class="ik ik-trending-down"></i> - 22%
+                                <i class="ik ik-trending-down"></i> {{ $inactivePercent }}%
                             </span>
                         </div>
                         <div class="adm-stat-bars">
@@ -136,8 +196,10 @@
                     </div>
                     <div class="adm-stat-bottom">
                         <div>
-                            <h2 class="adm-stat-num">{{ totalblockedMembers() }}</h2>
-                            <span class="adm-stat-badge">0.0%</span>
+                            <h2 class="adm-stat-num">{{ $blockedMembers }}</h2>
+                            <span class="adm-stat-badge">
+                                <i class="ik ik-user-x"></i> {{ $blockedPercent }}%
+                            </span>
                         </div>
                         <div class="adm-stat-bars">
                             <span></span>
@@ -159,7 +221,7 @@
                 <div class="adm-wallet-card">
                     <div class="adm-wallet-info">
                         <p class="adm-wallet-label">Total Income Wallet Balance</p>
-                        <h3 class="adm-wallet-val">$ {{ number_format(totalWalletBalance(), 2) }}</h3>
+                        <h3 class="adm-wallet-val">$ {{ number_format($walletBalance, 2) }}</h3>
                         <p class="adm-wallet-sub">Cumulative earnings balance</p>
                     </div>
                     <div class="adm-wallet-graphic">
@@ -191,7 +253,7 @@
                 <div class="adm-wallet-card">
                     <div class="adm-wallet-info">
                         <p class="adm-wallet-label">Total Fund Wallet Balance</p>
-                        <h3 class="adm-wallet-val">$ {{ number_format(totalFundWalletBalance(), 2) }}</h3>
+                        <h3 class="adm-wallet-val">$ {{ number_format($fundWalletBalance, 2) }}</h3>
                         <p class="adm-wallet-sub">Deposit & working balance</p>
                     </div>
                     <div class="adm-wallet-graphic">
@@ -220,7 +282,7 @@
                 <div class="adm-wallet-card">
                     <div class="adm-wallet-info">
                         <p class="adm-wallet-label">Total PEPE Wallet Balance</p>
-                        <h3 class="adm-wallet-val">{{ totalPEPEWalletBalance() }} PEPE</h3>
+                        <h3 class="adm-wallet-val">{{ number_format($pepeWalletBalance, 2) }} PEPE</h3>
                         <p class="adm-wallet-sub">Platform token reserves</p>
                     </div>
                     <div class="adm-wallet-graphic">
@@ -258,29 +320,31 @@
                             <span>▾</span>
                         </div>
                     </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 18031a8b211e5282068ba717206fef2c9b05f1d3
 
-                    <div class="adm-chart-wrap">
-                        <!-- Floating Tooltip Badge Matching Reference -->
-                        <div class="adm-chart-floating-badge">
-                            $ 210.50
-                            <span>19 Oct</span>
+                    <div class="adm-chart-wrap" style="position: relative;">
+                        <!-- Floating Tooltip Badge Dynamically Positioned Above Peak Interval -->
+                        @php
+                            $peakPos = $groupCenters[$chartData['peakIndex']] ?? 310;
+                            $peakPct = round(($peakPos / 650) * 100, 1);
+                            $peakH = $chartData['hasData'] ? max(20, round(($chartData['peakAmount'] / $chartData['yMax']) * 140)) : 10;
+                            $badgeTop = max(10, 185 - $peakH);
+                        @endphp
+                        <div class="adm-chart-floating-badge" style="left: calc({{ $peakPct }}% - 38px); top: {{ $badgeTop }}px;">
+                            $ {{ number_format($chartData['peakAmount'], 2) }}
+                            <span>{{ $chartData['peakLabel'] }}</span>
                         </div>
 
-                        <!-- Pixel-Perfect SVG Bar Chart matching Reference Image -->
+                        <!-- Pixel-Perfect SVG Bar Chart with 100% Dynamic Data -->
                         <svg class="adm-svg-chart" viewBox="0 0 650 230" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Horizontal Grid Lines -->
+                            <!-- Horizontal Grid Lines & Dynamic Y-Axis Labels -->
                             <line x1="45" y1="20" x2="640" y2="20" stroke="#F1F5F9" stroke-dasharray="3 3"/>
-                            <text x="10" y="24" fill="#94A3B8" font-size="11" font-weight="600">300</text>
+                            <text x="10" y="24" fill="#94A3B8" font-size="11" font-weight="600">{{ $chartData['yMax'] }}</text>
 
                             <line x1="45" y1="80" x2="640" y2="80" stroke="#F1F5F9" stroke-dasharray="3 3"/>
-                            <text x="10" y="84" fill="#94A3B8" font-size="11" font-weight="600">200</text>
+                            <text x="10" y="84" fill="#94A3B8" font-size="11" font-weight="600">{{ $chartData['yMid'] }}</text>
 
                             <line x1="45" y1="140" x2="640" y2="140" stroke="#F1F5F9" stroke-dasharray="3 3"/>
-                            <text x="10" y="144" fill="#94A3B8" font-size="11" font-weight="600">100</text>
+                            <text x="10" y="144" fill="#94A3B8" font-size="11" font-weight="600">{{ $chartData['yLow'] }}</text>
 
                             <line x1="45" y1="200" x2="640" y2="200" stroke="#E2E8F0" stroke-width="1.2"/>
                             <text x="24" y="204" fill="#94A3B8" font-size="11" font-weight="600">0</text>
@@ -297,54 +361,44 @@
                                 </linearGradient>
                             </defs>
 
-                            <!-- Bar Group 1 (1 Oct) -->
-                            <rect x="58" y="165" width="8" height="35" rx="4" fill="url(#barGrad)"/>
-                            <rect x="74" y="172" width="8" height="28" rx="4" fill="#93C5FD"/>
-                            <rect x="88" y="152" width="8" height="48" rx="4" fill="url(#barGrad)"/>
+                            <!-- 7 Dynamic Bar Groups -->
+                            @foreach ($chartData['groups'] as $idx => $grp)
+                                @php
+                                    $cX = $groupCenters[$idx] ?? (70 + $idx * 60);
+                                    $b1 = (float)$grp['bar1'];
+                                    $b2 = (float)$grp['bar2'];
+                                    $b3 = (float)$grp['bar3'];
+                                    $isPeak = ($idx === $chartData['peakIndex'] && $chartData['hasData']);
 
-                            <!-- Bar Group 2 (5 Oct) -->
-                            <rect x="115" y="160" width="8" height="40" rx="4" fill="#93C5FD"/>
-                            <rect x="130" y="130" width="8" height="70" rx="4" fill="url(#barGrad)"/>
-                            <rect x="145" y="150" width="8" height="50" rx="4" fill="#93C5FD"/>
+                                    // Dynamic bar heights
+                                    $h1 = $b1 > 0 ? max(6, min(140, round(($b1 / $chartData['yMax']) * 140))) : ($chartData['hasData'] ? 0 : 2);
+                                    $h2 = $b2 > 0 ? max(6, min(140, round(($b2 / $chartData['yMax']) * 140))) : ($chartData['hasData'] ? 0 : 2);
+                                    $h3 = $b3 > 0 ? max(6, min(140, round(($b3 / $chartData['yMax']) * 140))) : ($chartData['hasData'] ? 0 : 2);
 
-                            <!-- Bar Group 3 (10 Oct) -->
-                            <rect x="175" y="135" width="8" height="65" rx="4" fill="url(#barGrad)"/>
-                            <rect x="190" y="168" width="8" height="32" rx="4" fill="#93C5FD"/>
-                            <rect x="205" y="142" width="8" height="58" rx="4" fill="url(#barGrad)"/>
+                                    if ($isPeak && $h2 < 18) {
+                                        $h2 = max(18, min(140, round(($grp['total'] / $chartData['yMax']) * 140)));
+                                    }
 
-                            <!-- Bar Group 4 (15 Oct) -->
-                            <rect x="235" y="118" width="8" height="82" rx="4" fill="url(#barGrad)"/>
-                            <rect x="250" y="155" width="8" height="45" rx="4" fill="#93C5FD"/>
-                            <rect x="265" y="140" width="8" height="60" rx="4" fill="url(#barGrad)"/>
+                                    $y1 = 200 - $h1;
+                                    $y2 = 200 - $h2;
+                                    $y3 = 200 - $h3;
+                                @endphp
 
-                            <!-- Bar Group 5 (20 Oct - Peak Highlighted Group) -->
-                            <rect x="295" y="80" width="8" height="120" rx="4" fill="url(#barGrad)"/>
-                            <!-- Peak Bar with Tooltip above it -->
-                            <rect x="310" y="60" width="9" height="140" rx="4.5" fill="url(#barActiveGrad)"/>
-                            <rect x="326" y="95" width="8" height="105" rx="4" fill="url(#barGrad)"/>
+                                @if ($h1 > 0)
+                                    <rect x="{{ $cX - 15 }}" y="{{ $y1 }}" width="8" height="{{ $h1 }}" rx="4" fill="url(#barGrad)"/>
+                                @endif
 
-                            <!-- Bar Group 6 (25 Oct) -->
-                            <rect x="355" y="105" width="8" height="95" rx="4" fill="url(#barGrad)"/>
-                            <rect x="370" y="125" width="8" height="75" rx="4" fill="#93C5FD"/>
-                            <rect x="385" y="148" width="8" height="52" rx="4" fill="url(#barGrad)"/>
+                                @if ($h2 > 0)
+                                    <rect x="{{ $cX - 4 }}" y="{{ $y2 }}" width="9" height="{{ $h2 }}" rx="4.5" fill="{{ $isPeak ? 'url(#barActiveGrad)' : '#93C5FD' }}"/>
+                                @endif
 
-                            <!-- Bar Group 7 (31 Oct) -->
-                            <rect x="415" y="142" width="8" height="58" rx="4" fill="#93C5FD"/>
-                            <rect x="430" y="130" width="8" height="70" rx="4" fill="url(#barGrad)"/>
-                            <rect x="445" y="155" width="8" height="45" rx="4" fill="#93C5FD"/>
+                                @if ($h3 > 0)
+                                    <rect x="{{ $cX + 8 }}" y="{{ $y3 }}" width="8" height="{{ $h3 }}" rx="4" fill="url(#barGrad)"/>
+                                @endif
 
-                            <rect x="475" y="138" width="8" height="62" rx="4" fill="url(#barGrad)"/>
-                            <rect x="490" y="148" width="8" height="52" rx="4" fill="#93C5FD"/>
-                            <rect x="505" y="122" width="8" height="78" rx="4" fill="url(#barGrad)"/>
-
-                            <!-- X Axis Date Labels -->
-                            <text x="65" y="218" fill="#94A3B8" font-size="11" font-weight="600">1 Oct</text>
-                            <text x="132" y="218" fill="#94A3B8" font-size="11" font-weight="600">5 Oct</text>
-                            <text x="195" y="218" fill="#94A3B8" font-size="11" font-weight="600">10 Oct</text>
-                            <text x="255" y="218" fill="#94A3B8" font-size="11" font-weight="600">15 Oct</text>
-                            <text x="312" y="218" fill="#94A3B8" font-size="11" font-weight="600">20 Oct</text>
-                            <text x="375" y="218" fill="#94A3B8" font-size="11" font-weight="600">25 Oct</text>
-                            <text x="475" y="218" fill="#94A3B8" font-size="11" font-weight="600">31 Oct</text>
+                                <!-- X Axis Date Label -->
+                                <text x="{{ $cX }}" y="218" fill="#94A3B8" font-size="11" font-weight="600" text-anchor="middle">{{ $grp['label'] }}</text>
+                            @endforeach
                         </svg>
                     </div>
                 </div>
@@ -355,157 +409,45 @@
                 <div class="adm-income-panel">
                     <div class="adm-panel-head">
                         <h3>Income Summary</h3>
-                        <span class="badge bg-light text-muted px-2 py-1" style="font-size: 11px; font-weight: 600; border-radius: 6px;">Total: ${{ number_format((float) totalIn(), 2) }}</span>
+                        <span class="badge bg-light text-muted px-2 py-1" style="font-size: 11px; font-weight: 600; border-radius: 6px;">Total: ${{ number_format($totVal, 2) }}</span>
                     </div>
 
-                    @php
-                        $totVal = (float) totalIn();
-                        $roiVal = (float) totalAdminRoiIncome();
-                        $dirVal = (float) totalAdminDirectIncome();
-                        $stkVal = (float) totalAdminStakingLevelIncome();
-                        $lvlVal = (float) totalAdminLevelIncome();
-                        $heroVal = (float) totalAdminHeroOfTheMonthIncome();
-                        $partVal = (float) totalAdminPartnershipIncome();
-                        $slegVal = (float) totalAdminSingleLegIncome();
-
-                        // Circumference for r=48 is ~301.6
-                        $circ = 301.6;
-                        if ($totVal > 0) {
-                            $lenRoi = max(8, ($roiVal / $totVal) * $circ);
-                            $lenDir = max(8, ($dirVal / $totVal) * $circ);
-                            $lenStk = max(8, ($stkVal / $totVal) * $circ);
-                            $lenLvl = max(8, ($lvlVal / $totVal) * $circ);
-                            $lenHero = max(8, ($heroVal / $totVal) * $circ);
-                            $lenPart = max(8, ($partVal / $totVal) * $circ);
-                        } else {
-                            $lenRoi = 55;
-                            $lenDir = 50;
-                            $lenStk = 48;
-                            $lenLvl = 45;
-                            $lenHero = 45;
-                            $lenPart = 40;
-                        }
-                    @endphp
-
                     <div class="adm-summary-content">
-                        <!-- Donut Chart -->
+                        <!-- Dynamic Donut Chart -->
                         <div class="adm-donut-wrap">
                             <svg class="adm-donut-svg" viewBox="0 0 120 120">
                                 <!-- Background Circle -->
                                 <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F1F5F9" stroke-width="8"/>
-                                <!-- Segment 1: Blue (Monthly Trading Profit) -->
-                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#3B82F6" stroke-width="8"
-                                    stroke-dasharray="{{ number_format($lenRoi, 1) }} 301.6" stroke-dashoffset="0" stroke-linecap="round"/>
-                                <!-- Segment 2: Orange (Referral Bonus) -->
-                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F97316" stroke-width="8"
-                                    stroke-dasharray="{{ number_format($lenDir, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + 4, 1) }}" stroke-linecap="round"/>
-                                <!-- Segment 3: Emerald (Team Trading Profit) -->
-                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#10B981" stroke-width="8"
-                                    stroke-dasharray="{{ number_format($lenStk, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + 8, 1) }}" stroke-linecap="round"/>
-                                <!-- Segment 4: Amber (Daily Team Investment Share) -->
-                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#F59E0B" stroke-width="8"
-                                    stroke-dasharray="{{ number_format($lenLvl, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + 12, 1) }}" stroke-linecap="round"/>
-                                <!-- Segment 5: Purple (Hero of the Month) -->
-                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#8B5CF6" stroke-width="8"
-                                    stroke-dasharray="{{ number_format($lenHero, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + 16, 1) }}" stroke-linecap="round"/>
-                                <!-- Segment 6: Pink (Partnership Income) -->
-                                <circle cx="60" cy="60" r="48" fill="transparent" stroke="#EC4899" stroke-width="8"
-                                    stroke-dasharray="{{ number_format($lenPart, 1) }} 301.6" stroke-dashoffset="-{{ number_format($lenRoi + $lenDir + $lenStk + $lenLvl + $lenHero + 20, 1) }}" stroke-linecap="round"/>
+                                
+                                @foreach ($incomeCategories as $cat)
+                                    @if ($cat['len'] > 0)
+                                        <circle cx="60" cy="60" r="48" fill="transparent" stroke="{{ $cat['color'] }}" stroke-width="8"
+                                            stroke-dasharray="{{ $cat['len'] }} 301.6" stroke-dashoffset="-{{ $cat['offset'] }}" stroke-linecap="round"/>
+                                    @endif
+                                @endforeach
                             </svg>
                             <div class="adm-donut-center">
-                                <h4>$ {{ number_format((float) totalIn(), 2) }}</h4>
+                                <h4>$ {{ number_format($totVal, 2) }}</h4>
                                 <span>Total Income</span>
                             </div>
                         </div>
 
-                        <!-- 6 Incomes Breakdown List matching PDF Plan -->
+                        <!-- 6 Incomes Dynamic Breakdown List -->
                         <ul class="adm-income-list">
-                            <li>
-                                <a href="{{ url('admin/income/monthly-trading-profit') }}" class="adm-income-item-link">
-                                    <div class="adm-income-item-left">
-                                        <span class="adm-income-dot" style="background: #3B82F6; box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);"></span>
-                                        <span class="adm-income-label">Monthly Trading Profit</span>
-                                    </div>
-                                    <div class="adm-income-item-right">
-                                        <span class="adm-income-amount">$ {{ number_format($roiVal, 2) }}</span>
-                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url('admin/income/referral-bonus') }}" class="adm-income-item-link">
-                                    <div class="adm-income-item-left">
-                                        <span class="adm-income-dot" style="background: #F97316; box-shadow: 0 0 6px rgba(249, 115, 22, 0.4);"></span>
-                                        <span class="adm-income-label">Referral Bonus</span>
-                                    </div>
-                                    <div class="adm-income-item-right">
-                                        <span class="adm-income-amount">$ {{ number_format($dirVal, 2) }}</span>
-                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url('admin/income/team-trading-profit') }}" class="adm-income-item-link">
-                                    <div class="adm-income-item-left">
-                                        <span class="adm-income-dot" style="background: #10B981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);"></span>
-                                        <span class="adm-income-label">Team Trading Profit</span>
-                                    </div>
-                                    <div class="adm-income-item-right">
-                                        <span class="adm-income-amount">$ {{ number_format($stkVal, 2) }}</span>
-                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url('admin/income/daily-team-investment-share') }}" class="adm-income-item-link">
-                                    <div class="adm-income-item-left">
-                                        <span class="adm-income-dot" style="background: #F59E0B; box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);"></span>
-                                        <span class="adm-income-label">Daily Team Investment Share</span>
-                                    </div>
-                                    <div class="adm-income-item-right">
-                                        <span class="adm-income-amount">$ {{ number_format($lvlVal, 2) }}</span>
-                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url('admin/income/hero-of-the-month') }}" class="adm-income-item-link">
-                                    <div class="adm-income-item-left">
-                                        <span class="adm-income-dot" style="background: #8B5CF6; box-shadow: 0 0 6px rgba(139, 92, 246, 0.4);"></span>
-                                        <span class="adm-income-label">Hero of the Month</span>
-                                    </div>
-                                    <div class="adm-income-item-right">
-                                        <span class="adm-income-amount">$ {{ number_format($heroVal, 2) }}</span>
-                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ url('admin/income/partnership-incomes') }}" class="adm-income-item-link">
-                                    <div class="adm-income-item-left">
-                                        <span class="adm-income-dot" style="background: #EC4899; box-shadow: 0 0 6px rgba(236, 72, 153, 0.4);"></span>
-                                        <span class="adm-income-label">Partnership Income</span>
-                                    </div>
-                                    <div class="adm-income-item-right">
-                                        <span class="adm-income-amount">$ {{ number_format($partVal, 2) }}</span>
-                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            @if ($slegVal > 0)
-                            <li>
-                                <a href="{{ url('admin/income/single-leg-incomes') }}" class="adm-income-item-link">
-                                    <div class="adm-income-item-left">
-                                        <span class="adm-income-dot" style="background: #06B6D4; box-shadow: 0 0 6px rgba(6, 182, 212, 0.4);"></span>
-                                        <span class="adm-income-label">Single Leg Income</span>
-                                    </div>
-                                    <div class="adm-income-item-right">
-                                        <span class="adm-income-amount">$ {{ number_format($slegVal, 2) }}</span>
-                                        <i class="ik ik-chevron-right adm-income-chevron"></i>
-                                    </div>
-                                </a>
-                            </li>
-                            @endif
+                            @foreach ($incomeCategories as $cat)
+                                <li>
+                                    <a href="{{ $cat['url'] }}" class="adm-income-item-link">
+                                        <div class="adm-income-item-left">
+                                            <span class="adm-income-dot" style="background: {{ $cat['color'] }}; box-shadow: 0 0 6px {{ $cat['color'] }}66;"></span>
+                                            <span class="adm-income-label">{{ $cat['name'] }}</span>
+                                        </div>
+                                        <div class="adm-income-item-right">
+                                            <span class="adm-income-amount">$ {{ number_format((float) $cat['val'], 2) }}</span>
+                                            <i class="ik ik-chevron-right adm-income-chevron"></i>
+                                        </div>
+                                    </a>
+                                </li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
@@ -521,122 +463,26 @@
                         <div class="col-xl-3 col-md-6 col-6 mb-2 mb-xl-0">
                             <div class="adm-strip-item">
                                 <p class="adm-strip-item-label">Today PEPE Withdrawal</p>
-                                <h5 class="adm-strip-item-val text-success">{{ todayPEPEWithdrawal() }} PEPE</h5>
+                                <h5 class="adm-strip-item-val text-success">{{ number_format((float) todayPEPEWithdrawal(), 2) }} PEPE</h5>
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 col-6 mb-2 mb-xl-0">
                             <div class="adm-strip-item">
                                 <p class="adm-strip-item-label">Total PEPE Withdrawal</p>
-                                <h5 class="adm-strip-item-val text-danger">{{ totalPEPEWithdrawal() }} PEPE</h5>
+                                <h5 class="adm-strip-item-val text-danger">{{ number_format((float) totalPEPEWithdrawal(), 2) }} PEPE</h5>
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 col-6">
                             <div class="adm-strip-item">
                                 <p class="adm-strip-item-label">Today's Withdrawal</p>
-                                <h5 class="adm-strip-item-val text-primary">$ {{ todaysWithdrawal() }}</h5>
+                                <h5 class="adm-strip-item-val text-primary">$ {{ number_format((float) todaysWithdrawal(), 2) }}</h5>
                             </div>
                         </div>
                         <div class="col-xl-3 col-md-6 col-6">
                             <div class="adm-strip-item">
                                 <p class="adm-strip-item-label">Total Withdrawal</p>
-                                <h5 class="adm-strip-item-val text-danger">$ {{ totalWithdrawal() }}</h5>
+                                <h5 class="adm-strip-item-val text-danger">$ {{ number_format((float) totalWithdrawal(), 2) }}</h5>
                             </div>
-<<<<<<< HEAD
-=======
-                    <div class="card-body commission-overview-body" style="padding: 0px 20px;">
-                        <div class="row">
-                            <!-- 1. Monthly Trading Profit -->
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/monthly-trading-profit') }}"
-                                    class="commission-metric commission-metric-deposit">
-                                    <span class="commission-metric-icon"><i class="ik ik-trending-up"></i></span>
-                                    <p class="commission-metric-label">Monthly Trading Profit</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminRoiIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
-                                </a>
-                            </div>
-
-                            <!-- 2. Referral Bonus -->
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/referral-bonus') }}"
-                                    class="commission-metric commission-metric-advertisement">
-                                    <span class="commission-metric-icon"><i class="ik ik-user-check"></i></span>
-                                    <p class="commission-metric-label">Referral Bonus</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminDirectIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
-                                </a>
-                            </div>
-
-                            <!-- 3. Team Trading Profit -->
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/team-trading-profit') }}"
-                                    class="commission-metric commission-metric-withdrawal">
-                                    <span class="commission-metric-icon"><i class="ik ik-layers"></i></span>
-                                    <p class="commission-metric-label">Team Trading Profit</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminStakingLevelIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
-                                </a>
-                            </div>
-
-                            <!-- 4. Daily Team Investment Share -->
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/daily-team-investment-share') }}"
-                                    class="commission-metric commission-metric-deposit">
-                                    <span class="commission-metric-icon"><i class="ik ik-bar-chart-2"></i></span>
-                                    <p class="commission-metric-label">Daily Team Investment Share</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminLevelIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
-                                </a>
-                            </div>
-
-                            <!-- 5. Hero of the Month -->
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/hero-of-the-month') }}"
-                                    class="commission-metric commission-metric-advertisement">
-                                    <span class="commission-metric-icon"><i class="ik ik-award"></i></span>
-                                    <p class="commission-metric-label">Hero of the Month</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminHeroOfTheMonthIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
-                                </a>
-                            </div>
-
-                            <!-- 6. Partnership Income -->
-                            <div class="col-xl-4 col-md-6 mb-3">
-                                <a href="{{ url('admin/income/partnership-incomes') }}"
-                                    class="commission-metric commission-metric-withdrawal">
-                                    <span class="commission-metric-icon"><i class="ik ik-briefcase"></i></span>
-                                    <p class="commission-metric-label">Partnership Income</p>
-                                    <h4 class="commission-metric-value">
-                                        $ {{ number_format((float) totalAdminPartnershipIncome(), 2) }}</h4>
-                                    <span class="commission-metric-link">View Details <i
-                                            class="ik ik-arrow-right"></i></span>
-                                </a>
-                            </div>
-
-                            @if (totalAdminSingleLegIncome() > 0)
-                                <div class="col-xl-6 col-md-6 mb-3">
-                                    <a href="{{ url('admin/income/single-leg-incomes') }}"
-                                        class="commission-metric commission-metric-deposit">
-                                        <span class="commission-metric-icon"><i class="ik ik-pie-chart"></i></span>
-                                        <p class="commission-metric-label">Single Leg Income</p>
-                                        <h4 class="commission-metric-value">$ {{ number_format((float) totalAdminSingleLegIncome(), 2) }}</h4>
-                                        <span class="commission-metric-link">View Details <i class="ik ik-arrow-right"></i></span>
-                                    </a>
-                                </div>
-                            @endif
->>>>>>> 2813b871e89c2034f7174bfbe269b81a8f8ab7bf
-=======
->>>>>>> 18031a8b211e5282068ba717206fef2c9b05f1d3
                         </div>
                     </div>
                 </div>
@@ -649,7 +495,7 @@
             <div class="col-xl-4 col-lg-4 col-md-6 col-12">
                 <div class="adm-gradient-card adm-card-purple">
                     <div class="adm-grad-info">
-                        <h3 class="adm-grad-val">$ {{ totalgrossAmount() }}</h3>
+                        <h3 class="adm-grad-val">$ {{ number_format((float) totalgrossAmount(), 2) }}</h3>
                         <p class="adm-grad-label">Withdrawal Gross Amount</p>
                     </div>
                     <div class="adm-grad-icon">
@@ -667,7 +513,7 @@
             <div class="col-xl-4 col-lg-4 col-md-6 col-12">
                 <div class="adm-gradient-card adm-card-blue">
                     <div class="adm-grad-info">
-                        <h3 class="adm-grad-val">$ {{ totalnetAmount() }}</h3>
+                        <h3 class="adm-grad-val">$ {{ number_format((float) totalnetAmount(), 2) }}</h3>
                         <p class="adm-grad-label">Withdrawal Net Amount</p>
                     </div>
                     <div class="adm-grad-icon">
@@ -685,7 +531,7 @@
             <div class="col-xl-4 col-lg-4 col-md-12 col-12">
                 <div class="adm-gradient-card adm-card-green">
                     <div class="adm-grad-info">
-                        <h3 class="adm-grad-val">$ {{ totaldeductions() }}</h3>
+                        <h3 class="adm-grad-val">$ {{ number_format((float) totaldeductions(), 2) }}</h3>
                         <p class="adm-grad-label">Deduction on Withdrawal</p>
                     </div>
                     <div class="adm-grad-icon">

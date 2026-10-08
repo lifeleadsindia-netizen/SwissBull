@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-    
     <!-- FAVICONS ICON -->
     <link rel="icon" type="image/png" href="{{ asset('logo/favicon/favicon-96x96.png') }}" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon/favicon.svg') }}" />
@@ -10,298 +9,374 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('logo/favicon/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ asset('logo/favicon/site.webmanifest') }}" />
 
-    
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin Login | {{config('detailsApp.name')}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin Login | {{ config('detailsApp.name') }}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/bootstrap/dist/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/icon-kit/dist/css/iconkit.min.css') }}">
 
     <style>
         :root {
-            --primary-blue: #3B6CFF;
-            --electric-blue: #2563FF;
-            --purple-accent: #7C4DFF;
-            --cyan-accent: #22D3EE;
-            --dark-bg: #070B18;
-            --card-bg: rgba(15, 22, 45, 0.85);
-            --text-gray: #98A2C3;
-            --gradient-primary: linear-gradient(135deg, #3B6CFF 0%, #7C4DFF 100%);
-            --gradient-primary-hover: linear-gradient(135deg, #4B7BFF 0%, #8B5CF6 100%);
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --text-sub: #475569;
+            --border-color: #e2e8f0;
+            --card-bg: rgba(255, 255, 255, 0.90);
+            --card-border: rgba(255, 255, 255, 0.95);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--dark-bg);
-            color: #fff;
-            height: 100vh;
-            overflow: hidden;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f0f6fd;
+            background-image: url("{{ asset('admin-bg.png') }}");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text-dark);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            padding: 24px 16px;
         }
 
-        /* Ambient Grid Overlay */
-        body::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 32px 32px;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        /* Responsive Layout Fix */
-        .login-container {
+        .login-wrapper {
             width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            z-index: 2;
+            max-width: 440px;
+            margin: auto;
         }
 
-        /* Glassmorphism Card */
+        /* Premium Glass Card */
         .auth-card {
             background: var(--card-bg);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border-radius: 24px;
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
+            padding: 42px 38px 36px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.10),
+                        0 8px 20px -6px rgba(37, 99, 235, 0.08),
+                        0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            width: 100%;
         }
 
-        .auth-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #3B6CFF 0%, #7C4DFF 50%, #22D3EE 100%);
-        }
-
-        .logo-box {
+        /* Brand / Logo Area */
+        .brand-header {
             text-align: center;
-            height: 90px;
+            margin-bottom: 28px;
         }
 
-        .logo-box img {
-            height: 60px;
+        .brand-logo-img {
+            max-height: 54px;
+            max-width: 200px;
             object-fit: contain;
-            filter: drop-shadow(0 0 12px rgba(59, 108, 255, 0.35));
+            margin-bottom: 6px;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.04));
         }
 
-        h3 {
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            border-radius: 14px;
+            background: rgba(37, 99, 235, 0.06);
+            border: 1px solid rgba(37, 99, 235, 0.15);
+            color: var(--primary);
             font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-badge i {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .auth-title {
             font-size: 24px;
-            margin-bottom: 8px;
-            text-align: center;
-            color: #FFFFFF;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
         }
 
-        .subtitle {
-            color: var(--text-gray);
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 30px;
+        .auth-subtitle {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin: 0;
         }
 
-        /* Floating Input Style */
-        .input-group-custom {
-            position: relative;
+        /* Form Controls */
+        .form-group-custom {
             margin-bottom: 20px;
         }
 
-        .input-group-custom i {
+        .form-label-custom {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-icon {
             position: absolute;
             left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--cyan-accent);
-            font-size: 18px;
-            z-index: 5;
-        }
-
-        .form-control {
-            background: rgba(255, 255, 255, 0.035) !important;
-            border: 1px solid rgba(255, 255, 255, 0.10) !important;
-            border-radius: 14px !important;
-            padding: 12px 12px 12px 48px !important;
-            color: #fff !important;
-            height: 55px;
-            transition: 0.3s ease;
-        }
-
-        .form-control::placeholder {
-            color: #6F7A9B !important;
-        }
-
-        .form-control:focus {
-            border-color: #4A6FFF !important;
-            box-shadow: 0 0 0 3px rgba(74, 111, 255, 0.18) !important;
-            background: rgba(255, 255, 255, 0.06) !important;
-        }
-
-        /* OTP Button */
-        .btn-otp {
-            background: rgba(59, 108, 255, 0.12);
-            color: var(--cyan-accent);
-            border: 1px solid rgba(59, 108, 255, 0.35);
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 16px;
-            float: right;
-            margin-bottom: 12px;
-            transition: 0.3s ease;
-            text-decoration: none;
-        }
-
-        .btn-otp:hover {
-            background: var(--primary-blue);
-            color: #ffffff;
-            border-color: var(--primary-blue);
-            box-shadow: 0 4px 15px rgba(59, 108, 255, 0.35);
-        }
-
-        /* Main Action Button */
-        .btn-login {
-            background: var(--gradient-primary);
-            border: none;
-            border-radius: 14px;
-            color: #FFFFFF;
-            font-weight: 700;
-            height: 54px;
-            width: 100%;
-            margin-top: 10px;
-            font-size: 16px;
-            box-shadow: 0 10px 30px rgba(59, 108, 255, 0.35);
-            transition: all 0.25s ease;
-        }
-
-        .btn-login:hover {
-            background: var(--gradient-primary-hover);
-            transform: translateY(-1.5px);
-            box-shadow: 0 14px 35px rgba(124, 77, 255, 0.45);
-            color: #ffffff;
-        }
-
-        /* Background Decoration */
-        .bg-circle {
-            position: absolute;
-            width: 450px;
-            height: 450px;
-            border-radius: 50%;
-            z-index: 1;
-            filter: blur(80px);
+            color: #94a3b8;
+            font-size: 17px;
             pointer-events: none;
+            transition: color 0.2s ease;
+            z-index: 3;
         }
 
-        .circle-1 {
-            top: -150px;
-            left: -150px;
-            background: radial-gradient(circle, rgba(59, 108, 255, 0.20) 0%, transparent 70%);
+        .form-control-custom {
+            width: 100%;
+            height: 48px;
+            background: rgba(248, 250, 252, 0.9);
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px 16px 10px 44px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            outline: none;
         }
 
-        .circle-2 {
-            bottom: -150px;
-            right: -150px;
-            background: radial-gradient(circle, rgba(124, 77, 255, 0.20) 0%, transparent 70%);
+        .form-control-custom::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
         }
 
-        /* Link Styling */
+        .form-control-custom:focus {
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .form-control-custom:focus + .input-icon,
+        .input-wrapper:focus-within .input-icon {
+            color: var(--primary);
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 14px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 17px;
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+            z-index: 3;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--text-dark);
+        }
+
+        .form-control-custom.has-toggle {
+            padding-right: 44px;
+        }
+
+        /* Forgot password link */
         .forgot-link {
-            color: var(--cyan-accent);
+            color: var(--primary);
             font-size: 13px;
             font-weight: 600;
             text-decoration: none;
-            transition: color 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         .forgot-link:hover {
-            color: #ffffff;
+            color: var(--primary-hover);
             text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            height: 48px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+            transition: all 0.25s ease;
+            margin-top: 24px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.36);
+            color: #ffffff;
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* Custom Alert Messages */
+        .alert-custom-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 13.5px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-custom-danger i {
+            font-size: 18px;
+            color: #ef4444;
+            flex-shrink: 0;
+        }
+
+        /* Footer Note */
+        .auth-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--text-muted);
         }
 
         @media (max-width: 576px) {
             .auth-card {
-                padding: 30px 20px;
-                background: var(--card-bg);
+                padding: 30px 20px 24px;
+                border-radius: 20px;
+            }
+
+            .auth-title {
+                font-size: 21px;
+            }
+
+            body {
+                padding: 16px 12px;
             }
         }
     </style>
-    
 </head>
 
 <body>
-
-    <div class="bg-circle circle-1"></div>
-    <div class="bg-circle circle-2"></div>
-
-    <div class="login-container">
+    <div class="login-wrapper">
         <div class="auth-card">
-            <div class="logo-box" style="height: 70px;">
-                <img src="{{ asset('logo/logo.png') }}" alt="{{ config('detailsApp.name') }}">
+            <div class="brand-header">
+                <a href="{{ url('/') }}" style="text-decoration: none;">
+                    <img src="{{ asset('logo/logo.png') }}" alt="{{ config('detailsApp.name') }}" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                    <span class="brand-badge" style="display: none;">
+                        <i class="ik ik-shield"></i>
+                        <span>{{ config('detailsApp.name', 'SwissBull') }}</span>
+                    </span>
+                </a>
+                <h3 class="auth-title mt-3">Welcome Back</h3>
+                <p class="auth-subtitle">Sign in to your administrator dashboard</p>
             </div>
 
-            <h3>Welcome Back</h3>
-
-            {{-- @if (session('OtpMsg'))
-                <div class="alert alert-success py-2 mt-4"
-                    style="font-size: 13px;border-radius: 10px;background: rgb(68 239 130 / 10%);border: 1px solid rgb(68 239 103 / 30%);color: #a5fcbd;">
-                    {{ session('OtpMsg') }}
-                </div>
-            @endif --}}
-            
             @if (session('loginmsg'))
-                <div class="alert alert-danger py-2 mt-3"
-                    style="font-size: 13px; border-radius: 10px; background: rgba(220,53,69,0.1); border: 1px solid #dc3545; color: #ff8e98;">
-                    {{ session('loginmsg') }}
+                <div class="alert-custom-danger">
+                    <i class="ik ik-alert-circle"></i>
+                    <span>{{ session('loginmsg') }}</span>
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('adminLogin') }}">
+            <form method="POST" action="{{ route('adminLogin') }}" autocomplete="on">
                 @csrf
 
-                {{-- <div class="clearfix mt-4" style="justify-self: center;">
-                    <a href="{{ url('/send-admin-otp') }}" class="btn-otp">Get OTP</a>
-                </div>
-                @if (session('admin_otp'))
-                     <span>{{session('admin_otp')}}</span>
-                @endif
-
-                <div class="input-group-custom">
-                    <i class="ik ik-shield"></i>
-                    <input type="text" name="otp" class="form-control" placeholder="Enter OTP" required onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-                </div> --}}
-
-                <div class="input-group-custom" style="margin-top: 20px;">
-                    <i class="ik ik-user"></i>
-                    <input type="email" name="email" class="form-control" placeholder="Email Address" required>
+                <div class="form-group-custom">
+                    <label class="form-label-custom" for="adminEmail">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="ik ik-mail input-icon"></i>
+                        <input type="email" id="adminEmail" name="email" class="form-control-custom" placeholder="name@domain.com" required autofocus value="{{ old('email') }}">
+                    </div>
                 </div>
 
-                <div class="input-group-custom">
-                    <i class="ik ik-lock"></i>
-                    <input type="password" name="password" class="form-control" placeholder="Password" required>
+                <div class="form-group-custom">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label-custom mb-0" for="adminPassword">Password</label>
+                        <a href="{{ url('/forget-password') }}" class="forgot-link">Forgot Password?</a>
+                    </div>
+                    <div class="input-wrapper">
+                        <i class="ik ik-lock input-icon"></i>
+                        <input type="password" id="adminPassword" name="password" class="form-control-custom has-toggle" placeholder="••••••••••••" required>
+                        <button type="button" class="password-toggle-btn" id="togglePasswordBtn" aria-label="Toggle password visibility">
+                            <i class="ik ik-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="d-flex justify-content-end mb-4">
-                    <a href="{{ url('/forget-password') }}" class="forgot-link">Forgot Password?</a>
-                </div>
-
-                <button type="submit" class="btn-login">Sign In Now</button>
+                <button type="submit" class="btn-submit">
+                    <span>Sign In Now</span>
+                    <i class="ik ik-arrow-right"></i>
+                </button>
             </form>
+
+            <div class="auth-footer">
+                &copy; {{ date('Y') }} {{ config('detailsApp.name', 'SwissBull') }}. All rights reserved.
+            </div>
         </div>
     </div>
 
     <script src="{{ asset('adm_assets/assets/src/js/vendor/jquery-3.3.1.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            const passwordInput = document.getElementById('adminPassword');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+
+            if (toggleBtn && passwordInput && toggleIcon) {
+                toggleBtn.addEventListener('click', function () {
+                    const isPassword = passwordInput.getAttribute('type') === 'password';
+                    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                    toggleIcon.className = isPassword ? 'ik ik-eye-off' : 'ik ik-eye';
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

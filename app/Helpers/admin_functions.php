@@ -339,3 +339,108 @@ function totalPEPEWithdrawal()
 
     return $sum;
 }
+
+function adminIncomeOverviewChartData($month = null, $year = null)
+{
+    if (! $month) {
+        $month = date('m');
+    }
+    if (! $year) {
+        $year = date('Y');
+    }
+
+    $daysInMonth = (int) date('t', strtotime("$year-$month-01"));
+    $monthName = date('M', strtotime("$year-$month-01"));
+
+    $checkpoints = [
+        ['day' => 1, 'start' => 1, 'end' => 4, 'label' => "1 $monthName"],
+        ['day' => 5, 'start' => 5, 'end' => 9, 'label' => "5 $monthName"],
+        ['day' => 10, 'start' => 10, 'end' => 14, 'label' => "10 $monthName"],
+        ['day' => 15, 'start' => 15, 'end' => 19, 'label' => "15 $monthName"],
+        ['day' => 20, 'start' => 20, 'end' => 24, 'label' => "20 $monthName"],
+        ['day' => 25, 'start' => 25, 'end' => 29, 'label' => "25 $monthName"],
+        ['day' => min(31, $daysInMonth), 'start' => 30, 'end' => $daysInMonth, 'label' => "$daysInMonth $monthName"],
+    ];
+
+    $groups = [];
+    $maxVal = 0;
+    $peakIndex = 4;
+    $peakAmount = 0;
+
+    foreach ($checkpoints as $idx => $cp) {
+        $startDate = sprintf('%04d-%02d-%02d 00:00:00', $year, $month, $cp['start']);
+        $endDate = sprintf('%04d-%02d-%02d 23:59:59', $year, $month, $cp['end']);
+
+        $bar1 = (float) LevelIncome::where('status', 'Paid')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount');
+
+        $bar2 = (float) StakingIncome::where('status', 'Paid')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount');
+        if ($bar2 <= 0) {
+            $bar2 = (float) DailyIncome::where('status', 'Paid')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->sum('amount');
+        }
+
+        $bar3 = (float) DirectIncome::where('status', 'Paid')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount')
+            + (float) RoiLevelIncome::where('status', 'Paid')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount')
+            + (float) PartnershipIncome::where('status', 'Paid')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount');
+
+        $totalGroup = $bar1 + $bar2 + $bar3;
+        if ($totalGroup > $maxVal) {
+            $maxVal = $totalGroup;
+            $peakIndex = $idx;
+            $peakAmount = $totalGroup;
+        }
+
+        $groups[] = [
+            'label' => $cp['label'],
+            'bar1' => $bar1,
+            'bar2' => $bar2,
+            'bar3' => $bar3,
+            'total' => $totalGroup,
+        ];
+    }
+
+    if ($maxVal <= 0) {
+        $yMax = 100;
+        $peakIndex = 4;
+        $peakAmount = 0;
+        $peakLabel = $checkpoints[$peakIndex]['label'];
+    } else {
+        if ($maxVal <= 5) {
+            $yMax = 10;
+        } elseif ($maxVal <= 25) {
+            $yMax = 30;
+        } elseif ($maxVal <= 50) {
+            $yMax = 60;
+        } elseif ($maxVal <= 100) {
+            $yMax = 120;
+        } elseif ($maxVal <= 300) {
+            $yMax = 300;
+        } else {
+            $yMax = ceil($maxVal / 100) * 100;
+        }
+        $peakLabel = $checkpoints[$peakIndex]['label'];
+    }
+
+    return [
+        'groups' => $groups,
+        'yMax' => $yMax,
+        'yMid' => round($yMax * 0.66, 0),
+        'yLow' => round($yMax * 0.33, 0),
+        'peakIndex' => $peakIndex,
+        'peakAmount' => $peakAmount,
+        'peakLabel' => $peakLabel,
+        'hasData' => ($maxVal > 0),
+    ];
+}
+
