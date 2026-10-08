@@ -108,8 +108,8 @@ class MemberDetailController extends Controller
         $activePackageInvestAmount = (float) ($activePackage->invest_amount ?? ($activePackage->package_value ?? ($activeStaking ? $activeStaking->invest_amount : $totalInvestment)));
         $result['activePackageInvestAmount'] = $activePackageInvestAmount;
 
-        // 2. Trading Wallet balance (sourced strictly from member's p2p_wallet)
-        $tradingWalletBalance = (float) ($member->p2p_wallet ?? 0.00);
+        // 2. Trading Wallet balance (sourced strictly from member's trading_wallet)
+        $tradingWalletBalance = (float) ($member->trading_wallet ?? 0.00);
         $result['tradingWalletBalance'] = $tradingWalletBalance;
 
         // 3. Dynamic Admin-configured Package Plan and Return %
@@ -313,7 +313,7 @@ class MemberDetailController extends Controller
         }
         $totalInvestment = $totalInvestQuery > 0 ? $totalInvestQuery : (float) ($member->self_biz ?? 0);
 
-        $tradingWalletBalance = (float) ($member->p2p_wallet ?? 0.00);
+        $tradingWalletBalance = (float) ($member->trading_wallet ?? 0.00);
 
         $packagePlan = null;
         if ($activePackage && $activePackage->package_range) {

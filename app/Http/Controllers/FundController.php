@@ -272,8 +272,8 @@ class FundController extends Controller
                 $stakingDetail->save();
 
                 // 3. Update Member Trading Wallet (70% Allocation) and Member Status
-                $oldWallet = (float) $member->p2p_wallet;
-                $member->p2p_wallet = $oldWallet + $tradingWalletAmount;
+                $oldWallet = (float) $member->trading_wallet;
+                $member->trading_wallet = $oldWallet + $tradingWalletAmount;
                 $member->package = $amount;
                 $member->self_biz = ((float) $member->self_biz) + $amount;
 

@@ -52,21 +52,7 @@ class MemberDetail extends Model
         return $this->hasOne(PackageDetail::class, 'memberid', 'memberid')->latestOfMany();
     }
 
-    /**
-     * Accessor: Trading Wallet balance is sourced directly from P2P Wallet.
-     */
-    public function getTradingWalletAttribute(): float
-    {
-        return (float) ($this->attributes['p2p_wallet'] ?? 0.00);
-    }
 
-    /**
-     * Mutator: Redirect setting Trading Wallet balance directly to P2P Wallet.
-     */
-    public function setTradingWalletAttribute($value): void
-    {
-        $this->attributes['p2p_wallet'] = (float) $value;
-    }
 
     /**
      * Accessor: Default lock days from active setting.
@@ -171,7 +157,7 @@ class MemberDetail extends Model
         }
 
         $percent = TradingWalletSetting::getDefaultWithdrawalPercent();
-        $balance = (float) ($this->p2p_wallet ?? 0.00);
+        $balance = (float) ($this->trading_wallet ?? 0.00);
         $max = ($balance * (float) $percent) / 100.00;
 
         return max(0.00, round($max, 2));
@@ -197,8 +183,8 @@ class MemberDetail extends Model
             return false;
         }
 
-        // Available balance check (sourced from p2p_wallet)
-        $balance = (float) ($this->p2p_wallet ?? 0.00);
+        // Available balance check (sourced from trading_wallet)
+        $balance = (float) ($this->trading_wallet ?? 0.00);
         if ($amount > $balance) {
             $errorMessage = 'Requested amount exceeds your available Trading Wallet balance ($'.number_format($balance, 2).').';
 
