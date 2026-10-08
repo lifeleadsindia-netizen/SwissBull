@@ -248,9 +248,9 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::get('/activation-detail', [ActivationController::class, 'activationDetail'])->name('activationDetail');
 
     //  Staking Routes
-    // Route::get('/Staking/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
-    // Route::post('/createInvestment', [InvestmentController::class, 'createInvestment'])->name('createInvestment');
-    // Route::get('/Staking/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
+    Route::get('/Staking/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
+    Route::post('/createInvestment', [InvestmentController::class, 'createInvestment'])->name('createInvestment');
+    Route::get('/Staking/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
 
     // Partnership Investment Routes
     Route::get('/partnership/create-investment', [PartnershipController::class, 'partCreateInvestment']);

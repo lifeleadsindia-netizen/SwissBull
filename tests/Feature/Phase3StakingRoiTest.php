@@ -10,7 +10,6 @@ use App\Models\StakingDetail;
 use App\Models\StakingIncome;
 use App\Models\WalletTransfer;
 use App\Services\StakingRoiService;
-use Carbon\Carbon;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
@@ -85,19 +84,20 @@ class Phase3StakingRoiTest extends TestCase
         ];
 
         foreach ($testCases as $idx => $tc) {
-            $txnid = '0x_p3_dep_test_'.$idx.'_'.time().rand(10, 99);
+            StakingDetail::where('memberid', $this->memberId)->delete();
+            PackageDetail::where('memberid', $this->memberId)->delete();
+            MemberDetail::where('memberid', $this->memberId)->update(['p2p_wallet' => 50000.00]);
             $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-                ->postJson(route('addFund'), [
+                ->postJson(route('createInvestment'), [
                     'memberid' => $this->memberId,
                     'package' => $tc['package'],
                     'amount' => $tc['amount'],
-                    'txnid' => $txnid,
                 ]);
 
             $response->assertStatus(200);
 
             // Verify StakingDetail record created and active
-            $staking = StakingDetail::where('txnid', $txnid)->first();
+            $staking = StakingDetail::where('memberid', $this->memberId)->latest()->first();
             $this->assertNotNull($staking, "StakingDetail record must be created for {$tc['amount']} USDT");
             $this->assertEquals($this->memberId, $staking->memberid);
             $this->assertEquals($tc['amount'], (float) $staking->invest_amount);

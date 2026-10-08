@@ -4,6 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\ImportFund;
 use App\Models\MemberDetail;
+use App\Models\PackageDetail;
+use App\Models\PackageDistribution;
+use App\Models\StakingDetail;
 use App\Models\WalletTransfer;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Tests\TestCase;
@@ -17,9 +20,9 @@ class DepositFundTest extends TestCase
         parent::setUp();
         $this->withoutMiddleware(PreventRequestForgery::class);
 
-        \App\Models\ImportFund::where('txnid', 'like', '0x_test_%')->delete();
-        \App\Models\PackageDetail::where('txnid', 'like', '0x_test_%')->delete();
-        \App\Models\StakingDetail::where('txnid', 'like', '0x_test_%')->delete();
+        ImportFund::where('txnid', 'like', '0x_test_%')->delete();
+        PackageDetail::where('txnid', 'like', '0x_test_%')->delete();
+        StakingDetail::where('txnid', 'like', '0x_test_%')->delete();
 
         $this->memberId = 'TESTDEP'.rand(10000, 99999);
         MemberDetail::create([
@@ -36,36 +39,35 @@ class DepositFundTest extends TestCase
     protected function tearDown(): void
     {
         ImportFund::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
-        \App\Models\PackageDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
-        \App\Models\StakingDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
+        PackageDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
+        StakingDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_test_%')->delete();
         WalletTransfer::where('memberid', $this->memberId)->delete();
         MemberDetail::where('memberid', $this->memberId)->delete();
         parent::tearDown();
     }
 
-    public function test_deposit_fund_page_contains_package_dropdown_and_options(): void
+    public function test_deposit_fund_page_renders_successfully(): void
     {
         $response = $this->withSession(['MEMBER_ID' => $this->memberId])
             ->get('/member/fund/deposit-fund');
 
         $response->assertStatus(200);
-        $response->assertSee('name="package"', false);
-        $response->assertSee('value="50-500"', false);
-        $response->assertSee('value="600-5000"', false);
-        $response->assertSee('value="6000+"', false);
-        $response->assertSee('50 - 500');
-        $response->assertSee('600 - 5000');
-        $response->assertSee('6000 and above');
+        $response->assertSee('Deposit Fund');
+        $response->assertSee('id="memberid"', false);
+        $response->assertSee('id="amount"', false);
+        $response->assertSee('name="wallet"', false);
     }
 
-    public function test_valid_deposit_package_1_boundary_50(): void
+    public function test_valid_deposit_credits_100_percent_to_p2p_wallet(): void
     {
+        $initialBalance = (float) MemberDetail::where('memberid', $this->memberId)->value('p2p_wallet');
+        $depositAmount = 250.00;
+
         $response = $this->withSession(['MEMBER_ID' => $this->memberId])
             ->postJson(route('addFund'), [
                 'memberid' => $this->memberId,
-                'package' => '50-500',
-                'amount' => 50,
-                'txnid' => '0x_test_txn_50',
+                'amount' => $depositAmount,
+                'txnid' => '0x_test_txn_250',
             ]);
 
         $response->assertStatus(200);
@@ -73,196 +75,19 @@ class DepositFundTest extends TestCase
 
         $this->assertDatabaseHas('import_funds', [
             'memberid' => $this->memberId,
-            'package' => '50-500',
-            'amount' => 50,
-            'txnid' => '0x_test_txn_50',
+            'amount' => $depositAmount,
+            'txnid' => '0x_test_txn_250',
             'status' => 'Approved',
         ]);
-    }
 
-    public function test_valid_deposit_package_1_boundary_500(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '50-500',
-                'amount' => 500,
-                'txnid' => '0x_test_txn_500',
-            ]);
+        $newBalance = (float) MemberDetail::where('memberid', $this->memberId)->value('p2p_wallet');
+        $this->assertEquals($initialBalance + $depositAmount, $newBalance);
 
-        $response->assertStatus(200);
-        $response->assertJson(['status' => true]);
-
-        $this->assertDatabaseHas('import_funds', [
+        $this->assertDatabaseHas('wallet_transfers', [
             'memberid' => $this->memberId,
-            'package' => '50-500',
-            'amount' => 500,
-            'txnid' => '0x_test_txn_500',
+            'walletType' => 'Fund Added',
+            'debit' => $depositAmount,
         ]);
-    }
-
-    public function test_valid_deposit_package_2_boundary_600(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '600-5000',
-                'amount' => 600,
-                'txnid' => '0x_test_txn_600',
-            ]);
-
-        $response->assertStatus(200);
-        $response->assertJson(['status' => true]);
-
-        $this->assertDatabaseHas('import_funds', [
-            'memberid' => $this->memberId,
-            'package' => '600-5000',
-            'amount' => 600,
-        ]);
-    }
-
-    public function test_valid_deposit_package_2_boundary_5000(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '600-5000',
-                'amount' => 5000,
-                'txnid' => '0x_test_txn_5000',
-            ]);
-
-        $response->assertStatus(200);
-        $response->assertJson(['status' => true]);
-
-        $this->assertDatabaseHas('import_funds', [
-            'memberid' => $this->memberId,
-            'package' => '600-5000',
-            'amount' => 5000,
-        ]);
-    }
-
-    public function test_valid_deposit_package_3_boundary_6000(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '6000+',
-                'amount' => 6000,
-                'txnid' => '0x_test_txn_6000',
-            ]);
-
-        $response->assertStatus(200);
-        $response->assertJson(['status' => true]);
-
-        $this->assertDatabaseHas('import_funds', [
-            'memberid' => $this->memberId,
-            'package' => '6000+',
-            'amount' => 6000,
-        ]);
-    }
-
-    public function test_valid_deposit_package_3_above_6000(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '6000+',
-                'amount' => 8500,
-                'txnid' => '0x_test_txn_8500',
-            ]);
-
-        $response->assertStatus(200);
-        $response->assertJson(['status' => true]);
-
-        $this->assertDatabaseHas('import_funds', [
-            'memberid' => $this->memberId,
-            'package' => '6000+',
-            'amount' => 8500,
-        ]);
-    }
-
-    public function test_invalid_package_1_below_minimum_49(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '50-500',
-                'amount' => 49,
-                'txnid' => '0x_test_invalid_49',
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson(['status' => false]);
-    }
-
-    public function test_invalid_package_1_above_maximum_501(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '50-500',
-                'amount' => 501,
-                'txnid' => '0x_test_invalid_501',
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson(['status' => false]);
-    }
-
-    public function test_invalid_package_2_below_minimum_599(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '600-5000',
-                'amount' => 599,
-                'txnid' => '0x_test_invalid_599',
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson(['status' => false]);
-    }
-
-    public function test_invalid_package_2_above_maximum_5001(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '600-5000',
-                'amount' => 5001,
-                'txnid' => '0x_test_invalid_5001',
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson(['status' => false]);
-    }
-
-    public function test_invalid_package_3_below_minimum_5999(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '6000+',
-                'amount' => 5999,
-                'txnid' => '0x_test_invalid_5999',
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson(['status' => false]);
-    }
-
-    public function test_invalid_empty_package(): void
-    {
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
-            ->postJson(route('addFund'), [
-                'memberid' => $this->memberId,
-                'package' => '',
-                'amount' => 100,
-                'txnid' => '0x_test_empty_pkg',
-            ]);
-
-        $response->assertStatus(422);
-        $response->assertJson(['status' => false]);
     }
 
     public function test_invalid_empty_amount(): void
@@ -270,7 +95,6 @@ class DepositFundTest extends TestCase
         $response = $this->withSession(['MEMBER_ID' => $this->memberId])
             ->postJson(route('addFund'), [
                 'memberid' => $this->memberId,
-                'package' => '50-500',
                 'amount' => '',
                 'txnid' => '0x_test_empty_amt',
             ]);
@@ -284,7 +108,6 @@ class DepositFundTest extends TestCase
         $response = $this->withSession(['MEMBER_ID' => $this->memberId])
             ->postJson(route('addFund'), [
                 'memberid' => $this->memberId,
-                'package' => '50-500',
                 'amount' => 'abc',
                 'txnid' => '0x_test_non_num',
             ]);
@@ -298,7 +121,6 @@ class DepositFundTest extends TestCase
         $response = $this->withSession(['MEMBER_ID' => $this->memberId])
             ->postJson(route('addFund'), [
                 'memberid' => $this->memberId,
-                'package' => '50-500',
                 'amount' => -50,
                 'txnid' => '0x_test_neg_amt',
             ]);
@@ -307,35 +129,31 @@ class DepositFundTest extends TestCase
         $response->assertJson(['status' => false]);
     }
 
-    public function test_wallet_balance_and_transfer_ledger_updated_properly(): void
+    public function test_duplicate_txnid_is_rejected(): void
     {
-        $initialBalance = (float) MemberDetail::where('memberid', $this->memberId)->value('p2p_wallet');
+        $txnid = '0x_test_duplicate_txnid';
 
-        $depositAmount = 250.00;
-        $response = $this->withSession(['MEMBER_ID' => $this->memberId])
+        $first = $this->withSession(['MEMBER_ID' => $this->memberId])
             ->postJson(route('addFund'), [
                 'memberid' => $this->memberId,
-                'package' => '50-500',
-                'amount' => $depositAmount,
-                'txnid' => '0x_test_wallet_check',
+                'amount' => 100,
+                'txnid' => $txnid,
             ]);
+        $first->assertStatus(200);
 
-        $response->assertStatus(200);
-
-        $expectedCredited = round($depositAmount * 0.70, 2);
-        $newBalance = (float) MemberDetail::where('memberid', $this->memberId)->value('p2p_wallet');
-        $this->assertEquals($initialBalance + $expectedCredited, $newBalance);
-
-        $this->assertDatabaseHas('wallet_transfers', [
-            'memberid' => $this->memberId,
-            'walletType' => 'Fund Added',
-            'debit' => $expectedCredited,
-        ]);
+        $second = $this->withSession(['MEMBER_ID' => $this->memberId])
+            ->postJson(route('addFund'), [
+                'memberid' => $this->memberId,
+                'amount' => 100,
+                'txnid' => $txnid,
+            ]);
+        $second->assertStatus(422);
+        $second->assertJson(['status' => false]);
     }
 
     public function test_package_distribution_configuration_reads_from_database(): void
     {
-        $config = \App\Models\PackageDistribution::getDistributionConfig();
+        $config = PackageDistribution::getDistributionConfig();
 
         $this->assertEquals(70.0, $config['p2p_wallet']);
         $this->assertArrayHasKey('referral_bonus', $config);

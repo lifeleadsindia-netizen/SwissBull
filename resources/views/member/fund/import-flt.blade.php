@@ -294,21 +294,6 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="dep-label" for="package">
-                                <i class="fa-solid fa-cubes-stacked me-1"></i> Package Selection
-                            </label>
-                            <select class="form-control dep-input" name="package" id="package">
-                                <option value="" selected disabled>Select Package</option>
-                                <option value="50-500">50 - 500</option>
-                                <option value="600-5000">600 - 5000</option>
-                                <option value="6000+">6000 and above</option>
-                            </select>
-                            @error('package')
-                                <span class="text-danger d-block mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="mb-4">
                             <label class="dep-label" for="amount">
                                 <i class="fa-solid fa-dollar-sign me-1"></i> Amount (USDT BEP-20)
                             </label>
@@ -317,9 +302,8 @@
                                 <input type="text" class="form-control dep-input amount-field"
                                     name="amount" value="" id="amount"
                                     onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode == 46'
-                                    placeholder="Select a package first">
+                                    placeholder="Enter deposit amount (min 1 USDT)">
                             </div>
-                            <div id="amount-hint" class="mt-1" style="font-size: 11.5px; color: #F59E0B; display: none;"></div>
                             @error('amount')
                                 <span class="text-danger d-block mt-1">{{ $message }}</span>
                             @enderror

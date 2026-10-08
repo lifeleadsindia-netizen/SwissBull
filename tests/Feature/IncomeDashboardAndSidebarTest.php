@@ -155,8 +155,8 @@ class IncomeDashboardAndSidebarTest extends TestCase
         $dashRes->assertSee('Hero of the Month');
         $dashRes->assertSee('Partnership Income');
         $dashRes->assertDontSee('Team Withdrawal Commission');
-        $dashRes->assertDontSee('Create Staking');
-        $dashRes->assertDontSee('Staking History');
+        $dashRes->assertSee('Create Staking');
+        $dashRes->assertSee('Staking History');
     }
 
     public function test_admin_income_views_render_successfully(): void

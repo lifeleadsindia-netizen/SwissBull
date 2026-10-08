@@ -221,11 +221,7 @@ if (amount) {
 
 async function depositActivation() {
     try {
-        if (!packageSelect || !packageSelect.value) {
-            return notifyAlert("Select Package", "Please select a deposit package first.", "warning");
-        }
-
-        const selectedPkg = packageSelect.value;
+        const selectedPkg = (packageSelect && packageSelect.value) ? packageSelect.value : "Deposit";
 
         if (!amount || !amount.value) {
             return notifyAlert("No Amount", "Please enter amount to deposit", "error");
@@ -234,23 +230,6 @@ async function depositActivation() {
         const enteredAmount = parseFloat(amount.value);
         if (isNaN(enteredAmount) || enteredAmount <= 0) {
             return notifyAlert("Invalid", "Please enter a valid positive amount", "error");
-        }
-
-        // Validate package range rules before triggering MetaMask
-        if (selectedPkg === "50-500") {
-            if (enteredAmount < 50 || enteredAmount > 500) {
-                return notifyAlert("Invalid Amount", "For package 50 - 500, amount must be between 50 and 500 USDT.", "error");
-            }
-        } else if (selectedPkg === "600-5000") {
-            if (enteredAmount < 600 || enteredAmount > 5000) {
-                return notifyAlert("Invalid Amount", "For package 600 - 5000, amount must be between 600 and 5000 USDT.", "error");
-            }
-        } else if (selectedPkg === "6000+") {
-            if (enteredAmount < 6000) {
-                return notifyAlert("Invalid Amount", "For package 6000 and above, amount must be at least 6000 USDT.", "error");
-            }
-        } else {
-            return notifyAlert("Invalid Package", "Please select a valid deposit package.", "error");
         }
 
         // if (!window.ethereum)
