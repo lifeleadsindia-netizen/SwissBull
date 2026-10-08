@@ -14,7 +14,7 @@
                 <div class="sk-hero-chips">
                     <div class="sk-chip"><i class="fa-solid fa-shield-halved"></i> Secure & Insured</div>
                     <div class="sk-chip"><i class="fa-solid fa-bolt"></i> Instant Activation</div>
-                    <div class="sk-chip"><i class="fa-solid fa-lock"></i> Funds Protected</div>
+                    <div class="sk-chip"><i class="fa-solid fa-unlock"></i> No Fund Lock</div>
                 </div>
             </div>
 
@@ -131,15 +131,15 @@
                                         @enderror
                                     </div>
 
-                                    {{-- Fund Wallet --}}
+                                    {{-- P2P Wallet --}}
                                     <div class="col-md-12">
                                         <label class="staking-label" for="wallet">
-                                            <i class="fa-solid fa-wallet me-1"></i> Fund Wallet Balance
+                                            <i class="fa-solid fa-wallet me-1"></i> P2P Wallet Balance
                                         </label>
                                         <div class="input-group">
                                             <span class="input-group-text">$</span>
                                             <input class="form-control staking-input" id="wallet" name="wallet"
-                                                type="text" placeholder="Enter wallet"
+                                                type="text" placeholder="P2P Wallet Balance"
                                                 value="{{ number_format($data['p2p_wallet'], 2) }}" readonly>
                                         </div>
                                     </div>
@@ -177,7 +177,7 @@
                                 <div class="sk-stat-icon green"><i class="fa-solid fa-wallet"></i></div>
                             </div>
                             <div class="sk-stat-value">${{ number_format($data['p2p_wallet'], 2) }}</div>
-                            <div class="sk-stat-sub">Fund wallet • Ready for investment</div>
+                            <div class="sk-stat-sub">P2P wallet • Ready for investment</div>
                         </div>
 
                         {{-- 4 Partnership Levels Overview --}}
