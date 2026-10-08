@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.main')
+@extends('admin.layouts.main')
 @section('title', 'New Withdrawal Requests')
 @section('content')
     @push('head')
@@ -56,6 +56,14 @@
                                     style="border-radius: 6px; padding: 8px 18px; border: 1px solid #28a745; color: #28a745;">
                                     <i class="ik ik-award mr-1"></i> {{ __('PEPE Tokens') }}
                                     <span class="badge badge-success ml-1">{{ count($pepeData ?? []) }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item ml-2">
+                                <a class="nav-link font-weight-bold" id="trading-tab" data-toggle="pill" href="#trading-panel"
+                                    role="tab" aria-controls="trading-panel" aria-selected="false"
+                                    style="border-radius: 6px; padding: 8px 18px; border: 1px solid #ffc107; color: #ffc107;">
+                                    <i class="ik ik-bar-chart-2 mr-1"></i> {{ __('Trading') }}
+                                    <span class="badge badge-warning ml-1">{{ count($tradingData ?? []) }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -175,6 +183,62 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <!-- 3rd Tab: Trading Requests -->
+                            <div class="tab-pane fade" id="trading-panel" role="tabpanel" aria-labelledby="trading-tab">
+                                <div class="table-responsive">
+                                    <table id="trading_data_table" class="table px-3" style="zoom: 90%; width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ __('S.No') }}</th>
+                                                <th>{{ __('Request Date') }}</th>
+                                                <th>{{ __('Request Id') }}</th>
+                                                <th>{{ __('Member Id') }}</th>
+                                                <th>{{ __('Wallet Type') }}</th>
+                                                <th>{{ __('Wallet Address') }}</th>
+                                                <th>{{ __('Net Amount ') }}</th>
+                                                <th>{{ __('Action') }}</th>
+                                                <th>{{ __('Action') }}</th>
+                                                <th>{{ __('Action') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php $k = 1;  @endphp
+                                            @forelse (($tradingData ?? []) as $list)
+                                                <tr>
+                                                    <td>{{ $k }}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
+                                                    
+                                                    <td>{{ $list['request_id'] }}</td>
+                                                    <td>{{ $list['memberid'] }}</td>
+                                                    <td>{{ $list['type'] }}</td>
+                                                    <td>{{ $list['wallet_address'] }}</td>
+                                                    <td>$ {{ $list['net_amount'] }}</td>
+                                                    <td class="px-0">
+                                                        <a href="{{ url('admin/withdrawal/accept-online') }}/{{ $list['id'] }}"
+                                                            class="btn btn-sm btn-success mx-0">Online Pay</a>
+                                                    </td>
+                                                    <td class="px-1">
+                                                        <a href="{{ url('admin/withdrawal/accept') }}/{{ $list['id'] }}"
+                                                            class="btn btn-sm btn-primary mx-0">Accept</a>
+                                                    </td>
+                                                    <td class="px-0">
+                                                        <a href="{{ url('admin/withdrawal/cancel') }}/{{ $list['id'] }}"
+                                                            class="btn btn-sm btn-danger mx-0">Cancel</a>
+                                                    </td>
+                                                </tr>
+                                                @php $k++;  @endphp
+                                            @empty
+                                                <tr>
+                                                    <td colspan="10" class="text-center py-4 text-muted">
+                                                        No new Trading withdrawal requests found.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -189,6 +253,15 @@
             $(document).ready(function() {
                 if ($('#pepe_data_table').length && !$.fn.DataTable.isDataTable('#pepe_data_table')) {
                     $('#pepe_data_table').DataTable({
+                        responsive: true,
+                        order: [
+                            [1, 'desc']
+                        ]
+                    });
+                }
+
+                if ($('#trading_data_table').length && !$.fn.DataTable.isDataTable('#trading_data_table')) {
+                    $('#trading_data_table').DataTable({
                         responsive: true,
                         order: [
                             [1, 'desc']

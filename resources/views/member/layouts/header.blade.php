@@ -1510,7 +1510,7 @@
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="account_balance">account_balance</i>
-                                <span class="nav-text">Package Activation</span>
+                                <span class="nav-text">Deposit Section</span>
                             </a>
                             <ul aria-expanded="false">
                                 <li><a href="{{ url('member/fund/deposit-fund') }}">Deposit Fund</a>
@@ -1557,7 +1557,7 @@
                             </ul>
                         </li>
 
-                        <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
+                        {{-- <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="account_tree">account_tree</i>
                                 <span class="nav-text">Single Leg Section</span>
@@ -1568,7 +1568,7 @@
                                 <li><a href="{{ url('member/income/single-leg-income') }}">Single Leg Income</a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> --}}
 
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined" data-icon="money">money</i>

@@ -113,7 +113,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::get('/income/daily-team-investment-share', [AdminController::class, 'levelInc'])->name('admin.income.dailyTeamInvestmentShare');
     Route::get('/income/level-incomes', [AdminController::class, 'levelInc']);
     Route::get('/income/hero-of-the-month', [AdminController::class, 'heroRewards'])->name('admin.income.heroOfTheMonth');
-    Route::get('/income/single-leg-incomes', [AdminController::class, 'singleLegInc']);
+    // Route::get('/income/single-leg-incomes', [AdminController::class, 'singleLegInc']);
     Route::get('/income/partnership-incomes', [AdminController::class, 'partnershipInc']);
     Route::get('/income/partnership-details', [AdminController::class, 'partnershipDetails']);
     Route::get('/income/team-withdrawal-commission-incomes', [AdminController::class, 'teamWithInc']);
@@ -294,8 +294,8 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::get('/income/hero-of-the-month', [IncomeController::class, 'heroIncome'])->name('member.heroOfTheMonth');
     Route::get('/income/partnership-income', [IncomeController::class, 'partnershipIncome'])->name('member.partnershipIncome');
     Route::get('/income/partnership/investment-incomes', [IncomeController::class, 'partnershipIncome']);
-    Route::get('/income/single-leg-income', [IncomeController::class, 'singleLegIncome']);
-    Route::get('/income/single-leg-details', [MemberDetailController::class, 'singlrLegDetails'])->name('member.single-leg-details');
+    // Route::get('/income/single-leg-income', [IncomeController::class, 'singleLegIncome']);
+    // Route::get('/income/single-leg-details', [MemberDetailController::class, 'singlrLegDetails'])->name('member.single-leg-details');
     Route::get('/income/team-withdrawal-commission', [IncomeController::class, 'withdrawalCommissionIncome']);
 
     // Withdrawal Section
