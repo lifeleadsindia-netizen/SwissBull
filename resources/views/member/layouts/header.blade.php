@@ -35,7 +35,7 @@
 
     <!-- Style css -->
     <link href="{{ asset('uassets/css/style.css') }}" rel="stylesheet">
-    <link href="{{ asset('uassets/css/custom.css') }}" rel="stylesheet">
+    <link href="{{ asset('uassets/css/custom.css') }}?v={{ filemtime(public_path('uassets/css/custom.css')) }}" rel="stylesheet">
     <link href="{{ asset('uassets/icons/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet">
 
 
