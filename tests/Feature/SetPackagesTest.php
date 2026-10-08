@@ -363,4 +363,49 @@ class SetPackagesTest extends TestCase
         $this->assertEquals($originalMaxReturnPercent, $refreshedPlan->max_return_percent);
         $this->assertEquals($originalLockDays, $refreshedPlan->lock_days);
     }
+
+    public function test_dynamic_package_range_display_and_persistence(): void
+    {
+        $admin = ['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1];
+
+        $plan1 = PackagePlan::find(1);
+        $plan2 = PackagePlan::find(2);
+        $plan3 = PackagePlan::find(3);
+
+        // 1. Verify model accessor computes dynamic range based on min/max amounts
+        $plan1->update(['min_amount' => 36.00, 'max_amount' => 550.00]);
+        $this->assertEquals('36–550 USDT', $plan1->fresh()->display_range);
+
+        $plan2->update(['min_amount' => 600.00, 'max_amount' => 5000.00]);
+        $this->assertEquals('600–5000 USDT', $plan2->fresh()->display_range);
+
+        $plan3->update(['min_amount' => 6000.00, 'max_amount' => null]);
+        $this->assertEquals('6000+ USDT', $plan3->fresh()->display_range);
+
+        // 2. Open /admin/set-packages and confirm the rendered header contains the dynamic ranges
+        $response = $this->withSession($admin)->get('/admin/set-packages');
+        $response->assertStatus(200);
+        $response->assertSee('36–550 USDT');
+        $response->assertSee('600–5000 USDT');
+        $response->assertSee('6000+ USDT');
+
+        // 3. Save new values via HTTP POST
+        $saveResponse = $this->withSession($admin)->post('/admin/savePackages', [
+            'plans' => [
+                [
+                    'id' => 1,
+                    'name' => 'Package 1',
+                    'min_amount' => 45.00,
+                    'max_amount' => 520.00,
+                    'status' => 'Active',
+                ],
+            ],
+        ]);
+        $saveResponse->assertSessionHasNoErrors();
+
+        // 4. Reload page and confirm updated range appears
+        $refresh = $this->withSession($admin)->get('/admin/set-packages');
+        $refresh->assertStatus(200);
+        $refresh->assertSee('45–520 USDT');
+    }
 }
