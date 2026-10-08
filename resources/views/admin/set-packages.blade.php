@@ -137,7 +137,7 @@
                                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                                     <h5 class="font-weight-bold text-primary mb-0">
                                                         <span class="badge badge-primary mr-2">Tier {{ $index + 1 }}</span>
-                                                        {{ $plan->package_range }} USDT
+                                                        <span class="plan-range-display" id="planRangeDisplay_{{ $index }}">{{ $plan->display_range }}</span>
                                                     </h5>
                                                     <div>
                                                         <select name="plans[{{ $index }}][status]" class="form-control form-control-sm d-inline-block font-weight-bold" style="width: 100px;">
@@ -154,11 +154,11 @@
                                                     </div>
                                                     <div class="col-md-3 form-group mb-0">
                                                         <label class="small text-muted mb-1">{{ __('Min Deposit ($)') }}</label>
-                                                        <input type="number" step="any" min="0" class="form-control form-control-sm" name="plans[{{ $index }}][min_amount]" value="{{ $plan->min_amount }}" required>
+                                                        <input type="number" step="any" min="0" class="form-control form-control-sm min-deposit-input" name="plans[{{ $index }}][min_amount]" id="minAmount_{{ $index }}" data-index="{{ $index }}" value="{{ (float)$plan->min_amount == (int)$plan->min_amount ? (int)$plan->min_amount : $plan->min_amount }}" required>
                                                     </div>
                                                     <div class="col-md-3 form-group mb-0">
                                                         <label class="small text-muted mb-1">{{ __('Max Deposit ($)') }}</label>
-                                                        <input type="number" step="any" min="0" class="form-control form-control-sm" name="plans[{{ $index }}][max_amount]" value="{{ $plan->max_amount }}" placeholder="Unlimited">
+                                                        <input type="number" step="any" min="0" class="form-control form-control-sm max-deposit-input" name="plans[{{ $index }}][max_amount]" id="maxAmount_{{ $index }}" data-index="{{ $index }}" value="{{ ($plan->max_amount !== null && $plan->max_amount !== '') ? ((float)$plan->max_amount == (int)$plan->max_amount ? (int)$plan->max_amount : $plan->max_amount) : '' }}" placeholder="Unlimited">
                                                     </div>
                                                 </div>
                                             </div>
@@ -179,3 +179,57 @@
         </div>
     </div>
 @endsection
+
+@push('script')
+<script>
+    (function () {
+        function updateRangeDisplay(index) {
+            const minEl = document.getElementById('minAmount_' + index);
+            const maxEl = document.getElementById('maxAmount_' + index);
+            const displayEl = document.getElementById('planRangeDisplay_' + index);
+
+            if (!minEl || !displayEl) return;
+
+            const minVal = minEl.value.trim();
+            const maxVal = maxEl ? maxEl.value.trim() : '';
+
+            const formattedMin = minVal !== '' ? minVal : '0';
+
+            if (maxVal !== '' && !isNaN(maxVal) && parseFloat(maxVal) > 0) {
+                displayEl.textContent = formattedMin + '–' + maxVal + ' USDT';
+            } else {
+                displayEl.textContent = formattedMin + '+ USDT';
+            }
+        }
+
+        function initRangeListeners() {
+            const minInputs = document.querySelectorAll('.min-deposit-input');
+            const maxInputs = document.querySelectorAll('.max-deposit-input');
+
+            minInputs.forEach(function (input) {
+                const idx = input.getAttribute('data-index');
+                ['input', 'change', 'keyup', 'blur'].forEach(function (evt) {
+                    input.addEventListener(evt, function () {
+                        updateRangeDisplay(idx);
+                    });
+                });
+            });
+
+            maxInputs.forEach(function (input) {
+                const idx = input.getAttribute('data-index');
+                ['input', 'change', 'keyup', 'blur'].forEach(function (evt) {
+                    input.addEventListener(evt, function () {
+                        updateRangeDisplay(idx);
+                    });
+                });
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initRangeListeners);
+        } else {
+            initRangeListeners();
+        }
+    })();
+</script>
+@endpush

@@ -78,4 +78,24 @@ class PackagePlan extends Model
 
         return round($amount * ($percent / 100), 2);
     }
+
+    /**
+     * Get the dynamic display range string formatted from current min_amount and max_amount.
+     */
+    public function getDisplayRangeAttribute(): string
+    {
+        $min = (float) $this->min_amount == (int) $this->min_amount
+            ? (int) $this->min_amount
+            : (float) $this->min_amount;
+
+        if ($this->max_amount !== null && $this->max_amount !== '' && (float) $this->max_amount > 0) {
+            $max = (float) $this->max_amount == (int) $this->max_amount
+                ? (int) $this->max_amount
+                : (float) $this->max_amount;
+
+            return "{$min}–{$max} USDT";
+        }
+
+        return "{$min}+ USDT";
+    }
 }
