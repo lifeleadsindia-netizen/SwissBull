@@ -700,7 +700,7 @@ class MemberDetailController extends Controller
             ];
             $user['to'] = $email;
             $fromAddress = config('mail.from.address', 'support@mathwallet.live');
-            $fromName = config('mail.from.name', config('detailsApp.name', 'Math Wallet'));
+            $fromName = config('mail.from.name', config('detailsApp.name', 'SYNC TRADE'));
 
             Mail::send([
                 'html' => 'member.mails.register-otp',
@@ -799,7 +799,7 @@ class MemberDetailController extends Controller
                 'id' => $b->id,
                 'filename' => basename($b->image_path),
                 'title' => $b->title,
-                'tag' => $b->tag ?: 'Math Wallet Official',
+                'tag' => $b->tag ?: 'SYNC TRADE Official',
                 'url' => $b->image_url,
                 'download_url' => route('member.promotional-banners.download', ['filename' => $b->id]),
                 'external_link' => $b->external_link,
@@ -1080,62 +1080,62 @@ class MemberDetailController extends Controller
         abort(404, 'Tutorial video file not found.');
     }
 
-    public function singlrLegDetails()
-    {
-        $memberid = session('MEMBER_ID');
+    // public function singlrLegDetails()
+    // {
+    //     $memberid = session('MEMBER_ID');
 
-        $data = MemberDetail::where('memberid', $memberid)->first();
+    //     $data = MemberDetail::where('memberid', $memberid)->first();
 
-        if (! $data || empty($data->activated_at)) {
-            $totalMembers = 0;
-            $membersDetails = collect();
-            $totalActiveMembers = 0;
-        } else {
-            $activated_at = $data->activated_at;
-            $memberDbId = $data->id;
+    //     if (! $data || empty($data->activated_at)) {
+    //         $totalMembers = 0;
+    //         $membersDetails = collect();
+    //         $totalActiveMembers = 0;
+    //     } else {
+    //         $activated_at = $data->activated_at;
+    //         $memberDbId = $data->id;
 
-            // Details — Active members first (sorted by activation), then Inactive members (sorted by registration)
-            $membersDetails = MemberDetail::where('id', '!=', $memberDbId)
-                ->where('memberid', '!=', $memberid)
-                ->where(function ($q) use ($activated_at) {
-                    $q->where(function ($subActive) use ($activated_at) {
-                        $subActive->where('status', 'Active')
-                            ->whereNotNull('activated_at')
-                            ->where('activated_at', '>=', $activated_at);
-                    })->orWhere(function ($subInactive) use ($activated_at) {
-                        $subInactive->where('status', '!=', 'Active')
-                            ->where(function ($dateQ) use ($activated_at) {
-                                $dateQ->where('created_at', '>=', $activated_at)
-                                    ->orWhere(function ($actQ) use ($activated_at) {
-                                        $actQ->whereNotNull('activated_at')
-                                            ->where('activated_at', '>=', $activated_at);
-                                    });
-                            });
-                    });
-                })
-                ->orderByRaw("
-                    CASE
-                        WHEN status = 'Active' THEN 0
-                        ELSE 1
-                    END ASC
-                ")
-                ->orderByRaw("
-                    CASE
-                        WHEN status = 'Active' THEN activated_at
-                        ELSE created_at
-                    END ASC
-                ")
-                ->get();
+    //         // Details — Active members first (sorted by activation), then Inactive members (sorted by registration)
+    //         $membersDetails = MemberDetail::where('id', '!=', $memberDbId)
+    //             ->where('memberid', '!=', $memberid)
+    //             ->where(function ($q) use ($activated_at) {
+    //                 $q->where(function ($subActive) use ($activated_at) {
+    //                     $subActive->where('status', 'Active')
+    //                         ->whereNotNull('activated_at')
+    //                         ->where('activated_at', '>=', $activated_at);
+    //                 })->orWhere(function ($subInactive) use ($activated_at) {
+    //                     $subInactive->where('status', '!=', 'Active')
+    //                         ->where(function ($dateQ) use ($activated_at) {
+    //                             $dateQ->where('created_at', '>=', $activated_at)
+    //                                 ->orWhere(function ($actQ) use ($activated_at) {
+    //                                     $actQ->whereNotNull('activated_at')
+    //                                         ->where('activated_at', '>=', $activated_at);
+    //                                 });
+    //                         });
+    //                 });
+    //             })
+    //             ->orderByRaw("
+    //                 CASE
+    //                     WHEN status = 'Active' THEN 0
+    //                     ELSE 1
+    //                 END ASC
+    //             ")
+    //             ->orderByRaw("
+    //                 CASE
+    //                     WHEN status = 'Active' THEN activated_at
+    //                     ELSE created_at
+    //                 END ASC
+    //             ")
+    //             ->get();
 
-            $totalActiveMembers = $membersDetails->where('status', 'Active')->count();
-            $totalMembers = $membersDetails->count();
-        }
+    //         $totalActiveMembers = $membersDetails->where('status', 'Active')->count();
+    //         $totalMembers = $membersDetails->count();
+    //     }
 
-        return view(
-            'member.single-leg-details',
-            compact('data', 'totalMembers', 'membersDetails', 'totalActiveMembers')
-        );
-    }
+    //     return view(
+    //         'member.single-leg-details',
+    //         compact('data', 'totalMembers', 'membersDetails', 'totalActiveMembers')
+    //     );
+    // }
 
     public function businessPlanText(Request $request)
     {

@@ -47,7 +47,7 @@
                             <button type="button" class="btn btn-warning btn-sm px-3 fw-bold d-flex align-items-center" onclick="copyReferralLink()">
                                 <i class="far fa-copy me-1"></i> <span id="copyBtnText">Copy Link</span>
                             </button>
-                            <a href="https://wa.me/?text={{ rawurlencode("🔥 Discover Math Wallet - The Next-Gen Decentralized Platform! 🚀\n\nJoin my team and start earning rewards today:\n👉 " . $referralLink . "\n\nRegister now and start your journey!") }}" 
+                            <a href="https://wa.me/?text={{ rawurlencode("🔥 Discover SYNC TRADE - The Next-Gen Decentralized Platform! 🚀\n\nJoin my team and start earning rewards today:\n👉 " . $referralLink . "\n\nRegister now and start your journey!") }}" 
                                target="_blank" class="btn btn-success btn-sm px-3 fw-bold d-flex align-items-center">
                                 <i class="fab fa-whatsapp me-1"></i> Share
                             </a>
@@ -130,7 +130,7 @@
                                     </a>
 
                                     <!-- Direct WhatsApp Share Button with Referral Link -->
-                                    <a href="https://wa.me/?text={{ rawurlencode("🔥 *Math Wallet Official Update* 🚀\n\nTake your crypto portfolio to the next level with our decentralized system!\n\n👉 *Join using my referral link:* " . $referralLink . "\n\nCheck out our official banner: " . $banner['url']) }}" 
+                                    <a href="https://wa.me/?text={{ rawurlencode("🔥 *SYNC TRADE Official Update* 🚀\n\nTake your crypto portfolio to the next level with our decentralized system!\n\n👉 *Join using my referral link:* " . $referralLink . "\n\nCheck out our official banner: " . $banner['url']) }}" 
                                        target="_blank" 
                                        class="btn btn-wa-share" 
                                        title="Share to WhatsApp with Referral Link">
@@ -178,7 +178,7 @@
         <div class="modal-content border-0">
             <div class="modal-header border-0 pb-0">
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge badge-tag" id="lightboxTag">Math Wallet</span>
+                    <span class="badge badge-tag" id="lightboxTag">SYNC TRADE</span>
                     <h5 class="modal-title text-white fw-bold mb-0" id="lightboxTitle">Banner Preview</h5>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -562,7 +562,7 @@ function updateLightboxUI() {
     if (!banner) return;
 
     document.getElementById('lightboxTitle').innerText = banner.title;
-    document.getElementById('lightboxTag').innerText = banner.tag || 'Math Wallet';
+    document.getElementById('lightboxTag').innerText = banner.tag || 'SYNC TRADE';
     document.getElementById('lightboxImage').src = getLiveUrl(banner.url);
     document.getElementById('lightboxCounter').innerText = currentLightboxIndex + 1;
     document.getElementById('lightboxDownloadBtn').href = getLiveUrl(banner.download_url);
@@ -570,7 +570,7 @@ function updateLightboxUI() {
     // WhatsApp Share Link with Live URL
     const liveBannerUrl = getLiveUrl(banner.url);
     const liveRefUrl = getLiveUrl(memberReferralUrl);
-    const waText = "🔥 *Math Wallet Official Update* 🚀\n\nTake your crypto portfolio to the next level with our decentralized system!\n\n👉 *Join using my referral link:* " + liveRefUrl + "\n\nCheck out our official banner: " + liveBannerUrl;
+    const waText = "🔥 *SYNC TRADE Official Update* 🚀\n\nTake your crypto portfolio to the next level with our decentralized system!\n\n👉 *Join using my referral link:* " + liveRefUrl + "\n\nCheck out our official banner: " + liveBannerUrl;
     document.getElementById('lightboxWaBtn').href = "https://wa.me/?text=" + encodeURIComponent(waText);
 }
 

@@ -7,6 +7,7 @@ use App\Models\MemberDetail;
 use App\Models\PepeSetting;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
+use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalRequest;
 use App\Services\PepeRewardService;
@@ -817,7 +818,7 @@ class WithdrawalController extends Controller
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
         $result['country'] = Country::where('name', $country)->first();
         $result['staking_details'] = StakingDetail::where('memberid', $memberid)->orderBy('id', 'desc')->get();
-        $result['trading_settings'] = \App\Models\TradingWalletSetting::getActiveSetting();
+        $result['trading_settings'] = TradingWalletSetting::getActiveSetting();
 
         return view('member.wallet.trading-withdrawal')->with($result);
     }
@@ -883,6 +884,7 @@ class WithdrawalController extends Controller
         if ($staking->isLocked()) {
             $remaining = $staking->remainingLockDays();
             $until = $staking->locked_until ? $staking->locked_until->format('d M Y') : 'lock expiry';
+
             return response()->json([
                 'code' => 0,
                 'status' => 'error',
@@ -901,7 +903,7 @@ class WithdrawalController extends Controller
         $service = 0; // Configured to 0 for now. Adjust if needed.
         $netAmount = $amount - $service;
         $date = date('Y-m-d H:i:s');
-        $requestid = 'TRD'.time();
+        $requestid = 'TRD-'.$stakingId.'-'.time();
         $txnid = $request->post('txnid') ?? '0x'.str_pad(bin2hex(random_bytes(32)), 64, '0', STR_PAD_LEFT);
 
         $mem->trading_wallet = max(0, $mem->trading_wallet - $amount);
@@ -912,7 +914,7 @@ class WithdrawalController extends Controller
             $staking->save();
         }
 
-        $var = new WithdrawalRequest();
+        $var = new WithdrawalRequest;
         $var->request_date = $date;
         $var->payment_date = date('Y-m-d H:i:s');
         $var->request_id = $requestid;

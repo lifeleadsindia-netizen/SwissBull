@@ -58,6 +58,14 @@
                                     <span class="badge badge-success ml-1">{{ count($pepeData ?? []) }}</span>
                                 </a>
                             </li>
+                            <li class="nav-item ml-2">
+                                <a class="nav-link font-weight-bold" id="trading-tab" data-toggle="pill" href="#trading-panel"
+                                    role="tab" aria-controls="trading-panel" aria-selected="false"
+                                    style="border-radius: 6px; padding: 8px 18px; border: 1px solid #ffc107; color: #ffc107;">
+                                    <i class="ik ik-bar-chart-2 mr-1"></i> {{ __('Trading') }}
+                                    <span class="badge badge-warning ml-1">{{ count($tradingData ?? []) }}</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="card-body">
@@ -176,6 +184,52 @@
                                     </table>
                                 </div>
                             </div>
+
+                            <!-- 3rd Tab: Trading Paid Requests -->
+                            <div class="tab-pane fade" id="trading-panel" role="tabpanel" aria-labelledby="trading-tab">
+                                <div class="table-responsive">
+                                    <table id="trading_data_table" class="table px-3" style="zoom: 90%; width: 100%;">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ __('S.No') }}</th>
+                                                <th>{{ __('Request Date') }}</th>
+                                                <th>{{ __('Request Id') }}</th>
+                                                <th>{{ __('Member Id') }}</th>
+                                                <th>{{ __('Wallet Address') }}</th>
+                                                <th>{{ __('Type') }}</th>
+                                                <th>{{ __('Net ') }}</th>
+                                                <th>{{ __('Payment Date') }}</th>
+                                                <th>{{ __('Status') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @php $k = 1;  @endphp
+                                            @forelse (($tradingData ?? []) as $list)
+                                                <tr>
+                                                    <td>{{ $k }}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
+                                                    <td>{{ $list['request_id'] }}</td>
+                                                    <td>{{ $list['memberid'] }}</td>
+                                                    <td>{{ $list['wallet_address'] }}</td>
+                                                    <td><span
+                                                            class="badge badge-{{ $list['type'] == 'Exchange' ? 'warning' : 'primary' }}">{{ $list['type'] }}</span>
+                                                    </td>
+                                                    <td>$ {{ $list['net_amount'] }}</td>
+                                                    <td>{{ $list['payment_date'] }}</td>
+                                                    <td><span class="badge badge-success">{{ $list['status'] }}</span></td>
+                                                </tr>
+                                                @php $k++;  @endphp
+                                            @empty
+                                                <tr>
+                                                    <td colspan="9" class="text-center py-4 text-muted">
+                                                        No paid Trading withdrawal requests found.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -190,6 +244,15 @@
             $(document).ready(function() {
                 if ($('#pepe_data_table').length && !$.fn.DataTable.isDataTable('#pepe_data_table')) {
                     $('#pepe_data_table').DataTable({
+                        responsive: true,
+                        order: [
+                            [1, 'desc']
+                        ]
+                    });
+                }
+
+                if ($('#trading_data_table').length && !$.fn.DataTable.isDataTable('#trading_data_table')) {
+                    $('#trading_data_table').DataTable({
                         responsive: true,
                         order: [
                             [1, 'desc']

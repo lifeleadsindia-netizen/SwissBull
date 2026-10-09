@@ -35,7 +35,7 @@
 
     <!-- Style css -->
     <link href="{{ asset('uassets/css/style.css') }}" rel="stylesheet">
-    <link href="{{ asset('uassets/css/custom.css') }}" rel="stylesheet">
+    <link href="{{ asset('uassets/css/custom.css') }}?v={{ filemtime(public_path('uassets/css/custom.css')) }}" rel="stylesheet">
     <link href="{{ asset('uassets/icons/line-awesome/css/line-awesome.min.css') }}" rel="stylesheet">
 
 
@@ -1510,7 +1510,7 @@
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="account_balance">account_balance</i>
-                                <span class="nav-text">Package Activation</span>
+                                <span class="nav-text">Deposit Section</span>
                             </a>
                             <ul aria-expanded="false">
                                 <li><a href="{{ url('member/fund/deposit-fund') }}">Deposit Fund</a>
@@ -1548,16 +1548,20 @@
                                 <span class="nav-text">Income Section</span>
                             </a>
                             <ul aria-expanded="false">
-                                <li><a href="{{ url('member/income/monthly-trading-profit') }}">Monthly Trading Profit</a></li>
+                                <li><a href="{{ url('member/income/monthly-trading-profit') }}">Monthly Trading
+                                        Profit</a></li>
                                 <li><a href="{{ url('member/income/referral-bonus') }}">Referral Bonus</a></li>
-                                <li><a href="{{ url('member/income/team-trading-profit') }}">Team Trading Profit</a></li>
-                                <li><a href="{{ url('member/income/daily-team-investment-share') }}">Daily Team Investment Share</a></li>
+                                <li><a href="{{ url('member/income/team-trading-profit') }}">Team Trading Profit</a>
+                                </li>
+                                <li><a href="{{ url('member/income/daily-team-investment-share') }}">Daily Team
+                                        Investment Share</a></li>
                                 <li><a href="{{ url('member/income/hero-of-the-month') }}">Hero of the Month</a></li>
-                                <li><a href="{{ url('member/income/partnership-income') }}">Partnership Income</a></li>
+                                <li><a href="{{ url('member/income/partnership-income') }}">Partnership Income</a>
+                                </li>
                             </ul>
                         </li>
 
-                        <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
+                        {{-- <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="account_tree">account_tree</i>
                                 <span class="nav-text">Single Leg Section</span>
@@ -1568,7 +1572,7 @@
                                 <li><a href="{{ url('member/income/single-leg-income') }}">Single Leg Income</a>
                                 </li>
                             </ul>
-                        </li>
+                        </li> --}}
 
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined" data-icon="money">money</i>
@@ -1590,7 +1594,8 @@
                                 <span class="nav-text">Trading Wallet</span>
                             </a>
                             <ul aria-expanded="false">
-                                <li><a href="{{ url('member/wallet/trading-withdrawal') }}">Trading Withdrawal</a></li>
+                                <li><a href="{{ url('member/wallet/trading-withdrawal') }}">Trading Withdrawal</a>
+                                </li>
 
                             </ul>
                         </li>

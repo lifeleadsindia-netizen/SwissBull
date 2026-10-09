@@ -263,7 +263,7 @@
                     <img src="{{ asset('logo/logo.png') }}" alt="{{ config('detailsApp.name') }}" class="brand-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
                     <span class="brand-badge" style="display: none;">
                         <i class="ik ik-shield"></i>
-                        <span>{{ config('detailsApp.name', 'SwissBull') }}</span>
+                        <span>{{ config('detailsApp.name', 'SYNC TRADE') }}</span>
                     </span>
                 </a>
                 <h3 class="auth-title mt-3">Forget Password</h3>
@@ -298,7 +298,7 @@
             </form>
 
             <div class="auth-footer">
-                &copy; {{ date('Y') }} {{ config('detailsApp.name', 'SwissBull') }}. All rights reserved.
+                &copy; {{ date('Y') }} {{ config('detailsApp.name', 'SYNC TRADE') }}. All rights reserved.
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATH WALLET / MEMBER PANEL DESIGN SYSTEM
+   SYNC TRADE / MEMBER PANEL DESIGN SYSTEM
    Theme: Luxury Obsidian Black, Radiant Gold, Swiss Crimson Red, Candlestick Green
    Target: Complete Member Panel Color Theme Transformation
    ========================================================================== */
@@ -149,7 +149,7 @@ body,
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
-    width: 19.5rem !important;
+    width: 20.5rem !important;
     height: 70px !important;
     z-index: 1001 !important;
     display: flex !important;
@@ -482,9 +482,14 @@ body,
     box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5) !important;
     height: calc(100vh - 70px) !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     position: fixed !important;
     top: 70px !important;
     z-index: 999 !important;
+}
+
+.dlabnav-scroll {
+    overflow-x: hidden !important;
 }
 
 /* Sidebar Wallet Mini Card */
@@ -580,16 +585,31 @@ body,
 }
 
 /* MetisMenu Navigation */
+.dlabnav .metismenu > li,
+[data-sidebar-style="full"][data-layout="vertical"] .dlabnav .metismenu > li {
+    padding: 0 4px !important;
+}
+
 .metismenu li a {
     color: var(--mw-text-sec) !important;
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     font-weight: 500 !important;
-    padding: 12px 20px !important;
+    padding: 10px 14px !important;
     border-radius: 12px !important;
-    margin: 2px 10px !important;
+    margin: 2px 6px !important;
     transition: all 0.25s ease !important;
     display: flex;
     align-items: center;
+    white-space: nowrap !important;
+}
+
+.metismenu li a .nav-text,
+.dlabnav .nav-text,
+.nav-text {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
 }
 
 .metismenu li a i.material-symbols-outlined,
@@ -597,7 +617,8 @@ body,
 .metismenu li a svg {
     color: #A0ABC0 !important;
     font-size: 20px !important;
-    margin-right: 12px !important;
+    margin-right: 10px !important;
+    flex-shrink: 0 !important;
     transition: color 0.25s ease, transform 0.25s ease !important;
 }
 
@@ -636,20 +657,22 @@ body,
 .metismenu ul {
     background: rgba(8, 9, 12, 0.75) !important;
     border-radius: 10px !important;
-    margin: 4px 14px !important;
+    margin: 4px 10px !important;
     padding: 6px 0 !important;
 }
 
 .dlabnav .metismenu ul a,
 .metismenu ul a {
     position: relative !important;
-    padding: 8px 16px 8px 46px !important;
+    padding: 8px 12px 8px 38px !important;
     font-size: 13px !important;
     color: var(--mw-text-sec) !important;
-    margin: 1px 6px !important;
+    margin: 1px 4px !important;
     display: block !important;
     text-align: left !important;
     line-height: 1.5 !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
 }
 
 .dlabnav .metismenu ul a:before,
@@ -660,7 +683,7 @@ body,
     width: 6px !important;
     border: 2px solid rgba(245, 158, 11, 0.45) !important;
     top: 50% !important;
-    left: 20px !important;
+    left: 18px !important;
     right: auto !important;
     transform: translateY(-50%) rotate(45deg) !important;
     transition: all 0.25s ease !important;
@@ -705,23 +728,23 @@ body,
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        width: 19.5rem !important;
+        width: 20.5rem !important;
         height: 70px !important;
         z-index: 1001 !important;
     }
 
     .header {
-        left: 19.5rem !important;
-        width: calc(100% - 19.5rem) !important;
+        left: 20.5rem !important;
+        width: calc(100% - 20.5rem) !important;
     }
 
     .dlabnav {
         left: 0 !important;
-        width: 19.5rem !important;
+        width: 20.5rem !important;
     }
 
     .content-body {
-        margin-left: 19.5rem !important;
+        margin-left: 20.5rem !important;
         padding-top: 76px !important;
         padding-left: 14px !important;
         padding-right: 14px !important;
@@ -873,7 +896,7 @@ body,
     .dlabnav {
         top: 70px !important;
         left: -100% !important;
-        width: 17.5rem !important;
+        width: 18.5rem !important;
         height: calc(100vh - 70px) !important;
         transition: left 0.15s ease-out !important;
         will-change: left;
@@ -885,7 +908,7 @@ body,
     #main-wrapper.menu-toggle .dlabnav,
     .menu-toggle .dlabnav {
         left: 0 !important;
-        width: 17.5rem !important;
+        width: 18.5rem !important;
     }
 
     #main-wrapper.menu-toggle::before {

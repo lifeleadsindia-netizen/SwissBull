@@ -10,7 +10,11 @@
     <meta name="keywords" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-   <link rel="icon" type="image/png" href="{{ asset('/logo/favicon/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/png" href="{{ asset('logo/favicon/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon/favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ asset('logo/favicon/favicon.ico') }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('logo/favicon/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ asset('logo/favicon/site.webmanifest') }}" />
 
     <!-- font awesome library -->
     <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700,800" rel="stylesheet">
@@ -174,8 +178,8 @@
             <div class="sidebar-header">
                 <a class="header-brand" href="{{ route('dashboard') }}">
                     <div class="logo-img">
-                        <img height="30" src="{{ asset('adm_assets/assets/uploads/logo.png') }}"
-                            class="header-brand-img" title="RADMIN">
+                        <img height="30" src="{{ asset('logo/logo.png') }}"
+                            class="header-brand-img" title="{{ config('detailsApp.name') }}">
                     </div>
                 </a>
                 <div class="sidebar-action"><i class="ik ik-arrow-left-circle"></i></div>

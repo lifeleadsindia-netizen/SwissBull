@@ -41,8 +41,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- FAVICONS ICON -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('adm_assets/assets/favicon/favicon.ico') }}" />
-    <link rel="shortcut icon" href="{{ asset('adm_assets/assets/favicon/favicon.ico') }}" />
+    <link rel="icon" type="image/png" href="{{ asset('logo/favicon/favicon-96x96.png') }}" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon/favicon.svg') }}" />
+    <link rel="shortcut icon" href="{{ asset('logo/favicon/favicon.ico') }}" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('logo/favicon/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ asset('logo/favicon/site.webmanifest') }}" />
     <link href="vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0">

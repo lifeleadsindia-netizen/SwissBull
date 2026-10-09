@@ -219,7 +219,7 @@ class WhatsappReferralController extends Controller
         $messageModel = null;
         $referralLink = url('/member/register/'.$member->memberid);
 
-        // return "Hello! Join Math Wallet using my referral link:\n".$referralLink;
+        // return "Hello! Join SYNC TRADE using my referral link:\n".$referralLink;
         return 'Hi! 👋
 
             I wanted to share something interesting with you. I’ve recently come across a *business opportunity with excellent earning potential* and a model that I feel is worth exploring.

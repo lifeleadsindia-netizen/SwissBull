@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.main')
+@extends('admin.layouts.main')
 @section('title', 'Business Plan PDFs Management')
 @section('content')
     @push('head')
@@ -149,7 +149,7 @@
 
                         <div class="form-group mb-3">
                             <label class="form-label font-weight-bold">{{ __('Document Title') }} <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="title" id="pdf_title" placeholder="e.g. Math Wallet Global Business Plan" required>
+                            <input type="text" class="form-control" name="title" id="pdf_title" placeholder="e.g. SYNC TRADE Global Business Plan" required>
                         </div>
 
                         <div class="row">

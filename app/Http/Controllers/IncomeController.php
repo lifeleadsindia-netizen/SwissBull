@@ -54,13 +54,13 @@ class IncomeController extends Controller
         return view('member.income.hero-rewards')->with($result);
     }
 
-    public function singleLegIncome()
-    {
-        $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
-        $result['sData'] = SingleLegIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
+    // public function singleLegIncome()
+    // {
+    //     $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
+    //     $result['sData'] = SingleLegIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
 
-        return view('member.income.singleleg-incomes')->with($result);
-    }
+    //     return view('member.income.singleleg-incomes')->with($result);
+    // }
 
     public function partnershipIncome()
     {

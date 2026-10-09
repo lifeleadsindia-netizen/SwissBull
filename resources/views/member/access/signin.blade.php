@@ -78,7 +78,7 @@
                 </h1>
 
                 <p class="text-[#98A2C3] text-base leading-relaxed mb-8">
-                    Math Wallet is a multi-platform universal crypto portal supporting 100+ blockchains and 3000+ tokens. Connect your Web3 wallet to access your member dashboard instantly.
+                    SYNC TRADE is a multi-platform universal crypto portal supporting 100+ blockchains and 3000+ tokens. Connect your Web3 wallet to access your member dashboard instantly.
                 </p>
 
                 <!-- Live Metrics Showcase -->
