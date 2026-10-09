@@ -488,13 +488,9 @@
             Nav header start
         ***********************************-->
         <div class="nav-header">
-            <a href="#" class="brand-logo">
-                <div class="py-2 text-center">
-                    <img src="{{ asset('logo/name-logo.png') }}" height="36px" alt=""
-                        class="text-center mt-2 d-none d-md-inline-block">
-                    <img src="{{ asset('logo/logo.png') }}" height="25px" alt=""
-                        class="text-center mt-1 d-inline-block d-md-none me-2">
-                </div>
+            <a href="{{ url('/member/dashboard') }}" class="brand-logo">
+                <img src="{{ asset('logo/name-logo.png') }}" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}"
+                    class="brand-logo-img">
             </a>
             <div class="nav-control me-1">
                 <div class="hamburger">
@@ -1447,54 +1443,19 @@
                                 <span class="nav-text">All Notifications</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="{{ url('/member/whatsapp/referral-details') }}" aria-expanded="false">
-                                <i class="material-symbols-outlined notranslate" translate="no"
-                                    data-icon="share">share</i>
-                                <span class="nav-text">Promotion Details</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('/member/pepe/redeem-history') }}" aria-expanded="false">
-                                <i class="material-symbols-outlined notranslate" translate="no"
-                                    data-icon="redeem">redeem</i>
-                                <span class="nav-text">Airdrop Withdrawal</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('/member/promotion-banners') }}" aria-expanded="false">
+                        <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined notranslate" translate="no"
                                     data-icon="campaign">campaign</i>
-                                <span class="nav-text">Promotion Banners</span>
+                                <span class="nav-text">Promotion Section</span>
                             </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('/member/business-plan-pdf') }}" aria-expanded="false">
-                                <i class="material-symbols-outlined notranslate" translate="no"
-                                    data-icon="picture_as_pdf">picture_as_pdf</i>
-                                <span class="nav-text">Business Plan PDF</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('/member/business-plan-text') }}" aria-expanded="false">
-                                <i class="material-symbols-outlined notranslate" translate="no"
-                                    data-icon="text_snippet">text_snippet</i>
-                                <span class="nav-text">Business Plan Text</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('/member/plan-video') }}" aria-expanded="false">
-                                <i class="material-symbols-outlined notranslate" translate="no"
-                                    data-icon="smart_display">smart_display</i>
-                                <span class="nav-text">Plan Video</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ url('/member/tutorial-video') }}" aria-expanded="false">
-                                <i class="material-symbols-outlined notranslate" translate="no"
-                                    data-icon="ondemand_video">ondemand_video</i>
-                                <span class="nav-text">Tutorial Video</span>
-                            </a>
+                            <ul aria-expanded="false">
+                                <li><a href="{{ url('/member/whatsapp/referral-details') }}">Promotion Details</a></li>
+                                <li><a href="{{ url('/member/promotion-banners') }}">Promotion Banners</a></li>
+                                <li><a href="{{ url('/member/business-plan-pdf') }}">Business Plan PDF</a></li>
+                                <li><a href="{{ url('/member/business-plan-text') }}">Business Plan Text</a></li>
+                                <li><a href="{{ url('/member/plan-video') }}">Plan Video</a></li>
+                                <li><a href="{{ url('/member/tutorial-video') }}">Tutorial Video</a></li>
+                            </ul>
                         </li>
                         <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                                 <i class="material-symbols-outlined">account_circle</i>

@@ -337,7 +337,6 @@ class InvestmentController extends Controller
                 // 6. Referral Bonus & Team Investment Share
                 if ($sponsorid && $sponsorid !== 'Root') {
                     directIncome($sponsorid, $memberid, $name, $amount, 'Referral Bonus');
-                    levelIncome($sponsorid, $memberid, $name, $amount, 'Daily Team Investment Share');
                     team_biz_update($sponsorid, $amount);
                 }
             });

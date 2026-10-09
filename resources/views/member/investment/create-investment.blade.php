@@ -9,15 +9,15 @@
             <div class="staking-hero mb-4 mb-md-5">
                 <div class="staking-eyebrow">Staking &amp; Trading Packages</div>
                 <h1>Activate Staking Package</h1>
-                <p>Stake directly from your Fund Wallet (P2P Wallet). <strong>70% of the package amount</strong> is credited directly to your Trading Wallet to earn daily trading profits.</p>
+                <p>Stake directly from your Fund Wallet (Fund Wallet). <strong>70% of the package amount</strong> is credited directly to your Trading Wallet to earn daily trading profits.</p>
                 <div class="sk-hero-chips">
-                    <div class="sk-chip"><i class="fa-solid fa-wallet"></i> Funded from P2P Wallet</div>
-                    <div class="sk-chip"><i class="fa-solid fa-chart-line"></i> 70% to Trading Wallet</div>
+                    <div class="sk-chip"><i class="fa-solid fa-wallet"></i> Funded from Fund Wallet</div>
+                    <div class="sk-chip"><i class="fa-solid fa-chart-line"></i>{{ $globalTradingPercent ?? 70 }}% to Trading Wallet</div>
                     <div class="sk-chip"><i class="fa-solid fa-bolt"></i> Daily Trading ROI</div>
                 </div>
             </div>
 
-            {{-- ===================== MAIN GRID ===================== --}}
+            {{-- ===================== MAIN GRID ===================== }}
             <div class="row g-4">
 
                 {{-- ---- Left: Form ---- --}}
@@ -75,7 +75,7 @@
                                     <div class="col-md-12">
                                         <div class="p-3 rounded d-flex align-items-center justify-content-between" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px;">
                                             <div>
-                                                <small class="text-white-50 text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Fund Wallet Balance (P2P Wallet)</small>
+                                                <small class="text-white-50 text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Fund Wallet Balance (Fund Wallet)</small>
                                                 <span class="text-warning font-weight-bold" style="font-size: 18px;">${{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }} USDT</span>
                                             </div>
                                             <a href="{{ url('member/fund/deposit-fund') }}" class="btn btn-sm" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px;">
@@ -101,7 +101,7 @@
                                                             data-cap="{{ $plan->max_return_percent }}"
                                                             data-lock="{{ $plan->lock_days }}"
                                                             data-trading-percent="{{ $plan->trading_wallet_percent ?: ($globalTradingPercent ?? 70) }}">
-                                                            {{ $plan->name }} ({{ $plan->package_range }} USDT) — {{ $plan->return_percent }}% Daily ROI, {{ $plan->max_return_percent }}% Cap
+                                                             ({{ $plan->package_range }} USDT) — {{ $plan->return_percent }}% Daily ROI
                                                         </option>
                                                     @endforeach
                                                 @else
@@ -148,7 +148,7 @@
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
                                                 <span class="text-white-50 small"><i class="fa-solid fa-chart-line text-success me-1"></i> <span id="preview-trading-label-percent">{{ $globalTradingPercent ?? 70 }}%</span> Credited to Trading Wallet:</span>
-                                                <strong id="preview-trading-amount" class="text-success font-weight-bold" style="font-size: 15px;">$0.00 USDT</strong>
+                                                <strong id="preview-trading-amount" class="text-success font-weight-bold" style="font-size: 15px;"></strong>
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
                                                 <span class="text-white-50 small"><i class="fa-solid fa-bolt text-warning me-1"></i> Estimated Daily ROI:</span>
@@ -166,14 +166,14 @@
                                 {{-- Info Note --}}
                                 <div class="staking-note mt-4">
                                     <i class="fa-solid fa-circle-info"></i>
-                                    <span>Staking package is deducted from your <strong>Fund Wallet (P2P Wallet)</strong>. <strong><span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 70 }}%</span> of the amount</strong> is credited to your <strong>Trading Wallet</strong>. Multiple staking packages are supported — every package operates independently with its own individual returns, capping, and expiry.</span>
+                                    <span>Staking package is deducted from your <strong>Fund Wallet (Fund Wallet)</strong>. <strong><span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 70 }}%</span> of the amount</strong> is credited to your <strong>Trading Wallet</strong>. Multiple staking packages are supported — every package operates independently with its own individual returns, capping, and expiry.</span>
                                 </div>
 
                                 {{-- Footer Actions --}}
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-4 pt-2"
                                     style="border-top: 1px solid rgba(255,255,255,0.06);">
                                     <span class="sk-secure-txt">
-                                        <i class="fa-solid fa-shield-halved"></i> Internal P2P Wallet Transaction
+                                        <i class="fa-solid fa-shield-halved"></i> Internal Fund Wallet Transaction
                                     </span>
                                     <button type="submit" class="btn staking-btn" id="submitStakingBtn">
                                         <i class="fa-solid fa-bolt me-2"></i>Create Staking
@@ -191,7 +191,7 @@
                         {{-- Stat: Fund Wallet --}}
                         <div class="sk-stat-card mb-3">
                             <div class="sk-stat-top">
-                                <div class="sk-stat-label">Fund Wallet (P2P Wallet)</div>
+                                <div class="sk-stat-label">Fund Wallet (Fund Wallet)</div>
                                 <div class="sk-stat-icon green"><i class="fa-solid fa-wallet"></i></div>
                             </div>
                             <div class="sk-stat-value">${{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }}</div>
