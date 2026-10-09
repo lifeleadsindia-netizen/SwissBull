@@ -1,34 +1,34 @@
 @extends('admin.layouts.main')
 @section('title', 'Roi Details')
 @section('content')
-    @push('head')
-        <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.css') }}">
-    @endpush
-    <div class="container-fluid">
-        <div class="page-header">
-            <div class="row align-items-end">
-                <div class="col-lg-8">
-                    <div class="page-header-title">
-                        <i class="ik ik-edit bg-blue"></i>
-                        <div class="d-inline">
-                            <h5>{{ __('Roi Details') }}</h5>
-                            <span>{{ __('Roi Details details') }}</span>
-                        </div>
+@push('head')
+<link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.css') }}">
+@endpush
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="row align-items-end">
+            <div class="col-lg-8">
+                <div class="page-header-title">
+                    <i class="ik ik-edit bg-blue"></i>
+                    <div class="d-inline">
+                        <h5>{{ __('Roi Details') }}</h5>
+                        <span>{{ __('Roi Details details') }}</span>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <nav class="breadcrumb-container" aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a href="#"><i class="ik ik-home"></i></a>
-                            </li>
-                            <li class="breadcrumb-item"><a href="#">{{ __('Admin') }}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('Roi Details') }}</li>
-                        </ol>
-                    </nav>
-                </div>
+            </div>
+            <div class="col-lg-4">
+                <nav class="breadcrumb-container" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#"><i class="ik ik-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="#">{{ __('Admin') }}</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ __('Roi Details') }}</li>
+                    </ol>
+                </nav>
             </div>
         </div>
+    </div>
 
 
         <div class="row">
@@ -94,9 +94,10 @@
             </div>
         </div>
     </div>
+</div>
 
-    @push('script')
-        <script src="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.js') }}"></script>
-        <script src="{{ asset('adm_assets/assets/js/datatables.js') }}"></script>
-    @endpush
+@push('script')
+<script src="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.js') }}"></script>
+<script src="{{ asset('adm_assets/assets/js/datatables.js') }}"></script>
+@endpush
 @endsection

@@ -11,7 +11,6 @@ use App\Models\HeroOfTheMonthReward;
 use App\Models\ImportFund;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
-use App\Models\MonthlyTradingProfitConfiction;
 use App\Models\Notification;
 use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
@@ -37,6 +36,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -474,7 +474,7 @@ class AdminController extends Controller
 
     public function addFundsDetails(Request $request)
     {
-        $query = ImportFund::where([['status', 'Approved'],['added_by', 'Admin']]);
+        $query = ImportFund::where([['status', 'Approved'], ['added_by', 'Admin']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
@@ -901,100 +901,112 @@ class AdminController extends Controller
 
     public function setPackages()
     {
-        $distribution = PackageDistribution::first();
+        $distribution = PackageDistribution::getActiveSetting();
         $packagePlans = PackagePlan::orderBy('min_amount', 'asc')->get();
+        $currentStatus = strtolower((string) ($distribution->status ?? 'on'));
+        $capping = (float) ($distribution->capping ?? $distribution->capping_percent ?? 200.00);
 
-        return view('admin.set-packages', compact('distribution', 'packagePlans'));
+        return view('admin.set-packages', compact('distribution', 'packagePlans', 'currentStatus', 'capping'));
     }
 
     public function savePackages(Request $request)
     {
-        $hasDistribution = $request->filled('p2p_wallet') || $request->filled('trading_wallet') || $request->filled('hero_of_the_month');
-        $hasPlans = $request->has('plans');
+        $distribution = PackageDistribution::getActiveSetting();
+        $packagePlans = PackagePlan::orderBy('min_amount', 'asc')->get();
 
-        $rules = [];
-
-        // Validate Distribution when submitted (or when neither is present)
-        if ($hasDistribution || ! $hasPlans) {
-            $rules['p2p_wallet'] = 'nullable|numeric|min:0';
-            $rules['trading_wallet'] = 'nullable|numeric|min:0';
-            $rules['hero_of_the_month'] = 'required|numeric|min:0';
-
-            if (! $request->filled('p2p_wallet') && ! $request->filled('trading_wallet')) {
-                $rules['trading_wallet'] = 'required|numeric|min:0';
-            }
-        }
-
-        // Validate Plans when submitted
-        if ($hasPlans) {
-            $rules['plans'] = 'required|array';
-            $rules['plans.*.id'] = 'required|exists:package_plans,id';
-            $rules['plans.*.name'] = 'required|string|max:100';
-            $rules['plans.*.min_amount'] = 'required|numeric|min:0';
-            $rules['plans.*.max_amount'] = 'nullable|numeric';
-            $rules['plans.*.status'] = 'nullable|in:Active,Inactive';
-        }
+        $rules = [
+            'p2p_wallet' => 'nullable|numeric|min:0|max:100',
+            'trading_wallet' => 'nullable|numeric|min:0|max:100',
+            'hero_of_the_month' => 'nullable|numeric|min:0|max:100',
+            'lock_days' => 'nullable|integer|min:0',
+            'withdrawal_percent' => 'nullable|numeric|min:0|max:100',
+            'status' => 'nullable|in:on,off,lock,unlock,On,Off',
+            'capping' => 'nullable|numeric|min:0',
+            'capping_percent' => 'nullable|numeric|min:0',
+            'rates' => 'nullable|array',
+            'rates.*' => 'nullable|numeric|min:0|max:100',
+            'package_1_rate' => 'nullable|numeric|min:0|max:100',
+            'package_2_rate' => 'nullable|numeric|min:0|max:100',
+            'package_3_rate' => 'nullable|numeric|min:0|max:100',
+            'plans' => 'nullable|array',
+            'plans.*.id' => 'required_with:plans|exists:package_plans,id',
+            'plans.*.name' => 'required_with:plans|string|max:100',
+            'plans.*.min_amount' => 'required_with:plans|numeric|min:0',
+            'plans.*.max_amount' => 'nullable|numeric',
+            'plans.*.status' => 'nullable|in:Active,Inactive',
+        ];
 
         $validated = $request->validate($rules);
 
-        if ($hasDistribution || ! $hasPlans) {
-            $tradingWalletVal = $validated['p2p_wallet'] ?? $validated['trading_wallet'] ?? 70.00;
-
-            $distribution = PackageDistribution::first();
-            if (! $distribution) {
-                $distribution = new PackageDistribution;
-            }
-
-            $distribution->p2p_wallet = $tradingWalletVal;
+        // 1. Trading Wallet Allocation & Hero of the Month
+        if ($request->filled('trading_wallet') || $request->filled('p2p_wallet')) {
+            $tradingWalletVal = (float) ($request->input('trading_wallet') ?? $request->input('p2p_wallet'));
             $distribution->trading_wallet = $tradingWalletVal;
-            $distribution->hero_of_the_month = $validated['hero_of_the_month'];
-            $distribution->save();
+        }
+        if (Schema::hasColumn('package_distributions', 'hero_of_the_month') && $request->filled('hero_of_the_month')) {
+            $distribution->hero_of_the_month = (float) $request->input('hero_of_the_month');
         }
 
+        // 2. Trading Wallet Control: Lock Days, Withdrawal %, Status
+        if ($request->has('lock_days')) {
+            $distribution->lock_days = (int) $request->input('lock_days');
+        }
+        if (Schema::hasColumn('package_distributions', 'withdrawal_percent') && $request->filled('withdrawal_percent')) {
+            $distribution->withdrawal_percent = (float) $request->input('withdrawal_percent');
+        }
+        if ($request->has('status')) {
+            $rawStatus = strtolower((string) $request->input('status'));
+            $distribution->status = in_array($rawStatus, ['on', 'lock']) ? 'on' : 'off';
+        }
+
+        // 3. Monthly Trading Profit: Capping and Package Rates
+        if ($request->filled('capping') || $request->filled('capping_percent')) {
+            $cappingVal = (float) ($request->input('capping') ?? $request->input('capping_percent'));
+            $distribution->capping = $cappingVal;
+            PackagePlan::query()->update(['max_return_percent' => $cappingVal]);
+        }
+
+        $submittedRates = $request->input('rates', []);
+        foreach ($packagePlans as $index => $plan) {
+            $rateVal = null;
+            if (isset($submittedRates[$plan->id]) && $submittedRates[$plan->id] !== '') {
+                $rateVal = (float) $submittedRates[$plan->id];
+            } elseif ($request->filled('package_'.($index + 1).'_rate')) {
+                $rateVal = (float) $request->input('package_'.($index + 1).'_rate');
+            }
+
+            if ($rateVal !== null) {
+                $field = 'package_'.($index + 1).'_rate';
+                $distribution->{$field} = $rateVal;
+                $plan->update(['return_percent' => $rateVal]);
+            }
+        }
+
+        // 4. Dynamic Package Plans (if submitted)
         if (! empty($validated['plans'])) {
             foreach ($validated['plans'] as $planData) {
                 $plan = PackagePlan::find($planData['id']);
                 if ($plan) {
                     $planTradingWallet = (isset($planData['trading_wallet_percent']) && $planData['trading_wallet_percent'] !== '')
                         ? (float) $planData['trading_wallet_percent']
-                        : $tradingWalletVal;
+                        : ($distribution->trading_wallet ?? 70.00);
 
                     $plan->update([
                         'name' => $planData['name'],
                         'min_amount' => $planData['min_amount'],
                         'max_amount' => (isset($planData['max_amount']) && $planData['max_amount'] !== '' && $planData['max_amount'] !== null) ? $planData['max_amount'] : null,
                         'trading_wallet_percent' => $planTradingWallet,
-                        'return_percent' => $planData['return_percent'] ?? $plan->return_percent ?? 5.00,
-                        'max_return_percent' => $planData['max_return_percent'] ?? $plan->max_return_percent ?? 200.00,
-                        'lock_days' => $planData['lock_days'] ?? $plan->lock_days ?? 30,
-                        'duration_days' => $planData['duration_days'] ?? $plan->duration_days ?? 1200,
                         'status' => $planData['status'] ?? 'Active',
                     ]);
-
-                    if (isset($planData['return_percent']) || isset($planData['max_return_percent'])) {
-                        MonthlyTradingProfitConfiction::updateOrCreate(
-                            ['package_id' => $plan->id],
-                            [
-                                'rate' => (float) ($planData['return_percent'] ?? 5.00),
-                                'rate_percent' => (float) ($planData['return_percent'] ?? 5.00),
-                                'capping_percent' => (float) ($planData['max_return_percent'] ?? 200.00),
-                            ]
-                        );
-                    }
                 }
             }
         }
 
-        $msg = 'Package configuration updated successfully.';
-        if ($hasDistribution && ! $hasPlans) {
-            $msg = 'Package distribution configuration updated successfully.';
-        } elseif ($hasPlans && ! $hasDistribution) {
-            $msg = 'Package investment tiers updated successfully.';
-        }
+        $distribution->save();
 
-        session()->flash('successMsg', $msg);
+        session()->flash('successMsg', 'Package configuration updated successfully.');
 
-        return redirect()->back();
+        return redirect()->route('admin.setPackages');
     }
 
     /**
@@ -1002,11 +1014,7 @@ class AdminController extends Controller
      */
     public function monthlyTradingProfit()
     {
-        $packages = PackagePlan::orderBy('min_amount', 'asc')->get();
-        $configurations = MonthlyTradingProfitConfiction::all()->keyBy('package_id');
-        $cappingPercent = MonthlyTradingProfitConfiction::getCappingPercent();
-
-        return view('admin.monthly-trading-profit', compact('packages', 'configurations', 'cappingPercent'));
+        return redirect()->route('admin.setPackages');
     }
 
     /**
@@ -1014,66 +1022,7 @@ class AdminController extends Controller
      */
     public function saveMonthlyTradingProfit(Request $request)
     {
-        $packages = PackagePlan::orderBy('min_amount', 'asc')->get();
-
-        $rules = [
-            'capping_percent' => 'required|numeric|min:0',
-            'rates' => 'nullable|array',
-            'rates.*' => 'nullable|numeric|min:0|max:100',
-            'package_1_rate' => 'nullable|numeric|min:0|max:100',
-            'package_2_rate' => 'nullable|numeric|min:0|max:100',
-            'package_3_rate' => 'nullable|numeric|min:0|max:100',
-        ];
-
-        $request->validate($rules, [
-            'capping_percent.required' => 'Please enter Monthly Trading Profit Capping (%).',
-            'capping_percent.numeric' => 'Monthly Trading Profit Capping must be a valid number.',
-            'capping_percent.min' => 'Monthly Trading Profit Capping cannot be negative.',
-        ]);
-
-        $cappingPercent = (float) $request->input('capping_percent');
-        $submittedRates = $request->input('rates', []);
-
-        $orderedRates = [];
-        foreach ($packages as $index => $package) {
-            $key = $package->id;
-            $fallbackField = 'package_'.($index + 1).'_rate';
-            $rateVal = isset($submittedRates[$key])
-                ? (float) $submittedRates[$key]
-                : (float) $request->input($fallbackField, 0.00);
-
-            $orderedRates[$index] = $rateVal;
-
-            MonthlyTradingProfitConfiction::updateOrCreate(
-                ['package_id' => $package->id],
-                [
-                    'rate' => $rateVal,
-                    'rate_percent' => $rateVal,
-                    'capping_percent' => $cappingPercent,
-                    'package_1_rate' => $orderedRates[0] ?? $rateVal,
-                    'package_2_rate' => $orderedRates[1] ?? 0.00,
-                    'package_3_rate' => $orderedRates[2] ?? 0.00,
-                ]
-            );
-
-            if ($rateVal > 0 || $cappingPercent > 0) {
-                $package->update([
-                    'return_percent' => $rateVal > 0 ? $rateVal : $package->return_percent,
-                    'max_return_percent' => $cappingPercent > 0 ? $cappingPercent : $package->max_return_percent,
-                ]);
-            }
-        }
-
-        MonthlyTradingProfitConfiction::query()->update([
-            'capping_percent' => $cappingPercent,
-            'package_1_rate' => $orderedRates[0] ?? 0.00,
-            'package_2_rate' => $orderedRates[1] ?? 0.00,
-            'package_3_rate' => $orderedRates[2] ?? 0.00,
-        ]);
-
-        session()->flash('successMsg', 'Monthly Trading Profit configuration saved successfully.');
-
-        return redirect()->route('admin.monthlyTradingProfit');
+        return $this->savePackages($request);
     }
 
     /**
@@ -1176,14 +1125,8 @@ class AdminController extends Controller
      */
     public function saveDailyTeamInvestmentShare(Request $request)
     {
-        $rules = [
-            'level_1_directs' => 'required|integer|min:0',
-        ];
-        $messages = [
-            'level_1_directs.required' => 'Please enter Level-1 Direct Referral requirement.',
-            'level_1_directs.integer' => 'Level-1 Direct Referral requirement must be a whole number.',
-            'level_1_directs.min' => 'Level-1 Direct Referral requirement cannot be negative.',
-        ];
+        $rules = [];
+        $messages = [];
 
         for ($i = 1; $i <= 10; $i++) {
             $rules["level_{$i}_rate"] = 'required|numeric|min:0|max:100';
@@ -1192,20 +1135,44 @@ class AdminController extends Controller
             $messages["level_{$i}_rate.min"] = "Level-{$i} Rate cannot be negative.";
             $messages["level_{$i}_rate.max"] = "Level-{$i} Rate cannot exceed 100%.";
 
-            if ($i > 1) {
-                $rules["level_{$i}_directs"] = 'nullable|integer|min:0';
-            }
+            $rules["level_{$i}_directs"] = 'required|integer|min:0';
+            $messages["level_{$i}_directs.required"] = "Please enter Level-{$i} Direct Referral requirement.";
+            $messages["level_{$i}_directs.integer"] = "Level-{$i} Direct Referral requirement must be a whole number.";
+            $messages["level_{$i}_directs.min"] = "Level-{$i} Direct Referral requirement cannot be negative.";
         }
 
-        $request->validate($rules, $messages);
+        $validator = Validator::make($request->all(), $rules, $messages);
 
-        $level1Directs = (int) $request->input('level_1_directs');
-        $directsChain = DailyTeamInvestmentShareConfiction::calculateDirectsChain($level1Directs);
+        $validator->after(function ($validator) use ($request) {
+            for ($i = 2; $i <= 10; $i++) {
+                $prevKey = 'level_'.($i - 1).'_directs';
+                $currKey = "level_{$i}_directs";
+
+                if ($request->has($prevKey) && $request->has($currKey)) {
+                    $prevRaw = $request->input($prevKey);
+                    $currRaw = $request->input($currKey);
+
+                    if (is_numeric($prevRaw) && is_numeric($currRaw)) {
+                        $prevVal = (int) $prevRaw;
+                        $currVal = (int) $currRaw;
+
+                        if ($currVal < $prevVal) {
+                            $validator->errors()->add(
+                                $currKey,
+                                "Level-{$i} Direct Referrals ({$currVal}) must be greater than or equal to Level-".($i - 1)." Direct Referrals ({$prevVal})."
+                            );
+                        }
+                    }
+                }
+            }
+        });
+
+        $validator->validate();
 
         $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
         for ($i = 1; $i <= 10; $i++) {
             $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
-            $setting->{"level_{$i}_directs"} = $directsChain[$i];
+            $setting->{"level_{$i}_directs"} = (int) $request->input("level_{$i}_directs");
         }
         $setting->save();
 
@@ -1903,163 +1870,17 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
-    /**
-     * Show Trading Wallet Control management page with exactly 2 cards:
-     * Card 1: 90-Day Delivery / Locking Code Configuration
-     * Card 2: Lock / Unlock control
-     */
     public function tradingWalletControl(Request $request)
     {
-        $setting = TradingWalletSetting::getActiveSetting();
-        $rawStatus = strtolower((string) ($setting->status ?? 'on'));
-        $currentStatus = in_array($rawStatus, ['on', 'lock']) ? 'on' : 'off';
-
-        return view('admin.trading-wallet-control', compact('setting', 'currentStatus'));
+        return redirect()->route('admin.setPackages');
     }
 
     /**
-     * AJAX query to filter package/staking entries by date range for Trading Wallet Control.
-     * Only members who have actually purchased/activated a package (staking_details) appear.
-     */
-    public function filterTradingMembers(Request $request)
-    {
-        $request->validate([
-            'date_from' => 'required|date',
-            'date_to' => 'required|date|after_or_equal:date_from',
-        ], [
-            'date_from.required' => 'Please select Package Date From.',
-            'date_to.required' => 'Please select Package Date To.',
-            'date_to.after_or_equal' => 'Package Date To must be on or after Package Date From.',
-        ]);
-
-        $start = Carbon::parse($request->input('date_from'))->startOfDay();
-        $end = Carbon::parse($request->input('date_to'))->endOfDay();
-
-        $setting = TradingWalletSetting::getActiveSetting();
-        $lockDays = (int) ($setting->lock_days ?? 90);
-        $withPercent = (float) ($setting->withdrawal_percent ?? 100.00);
-
-        // Must come from Staking Details, verified against Member Details
-        $stakings = StakingDetail::with('member')
-            ->whereHas('member')
-            ->where('status', '!=', 'Rejected')
-            ->whereBetween('created_at', [$start, $end])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $data = $stakings->map(function ($stk) use ($lockDays, $withPercent) {
-            $mem = $stk->member;
-
-            // CHANGE 4: Formula: Activation Date/Time + Configured Lock Days = Unlock Date/Time
-            // DO NOT use now() + lock_days for existing/historical records.
-            $activationTime = $stk->created_at ? Carbon::parse($stk->created_at)
-                : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
-
-            $lockedUntil = ($activationTime && $lockDays > 0) ? $activationTime->copy()->addDays($lockDays) : null;
-            $isLocked = $lockedUntil ? now()->lt($lockedUntil) : false;
-            $remDays = $isLocked ? (int) ceil(now()->diffInSeconds($lockedUntil, false) / 86400) : 0;
-
-            // CHANGE 2: Backend balance is member_details.trading_wallet, mapped to Trading Wallet
-            $p2pBalance = (float) ($mem->trading_wallet ?? 0.00);
-            $maxWithdrawable = $isLocked ? 0.00 : max(0.00, round(($p2pBalance * $withPercent) / 100.00, 2));
-
-            $pkgName = $stk->package ? 'Package '.$stk->package : 'Staking Package';
-
-            return [
-                'id' => $stk->id,
-                'package_id' => $stk->id,
-                'staking_id' => $stk->id,
-                'memberid' => $mem->memberid,
-                'name' => $mem->name,
-                'mobile' => $mem->mobile,
-                'package_type' => $pkgName,
-                'package_value' => (float) ($stk->invest_amount ?? 0.00),
-                'package_date' => $activationTime ? $activationTime->format('d M Y') : 'N/A',
-                'registration_date' => $activationTime ? $activationTime->format('d M Y') : ($mem->created_at ? Carbon::parse($mem->created_at)->format('d M Y') : 'N/A'),
-                'raw_created_at' => $activationTime ? $activationTime->format('Y-m-d H:i:s') : null,
-                'trading_wallet' => $p2pBalance,
-                'p2p_wallet' => $p2pBalance,
-                'lock_days' => $lockDays,
-                'withdrawal_percent' => $withPercent,
-                'is_locked' => $isLocked,
-                'remaining_lock_days' => $remDays,
-                'locked_until' => $lockedUntil ? $lockedUntil->format('d M Y') : null,
-                'max_withdrawable' => $maxWithdrawable,
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'count' => $data->count(),
-            'packages' => $data,
-            'stakings' => $data,
-            'members' => $data,
-            'message' => "Found {$data->count()} package entry/entries verified with member details between {$request->date_from} and {$request->date_to}.",
-        ]);
-    }
-
-    /**
-     * Apply Trading Wallet Control settings:
-     * - Card 1: Update locking-code / delivery days (lock_days)
-     * - Card 2: Set status ('lock' or 'unlock')
-     * - Preserves legacy parameters for backwards compatibility.
+     * Apply Trading Wallet Control settings (delegates to consolidated savePackages).
      */
     public function applyTradingWalletControl(Request $request)
     {
-        $setting = TradingWalletSetting::getActiveSetting();
-
-        // Card 1: Locking Days / Delivery Days Configuration
-        if ($request->has('lock_days')) {
-            $request->validate([
-                'lock_days' => 'required|integer|min:0',
-                'withdrawal_percent' => 'nullable|numeric|min:0|max:100',
-            ], [
-                'lock_days.required' => 'Please enter the locking period in days.',
-                'lock_days.integer' => 'Locking period must be a whole number of days.',
-                'lock_days.min' => 'Locking period cannot be negative.',
-            ]);
-
-            $lockDays = (int) $request->input('lock_days');
-            $setting->lock_days = $lockDays;
-
-            if ($request->filled('withdrawal_percent')) {
-                $setting->withdrawal_percent = (float) $request->input('withdrawal_percent');
-            }
-
-            $setting->save();
-
-            session()->flash('successMsg', "Locking period updated to {$lockDays} days successfully.");
-
-            return redirect()->route('admin.tradingWalletControl');
-        }
-
-        // Card 2: ON / OFF Status Control
-        if ($request->has('status')) {
-            $request->validate([
-                'status' => 'required|in:on,off,lock,unlock',
-            ], [
-                'status.required' => 'Please select a status action.',
-                'status.in' => 'Status must be either on or off.',
-            ]);
-
-            $rawStatus = strtolower($request->input('status'));
-            $status = in_array($rawStatus, ['on', 'lock']) ? 'on' : 'off';
-            $setting->status = $status;
-            $setting->save();
-
-            session()->flash('successMsg', "Trading wallet status updated to {$status} successfully.");
-
-            return redirect()->route('admin.tradingWalletControl');
-        }
-
-        // Fallback for withdrawal_percent alone or other legacy saves
-        if ($request->filled('withdrawal_percent')) {
-            $setting->withdrawal_percent = (float) $request->input('withdrawal_percent');
-            $setting->save();
-            session()->flash('successMsg', 'Trading wallet settings updated successfully.');
-        }
-
-        return redirect()->route('admin.tradingWalletControl');
+        return $this->savePackages($request);
     }
 
     /**

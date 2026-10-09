@@ -78,25 +78,19 @@
                             </p>
                         </div>
 
-                        @php
-                            $level1DirectsVal = (int) old('level_1_directs', optional($setting)->level_1_directs ?? 4);
-                        @endphp
-
                         @for ($i = 1; $i <= 10; $i++)
                             @php
                                 $rateField = "level_{$i}_rate";
                                 $directsField = "level_{$i}_directs";
                                 $defaultRate = '1.00';
 
-                                $rateVal = optional($setting)->{$rateField} !== null
+                                $rateVal = old($rateField, optional($setting)->{$rateField} !== null
                                     ? number_format((float) $setting->{$rateField}, 2, '.', '')
-                                    : $defaultRate;
+                                    : $defaultRate);
 
-                                if ($i === 1) {
-                                    $directsVal = $level1DirectsVal;
-                                } else {
-                                    $directsVal = $level1DirectsVal + (($i - 1) * 2);
-                                }
+                                $directsVal = old($directsField, optional($setting)->{$directsField} !== null
+                                    ? (int) $setting->{$directsField}
+                                    : ($i === 1 ? 4 : 4));
                             @endphp
                             <div class="col-xl-6 col-lg-6 col-md-12 mb-4">
                                 <div class="card h-100 shadow-sm border-0">
@@ -119,7 +113,7 @@
                                                     <div class="input-group">
                                                         <input type="number" step="any" min="0" max="100"
                                                             class="form-control @error('level_' . $i . '_rate') is-invalid @enderror"
-                                                            id="level_{{ $i }}_rate" name="level_{{ $i }}_rate" value="{{ old('level_' . $i . '_rate', $rateVal) }}"
+                                                            id="level_{{ $i }}_rate" name="level_{{ $i }}_rate" value="{{ $rateVal }}"
                                                             placeholder="1.00"
                                                             required>
                                                         <div class="input-group-append">
@@ -130,7 +124,7 @@
                                                         {{ __('Daily share rate percentage.') }}
                                                     </small>
                                                     @error('level_' . $i . '_rate')
-                                                        <span class="text-danger small">{{ $message }}</span>
+                                                        <span class="text-danger small d-block mt-1">{{ $message }}</span>
                                                     @enderror
                                                 </div>
                                             </div>
@@ -142,34 +136,27 @@
                                                         {{ __('Direct Referrals', ['num' => $i]) }} <span class="text-danger">*</span>
                                                     </label>
                                                     <div class="input-group">
-                                                        @if ($i === 1)
-                                                            <input type="number" step="1" min="0"
-                                                                class="form-control @error('level_1_directs') is-invalid @enderror"
-                                                                id="level_1_directs" name="level_1_directs" value="{{ $directsVal }}"
-                                                                placeholder="4"
-                                                                required>
-                                                        @else
-                                                            <input type="number" step="1" min="0"
-                                                                class="form-control @error('level_' . $i . '_directs') is-invalid @enderror"
-                                                                id="level_{{ $i }}_directs" name="level_{{ $i }}_directs" value="{{ $directsVal }}"
-                                                                placeholder="{{ $directsVal }}"
-                                                                readonly
-                                                                tabindex="-1"
-                                                                style="background-color: #f8f9fa; cursor: not-allowed;">
-                                                        @endif
+                                                        <input type="number" step="1" min="0"
+                                                            class="form-control direct-referral-input @error('level_' . $i . '_directs') is-invalid @enderror"
+                                                            id="level_{{ $i }}_directs" name="level_{{ $i }}_directs"
+                                                            data-level="{{ $i }}"
+                                                            value="{{ $directsVal }}"
+                                                            placeholder="{{ $directsVal }}"
+                                                            required>
                                                         <div class="input-group-append">
                                                             <span class="input-group-text font-weight-bold bg-light">{{ __('Directs') }}</span>
                                                         </div>
                                                     </div>
                                                     <small class="form-text text-muted">
                                                         @if ($i === 1)
-                                                            {{ __('Base requirement. Sets the auto chain (+2) for subsequent levels.') }}
+                                                            {{ __('Base direct referral requirement for Level 1.') }}
                                                         @else
-                                                            <i class="ik ik-link text-primary mr-1"></i>{{ __('Auto-calculated: Previous level + 2') }}
+                                                            {{ __('Must be greater than or equal to Level :prev.', ['prev' => $i - 1]) }}
                                                         @endif
                                                     </small>
+                                                    <div class="direct-validation-feedback text-danger small mt-1 font-weight-bold" id="level_{{ $i }}_directs_client_error" style="display: none;"></div>
                                                     @error('level_' . $i . '_directs')
-                                                        <span class="text-danger small">{{ $message }}</span>
+                                                        <span class="text-danger small server-validation-error d-block mt-1 font-weight-bold">{{ $message }}</span>
                                                     @enderror
                                                 </div>
                                             </div>
@@ -194,37 +181,110 @@
 
 @push('script')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var level1Input = document.getElementById('level_1_directs');
-            if (!level1Input) {
-                return;
-            }
+        (function ($) {
+            'use strict';
 
-            function recalculateDirectsChain() {
-                var raw = level1Input.value.trim();
-                var baseVal = parseInt(raw, 10);
-                var isValid = !isNaN(baseVal) && baseVal >= 0;
+            $(function () {
+                var $form = $('#dailyTeamInvestmentShareForm');
+                var totalLevels = 10;
 
-                for (var i = 2; i <= 10; i++) {
-                    var targetInput = document.getElementById('level_' + i + '_directs');
-                    if (targetInput) {
-                        if (isValid) {
-                            var calculated = baseVal + ((i - 1) * 2);
-                            targetInput.value = calculated;
-                            targetInput.setAttribute('placeholder', calculated);
-                        } else {
-                            targetInput.value = '';
+                /**
+                 * Validate non-decreasing direct sequence across all 10 levels.
+                 * Sequence rule: Level i >= Level (i - 1) for all i from 2 to 10.
+                 * Each direct requirement must also be a non-negative integer.
+                 */
+                function validateDirectSequence() {
+                    var hasSequenceError = false;
+                    var directData = {};
+
+                    // Step 1: Read all inputs and parse integer values
+                    for (var i = 1; i <= totalLevels; i++) {
+                        var $input = $('#level_' + i + '_directs');
+                        var rawVal = $input.val();
+                        var trimmed = rawVal !== undefined && rawVal !== null ? String(rawVal).trim() : '';
+                        var parsed = parseInt(trimmed, 10);
+                        var isValidFormat = (trimmed !== '') && !isNaN(parsed) && (String(parsed) === trimmed) && (parsed >= 0);
+
+                        directData[i] = {
+                            $input: $input,
+                            $errorBox: $('#level_' + i + '_directs_client_error'),
+                            raw: trimmed,
+                            val: parsed,
+                            isValidFormat: isValidFormat
+                        };
+                    }
+
+                    // Step 2: Clear client validation state on all direct inputs
+                    for (var i = 1; i <= totalLevels; i++) {
+                        var item = directData[i];
+                        item.$errorBox.hide().text('');
+
+                        // Only clear is-invalid if there is no server-rendered validation error visible
+                        var hasServerError = item.$input.closest('.form-group').find('.server-validation-error:visible').length > 0;
+                        if (!hasServerError) {
+                            item.$input.removeClass('is-invalid');
                         }
                     }
+
+                    // Step 3: Check format/required for each direct input
+                    for (var i = 1; i <= totalLevels; i++) {
+                        var item = directData[i];
+                        if (item.raw === '') {
+                            item.$input.addClass('is-invalid');
+                            item.$errorBox.text('Level ' + i + ' Direct Referrals is required.').show();
+                            hasSequenceError = true;
+                        } else if (!item.isValidFormat) {
+                            item.$input.addClass('is-invalid');
+                            item.$errorBox.text('Level ' + i + ' Direct Referrals must be a non-negative whole number.').show();
+                            hasSequenceError = true;
+                        }
+                    }
+
+                    // Step 4: Validate sequence: Level i must be >= Level (i - 1)
+                    for (var i = 2; i <= totalLevels; i++) {
+                        var prev = directData[i - 1];
+                        var curr = directData[i];
+
+                        if (prev.isValidFormat && curr.isValidFormat) {
+                            if (curr.val < prev.val) {
+                                curr.$input.addClass('is-invalid');
+                                curr.$errorBox.text(
+                                    'Level ' + i + ' Directs (' + curr.val + ') cannot be less than Level ' + (i - 1) + ' (' + prev.val + ').'
+                                ).show();
+                                hasSequenceError = true;
+                            }
+                        }
+                    }
+
+                    return !hasSequenceError;
                 }
-            }
 
-            level1Input.addEventListener('input', recalculateDirectsChain);
-            level1Input.addEventListener('change', recalculateDirectsChain);
-            level1Input.addEventListener('keyup', recalculateDirectsChain);
+                // Event listener on all direct inputs (live validation on input, change, keyup, blur)
+                $('.direct-referral-input').on('input change keyup blur', function () {
+                    // Hide server error on the edited input so live client error takes over cleanly
+                    $(this).closest('.form-group').find('.server-validation-error').hide();
+                    validateDirectSequence();
+                });
 
-            // Run immediately on page load
-            recalculateDirectsChain();
-        });
+                // Form submit handler
+                $form.on('submit', function (e) {
+                    var isValid = validateDirectSequence();
+                    if (!isValid) {
+                        e.preventDefault();
+                        var $firstInvalid = $form.find('.direct-referral-input.is-invalid').first();
+                        if ($firstInvalid.length) {
+                            $('html, body').animate({
+                                scrollTop: $firstInvalid.offset().top - 120
+                            }, 200);
+                            $firstInvalid.focus();
+                        }
+                        return false;
+                    }
+                });
+
+                // Run validation on load to reflect any initial state
+                validateDirectSequence();
+            });
+        })(jQuery);
     </script>
 @endpush

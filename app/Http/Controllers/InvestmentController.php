@@ -22,7 +22,7 @@ class InvestmentController extends Controller
 
         return view('member.investment.create-investment', $result);
     }
-
+    
     public function createInvestment(Request $request)
     {
         $validator = Validator::make($request->all(), [

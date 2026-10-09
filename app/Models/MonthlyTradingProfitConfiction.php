@@ -12,7 +12,7 @@ class MonthlyTradingProfitConfiction extends Model
      *
      * @var string
      */
-    protected $table = 'monthly_trading_profit_confiction';
+    protected $table = 'package_distributions';
 
     /**
      * The attributes that aren't mass assignable.
@@ -27,43 +27,33 @@ class MonthlyTradingProfitConfiction extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'package_id' => 'integer',
-        'rate' => 'float',
-        'rate_percent' => 'float',
-        'capping_percent' => 'float',
+        'capping' => 'float',
         'package_1_rate' => 'float',
         'package_2_rate' => 'float',
         'package_3_rate' => 'float',
     ];
 
     /**
-     * Relationship: Associated package plan.
-     */
-    public function packagePlan(): BelongsTo
-    {
-        return $this->belongsTo(PackagePlan::class, 'package_id');
-    }
-
-    /**
      * Get rate for a specific package ID.
      */
     public static function getRateForPackage(int $packageId): float
     {
-        $record = static::where('package_id', $packageId)->first();
-        if ($record) {
-            return (float) ($record->rate ?? $record->rate_percent ?? 0.00);
-        }
-
-        return 0.00;
+        return PackageDistribution::getRateForPackage($packageId);
     }
 
     /**
-     * Get active Monthly Trading Profit Capping (%).
+     * Get active Monthly Trading Profit Capping.
+     */
+    public static function getCapping(): float
+    {
+        return PackageDistribution::getCapping();
+    }
+
+    /**
+     * Get active Monthly Trading Profit Capping (legacy alias).
      */
     public static function getCappingPercent(): float
     {
-        $capping = static::whereNotNull('capping_percent')->value('capping_percent');
-
-        return $capping !== null ? (float) $capping : 0.00;
+        return static::getCapping();
     }
 }
