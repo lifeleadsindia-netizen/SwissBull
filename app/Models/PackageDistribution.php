@@ -19,7 +19,6 @@ class PackageDistribution extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'p2p_wallet',
         'trading_wallet',
         'referral_bonus',
         'team_trading_profit',
@@ -40,7 +39,6 @@ class PackageDistribution extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'p2p_wallet' => 'decimal:2',
         'trading_wallet' => 'decimal:2',
         'referral_bonus' => 'decimal:2',
         'team_trading_profit' => 'decimal:2',
@@ -55,12 +53,16 @@ class PackageDistribution extends Model
         'package_3_rate' => 'float',
     ];
 
+    public function getP2pWalletAttribute(): float
+    {
+        return (float) ($this->attributes['trading_wallet'] ?? 70.00);
+    }
+
     public static function getActiveSetting(): self
     {
         $setting = static::first();
         if (! $setting) {
             $setting = static::create([
-                'p2p_wallet' => 70.00,
                 'trading_wallet' => 70.00,
                 'hero_of_the_month' => 2.00,
                 'lock_days' => 90,

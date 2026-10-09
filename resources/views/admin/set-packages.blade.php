@@ -63,9 +63,6 @@
             <div class="col-12">
                 <form action="{{ route('admin.savePackages') }}" method="POST" id="formSetPackages">
                     @csrf
-                    <input type="hidden" id="trading_wallet" name="trading_wallet"
-                        value="{{ old('trading_wallet', optional($distribution)->trading_wallet !== null ? number_format((float) $distribution->trading_wallet, 2, '.', '') : (optional($distribution)->p2p_wallet !== null ? number_format((float) $distribution->p2p_wallet, 2, '.', '') : '70.00')) }}">
-
                     <div class="row">
                         {{-- Card 1: Package Distribution & Allocation --}}
                         <div class="col-xl-6 col-lg-6 col-md-12 mb-4">
@@ -78,20 +75,19 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group mb-3">
-                                        <label for="p2p_wallet" class="font-weight-bold text-dark">{{ __('Trading Wallet Allocation') }} <span class="text-danger">*</span></label>
+                                        <label for="trading_wallet" class="font-weight-bold text-dark">{{ __('Trading Wallet Allocation') }} <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <input type="number" step="any" min="0" max="100"
-                                                class="form-control font-weight-bold @error('p2p_wallet') is-invalid @enderror"
-                                                id="p2p_wallet" name="p2p_wallet"
-                                                value="{{ old('p2p_wallet', optional($distribution)->p2p_wallet !== null ? number_format((float) $distribution->p2p_wallet, 2, '.', '') : '70.00') }}"
-                                                oninput="document.getElementById('trading_wallet').value = this.value;"
+                                                class="form-control font-weight-bold @error('trading_wallet') is-invalid @enderror"
+                                                id="trading_wallet" name="trading_wallet"
+                                                value="{{ old('trading_wallet', optional($distribution)->trading_wallet !== null ? number_format((float) $distribution->trading_wallet, 2, '.', '') : '70.00') }}"
                                                 required>
                                             <div class="input-group-append">
                                                 <span class="input-group-text font-weight-bold bg-light">%</span>
                                             </div>
                                         </div>
                                         <small class="form-text text-muted">{{ __('Allocated directly to member Trading Wallet on package purchase.') }}</small>
-                                        @error('p2p_wallet')
+                                        @error('trading_wallet')
                                             <span class="text-danger small">{{ $message }}</span>
                                         @enderror
                                     </div>
