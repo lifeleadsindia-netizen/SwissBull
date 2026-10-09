@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TradingWalletSetting extends Model
 {
-    protected $table = 'trading_wallet_settings';
+    protected $table = 'package_distributions';
 
     protected $guarded = [];
 
@@ -24,9 +24,13 @@ class TradingWalletSetting extends Model
         $setting = static::first();
         if (! $setting) {
             $setting = static::create([
+                'p2p_wallet' => 70.00,
+                'trading_wallet' => 70.00,
+                'hero_of_the_month' => 2.00,
                 'lock_days' => 90,
                 'withdrawal_percent' => 100.00,
                 'status' => 'on',
+                'capping' => 200.00,
             ]);
         }
 
