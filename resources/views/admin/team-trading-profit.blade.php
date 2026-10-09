@@ -102,8 +102,8 @@
                             @endphp
                             <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
                                 <div class="card h-100 shadow-sm border-0">
-                                    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-0 text-white font-weight-bold">
+                                    <div class="card-header bg-primary d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0 text-black font-weight-bold">
                                             <i class="ik ik-trending-up mr-2"></i>{{ __('Level-:num Rate', ['num' => $i]) }}
                                         </h6>
                                         <span class="badge badge-light text-primary font-weight-bold">

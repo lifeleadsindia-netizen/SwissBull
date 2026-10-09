@@ -163,7 +163,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     Route::post('/updateDetails', [AdminController::class, 'updateDetails'])->name('updateDetails');
 
     Route::get('/payment-history', [AdminController::class, 'paymentHistory']);
-    Route::get('/new-withdrawal-request', [AdminController::class, 'newWithdrawelRequest']);
+    Route::get('/new-withdrawal-request', [AdminController::class, 'newWithdrawelRequest'])->name('admin.newWithdrawalRequest');
     Route::get('/cancelled-request', [AdminController::class, 'cancelledRequest']);
     Route::get('/package-details', [AdminController::class, 'packageDetails']);
     Route::get('/transaction', [AdminController::class, 'transaction']);

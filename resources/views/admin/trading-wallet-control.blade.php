@@ -64,7 +64,7 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-white border-bottom">
                         <h5 class="mb-0 font-weight-bold text-dark">
-                            <i class="ik ik-clock mr-2 text-primary"></i>{{ __('90-Day Delivery / Locking Code Configuration') }}
+                            <i class="ik ik-clock mr-2 text-primary"></i>{{ __('Trading Wallet Locking Period') }}
                         </h5>
                     </div>
                     <div class="card-body">
@@ -72,7 +72,7 @@
                             @csrf
                             <div class="form-group mb-3">
                                 <label for="lock_days" class="font-weight-bold text-dark">
-                                    {{ __('Locking Period / Delivery Days') }} <span class="text-danger">*</span>
+                                    {{ __('Locking Period ') }} <span class="text-danger">*</span>
                                 </label>
                                 <div class="input-group">
                                     <input type="number" min="0" step="1"

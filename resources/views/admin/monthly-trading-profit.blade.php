@@ -10,7 +10,7 @@
                         <i class="ik ik-trending-up bg-blue"></i>
                         <div class="d-inline">
                             <h5>{{ __('Monthly Trading Profit') }}</h5>
-                            <span>{{ __('Configure dynamic monthly trading profit rates and capping for packages') }}</span>
+                            <span>{{ __('Set monthly trading profit rates and capping') }}</span>
                         </div>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                                     <div class="row align-items-center">
                                         <div class="col-lg-7 col-md-12 mb-3 mb-lg-0">
                                             <p class="text-muted mb-0">
-                                                {{ __('Configure the global Monthly Trading Profit Capping percentage limit applied across all eligible packages.') }}
+                                                {{ __('Enter Monthly Trading Profit Capping percentage limit') }}
                                             </p>
                                         </div>
                                         <div class="col-lg-5 col-md-12">
@@ -136,8 +136,8 @@
                             @endphp
                             <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
                                 <div class="card h-100 shadow-sm border-0">
-                                    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                                        <h5 class="mb-0 text-white font-weight-bold">
+                                    <div class="card-header bg-primary d-flex align-items-center justify-content-between">
+                                        <h5 class="mb-0 text-black font-weight-bold">
                                             <i class="ik ik-package mr-2"></i>{{ $package->name }}
                                         </h5>
                                         <span class="badge badge-light text-primary font-weight-bold">
