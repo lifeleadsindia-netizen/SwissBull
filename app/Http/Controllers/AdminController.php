@@ -11,7 +11,6 @@ use App\Models\HeroOfTheMonthReward;
 use App\Models\ImportFund;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
-use App\Models\MonthlyTradingProfitConfiction;
 use App\Models\Notification;
 use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
@@ -33,11 +32,11 @@ use App\Models\WithdrawalRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -475,7 +474,7 @@ class AdminController extends Controller
 
     public function addFundsDetails(Request $request)
     {
-        $query = ImportFund::where([['status', 'Approved'],['added_by', 'Admin']]);
+        $query = ImportFund::where([['status', 'Approved'], ['added_by', 'Admin']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
@@ -1126,14 +1125,8 @@ class AdminController extends Controller
      */
     public function saveDailyTeamInvestmentShare(Request $request)
     {
-        $rules = [
-            'level_1_directs' => 'required|integer|min:0',
-        ];
-        $messages = [
-            'level_1_directs.required' => 'Please enter Level-1 Direct Referral requirement.',
-            'level_1_directs.integer' => 'Level-1 Direct Referral requirement must be a whole number.',
-            'level_1_directs.min' => 'Level-1 Direct Referral requirement cannot be negative.',
-        ];
+        $rules = [];
+        $messages = [];
 
         for ($i = 1; $i <= 10; $i++) {
             $rules["level_{$i}_rate"] = 'required|numeric|min:0|max:100';
@@ -1142,20 +1135,44 @@ class AdminController extends Controller
             $messages["level_{$i}_rate.min"] = "Level-{$i} Rate cannot be negative.";
             $messages["level_{$i}_rate.max"] = "Level-{$i} Rate cannot exceed 100%.";
 
-            if ($i > 1) {
-                $rules["level_{$i}_directs"] = 'nullable|integer|min:0';
-            }
+            $rules["level_{$i}_directs"] = 'required|integer|min:0';
+            $messages["level_{$i}_directs.required"] = "Please enter Level-{$i} Direct Referral requirement.";
+            $messages["level_{$i}_directs.integer"] = "Level-{$i} Direct Referral requirement must be a whole number.";
+            $messages["level_{$i}_directs.min"] = "Level-{$i} Direct Referral requirement cannot be negative.";
         }
 
-        $request->validate($rules, $messages);
+        $validator = Validator::make($request->all(), $rules, $messages);
 
-        $level1Directs = (int) $request->input('level_1_directs');
-        $directsChain = DailyTeamInvestmentShareConfiction::calculateDirectsChain($level1Directs);
+        $validator->after(function ($validator) use ($request) {
+            for ($i = 2; $i <= 10; $i++) {
+                $prevKey = 'level_'.($i - 1).'_directs';
+                $currKey = "level_{$i}_directs";
+
+                if ($request->has($prevKey) && $request->has($currKey)) {
+                    $prevRaw = $request->input($prevKey);
+                    $currRaw = $request->input($currKey);
+
+                    if (is_numeric($prevRaw) && is_numeric($currRaw)) {
+                        $prevVal = (int) $prevRaw;
+                        $currVal = (int) $currRaw;
+
+                        if ($currVal < $prevVal) {
+                            $validator->errors()->add(
+                                $currKey,
+                                "Level-{$i} Direct Referrals ({$currVal}) must be greater than or equal to Level-".($i - 1)." Direct Referrals ({$prevVal})."
+                            );
+                        }
+                    }
+                }
+            }
+        });
+
+        $validator->validate();
 
         $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
         for ($i = 1; $i <= 10; $i++) {
             $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
-            $setting->{"level_{$i}_directs"} = $directsChain[$i];
+            $setting->{"level_{$i}_directs"} = (int) $request->input("level_{$i}_directs");
         }
         $setting->save();
 
