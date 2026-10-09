@@ -178,8 +178,8 @@
             <div class="sidebar-header">
                 <a class="header-brand" href="{{ route('dashboard') }}">
                     <div class="logo-img">
-                        <img height="30" src="{{ asset('logo/logo.png') }}"
-                            class="header-brand-img" title="{{ config('detailsApp.name') }}">
+                        <img src="{{ asset('logo/name-logo.png') }}"
+                            class="header-brand-img" alt="{{ config('detailsApp.name') }}" title="{{ config('detailsApp.name') }}">
                     </div>
                 </a>
                 <div class="sidebar-action"><i class="ik ik-arrow-left-circle"></i></div>

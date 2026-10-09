@@ -3874,7 +3874,7 @@
                         maxReturnPercent: {{ (float) ($maxReturnPercent ?? 200) }},
                         remainingDays: {{ (int) ($remainingLockDays ?? 0) }},
                         unlockDateTime: "{{ $unlockDateTime ?? 'Unlocked' }}",
-                        statusUrl: "{{ route('member.tradingWalletStatus') }}"
+                        statusUrl: "{{ Route::has('member.tradingWalletStatus') ? route('member.tradingWalletStatus') : url('/member/trading-wallet-status') }}"
                     };
 
                     function startTradingWalletCountdown() {

@@ -1,12 +1,12 @@
-﻿<div class="app-sidebar colored">
+<div class="app-sidebar colored">
     <div class="sidebar-header">
-        <a class="header-brand py-3" href="{{url('admin/dashboard')}}">
-            <div class="logo-img text-center ">
-              <img  height="51px" src="{{asset('logo/name-logo.png')}}" class="header-brand-img py-2 pe-3 pl-0" title="Admin">
+        <a class="header-brand" href="{{url('admin/dashboard')}}">
+            <div class="logo-img text-center d-flex justify-content-center align-items-center">
+              <img src="{{asset('logo/name-logo.png')}}" class="header-brand-img" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}" title="{{ config('detailsApp.name', 'SYNC TRADE') }}" />
             </div>
         </a>
         <div class="sidebar-action"></div>
-        <button id="sidebarClose" class="nav-close"><i class="ik ik-x"></i></button>
+        <button id="sidebarClose" class="nav-close" type="button" aria-label="Close Sidebar"><i class="ik ik-x"></i></button>
     </div>
 
     @php
