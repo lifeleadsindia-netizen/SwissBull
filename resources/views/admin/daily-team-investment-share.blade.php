@@ -100,8 +100,8 @@
                             @endphp
                             <div class="col-xl-6 col-lg-6 col-md-12 mb-4">
                                 <div class="card h-100 shadow-sm border-0">
-                                    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                                        <h6 class="mb-0 text-white font-weight-bold">
+                                    <div class="card-header bg-primary d-flex align-items-center justify-content-between">
+                                        <h6 class="mb-0 text-black font-weight-bold">
                                             <i class="ik ik-layers mr-2"></i>{{ __('Level :num Configuration', ['num' => $i]) }}
                                         </h6>
                                         <span class="badge badge-light text-primary font-weight-bold">

@@ -62,13 +62,9 @@
 
                             <div class="card shadow-sm border-0">
                                 <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                                    <h3 class="mb-0 text-white font-weight-bold"><i class="ik ik-pie-chart mr-2"></i>{{ __('Package Distribution (%)') }}</h3>
-                                    <span class="badge badge-light text-primary font-weight-bold">100% Pool</span>
+                                    <h3 class="mb-0 text-black font-weight-bold">{{ __('Set Packages') }}</h3>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted small mb-3">
-                                        {{ __('Configure how deposit funds are split across system wallets. By default, 70% goes to the Trading Wallet.') }}
-                                    </p>
 
                                     <div class="form-group">
                                         <label for="p2p_wallet" class="font-weight-bold text-dark">{{ __('Trading Wallet Allocation') }}</label>
@@ -83,7 +79,7 @@
                                                 <span class="input-group-text font-weight-bold bg-light">%</span>
                                             </div>
                                         </div>
-                                        <small class="form-text text-muted">{{ __('Allocated directly to member Trading Wallet (P2P Wallet).') }}</small>
+                                        <small class="form-text text-muted">{{ __('Allocated directly to member Trading Wallet') }}</small>
                                         @error('p2p_wallet')
                                             <span class="text-danger small">{{ $message }}</span>
                                         @enderror
@@ -117,10 +113,10 @@
                     </div>
 
                     {{-- Right Column: Dynamic Package Plans & Ranges --}}
-                    <div class="col-xl-7 col-lg-7 col-md-12 mb-4">
+                    <div class="col-xl-7 col-lg-7 col-md-12 mb-4 d-none" style="display: none;">
                         <form action="{{ route('admin.savePackages') }}" method="POST" id="formPackagePlans">
                             @csrf
-                            <div class="card shadow-sm border-0">
+                            <div class="card shadow-sm border-0 d-none" style="display: none;">
                                 <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between">
                                     <h3 class="mb-0 text-white font-weight-bold"><i class="ik ik-layers mr-2"></i>{{ __('Package Plans & Investment Tiers') }}</h3>
                                     <span class="badge badge-success font-weight-bold">3 Tiers Configured</span>

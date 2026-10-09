@@ -69,20 +69,20 @@
                         <div class="col-12 mb-2">
                             <div class="d-flex align-items-center justify-content-between">
                                 <h5 class="font-weight-bold text-dark mb-0">
-                                    <i class="ik ik-sliders mr-2 text-primary"></i>{{ __('Referral Bonus Rates Configuration') }}
+                                    <i class="ik ik-sliders mr-2 text-primary"></i>{{ __('Referral Bonus Configuration') }}
                                 </h5>
                                 <span class="badge badge-primary font-weight-bold">{{ __('3 Levels') }}</span>
                             </div>
                             <p class="text-muted small mt-1 mb-3">
-                                {{ __('Configure dynamic referral bonus percentage rates for Level 1, Level 2, and Level 3 sponsors.') }}
+                                {{ __('Enter referral bonus percentages') }}
                             </p>
                         </div>
 
                         {{-- Level 1 Card --}}
                         <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                                    <h5 class="mb-0 text-white font-weight-bold">
+                                <div class="card-header bg-primary d-flex align-items-center justify-content-between">
+                                    <h5 class="mb-0 text-black font-weight-bold">
                                         <i class="ik ik-user mr-2"></i>{{ __('Level-1 Rate') }}
                                     </h5>
                                     <span class="badge badge-light text-primary font-weight-bold">{{ __('Level 1') }}</span>
@@ -127,8 +127,8 @@
                         {{-- Level 2 Card --}}
                         <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                                    <h5 class="mb-0 text-white font-weight-bold">
+                                <div class="card-header bg-primary d-flex align-items-center justify-content-between">
+                                    <h5 class="mb-0 text-black font-weight-bold">
                                         <i class="ik ik-users mr-2"></i>{{ __('Level-2 Rate') }}
                                     </h5>
                                     <span class="badge badge-light text-primary font-weight-bold">{{ __('Level 2') }}</span>
@@ -173,8 +173,8 @@
                         {{-- Level 3 Card --}}
                         <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
                             <div class="card h-100 shadow-sm border-0">
-                                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-                                    <h5 class="mb-0 text-white font-weight-bold">
+                                <div class="card-header bg-primary d-flex align-items-center justify-content-between">
+                                    <h5 class="mb-0 text-black font-weight-bold">
                                         <i class="ik ik-award mr-2"></i>{{ __('Level-3 Rate') }}
                                     </h5>
                                     <span class="badge badge-light text-primary font-weight-bold">{{ __('Level 3') }}</span>

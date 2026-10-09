@@ -562,7 +562,7 @@ class AdminController extends Controller
             'pepeData' => $pepeData,
             'tradingData' => $tradingData,
             'pageTitle' => 'New Withdrawal Requests',
-            'action' => url('hdgteyusjasget/new-withdrawal-request'),
+            'action' => route('admin.newWithdrawalRequest'),
         ]);
 
         return view('admin.new-withdrawal-request')->with($result);
@@ -1425,7 +1425,7 @@ class AdminController extends Controller
         $preset = $request->query('preset');
         $fromDate = $request->query('from_date');
         $toDate = $request->query('to_date');
-        $dateField = $request->query('date_field');
+        $dateField = $request->query('date_field', $request->query('date_type'));
 
         // Safe column resolution using strict allowlist mapping
         $targetColumn = $defaultColumn;
@@ -1447,6 +1447,7 @@ class AdminController extends Controller
             'from_date' => 'nullable|date_format:Y-m-d',
             'to_date' => 'nullable|date_format:Y-m-d|after_or_equal:from_date',
             'date_field' => 'nullable|string',
+            'date_type' => 'nullable|string',
         ], [
             'filter_date.date_format' => 'The filter date must be a valid date in YYYY-MM-DD format.',
             'from_date.date_format' => 'The From Date must be a valid date in YYYY-MM-DD format.',

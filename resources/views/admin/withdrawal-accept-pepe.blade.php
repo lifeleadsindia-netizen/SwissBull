@@ -368,7 +368,7 @@
                             swal("Completed", "Withdrawal process has been completed successfully", "success")
                                 .then(function() {
                                     window.location.href =
-                                        "{{ url('hdgteyusjasget/new-withdrawal-request') }}";
+                                        "{{ route('admin.newWithdrawalRequest') }}";
                                 });
 
                         },

@@ -2,7 +2,7 @@
     $collapseId = 'adminDateFilterCollapse_' . md5($action ?? url()->current());
     $dateOptions = $dateOptions ?? [];
     $defaultDate = $defaultDateField ?? 'created_at';
-    $currentDateField = request('date_field', $defaultDate);
+    $currentDateField = request('date_field', request('date_type', $defaultDate));
     $isAdvanced = request()->has('preset') || request()->has('from_date') || request()->has('to_date') || (request('filter_mode') === 'advanced');
     $filterActive = $filterActive ?? (request()->filled('filter_date') || request()->filled('preset') || (request()->filled('from_date') && request()->filled('to_date')));
     $filterSummary = $filterSummary ?? null;
