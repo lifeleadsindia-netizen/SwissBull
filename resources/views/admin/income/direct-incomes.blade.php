@@ -53,6 +53,7 @@
                                         <th>{{ __('Date') }}</th>
                                         <th>{{ __('Member ID') }}</th>
                                         <th>{{ __('Name') }}</th>
+                                        <th>{{ __('Level') }}</th>
                                         <th>{{ __('From Member') }}</th>
                                         <th>{{ __('Package Amount') }}</th>
                                         <th>{{ __('Rate') }}</th>
@@ -67,13 +68,16 @@
                                         @php
                                             $pkg = (float) ($list['package'] ?? 0);
                                             $amt = (float) ($list['amount'] ?? 0);
-                                            $rate = $pkg > 0 ? round(($amt / $pkg) * 100, 1) : 0;
+                                            $storedRate = isset($list['rate']) && $list['rate'] !== null && (float) $list['rate'] > 0 ? (float) $list['rate'] : null;
+                                            $rate = $storedRate ?? ($pkg > 0 ? round(($amt / $pkg) * 100, 1) : 0);
+                                            $levelNum = $list['level'] ?? 1;
                                         @endphp
                                         <tr>
                                             <td>{{ $i }}</td>
                                             <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}</td>
                                             <td><strong>{{ $list['memberid'] }}</strong></td>
                                             <td>{{ getName($list['memberid']) }}</td>
+                                            <td><span class="badge badge-primary">Level {{ $levelNum }}</span></td>
                                             <td>{{ $list['activatingid'] ?? 'N/A' }} ({{ $list['name'] ?? '' }})</td>
                                             <td>$ {{ number_format($pkg, 2) }}</td>
                                             <td>{{ $rate > 0 ? $rate.'%' : 'Standard' }}</td>
