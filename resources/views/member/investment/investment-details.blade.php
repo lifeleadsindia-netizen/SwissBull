@@ -1,11 +1,11 @@
 @extends('member.layouts.main')
 @section('title', 'Staking History')
 @section('container')
-@include('member.income._income-styles')
+    @include('member.income._income-styles')
 
     <!--**********************************
-                    Content body start
-                ***********************************-->
+                            Content body start
+                        ***********************************-->
     <div class="content-body inc-page">
         <div class="container-fluid py-4">
             <!-- row -->
@@ -23,14 +23,11 @@
                             <table id="example3" class="inc-table display dataTable no-footer">
                                 <thead>
                                     <tr>
-                                        <th>S.No.</th>
-                                        <th>Invest Date</th>
-                                        <th>Invest Amount</th>
-                                        <th>Trading Amount</th>
-                                        <th> ROI Rate</th>
-                                        <th>Cap %</th>
-                                        <th>Max ROI</th>
-                                        <th>Earned</th>
+                                        <th>#</th>
+                                        <th>Date</th>
+                                        <th>Package Range</th>
+                                        <th>Invested</th>
+                                        <th>Txnid</th>
                                         <th>Installments</th>
                                         <th>Status</th>
                                     </tr>
@@ -38,28 +35,33 @@
                                 <tbody>
                                     @php $i = 1;  @endphp
                                     @foreach ($investment_data as $list)
-                                        @php
-                                            $item = $list instanceof \App\Models\StakingDetail ? $list : \App\Models\StakingDetail::find($list['id']);
-                                            $capPercent = $item ? $item->getCappingPercent() : ($list['capping_percent'] ?? 200.0);
-                                            $maxAmt = $item ? $item->getMaxRoiAmount() : ((float) $list['invest_amount'] * ($capPercent / 100));
-                                            $earned = $item ? $item->getTotalEarned() : (float) ($list['total_earned'] ?? 0);
-                                            $rem = max(0.00, round($maxAmt - $earned, 2));
-                                        @endphp
                                         <tr>
                                             <td>{{ $i }}</td>
-                                            <td> {{ date('d-m-Y', strtotime($list['invest_date'])) }}</td>
-                                            <td>$ {{ number_format((float) $list['invest_amount'], 2) }}</td>
-                                            <td>$ {{ number_format((float) $list['trading_wallet_amount'], 2) }}</td>
-                                            <td>{{ $item ? $item->getDailyRate() : $list['rate'] }}%</td>
-                                            <td>{{ number_format($capPercent, 1) }}%</td>
-                                            <td>$ {{ number_format($maxAmt, 2) }}</td>
-                                            <td>$ {{ number_format($earned, 2) }}</td>
-                                            <td>{{ $list['installments'] }}</td>
                                             <td>
-                                                @if ($list['status'] == 'Active')
-                                                    <span class="badge badge-success">{{ $list['status'] }}</span>
+                                                <small
+                                                    class="d-block text-white-50">{{ $list->created_at ? $list->created_at->format('d M Y') : '' }}</small>
+                                            </td>
+                                            <td>
+                                                @if ($list->package == 'Package1')
+                                                    <span class="text-white font-weight-bold">$50 - $500</span>
+                                                @elseif ($list->package == 'Package2')
+                                                    <span class="text-white font-weight-bold">$600 - $5000</span>
                                                 @else
-                                                    <span class="badge badge-danger">{{ $list['status'] }}</span>
+                                                    <span class="text-white font-weight-bold">$6000</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-warning font-weight-bold">
+                                                ${{ number_format((float) $list->invest_amount, 2) }}</td>
+                                            <td class="text-warning font-weight-bold">
+                                                {{ $list->txnid }}</td>
+                                            <td>{{ $list->installments }}</td>
+                                            <td>
+                                                @if ($list->status === 'Active')
+                                                    <span class="badge"
+                                                        style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">Active</span>
+                                                @else
+                                                    <span class="badge"
+                                                        style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 4px 8px;">Expired</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -74,6 +76,6 @@
         </div>
     </div>
     <!--**********************************
-                    Content body end
-                ***********************************-->
+                            Content body end
+                        ***********************************-->
 @endsection
