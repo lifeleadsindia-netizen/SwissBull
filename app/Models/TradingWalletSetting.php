@@ -24,7 +24,6 @@ class TradingWalletSetting extends Model
         $setting = static::first();
         if (! $setting) {
             $setting = static::create([
-                'p2p_wallet' => 70.00,
                 'trading_wallet' => 70.00,
                 'hero_of_the_month' => 2.00,
                 'lock_days' => 90,

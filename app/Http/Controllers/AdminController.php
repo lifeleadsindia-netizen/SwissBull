@@ -33,6 +33,7 @@ use App\Models\WithdrawalRequest;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -938,13 +939,12 @@ class AdminController extends Controller
 
         $validated = $request->validate($rules);
 
-        // 1. Trading Wallet Allocation / P2P Wallet & Hero of the Month
-        if ($request->filled('p2p_wallet') || $request->filled('trading_wallet')) {
-            $tradingWalletVal = (float) ($request->input('p2p_wallet') ?? $request->input('trading_wallet'));
-            $distribution->p2p_wallet = $tradingWalletVal;
+        // 1. Trading Wallet Allocation & Hero of the Month
+        if ($request->filled('trading_wallet') || $request->filled('p2p_wallet')) {
+            $tradingWalletVal = (float) ($request->input('trading_wallet') ?? $request->input('p2p_wallet'));
             $distribution->trading_wallet = $tradingWalletVal;
         }
-        if ($request->filled('hero_of_the_month')) {
+        if (Schema::hasColumn('package_distributions', 'hero_of_the_month') && $request->filled('hero_of_the_month')) {
             $distribution->hero_of_the_month = (float) $request->input('hero_of_the_month');
         }
 
@@ -952,7 +952,7 @@ class AdminController extends Controller
         if ($request->has('lock_days')) {
             $distribution->lock_days = (int) $request->input('lock_days');
         }
-        if ($request->filled('withdrawal_percent')) {
+        if (Schema::hasColumn('package_distributions', 'withdrawal_percent') && $request->filled('withdrawal_percent')) {
             $distribution->withdrawal_percent = (float) $request->input('withdrawal_percent');
         }
         if ($request->has('status')) {
