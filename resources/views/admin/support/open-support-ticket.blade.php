@@ -1,4 +1,4 @@
-﻿@extends('admin.layouts.main')
+@extends('admin.layouts.main')
 @section('title', 'Open Support Tickets')
 @section('content')
     @push('head')
@@ -33,7 +33,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                @include('admin.partials.history-date-filter')
+                @include('admin.partials.history-date-filter', ['showMemberIdFilter' => true])
                 
                 @if (session()->has('wMessage'))
                    <div class="alert alert-primary">{{session('wMessage')}}</div>

@@ -4,7 +4,8 @@
     $defaultDate = $defaultDateField ?? 'created_at';
     $currentDateField = request('date_field', request('date_type', $defaultDate));
     $isAdvanced = request()->has('preset') || request()->has('from_date') || request()->has('to_date') || (request('filter_mode') === 'advanced');
-    $filterActive = $filterActive ?? (request()->filled('filter_date') || request()->filled('preset') || (request()->filled('from_date') && request()->filled('to_date')));
+    $showMemberId = $showMemberIdFilter ?? false;
+    $filterActive = $filterActive ?? (request()->filled('filter_date') || request()->filled('preset') || (request()->filled('from_date') && request()->filled('to_date')) || ($showMemberId && request()->filled('member_id')));
     $filterSummary = $filterSummary ?? null;
     $filterErrors = $filterErrors ?? session('filter_errors', []);
     $resetUrl = $action ?? url()->current();
@@ -120,45 +121,99 @@
         <form method="GET" action="{{ $action ?? url()->current() }}" class="admin-history-filter-form" id="adminFilterForm_{{ md5($collapseId) }}">
             {{-- Basic Date Filter Section --}}
             <div class="form-row align-items-end">
-                <div class="form-group col-lg-4 col-md-5 col-sm-12 mb-2">
-                    <label for="filter_date_{{ md5($collapseId) }}" class="admin-history-filter-label">
-                        <i class="ik ik-calendar mr-1 text-muted"></i>{{ __('Specific Date') }}
-                    </label>
-                    <input type="date" 
-                           id="filter_date_{{ md5($collapseId) }}" 
-                           name="filter_date" 
-                           value="{{ request('filter_date') }}" 
-                           class="form-control admin-history-filter-input"
-                           placeholder="YYYY-MM-DD">
-                </div>
-
-                <div class="form-group col-lg-8 col-md-7 col-sm-12 mb-2">
-                    <div class="d-flex flex-wrap" style="gap: 8px;">
-                        <input type="hidden" name="filter_mode" id="filter_mode_{{ md5($collapseId) }}" value="{{ request('filter_mode', 'single') }}">
-                        
-                        <button type="submit" 
-                                class="btn btn-primary admin-history-filter-btn" 
-                                onclick="document.getElementById('filter_mode_{{ md5($collapseId) }}').value='single';">
-                            <i class="ik ik-filter mr-1"></i>{{ __('Filter') }}
-                        </button>
-
-                        <button type="button" 
-                                class="btn btn-outline-secondary admin-history-filter-btn" 
-                                data-toggle="collapse" 
-                                data-target="#{{ $collapseId }}" 
-                                aria-expanded="{{ $isAdvanced ? 'true' : 'false' }}" 
-                                aria-controls="{{ $collapseId }}">
-                            <i class="ik ik-sliders mr-1"></i>{{ __('Advanced Filter') }}
-                            <i class="ik ik-chevron-down ml-1"></i>
-                        </button>
-
-                        @if($filterActive)
-                            <a href="{{ $resetUrl }}" class="btn btn-light border admin-history-filter-btn" title="{{ __('Clear and show all records') }}">
-                                <i class="ik ik-rotate-ccw mr-1"></i>{{ __('Reset') }}
-                            </a>
-                        @endif
+                @if($showMemberId)
+                    <div class="form-group col-lg-3 col-md-4 col-sm-12 mb-2">
+                        <label for="member_id_{{ md5($collapseId) }}" class="admin-history-filter-label">
+                            <i class="ik ik-user mr-1 text-muted"></i>{{ __('Member ID') }}
+                        </label>
+                        <input type="text" 
+                               id="member_id_{{ md5($collapseId) }}" 
+                               name="member_id" 
+                               value="{{ request('member_id') }}" 
+                               class="form-control admin-history-filter-input"
+                               placeholder="{{ __('Enter Member ID') }}">
                     </div>
-                </div>
+
+                    <div class="form-group col-lg-3 col-md-4 col-sm-12 mb-2">
+                        <label for="filter_date_{{ md5($collapseId) }}" class="admin-history-filter-label">
+                            <i class="ik ik-calendar mr-1 text-muted"></i>{{ __('Specific Date') }}
+                        </label>
+                        <input type="date" 
+                               id="filter_date_{{ md5($collapseId) }}" 
+                               name="filter_date" 
+                               value="{{ request('filter_date') }}" 
+                               class="form-control admin-history-filter-input"
+                               placeholder="YYYY-MM-DD">
+                    </div>
+
+                    <div class="form-group col-lg-6 col-md-4 col-sm-12 mb-2">
+                        <div class="d-flex flex-wrap" style="gap: 8px;">
+                            <input type="hidden" name="filter_mode" id="filter_mode_{{ md5($collapseId) }}" value="{{ request('filter_mode', 'single') }}">
+                            
+                            <button type="submit" 
+                                    class="btn btn-primary admin-history-filter-btn" 
+                                    onclick="document.getElementById('filter_mode_{{ md5($collapseId) }}').value='single';">
+                                <i class="ik ik-filter mr-1"></i>{{ __('Filter') }}
+                            </button>
+
+                            <button type="button" 
+                                    class="btn btn-outline-secondary admin-history-filter-btn" 
+                                    data-toggle="collapse" 
+                                    data-target="#{{ $collapseId }}" 
+                                    aria-expanded="{{ $isAdvanced ? 'true' : 'false' }}" 
+                                    aria-controls="{{ $collapseId }}">
+                                <i class="ik ik-sliders mr-1"></i>{{ __('Advanced Filter') }}
+                                <i class="ik ik-chevron-down ml-1"></i>
+                            </button>
+
+                            @if($filterActive)
+                                <a href="{{ $resetUrl }}" class="btn btn-light border admin-history-filter-btn" title="{{ __('Clear and show all records') }}">
+                                    <i class="ik ik-rotate-ccw mr-1"></i>{{ __('Reset') }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <div class="form-group col-lg-4 col-md-5 col-sm-12 mb-2">
+                        <label for="filter_date_{{ md5($collapseId) }}" class="admin-history-filter-label">
+                            <i class="ik ik-calendar mr-1 text-muted"></i>{{ __('Specific Date') }}
+                        </label>
+                        <input type="date" 
+                               id="filter_date_{{ md5($collapseId) }}" 
+                               name="filter_date" 
+                               value="{{ request('filter_date') }}" 
+                               class="form-control admin-history-filter-input"
+                               placeholder="YYYY-MM-DD">
+                    </div>
+
+                    <div class="form-group col-lg-8 col-md-7 col-sm-12 mb-2">
+                        <div class="d-flex flex-wrap" style="gap: 8px;">
+                            <input type="hidden" name="filter_mode" id="filter_mode_{{ md5($collapseId) }}" value="{{ request('filter_mode', 'single') }}">
+                            
+                            <button type="submit" 
+                                    class="btn btn-primary admin-history-filter-btn" 
+                                    onclick="document.getElementById('filter_mode_{{ md5($collapseId) }}').value='single';">
+                                <i class="ik ik-filter mr-1"></i>{{ __('Filter') }}
+                            </button>
+
+                            <button type="button" 
+                                    class="btn btn-outline-secondary admin-history-filter-btn" 
+                                    data-toggle="collapse" 
+                                    data-target="#{{ $collapseId }}" 
+                                    aria-expanded="{{ $isAdvanced ? 'true' : 'false' }}" 
+                                    aria-controls="{{ $collapseId }}">
+                                <i class="ik ik-sliders mr-1"></i>{{ __('Advanced Filter') }}
+                                <i class="ik ik-chevron-down ml-1"></i>
+                            </button>
+
+                            @if($filterActive)
+                                <a href="{{ $resetUrl }}" class="btn btn-light border admin-history-filter-btn" title="{{ __('Clear and show all records') }}">
+                                    <i class="ik ik-rotate-ccw mr-1"></i>{{ __('Reset') }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             </div>
 
             {{-- Advanced Date Filter Section (Collapsible) --}}

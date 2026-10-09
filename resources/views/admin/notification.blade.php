@@ -101,8 +101,20 @@
                 </div>
             @endif
             <div class="card">
-                <div class="card-header"><h3>{{ __('Notification Table')}}</h3></div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">{{ __('Notification Table')}}</h3>
+                </div>
                 <div class="card-body px-5">
+                    <form method="GET" action="{{ url('admin/notification') }}" class="form-inline mb-4">
+                        <div class="form-group mr-2 mb-2">
+                            <label for="member_id" class="mr-2 font-weight-bold"><i class="ik ik-user mr-1 text-muted"></i>{{ __('Member ID') }}:</label>
+                            <input type="text" name="member_id" id="member_id" class="form-control" placeholder="{{ __('Enter Member ID') }}" value="{{ request('member_id') }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2 mr-2"><i class="ik ik-filter mr-1"></i>{{ __('Filter') }}</button>
+                        @if(request()->filled('member_id'))
+                            <a href="{{ url('admin/notification') }}" class="btn btn-light border mb-2" title="{{ __('Reset filter') }}"><i class="ik ik-rotate-ccw mr-1"></i>{{ __('Reset') }}</a>
+                        @endif
+                    </form>
                     <table id="data_table" class="table">
                         <thead>
                             <tr>

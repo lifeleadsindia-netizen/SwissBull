@@ -194,12 +194,21 @@ class AdminController extends Controller
         // $result['fiat'] = MemberDetail::where('memberid', $member)->first();
         // $symbol = $result['fiat']->country;
         // $result['fiat']['symbol'] = getCurrencySymbol($symbol);
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = MemberDetail::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'DESC')->get(),
             'pageTitle' => 'Member Details',
             'action' => url('admin/member-details'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.member-details')->with($result);
@@ -207,12 +216,21 @@ class AdminController extends Controller
 
     public function security(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = MemberDetail::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Member Security',
             'action' => url('admin/member-security'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.member-security')->with($result);
@@ -220,12 +238,21 @@ class AdminController extends Controller
 
     public function walletAddress(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = MemberDetail::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'DESC')->get(),
             'pageTitle' => 'Member Wallet Address',
             'action' => url('admin/wallet-address'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.wallet-address')->with($result);
@@ -277,12 +304,21 @@ class AdminController extends Controller
 
     public function accountControl(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = MemberDetail::where('status', '!=', 'Temp');
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Account Control',
             'action' => url('admin/account-control'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.account-control')->with($result);
@@ -438,12 +474,21 @@ class AdminController extends Controller
 
     public function addFundsDetails(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = ImportFund::where('status', 'Approved');
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Funds Details',
             'action' => url('admin/funds/add-funds-details'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.funds.add-funds-details')->with($result);
@@ -488,12 +533,21 @@ class AdminController extends Controller
 
     public function packageDetails(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = PackageDetail::whereIn('status', ['Accepted', 'Active']);
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Package Details',
             'action' => url('admin/package-details'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.package-details')->with($result);
@@ -509,18 +563,34 @@ class AdminController extends Controller
             'payment_date' => 'payment_date',
             'request_date' => 'request_date',
         ];
+        $memberId = trim((string) $request->query('member_id', ''));
+
         // 1st Tab: USDT
         $query = WithdrawalRequest::where([['status', 'Approved'], ['type', '!=', 'Airdrop Withdrawal'], ['type', '!=', 'Trading Withdrawal']]);
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'payment_date', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
         // 2nd Tab: PEPE Tokens Payment History
         $pepeQuery = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Airdrop Withdrawal']]);
+        if ($memberId !== '') {
+            $pepeQuery->where('memberid', $memberId);
+        }
         $pepeData = (clone $pepeQuery)->orderby('payment_date', 'desc')->get();
 
         // 3rd Tab: Trading Withdrawal History
         $tradingQuery = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Trading Withdrawal']]);
+        if ($memberId !== '') {
+            $tradingQuery->where('memberid', $memberId);
+        }
         $tradingData = (clone $tradingQuery)->orderby('payment_date', 'desc')->get();
+
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
 
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -529,6 +599,7 @@ class AdminController extends Controller
             'pepeSettings' => PepeSetting::getSettings(),
             'pageTitle' => 'Payment History',
             'action' => url('admin/payment-history'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.payment-history')->with($result);
@@ -544,18 +615,34 @@ class AdminController extends Controller
             'request_date' => 'request_date',
             'created_at' => 'created_at',
         ];
+        $memberId = trim((string) $request->query('member_id', ''));
+
         // 1st Tab: USDT Requests (exclude Exchange, PEPE, and Trading)
         $query = WithdrawalRequest::where([['status', 'Pending'], ['type', '!=', 'Exchange'], ['type', '!=', 'Airdrop Withdrawal'], ['type', '!=', 'Trading Withdrawal']]);
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'request_date', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
         // 2nd Tab: PEPE Tokens Redeem Requests
         $pepeQuery = WithdrawalRequest::where([['status', 'Pending'], ['type', 'Airdrop Withdrawal']]);
+        if ($memberId !== '') {
+            $pepeQuery->where('memberid', $memberId);
+        }
         $pepeData = (clone $pepeQuery)->orderby('created_at', 'desc')->get();
 
         // 3rd Tab: Trading Withdrawal Requests
         $tradingQuery = WithdrawalRequest::where([['status', 'Pending'], ['type', 'Trading Withdrawal']]);
+        if ($memberId !== '') {
+            $tradingQuery->where('memberid', $memberId);
+        }
         $tradingData = (clone $tradingQuery)->orderby('created_at', 'desc')->get();
+
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
 
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -563,6 +650,7 @@ class AdminController extends Controller
             'tradingData' => $tradingData,
             'pageTitle' => 'New Withdrawal Requests',
             'action' => route('admin.newWithdrawalRequest'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.new-withdrawal-request')->with($result);
@@ -579,18 +667,34 @@ class AdminController extends Controller
             'cancelled_date' => 'updated_at',
             'request_date' => 'request_date',
         ];
+        $memberId = trim((string) $request->query('member_id', ''));
+
         // 1st Tab: USDT Cancelled Requests
         $query = WithdrawalRequest::where([['status', 'Cancelled'], ['type', '!=', 'Airdrop Withdrawal'], ['type', '!=', 'Trading Withdrawal']]);
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'updated_at', $columnMapping);
         $filterMeta['dateOptions'] = $allowedColumns;
 
         // 2nd Tab: PEPE Tokens Cancelled Requests
         $pepeQuery = WithdrawalRequest::where([['status', 'Cancelled'], ['type', 'Airdrop Withdrawal']]);
+        if ($memberId !== '') {
+            $pepeQuery->where('memberid', $memberId);
+        }
         $pepeData = (clone $pepeQuery)->orderby('updated_at', 'desc')->get();
 
         // 3rd Tab: Trading Withdrawal Cancelled Requests
         $tradingQuery = WithdrawalRequest::where([['status', 'Cancelled'], ['type', 'Trading Withdrawal']]);
+        if ($memberId !== '') {
+            $tradingQuery->where('memberid', $memberId);
+        }
         $tradingData = (clone $tradingQuery)->orderby('updated_at', 'desc')->get();
+
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
 
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -598,6 +702,7 @@ class AdminController extends Controller
             'tradingData' => $tradingData,
             'pageTitle' => 'Cancelled Withdrawal Requests',
             'action' => url('admin/cancelled-request'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.cancelled-request')->with($result);
@@ -712,12 +817,21 @@ class AdminController extends Controller
 
     public function transaction(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = WalletTransfer::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Transactions',
             'action' => url('admin/transaction'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.transaction')->with($result);
@@ -1141,9 +1255,15 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
-    public function notification()
+    public function notification(Request $request)
     {
-        $result['data'] = Notification::orderBy('created_at', 'desc')->get();
+        $memberId = trim((string) $request->query('member_id', ''));
+        $query = Notification::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
+        $result['data'] = $query->orderBy('created_at', 'desc')->get();
+        $result['memberId'] = $memberId;
 
         return view('admin.notification')->with($result);
     }
@@ -1232,12 +1352,21 @@ class AdminController extends Controller
 
     public function roiInc(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = StakingIncome::where('status', 'Paid');
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Income',
             'action' => url('admin/income/roi-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.roi-incomes')->with($result);
@@ -1245,12 +1374,21 @@ class AdminController extends Controller
 
     public function stakingIncomes(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = StakingIncome::where('status', 'Paid');
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Income',
             'action' => url('admin/incomes/staking-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.roi-incomes')->with($result);
@@ -1258,12 +1396,21 @@ class AdminController extends Controller
 
     public function roiDetails(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = StakingDetail::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'invest_date', ['invest_date' => 'invest_date', 'created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Details',
             'action' => url('admin/income/roi-details'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.roi-details')->with($result);
@@ -1271,12 +1418,21 @@ class AdminController extends Controller
 
     public function stakingDetails(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = StakingDetail::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'invest_date', ['invest_date' => 'invest_date', 'created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Details',
             'action' => url('admin/incomes/staking-details'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.roi-details')->with($result);
@@ -1284,12 +1440,21 @@ class AdminController extends Controller
 
     public function levelInc(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = LevelIncome::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Level Income',
             'action' => url('admin/income/level-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.level-incomes')->with($result);
@@ -1297,12 +1462,21 @@ class AdminController extends Controller
 
     public function teamWithInc(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = WithdrawalIncome::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Team Withdrawal Commission',
             'action' => url('admin/income/team-withdrawal-commission-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.team-commission-incomes')->with($result);
@@ -1310,12 +1484,21 @@ class AdminController extends Controller
 
     public function levelIncomes(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = LevelIncome::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Level Incomes',
             'action' => url('admin/incomes/level-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.level-incomes')->with($result);
@@ -1323,12 +1506,21 @@ class AdminController extends Controller
 
     public function stakLevelInc(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = RoiLevelIncome::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Staking Level Income',
             'action' => url('admin/income/staking-level-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.staking-level-incomes')->with($result);
@@ -1336,12 +1528,21 @@ class AdminController extends Controller
 
     public function singleLegInc(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = SingleLegIncome::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Single Leg Income',
             'action' => url('admin/income/single-leg-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.singleleg-incomes')->with($result);
@@ -1349,12 +1550,21 @@ class AdminController extends Controller
 
     public function directIncomes(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = DirectIncome::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Referral Bonus',
             'action' => url('admin/income/referral-bonus'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.direct-incomes')->with($result);
@@ -1362,12 +1572,21 @@ class AdminController extends Controller
 
     public function heroRewards(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = HeroOfTheMonthReward::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Hero of the Month Rewards',
             'action' => url('admin/income/hero-of-the-month'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.hero-rewards')->with($result);
@@ -1375,12 +1594,21 @@ class AdminController extends Controller
 
     public function partnershipInc(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = PartnershipIncome::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'date', ['date' => 'date', 'created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Partnership Income',
             'action' => url('admin/income/partnership-incomes'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.partnership-incomes')->with($result);
@@ -1388,12 +1616,21 @@ class AdminController extends Controller
 
     public function partnershipDetails(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = PartnershipDetail::query();
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'invest_date', ['invest_date' => 'invest_date', 'created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Partnership Details',
             'action' => url('admin/income/partnership-details'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.income.partnership-details')->with($result);
@@ -1448,6 +1685,7 @@ class AdminController extends Controller
             'to_date' => 'nullable|date_format:Y-m-d|after_or_equal:from_date',
             'date_field' => 'nullable|string',
             'date_type' => 'nullable|string',
+            'member_id' => 'nullable|string|max:100',
         ], [
             'filter_date.date_format' => 'The filter date must be a valid date in YYYY-MM-DD format.',
             'from_date.date_format' => 'The From Date must be a valid date in YYYY-MM-DD format.',
@@ -1584,12 +1822,21 @@ class AdminController extends Controller
 
     public function importFundDetails(Request $request)
     {
+        $memberId = trim((string) $request->query('member_id', ''));
         $query = ImportFund::where('added_by', '!=', 'Admin');
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
+        if ($memberId !== '') {
+            $filterMeta['filterActive'] = true;
+            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+        }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Import Fund Details',
             'action' => url('admin/funds/import-fund-details'),
+            'showMemberIdFilter' => true,
         ]);
 
         return view('admin.funds.import-fund-details')->with($result);

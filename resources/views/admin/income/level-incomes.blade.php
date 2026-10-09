@@ -1,5 +1,5 @@
 @extends('admin.layouts.main')
-@section('title', 'Level Income')
+@section('title', 'Daily Team Investment Share')
 @section('content')
     @push('head')
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.css') }}">
@@ -33,7 +33,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                @include('admin.partials.history-date-filter')
+                @include('admin.partials.history-date-filter', ['showMemberIdFilter' => true])
                 
                 @if (session()->has('wMessage'))
                     <div class="alert alert-primary">{{ session('wMessage') }}</div>
