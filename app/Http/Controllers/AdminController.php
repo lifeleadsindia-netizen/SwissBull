@@ -438,7 +438,7 @@ class AdminController extends Controller
 
     public function addFundsDetails(Request $request)
     {
-        $query = ImportFund::where('status', 'Approved');
+        $query = ImportFund::where([['status', 'Approved'],['added_by', 'Admin']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),

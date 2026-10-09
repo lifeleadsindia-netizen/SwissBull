@@ -111,17 +111,13 @@
                                                 <option value="">Select Investment Package</option>
                                                 @if ($currPkg < 1000)
                                                     <option value="1000">🥈 Silver – 1,000 USDT (2% Daily | Max 2,000 USDT)</option>
-                                                @endif
-                                                @if ($currPkg < 5000)
+                                                @elseif ($currPkg < 5000)
                                                     <option value="5000">🥇 Gold – 5,000 USDT (4% Daily | Max 20,000 USDT)</option>
-                                                @endif
-                                                @if ($currPkg < 10000)
+                                                @elseif ($currPkg < 10000)
                                                     <option value="10000">💜 Platinum – 10,000 USDT (6% Daily | Max 60,000 USDT)</option>
-                                                @endif
-                                                @if ($currPkg < 25000)
+                                                @elseif ($currPkg < 25000)
                                                     <option value="25000">💎 Diamond – 25,000 USDT (8% Daily | Max 200,000 USDT)</option>
-                                                @endif
-                                                @if ($currPkg >= 25000)
+                                                @else
                                                     <option value="" disabled selected>Highest Package Active (Diamond – 25,000 USDT)</option>
                                                 @endif
                                             </select>
