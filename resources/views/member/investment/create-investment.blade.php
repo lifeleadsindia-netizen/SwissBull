@@ -276,10 +276,10 @@
                                                 <th>#</th>
                                                 <th>Package Range</th>
                                                 <th>Invested</th>
-                                                <th>Daily ROI Rate</th>
+                                                <th>Trading Amount</th>
+                                                <th>Monthly ROI Rate</th>
                                                 <th>Max Cap Return</th>
                                                 <th>Earned</th>
-                                                <th>Remaining Cap</th>
                                                 <th>Installments</th>
                                                 <th>Status</th>
                                             </tr>
@@ -299,11 +299,11 @@
                                                         <small class="d-block text-white-50">{{ $stk->created_at ? $stk->created_at->format('d M Y') : '' }}</small>
                                                     </td>
                                                     <td class="text-warning font-weight-bold">${{ number_format((float) $stk->invest_amount, 2) }}</td>
-                                                    <td class="text-success"><i class="fa-solid fa-bolt me-1"></i>+ {{ $stk->getDailyRate() }}% / day</td>
+                                                    <td class="text-warning font-weight-bold">${{ number_format((float) $stk->trading_wallet_amount, 2) }}</td>
+                                                    <td class="text-success"><i class="fa-solid fa-bolt me-1"></i>+ {{ $stk->getDailyRate() }}% </td>
                                                     <td class="text-white">${{ number_format($maxRoi, 2) }} ({{ number_format($cPercent, 0) }}%)</td>
                                                     <td class="text-info">${{ number_format($earned, 2) }}</td>
-                                                    <td class="text-white-50">${{ number_format($remaining, 2) }}</td>
-                                                    <td>{{ $stk->installments }} / {{ $stk->total_installments ?: 1200 }}</td>
+                                                    <td>{{ $stk->installments }}</td>
                                                     <td>
                                                         @if ($stk->status === 'Active')
                                                             <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">Active</span>
