@@ -53,7 +53,7 @@ class InvestmentController extends Controller
 
         return view('member.investment.create-investment', $result);
     }
-
+    
     public function createInvestment(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -193,15 +193,10 @@ class InvestmentController extends Controller
         }
 
         $distributionConfig = PackageDistribution::getDistributionConfig();
-        $globalTradingPercent = (float) ($distributionConfig['trading_wallet'] ?? $distributionConfig['p2p_wallet'] ?? 70.0);
+        $globalTradingPercent = (float) ($distributionConfig['trading_wallet']);
         $globalCappingPercent = MonthlyTradingProfitConfiction::getCappingPercent();
         $configuredRate = $plan ? MonthlyTradingProfitConfiction::getRateForPackage($plan->id) : 0.0;
-
-        if ($plan && $plan->trading_wallet_percent && (float) $plan->trading_wallet_percent !== 70.0) {
-            $tradingWalletPercent = (float) $plan->trading_wallet_percent;
-        } else {
-            $tradingWalletPercent = $globalTradingPercent > 0 ? $globalTradingPercent : 70.0;
-        }
+        $tradingWalletPercent = (float) $plan->trading_wallet_percent;
 
         $returnPercent = $configuredRate > 0
             ? $configuredRate

@@ -96,17 +96,27 @@
             <a href="{{ url('admin/notification') }}"><i class="ik ik-bell"></i><span>Notification</span> </a>
         </div>
 
-        <div class="nav-item {{ $isPlanConfig ? 'active open' : '' }} has-sub">
-            <a href="#"><i class="ik ik-sliders"></i><span>{{ __('Plan & Income') }}<br>{{ __('Configuration') }}</span></a>
-            <div class="submenu-content">
-                <a href="{{ route('admin.setPackages') }}" class="menu-item {{ (request()->is('admin/set-packages*', 'admin/set_packages*') || request()->routeIs('admin.setPackages', 'admin.savePackages')) ? 'active' : '' }}">{{ __('Set Packages') }}</a>
-                <a href="{{ route('admin.tradingWalletControl') }}" class="menu-item {{ (request()->is('admin/trading-wallet-control*', 'admin/apply-trading-wallet-control*') || request()->routeIs('admin.tradingWalletControl', 'admin.applyTradingWalletControl')) ? 'active' : '' }}">{{ __('Trading Wallet Control') }}</a>
-                <a href="{{ route('admin.monthlyTradingProfit') }}" class="menu-item {{ (request()->is('admin/monthly-trading-profit*', 'admin/monthly_trading_profit*', 'admin/save-monthly-trading-profit*') || request()->routeIs('admin.monthlyTradingProfit', 'admin.saveMonthlyTradingProfit')) ? 'active' : '' }}">{{ __('Monthly Trading Profit') }}</a>
-                <a href="{{ route('admin.referralBonus') }}" class="menu-item {{ (request()->is('admin/referral-bonus*', 'admin/referral_bonus*', 'admin/save-referral-bonus*') || request()->routeIs('admin.referralBonus', 'admin.saveReferralBonus')) ? 'active' : '' }}">{{ __('Referral Bonus') }}</a>
-                <a href="{{ route('admin.teamTradingProfit') }}" class="menu-item {{ (request()->is('admin/team-trading-profit*', 'admin/team_trading_profit*', 'admin/save-team-trading-profit*') || request()->routeIs('admin.teamTradingProfit', 'admin.saveTeamTradingProfit')) ? 'active' : '' }}">{{ __('Team Trading Profit') }}</a>
-                <a href="{{ route('admin.dailyTeamInvestmentShare') }}" class="menu-item {{ (request()->is('admin/daily-team-investment-share*', 'admin/daily_team_investment_share*', 'admin/save-daily-team-investment-share*') || request()->routeIs('admin.dailyTeamInvestmentShare', 'admin.saveDailyTeamInvestmentShare')) ? 'active' : '' }}">{{ __('Daily Team Investment Share') }}</a>
-            </div>
-        </div>
+                <div class="nav-item {{ $isPlanConfig ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-sliders"></i><span>{{ __('Plan & Income') }}<br>{{ __('Configuration') }}</span></a>
+                    <div class="submenu-content">
+                        <a href="{{ route('admin.setPackages') }}" class="menu-item {{ (request()->is('admin/set-packages*', 'admin/set_packages*') || request()->routeIs('admin.setPackages', 'admin.savePackages')) ? 'active' : '' }}">{{ __('Set Packages') }}</a>
+                        <a href="{{ route('admin.referralBonus') }}" class="menu-item {{ (request()->is('admin/referral-bonus*', 'admin/referral_bonus*', 'admin/save-referral-bonus*') || request()->routeIs('admin.referralBonus', 'admin.saveReferralBonus')) ? 'active' : '' }}">{{ __('Referral Bonus') }}</a>
+                        <a href="{{ route('admin.teamTradingProfit') }}" class="menu-item {{ (request()->is('admin/team-trading-profit*', 'admin/team_trading_profit*', 'admin/save-team-trading-profit*') || request()->routeIs('admin.teamTradingProfit', 'admin.saveTeamTradingProfit')) ? 'active' : '' }}">{{ __('Team Trading Profit') }}</a>
+                        <a href="{{ route('admin.dailyTeamInvestmentShare') }}" class="menu-item {{ (request()->is('admin/daily-team-investment-share*', 'admin/daily_team_investment_share*', 'admin/save-daily-team-investment-share*') || request()->routeIs('admin.dailyTeamInvestmentShare', 'admin.saveDailyTeamInvestmentShare')) ? 'active' : '' }}">{{ __('Daily Team Investment Share') }}</a>
+                    </div>
+                </div>
+                
+                <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
+                <!--    <a href="{{ url('admin/setRate') }}"><i class="ik ik-sliders"></i><span>Set Rate</span> </a>-->
+                <!--</div>-->
+
+                <div class="nav-item {{ ($segment1 == 'whatsapp-messages' || $segment1 == 'whatsapp-reports') ? 'active open' : '' }} has-sub">
+                    <a href="#"><i class="ik ik-share-2"></i><span>{{ __('Marketing') }}</span></a>
+                    <div class="submenu-content">
+                        {{-- <a href="{{ url('admin/whatsapp-messages') }}" class="menu-item {{ ($segment1 == 'whatsapp-messages') ? 'active' : '' }}">{{ __('WhatsApp Messages') }}</a> --}}
+                        <a href="{{ url('admin/whatsapp-reports') }}" class="menu-item {{ ($segment1 == 'whatsapp-reports') ? 'active' : '' }}">{{ __('WhatsApp Reports') }}</a>
+                    </div>
+                </div>
 
         <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
         <!--    <a href="{{ url('admin/setRate') }}"><i class="ik ik-sliders"></i><span>Set Rate</span> </a>-->
