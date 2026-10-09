@@ -474,11 +474,7 @@ class AdminController extends Controller
 
     public function addFundsDetails(Request $request)
     {
-        $memberId = trim((string) $request->query('member_id', ''));
-        $query = ImportFund::where('status', 'Approved');
-        if ($memberId !== '') {
-            $query->where('memberid', $memberId);
-        }
+        $query = ImportFund::where([['status', 'Approved'],['added_by', 'Admin']]);
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
