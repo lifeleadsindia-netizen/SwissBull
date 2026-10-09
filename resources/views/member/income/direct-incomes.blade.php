@@ -27,6 +27,7 @@
                             <th>S.No</th>
                             <th>Date</th>
                             <th>Member ID</th>
+                            <th>Level</th>
                             <th>From Member</th>
                             <th>Package Amount</th>
                             <th>Rate</th>
@@ -41,12 +42,15 @@
                             @php
                                 $pkg = (float) ($list['package'] ?? 0);
                                 $amt = (float) ($list['amount'] ?? 0);
-                                $rate = $pkg > 0 ? round(($amt / $pkg) * 100, 1) : 0;
+                                $storedRate = isset($list['rate']) && $list['rate'] !== null && (float) $list['rate'] > 0 ? (float) $list['rate'] : null;
+                                $rate = $storedRate ?? ($pkg > 0 ? round(($amt / $pkg) * 100, 1) : 0);
+                                $levelNum = $list['level'] ?? 1;
                             @endphp
                             <tr>
                                 <td>{{ $i }}</td>
                                 <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}</td>
                                 <td>{{ $list['memberid'] }}</td>
+                                <td><span class="badge bg-info text-white">Level {{ $levelNum }}</span></td>
                                 <td>{{ $list['activatingid'] ?? 'N/A' }} ({{ $list['name'] ?? '' }})</td>
                                 <td>$ {{ number_format($pkg, 2) }}</td>
                                 <td>{{ $rate > 0 ? $rate.'%' : 'Standard' }}</td>

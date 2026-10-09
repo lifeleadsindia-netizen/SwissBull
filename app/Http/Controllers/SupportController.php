@@ -88,9 +88,18 @@ class SupportController extends Controller
         return redirect()->back();
     }
 
-    public function newSupport()
+    public function newSupport(Request $request)
     {
-        $result['support'] = SupportTicket::where('support_status', 'New')->get();
+        $memberId = trim((string) $request->query('member_id', ''));
+        $query = SupportTicket::where('support_status', 'New');
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
+        $result['support'] = $query->orderBy('created_at', 'desc')->get();
+        $result['showMemberIdFilter'] = true;
+        $result['filterActive'] = ($memberId !== '');
+        $result['filterSummary'] = ($memberId !== '') ? 'Member: '.$memberId : null;
+        $result['action'] = url('admin/support/new-support-ticket');
 
         return view('admin.support.new-support-ticket')->with($result);
     }
@@ -131,9 +140,18 @@ class SupportController extends Controller
         return redirect()->back();
     }
 
-    public function closeSupport()
+    public function closeSupport(Request $request)
     {
-        $result['support'] = SupportTicket::where('status', 'Closed')->get();
+        $memberId = trim((string) $request->query('member_id', ''));
+        $query = SupportTicket::where('status', 'Closed');
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
+        $result['support'] = $query->orderBy('created_at', 'desc')->get();
+        $result['showMemberIdFilter'] = true;
+        $result['filterActive'] = ($memberId !== '');
+        $result['filterSummary'] = ($memberId !== '') ? 'Member: '.$memberId : null;
+        $result['action'] = url('admin/support/close-support-ticket');
 
         return view('admin.support.closed-support-ticket')->with($result);
     }
@@ -156,9 +174,18 @@ class SupportController extends Controller
         return view('admin.support.view-closed-ticket')->with($result);
     }
 
-    public function openSupport()
+    public function openSupport(Request $request)
     {
-        $result['support'] = SupportTicket::where([['support_status', 'Replied'], ['status', 'Open']])->get();
+        $memberId = trim((string) $request->query('member_id', ''));
+        $query = SupportTicket::where([['support_status', 'Replied'], ['status', 'Open']]);
+        if ($memberId !== '') {
+            $query->where('memberid', $memberId);
+        }
+        $result['support'] = $query->orderBy('created_at', 'desc')->get();
+        $result['showMemberIdFilter'] = true;
+        $result['filterActive'] = ($memberId !== '');
+        $result['filterSummary'] = ($memberId !== '') ? 'Member: '.$memberId : null;
+        $result['action'] = url('admin/support/open-support-ticket');
 
         return view('admin.support.open-support-ticket')->with($result);
     }

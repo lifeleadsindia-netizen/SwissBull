@@ -69,8 +69,8 @@
                     <div class="row mb-4">
                         <div class="col-12">
                             <div class="card shadow-sm border-0">
-                                <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between">
-                                    <h5 class="mb-0 text-white font-weight-bold">
+                                <div class="card-header bg-dark  d-flex align-items-center justify-content-between">
+                                    <h5 class="mb-0 text-black font-weight-bold">
                                         <i class="ik ik-shield mr-2"></i>{{ __('Monthly Trading Profit Capping (%)') }}
                                     </h5>
                                     <span class="badge badge-success font-weight-bold">{{ __('Capping Limit') }}</span>

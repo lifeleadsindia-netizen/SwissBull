@@ -26,11 +26,11 @@
                                         <th>S.No.</th>
                                         <th>Invest Date</th>
                                         <th>Invest Amount</th>
-                                        <th>Daily ROI Rate</th>
+                                        <th>Trading Amount</th>
+                                        <th> ROI Rate</th>
                                         <th>Cap %</th>
                                         <th>Max ROI</th>
                                         <th>Earned</th>
-                                        <th>Remaining</th>
                                         <th>Installments</th>
                                         <th>Status</th>
                                     </tr>
@@ -49,11 +49,11 @@
                                             <td>{{ $i }}</td>
                                             <td> {{ date('d-m-Y', strtotime($list['invest_date'])) }}</td>
                                             <td>$ {{ number_format((float) $list['invest_amount'], 2) }}</td>
+                                            <td>$ {{ number_format((float) $list['trading_wallet_amount'], 2) }}</td>
                                             <td>{{ $item ? $item->getDailyRate() : $list['rate'] }}%</td>
                                             <td>{{ number_format($capPercent, 1) }}%</td>
                                             <td>$ {{ number_format($maxAmt, 2) }}</td>
                                             <td>$ {{ number_format($earned, 2) }}</td>
-                                            <td>$ {{ number_format($rem, 2) }}</td>
                                             <td>{{ $list['installments'] }}</td>
                                             <td>
                                                 @if ($list['status'] == 'Active')
