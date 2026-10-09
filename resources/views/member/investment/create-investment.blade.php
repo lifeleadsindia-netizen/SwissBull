@@ -97,7 +97,7 @@
                                                             data-min="{{ $plan->min_amount }}"
                                                             data-max="{{ $plan->max_amount ?? '' }}"
                                                             data-rate="{{ $plan->return_percent }}"
-                                                            data-cap="{{ $plan->max_return_percent }}"
+                                                            data-cap="{{ $plan->max_return_percent ?? ($globalCappingPercent ?? 200) }}"
                                                             data-lock="{{ $plan->lock_days }}"
                                                             data-trading-percent="{{ $plan->trading_wallet_percent ?: ($globalTradingPercent ?? 65) }}">
                                                              ({{ $plan->package_range }} USDT) — {{ $plan->return_percent }}% Daily ROI
@@ -348,7 +348,8 @@
                 const min = parseFloat(selectedOption.getAttribute('data-min')) || 50;
                 const max = selectedOption.getAttribute('data-max') ? parseFloat(selectedOption.getAttribute('data-max')) : null;
                 const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 5;
-                const cap = parseFloat(selectedOption.getAttribute('data-cap')) || 200;
+                const configuredCap = parseFloat(selectedOption.getAttribute('data-cap'));
+                const cap = Number.isFinite(configuredCap) ? configuredCap : {{ $globalCappingPercent ?? 200 }};
                 const tradingPercent = parseFloat(selectedOption.getAttribute('data-trading-percent')) || {{ $globalTradingPercent ?? 65 }};
 
                 // Dynamically update all mentions of trading wallet percent on the page

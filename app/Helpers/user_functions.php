@@ -15,7 +15,7 @@ use App\Models\WithdrawalRequest;
 
 function userId()
 {
-    $userid = 'MW'.rand(1000000, 9999999);
+    $userid = 'ST'.rand(1000000, 9999999);
     $member = MemberDetail::where('memberid', $userid)->count();
     if ($member > 0) {
         userId();
@@ -56,7 +56,7 @@ function updateDownline($sponsorid)
 
 function updateUpline($sponsorid, $memberid)
 {
-    if ($memberid != 'MW1234567') {
+    if ($memberid != 'ST1234567') {
         $pool = UplineMember::where('memberid', $sponsorid)->first();
         $var = new UplineMember;
         $var->memberid = $memberid;
