@@ -105,13 +105,13 @@
                                                     @endforeach
                                                 @else
                                                     <option value="50-500" data-min="50" data-max="500" data-rate="5" data-cap="{{ $globalCappingPercent ?? 200 }}" data-lock="90" data-trading-percent="{{ $globalTradingPercent ?? 65 }}">
-                                                        Package 1 (50 - 500 USDT) — 5% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
+                                                        Package 1 (50 - 500 USDT) — {{ $plan->return_percent }}% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
                                                     </option>
                                                     <option value="600-5000" data-min="600" data-max="5000" data-rate="7" data-cap="{{ $globalCappingPercent ?? 200 }}" data-lock="90" data-trading-percent="{{ $globalTradingPercent ?? 65 }}">
-                                                        Package 2 (600 - 5000 USDT) — 7% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
+                                                        Package 2 (600 - 5000 USDT) — {{ $plan->return_percent }}% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
                                                     </option>
                                                     <option value="6000+" data-min="6000" data-max="" data-rate="10" data-cap="{{ $globalCappingPercent ?? 200 }}" data-lock="90" data-trading-percent="{{ $globalTradingPercent ?? 65 }}">
-                                                        Package 3 (6000+ USDT) — 10% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
+                                                        Package 3 (6000+ USDT) — {{ $plan->return_percent }}% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
                                                     </option>
                                                 @endif
                                             </select>
