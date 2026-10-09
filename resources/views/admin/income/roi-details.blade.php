@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-md-12">
                 @include('admin.partials.history-date-filter', ['showMemberIdFilter' => true])
-                
+
                 @if (session()->has('wMessage'))
                     <div class="alert alert-primary">{{ session('wMessage') }}</div>
                 @endif
@@ -50,12 +50,9 @@
                                         <th>{{ __('S.No') }}</th>
                                         <th>{{ __('Invest Date') }}</th>
                                         <th>{{ __('Member ID') }}</th>
+                                        <th>{{ __('Package Range') }}</th>
                                         <th>{{ __('Invest Amount') }}</th>
-                                        <th>{{ __('Rate') }}</th>
-                                        <th>{{ __('Capping %') }}</th>
-                                        <th>{{ __('Max ROI') }}</th>
-                                        <th>{{ __('Earned') }}</th>
-                                        <th>{{ __('Remaining') }}</th>
+                                        <th>{{ __('Txnid') }}</th>
                                         <th>{{ __('Installments') }}</th>
                                         <th>{{ __('Status') }}</th>
                                     </tr>
@@ -63,24 +60,22 @@
                                 <tbody>
                                     @php $i = 1;  @endphp
                                     @foreach ($data as $list)
-                                        @php
-                                            $item = $list instanceof \App\Models\StakingDetail ? $list : \App\Models\StakingDetail::find($list['id']);
-                                            $capPercent = $item ? $item->getCappingPercent() : ($list['capping_percent'] ?? 200.0);
-                                            $maxAmt = $item ? $item->getMaxRoiAmount() : ((float) $list['invest_amount'] * ($capPercent / 100));
-                                            $earned = $item ? $item->getTotalEarned() : (float) ($list['total_earned'] ?? 0);
-                                            $rem = max(0.00, round($maxAmt - $earned, 2));
-                                        @endphp
                                         <tr>
                                             <td>{{ $i }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($list['invest_date'])) }}</td>
+                                            <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}</td>
                                             <td>{{ $list['memberid'] }}</td>
+                                            <td>
+                                                @if ($list->package == 'Package1')
+                                                    <span>$50 - $500</span>
+                                                @elseif ($list->package == 'Package2')
+                                                    <span>$600 - $5000</span>
+                                                @else
+                                                    <span>$6000</span>
+                                                @endif
+                                            </td>
                                             <td>$ {{ number_format($list['invest_amount'], 2) }}</td>
-                                            <td>{{ $item ? $item->getDailyRate() : $list['rate'] }}%</td>
-                                            <td>{{ number_format($capPercent, 1) }}%</td>
-                                            <td>$ {{ number_format($maxAmt, 2) }}</td>
-                                            <td>$ {{ number_format($earned, 2) }}</td>
-                                            <td>$ {{ number_format($rem, 2) }}</td>
-                                            <td>{{ $list['installments'] }} / {{ $list['total_installments'] }}</td>
+                                            <td>{{ $list['txnid'] }}</td>
+                                            <td>{{ $list['installments'] }}</td>
                                             <td>
                                                 @if ($list['status'] == 'Active')
                                                     <label class="badge badge-success">{{ $list['status'] }}</label>

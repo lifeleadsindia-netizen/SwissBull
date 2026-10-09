@@ -9,10 +9,15 @@
             <div class="staking-hero mb-4 mb-md-5">
                 <div class="staking-eyebrow">Staking &amp; Trading Packages</div>
                 <h1>Activate Staking Package</h1>
-                <p>Stake directly from your Fund Wallet (P2P Wallet). <strong><span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 65 }}%</span> of the package amount</strong> is credited directly to your Trading Wallet to earn daily trading profits.</p>
+                <p>Stake directly from your Fund Wallet. <strong><span
+                            class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span> of the package
+                        amount</strong> is credited directly to your Trading Wallet to earn daily trading profits.</p>
                 <div class="sk-hero-chips">
-                    <div class="sk-chip"><i class="fa-solid fa-wallet"></i> Funded from P2P Wallet</div>
-                    <div class="sk-chip"><i class="fa-solid fa-chart-line"></i> <span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 65 }}%</span> to Trading Wallet</div>
+                    <div class="sk-chip"><i class="fa-solid fa-wallet"></i> Funded from Fund Wallet</div>
+                    <div class="sk-chip"><i class="fa-solid fa-chart-line"></i> <span
+                            class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span> to Trading
+                        Wallet
+                    </div>
                     <div class="sk-chip"><i class="fa-solid fa-bolt"></i> Daily Trading ROI</div>
                 </div>
             </div>
@@ -24,12 +29,14 @@
                 <div class="col-xl-7 col-lg-7">
 
                     @if (session()->has('successMsg'))
-                        <div class="alert alert-success mb-3" role="alert" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10B981; border-radius: 12px;">
+                        <div class="alert alert-success mb-3" role="alert"
+                            style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10B981; border-radius: 12px;">
                             <i class="fa-solid fa-circle-check me-2"></i>{{ session('successMsg') }}
                         </div>
                     @endif
                     @if (session()->has('failedMsg'))
-                        <div class="alert alert-danger mb-3" role="alert" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #EF4444; border-radius: 12px;">
+                        <div class="alert alert-danger mb-3" role="alert"
+                            style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #EF4444; border-radius: 12px;">
                             <i class="fa-solid fa-circle-xmark me-2"></i>{{ session('failedMsg') }}
                         </div>
                     @endif
@@ -72,12 +79,17 @@
 
                                     {{-- Fund Wallet Balance Notice --}}
                                     <div class="col-md-12">
-                                        <div class="p-3 rounded d-flex align-items-center justify-content-between" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px;">
+                                        <div class="p-3 rounded d-flex align-items-center justify-content-between"
+                                            style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px;">
                                             <div>
-                                                <small class="text-white-50 text-uppercase d-block" style="font-size: 11px; letter-spacing: 0.5px;">Fund Wallet Balance (P2P Wallet)</small>
-                                                <span class="text-warning font-weight-bold" style="font-size: 18px;">${{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }} USDT</span>
+                                                <small class="text-white-50 text-uppercase d-block"
+                                                    style="font-size: 11px; letter-spacing: 0.5px;">Fund Wallet Balance</small>
+                                                <span class="text-warning font-weight-bold"
+                                                    style="font-size: 18px;">${{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }}
+                                                    USDT</span>
                                             </div>
-                                            <a href="{{ url('member/fund/deposit-fund') }}" class="btn btn-sm" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px;">
+                                            <a href="{{ url('member/fund/deposit-fund') }}" class="btn btn-sm"
+                                                style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 8px;">
                                                 <i class="fa-solid fa-plus me-1"></i>Deposit Fund
                                             </a>
                                         </div>
@@ -89,31 +101,24 @@
                                             <i class="fa-solid fa-layer-group me-1"></i> Select Staking Package
                                         </label>
                                         <div class="input-group mb-2">
-                                            <select class="form-select staking-input staking-select" id="package" name="package" required>
+                                            <select class="form-select staking-input staking-select" id="package"
+                                                name="package" required>
                                                 <option value="" selected disabled>Select Package</option>
-                                                @if(isset($packagePlans) && $packagePlans->count() > 0)
-                                                    @foreach($packagePlans as $plan)
-                                                        <option value="{{ $plan->package_range }}"
-                                                            data-min="{{ $plan->min_amount }}"
-                                                            data-max="{{ $plan->max_amount ?? '' }}"
-                                                            data-rate="{{ $plan->return_percent }}"
-                                                            data-cap="{{ $plan->max_return_percent }}"
-                                                            data-lock="{{ $plan->lock_days }}"
-                                                            data-trading-percent="{{ $plan->trading_wallet_percent ?: ($globalTradingPercent ?? 65) }}">
-                                                             ({{ $plan->package_range }} USDT) — {{ $plan->return_percent }}% Daily ROI
-                                                        </option>
-                                                    @endforeach
-                                                @else
-                                                    <option value="50-500" data-min="50" data-max="500" data-rate="5" data-cap="{{ $globalCappingPercent ?? 200 }}" data-lock="90" data-trading-percent="{{ $globalTradingPercent ?? 65 }}">
-                                                        Package 1 (50 - 500 USDT) — 5% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
-                                                    </option>
-                                                    <option value="600-5000" data-min="600" data-max="5000" data-rate="7" data-cap="{{ $globalCappingPercent ?? 200 }}" data-lock="90" data-trading-percent="{{ $globalTradingPercent ?? 65 }}">
-                                                        Package 2 (600 - 5000 USDT) — 7% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
-                                                    </option>
-                                                    <option value="6000+" data-min="6000" data-max="" data-rate="10" data-cap="{{ $globalCappingPercent ?? 200 }}" data-lock="90" data-trading-percent="{{ $globalTradingPercent ?? 65 }}">
-                                                        Package 3 (6000+ USDT) — 10% Daily ROI, {{ $globalCappingPercent ?? 200 }}% Cap
-                                                    </option>
-                                                @endif
+                                                <option value="Package1" data-min="50" data-max="500"
+                                                    data-rate="{{ $packageDistribution->package_1_rate }}"
+                                                    data-cap="{{ $packageDistribution->capping }}"
+                                                    data-trading-percent="{{ $packageDistribution->trading_wallet }}">$50 -
+                                                    $500</option>
+                                                <option value="Package2" data-min="600" data-max="5000"
+                                                    data-rate="{{ $packageDistribution->package_2_rate }}"
+                                                    data-cap="{{ $packageDistribution->capping }}"
+                                                    data-trading-percent="{{ $packageDistribution->trading_wallet }}">$600
+                                                    - $5000</option>
+                                                <option value="Package3" data-min="6000" data-max=""
+                                                    data-rate="{{ $packageDistribution->package_3_rate }}"
+                                                    data-cap="{{ $packageDistribution->capping }}"
+                                                    data-trading-percent="{{ $packageDistribution->trading_wallet }}">$6000
+                                                    Above</option>
                                             </select>
                                         </div>
                                         @error('package')
@@ -127,12 +132,15 @@
                                             <i class="fa-solid fa-dollar-sign me-1"></i> Staking Amount (USDT)
                                         </label>
                                         <div class="input-group">
-                                            <span class="input-group-text" style="background: #08090C; border-color: rgba(245, 158, 11, 0.2); color: #F59E0B;"><i class="fa-solid fa-dollar-sign"></i></span>
-                                            <input type="number" step="any" class="form-control staking-input" id="amount"
-                                                name="amount" placeholder="Select a package first" required min="50"
-                                                value="{{ old('amount') }}">
+                                            <span class="input-group-text"
+                                                style="background: #08090C; border-color: rgba(245, 158, 11, 0.2); color: #F59E0B;"><i
+                                                    class="fa-solid fa-dollar-sign"></i></span>
+                                            <input type="number" step="any" class="form-control staking-input"
+                                                id="amount" name="amount" placeholder="Select a package first" required
+                                                min="50" value="{{ old('amount') }}">
                                         </div>
-                                        <div id="amount-hint" class="mt-2" style="font-size: 12px; display: none;"></div>
+                                        <div id="amount-hint" class="mt-2" style="font-size: 12px; display: none;">
+                                        </div>
                                         @error('amount')
                                             <span class="text-danger d-block mt-1"> {{ $message }}</span>
                                         @enderror
@@ -140,22 +148,38 @@
 
                                     {{-- Live Calculation Preview --}}
                                     <div class="col-md-12" id="preview-container" style="display: none;">
-                                        <div class="p-3 rounded" style="background: rgba(12, 14, 20, 0.95); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px;">
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
-                                                <span class="text-white-50 small"><i class="fa-solid fa-arrow-right-from-bracket text-warning me-1"></i> Deducted From Fund Wallet:</span>
+                                        <div class="p-3 rounded"
+                                            style="background: rgba(12, 14, 20, 0.95); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2"
+                                                style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+                                                <span class="text-white-50 small"><i
+                                                        class="fa-solid fa-arrow-right-from-bracket text-warning me-1"></i>
+                                                    Deducted From Fund Wallet:</span>
                                                 <strong id="preview-staked-amount" class="text-white">$0.00 USDT</strong>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
-                                                <span class="text-white-50 small"><i class="fa-solid fa-chart-line text-success me-1"></i> <span id="preview-trading-label-percent">{{ $globalTradingPercent ?? 65 }}%</span> Credited to Trading Wallet:</span>
-                                                <strong id="preview-trading-amount" class="text-success font-weight-bold" style="font-size: 15px;"></strong>
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2"
+                                                style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+                                                <span class="text-white-50 small"><i
+                                                        class="fa-solid fa-chart-line text-success me-1"></i> <span
+                                                        id="preview-trading-label-percent">{{ $packageDistribution->trading_wallet }}%</span>
+                                                    Credited to Trading Wallet:</span>
+                                                <strong id="preview-trading-amount" class="text-success font-weight-bold"
+                                                    style="font-size: 15px;"></strong>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
-                                                <span class="text-white-50 small"><i class="fa-solid fa-bolt text-warning me-1"></i> Estimated Daily ROI:</span>
-                                                <span id="preview-roi-rate" class="text-warning font-weight-bold">0% / day</span>
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2"
+                                                style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+                                                <span class="text-white-50 small"><i
+                                                        class="fa-solid fa-bolt text-warning me-1"></i> Estimated Daily
+                                                    ROI:</span>
+                                                <span id="preview-roi-rate" class="text-warning font-weight-bold">0% /
+                                                    day</span>
                                             </div>
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <span class="text-white-50 small"><i class="fa-solid fa-trophy text-info me-1"></i> Maximum Capping Return:</span>
-                                                <strong id="preview-cap-amount" class="text-info font-weight-bold">$0.00 USDT</strong>
+                                                <span class="text-white-50 small"><i
+                                                        class="fa-solid fa-trophy text-info me-1"></i> Maximum Capping
+                                                    Return:</span>
+                                                <strong id="preview-cap-amount" class="text-info font-weight-bold">$0.00
+                                                    USDT</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -165,14 +189,19 @@
                                 {{-- Info Note --}}
                                 <div class="staking-note mt-4">
                                     <i class="fa-solid fa-circle-info"></i>
-                                    <span>Staking package is deducted from your <strong>Fund Wallet (P2P Wallet)</strong>. <strong><span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 65 }}%</span> of the amount</strong> is credited to your <strong>Trading Wallet</strong>. Multiple staking packages are supported — every package operates independently with its own individual returns, capping, and expiry.</span>
+                                    <span>Staking package is deducted from your <strong>Fund Wallet</strong>.
+                                        <strong><span
+                                                class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span>
+                                            of the amount</strong> is credited to your <strong>Trading Wallet</strong>.
+                                        Multiple staking packages are supported — every package operates independently with
+                                        its own individual returns, capping, and expiry.</span>
                                 </div>
 
                                 {{-- Footer Actions --}}
                                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mt-4 pt-2"
                                     style="border-top: 1px solid rgba(255,255,255,0.06);">
                                     <span class="sk-secure-txt">
-                                        <i class="fa-solid fa-shield-halved"></i> Internal P2P Wallet Transaction
+                                        <i class="fa-solid fa-shield-halved"></i> Internal Fund Wallet Transaction
                                     </span>
                                     <button type="submit" class="btn staking-btn" id="submitStakingBtn">
                                         <i class="fa-solid fa-bolt me-2"></i>Create Staking
@@ -190,22 +219,14 @@
                         {{-- Stat: Fund Wallet --}}
                         <div class="sk-stat-card mb-3">
                             <div class="sk-stat-top">
-                                <div class="sk-stat-label">Fund Wallet (P2P Wallet)</div>
+                                <div class="sk-stat-label">Fund Wallet</div>
                                 <div class="sk-stat-icon green"><i class="fa-solid fa-wallet"></i></div>
                             </div>
                             <div class="sk-stat-value">${{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }}</div>
                             <div class="sk-stat-sub">Available balance • Deducted on staking</div>
                         </div>
 
-                        {{-- Stat: Trading Wallet --}}
-                        <div class="sk-stat-card mb-3" style="border-color: rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(12, 14, 20, 0.95));">
-                            <div class="sk-stat-top">
-                                <div class="sk-stat-label">Trading Wallet</div>
-                                <div class="sk-stat-icon green" style="background: rgba(16, 185, 129, 0.2); color: #10B981;"><i class="fa-solid fa-chart-line"></i></div>
-                            </div>
-                            <div class="sk-stat-value text-success">${{ number_format((float) ($data['trading_wallet'] ?? 0), 2) }}</div>
-                            <div class="sk-stat-sub">Receives <span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 65 }}%</span> of every staked package</div>
-                        </div>
+
 
                         {{-- How it Works --}}
                         <div class="sk-howto-card">
@@ -225,15 +246,22 @@
                                 <div class="sk-step-num">2</div>
                                 <div class="sk-step-text">
                                     <strong>Stake Package</strong>
-                                    Select your package tier and enter your amount. The full package amount is deducted from your Fund Wallet.
+                                    Select your package tier and enter your amount. The full package amount is deducted from
+                                    your Fund Wallet.
                                 </div>
                             </div>
 
                             <div class="sk-step">
                                 <div class="sk-step-num">3</div>
                                 <div class="sk-step-text">
-                                    <strong><span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 65 }}%</span> Credited to Trading Wallet</strong>
-                                    <span class="dynamic-trading-percent">{{ $globalTradingPercent ?? 65 }}%</span> of your staked amount is credited to your Trading Wallet for 90 days.
+                                    <strong><span
+                                            class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span>
+                                        Credited to Trading Wallet</strong>
+                                    <span
+                                        class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span>
+                                    of
+                                    your staked amount is credited to your Trading Wallet for
+                                    {{ $packageDistribution->lock_days }} days.
                                 </div>
                             </div>
 
@@ -256,7 +284,8 @@
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card staking-card">
-                            <div class="card-header pb-0 border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div
+                                class="card-header pb-0 border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div class="sk-card-title d-flex align-items-center">
                                     <div class="sk-title-icon me-3"><i class="fa-solid fa-list-check"></i></div>
                                     <div>
@@ -264,7 +293,9 @@
                                         <span>Every package has individual returns, capping, and expiry</span>
                                     </div>
                                 </div>
-                                <a href="{{ route('Staking.details') }}" class="btn btn-sm btn-outline-warning text-uppercase px-3" style="font-size: 11px; border-radius: 8px;">
+                                <a href="{{ route('Staking.details') }}"
+                                    class="btn btn-sm btn-outline-warning text-uppercase px-3"
+                                    style="font-size: 11px; border-radius: 8px;">
                                     <i class="fa-solid fa-clock-rotate-left me-1"></i> Full History
                                 </a>
                             </div>
@@ -272,49 +303,55 @@
                                 <div class="table-responsive">
                                     <table class="table table-dark table-hover mb-0" style="background: transparent;">
                                         <thead>
-                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); font-size: 12px;">
+                                            <tr
+                                                style="border-bottom: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); font-size: 12px;">
                                                 <th>#</th>
+                                                <th>Date</th>
                                                 <th>Package Range</th>
                                                 <th>Invested</th>
-                                                <th>Trading Amount</th>
-                                                <th>Monthly ROI Rate</th>
-                                                <th>Max Cap Return</th>
-                                                <th>Earned</th>
+                                                <th>Txnid</th>
                                                 <th>Installments</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
                                         <tbody style="font-size: 13px;">
                                             @foreach ($activeStakings as $idx => $stk)
-                                                @php
-                                                    $cPercent = $stk->getCappingPercent();
-                                                    $maxRoi = $stk->getMaxRoiAmount();
-                                                    $earned = $stk->getTotalEarned();
-                                                    $remaining = max(0.00, round($maxRoi - $earned, 2));
-                                                @endphp
                                                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
                                                     <td class="text-white-50">{{ $idx + 1 }}</td>
                                                     <td>
-                                                        <span class="text-white font-weight-bold">{{ $stk->package }} USDT</span>
-                                                        <small class="d-block text-white-50">{{ $stk->created_at ? $stk->created_at->format('d M Y') : '' }}</small>
+                                                        <small
+                                                            class="d-block text-white-50">{{ $stk->created_at ? $stk->created_at->format('d M Y') : '' }}</small>
                                                     </td>
-                                                    <td class="text-warning font-weight-bold">${{ number_format((float) $stk->invest_amount, 2) }}</td>
-                                                    <td class="text-warning font-weight-bold">${{ number_format((float) $stk->trading_wallet_amount, 2) }}</td>
-                                                    <td class="text-success"><i class="fa-solid fa-bolt me-1"></i>+ {{ $stk->getDailyRate() }}% </td>
-                                                    <td class="text-white">${{ number_format($maxRoi, 2) }} ({{ number_format($cPercent, 0) }}%)</td>
-                                                    <td class="text-info">${{ number_format($earned, 2) }}</td>
+                                                    <td>
+                                                        @if ($stk->package == 'Package1')
+                                                            <span class="text-white font-weight-bold">$50 - $500</span>
+                                                        @elseif ($stk->package == 'Package2')
+                                                            <span class="text-white font-weight-bold">$600 - $5000</span>
+                                                        @else
+                                                            <span class="text-white font-weight-bold">$6000</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-warning font-weight-bold">
+                                                        ${{ number_format((float) $stk->invest_amount, 2) }}</td>
+                                                    <td class="text-warning font-weight-bold">
+                                                        {{ $stk->txnid }}</td>
                                                     <td>{{ $stk->installments }}</td>
                                                     <td>
                                                         @if ($stk->status === 'Active')
-                                                            <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">Active</span>
+                                                            <span class="badge"
+                                                                style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">Active</span>
                                                         @else
-                                                            <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 4px 8px;">Expired</span>
+                                                            <span class="badge"
+                                                                style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 4px 8px;">Expired</span>
                                                         @endif
                                                     </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
+                                </div>
+                                <div class="mt-3 text-center" style="font-size: 12px; color: rgba(255,255,255,0.4);">
+                                    <i class="fa-solid fa-circle-info me-1"></i> Only the latest 3 entries are shown here.
                                 </div>
                             </div>
                         </div>
@@ -325,7 +362,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const packageSelect = document.getElementById('package');
             const amountInput = document.getElementById('amount');
             const amountHint = document.getElementById('amount-hint');
@@ -346,10 +383,11 @@
 
                 const selectedOption = packageSelect.options[packageSelect.selectedIndex];
                 const min = parseFloat(selectedOption.getAttribute('data-min')) || 50;
-                const max = selectedOption.getAttribute('data-max') ? parseFloat(selectedOption.getAttribute('data-max')) : null;
-                const rate = parseFloat(selectedOption.getAttribute('data-rate')) || 5;
-                const cap = parseFloat(selectedOption.getAttribute('data-cap')) || 200;
-                const tradingPercent = parseFloat(selectedOption.getAttribute('data-trading-percent')) || {{ $globalTradingPercent ?? 65 }};
+                const max = selectedOption.getAttribute('data-max') ? parseFloat(selectedOption.getAttribute(
+                    'data-max')) : null;
+                let rate = parseFloat(selectedOption.getAttribute('data-rate')) || 0;
+                let cap = parseFloat(selectedOption.getAttribute('data-cap')) || 0;
+                let tradingPercent = parseFloat(selectedOption.getAttribute('data-trading-percent')) || 0;
 
                 // Dynamically update all mentions of trading wallet percent on the page
                 document.querySelectorAll('.dynamic-trading-percent').forEach(function(el) {
@@ -406,7 +444,12 @@
                 previewStaked.textContent = `$${val.toFixed(2)} USDT`;
                 previewTrading.textContent = `$${tradingWalletCredit} USDT (${tradingPercent}%)`;
                 previewRoi.textContent = `${rate}% Daily ROI`;
-                previewCap.textContent = `$${maxCapReturn} USDT (${cap}% Max)`;
+
+                if (cap === 0) {
+                    previewCap.textContent = `No Capping`;
+                } else {
+                    previewCap.textContent = `$${maxCapReturn} USDT (${cap}% Max)`;
+                }
                 previewContainer.style.display = 'block';
             }
 
