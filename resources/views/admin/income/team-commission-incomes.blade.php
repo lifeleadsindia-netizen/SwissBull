@@ -33,7 +33,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                @include('admin.partials.history-date-filter')
+                @include('admin.partials.history-date-filter', ['showMemberIdFilter' => true])
                 
                 @if (session()->has('wMessage'))
                 <div class="alert alert-primary">{{session('wMessage')}}</div>
@@ -43,8 +43,7 @@
                     <div class="card-body px-5 " style="overflow: auto">
                         <div class="responsive">
                             @php
-                                $withIncomes = \App\Models\WithdrawalIncome::orderby('created_at', 'desc')->get();
-                                $incomeList = $withIncomes->isNotEmpty() ? $withIncomes : ((isset($data) && count($data) > 0) ? $data : []);
+                                $incomeList = $data ?? [];
                             @endphp
                             <table id="data_table" class="table">
                                 <thead>

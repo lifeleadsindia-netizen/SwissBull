@@ -33,7 +33,7 @@
 
     <div class="row">
         <div class="col-md-12">
-                @include('admin.partials.history-date-filter')
+                @include('admin.partials.history-date-filter', ['showMemberIdFilter' => true])
                 
             @if (session()->has('update'))
                <div class="alert alert-primary">{{session('update')}}</div> 

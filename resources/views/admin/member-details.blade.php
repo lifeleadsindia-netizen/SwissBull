@@ -33,7 +33,7 @@
 
         <div class="row">
             <div class="col-md-12">
-                @include('admin.partials.history-date-filter')
+                @include('admin.partials.history-date-filter', ['showMemberIdFilter' => true])
                 
                 <div class="card">
                     <div class="card-header">
