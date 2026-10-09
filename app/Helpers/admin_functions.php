@@ -52,6 +52,13 @@ function totalFundWalletBalance()
     return $sum;
 }
 
+function totalTradingWalletBalance()
+{
+    $sum = MemberDetail::sum('trading_wallet');
+
+    return $sum;
+}
+
 function todaysWithdrawal()
 {
     $sum = WithdrawalRequest::where('status', 'Approved')->whereDate('payment_date', date('Y-m-d'))->sum('gross_amount');
@@ -388,11 +395,11 @@ function adminIncomeOverviewChartData($month = null, $year = null)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('amount')
             + (float) RoiLevelIncome::where('status', 'Paid')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('amount')
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->sum('amount')
             + (float) PartnershipIncome::where('status', 'Paid')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->sum('amount');
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->sum('amount');
 
         $totalGroup = $bar1 + $bar2 + $bar3;
         if ($totalGroup > $maxVal) {
@@ -443,4 +450,3 @@ function adminIncomeOverviewChartData($month = null, $year = null)
         'hasData' => ($maxVal > 0),
     ];
 }
-

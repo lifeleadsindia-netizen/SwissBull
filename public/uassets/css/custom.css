@@ -174,18 +174,19 @@ body,
 .nav-header .brand-logo .brand-logo-img {
     filter: none !important;
     transition: transform 0.25s ease !important;
-    max-height: 52px !important;
-    max-width: 175px !important;
+    max-height: 68px !important;
+    max-width: 220px !important;
     width: auto !important;
-    height: auto !important;
+    height: 66px !important;
     object-fit: contain !important;
     display: block !important;
     margin: 0 auto !important;
+    transform: translateY(2px) !important;
 }
 
 .nav-header .brand-logo:hover img,
 .nav-header .brand-logo:hover .brand-logo-img {
-    transform: scale(1.03) !important;
+    transform: translateY(2px) scale(1.03) !important;
 }
 
 .header,
@@ -778,9 +779,11 @@ body,
 
     .menu-toggle .nav-header .brand-logo img,
     .menu-toggle .nav-header .brand-logo .brand-logo-img {
-        max-height: 38px !important;
-        max-width: 62px !important;
+        max-height: 48px !important;
+        max-width: 70px !important;
+        height: 46px !important;
         object-fit: contain !important;
+        transform: translateY(1px) !important;
     }
 
     .menu-toggle .header {
@@ -854,12 +857,13 @@ body,
     .nav-header .brand-logo img,
     .nav-header .brand-logo .brand-logo-img {
         display: block !important;
-        max-height: 32px !important;
-        max-width: 60px !important;
+        max-height: 48px !important;
+        max-width: 74px !important;
         width: auto !important;
-        height: auto !important;
+        height: 44px !important;
         object-fit: contain !important;
         margin: 0 auto !important;
+        transform: translateY(1px) !important;
     }
 
     .nav-header .nav-control {
