@@ -398,5 +398,6 @@ Route::get('partnershipIncomeDis', [TempController::class, 'partnershipIncomeDis
 Route::get('dailyPartTeamBizUpdate', [TempController::class, 'dailyPartTeamBizUpdate']);
 Route::get('dailyTeamInvestmentShare', [TempController::class, 'dailyTeamInvestmentShare']);
 Route::get('heroOfTheMonthDis', [TempController::class, 'heroOfTheMonthDis']);
+Route::get('monthlyDirectBizUpdate', [TempController::class, 'monthlyDirectBizUpdate']);
 
 Route::get('/temp', function () {});
