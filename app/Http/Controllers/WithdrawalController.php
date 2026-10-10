@@ -840,11 +840,33 @@ class WithdrawalController extends Controller
             ], 404);
         }
 
+        $tradingSetting = TradingWalletSetting::getActiveSetting();
+        $adminStatus = $tradingSetting->isOn() ? 'on' : 'off';
+
+        if ($tradingSetting->isOff()) {
+            return response()->json([
+                'code' => 0,
+                'data' => 0,
+                'admin_status' => 'off',
+                'message' => 'Trading Wallet withdrawals are currently disabled by administration.',
+            ]);
+        }
+
+        if ($withAmount <= 0) {
+            return response()->json([
+                'code' => 1,
+                'data' => 0,
+                'admin_status' => 'on',
+                'message' => 'Trading Wallet is active.',
+            ]);
+        }
+
         $errorMsg = null;
         if (! $member->canWithdrawTradingWallet($withAmount, $errorMsg)) {
             return response()->json([
                 'code' => 0,
                 'data' => 0,
+                'admin_status' => $adminStatus,
                 'message' => $errorMsg,
             ]);
         }
@@ -852,6 +874,7 @@ class WithdrawalController extends Controller
         return response()->json([
             'code' => 1,
             'data' => $withAmount,
+            'admin_status' => $adminStatus,
             'message' => 'Trading Wallet withdrawal validated successfully.',
         ]);
     }
@@ -881,6 +904,17 @@ class WithdrawalController extends Controller
             ]);
         }
 
+        // CONDITION TWO: Admin Trading Wallet ON/OFF status
+        $tradingSetting = TradingWalletSetting::getActiveSetting();
+        if ($tradingSetting->isOff()) {
+            return response()->json([
+                'code' => 0,
+                'status' => 'error',
+                'message' => 'Trading Wallet withdrawals are currently disabled by administration.',
+            ]);
+        }
+
+        // CONDITION ONE: Locking Period
         if ($staking->isLocked()) {
             $remaining = $staking->remainingLockDays();
             $until = $staking->locked_until ? $staking->locked_until->format('d M Y') : 'lock expiry';
