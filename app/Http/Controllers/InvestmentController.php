@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
-use App\Models\MonthlyTradingProfitConfiction;
 use App\Models\PackageDistribution;
-use App\Models\PackagePlan;
 use App\Models\StakingDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +15,7 @@ class InvestmentController extends Controller
         $memberid = session('MEMBER_ID');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
 
-        $result['packageDistribution'] = PackageDistribution::find(1);
+        $result['packageDistribution'] = PackageDistribution::first();
         $result['activeStakings'] = StakingDetail::where('memberid', $memberid)->orderBy('created_at', 'desc')->take(3)->get();
 
         return view('member.investment.create-investment', $result);

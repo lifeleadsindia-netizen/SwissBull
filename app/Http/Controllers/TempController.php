@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DailyTeamInvestmentShareConfiction;
+use App\Models\DailyTeamShareIncome;
+use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
 use App\Models\PackageDistribution;
@@ -88,9 +91,137 @@ class TempController extends Controller
         }
     }
 
+    public function teamTradingProfit()
+    {
+        $incomes = StakingIncome::where([['status', 'Paid'], ['level_status', 0]])->whereDate('created_at', date('Y-m-d'))->limit(50)->get();
+        foreach ($incomes as $value) {
+            $memberid = $value['memberid'];
+            $name = getName($memberid);
+            $package = $value['amount'];
+            $sponsorid = getSponsorid($memberid);
+            $limit = 11;
+            for ($i = 1; $i < $limit; $i++) {
+                $level = $i;
+                $rate = teamLevelRate($level);
+                $amount = $package * $rate / 100;
+
+                if ($sponsorid != 'Root') {
+                    $var = MemberDetail::where('memberid', $sponsorid)->first();
+                    $status = $var->status;
+                    $name = $var->name;
+                    $downline = $var->downline;
+
+                    if ($amount > 0 && $status == 'Active') {
+
+                        $insert = new LevelIncome;
+                        $insert->memberid = $sponsorid;
+                        $insert->level = $level;
+                        $insert->level_id = $memberid;
+                        $insert->amount = $amount;
+                        $insert->package = $package;
+                        $insert->name = $name;
+                        $insert->rate = $rate;
+                        $insert->downline = $downline;
+                        $insert->type = 'Team Trading Profit';
+                        $insert->status = 'Paid';
+                        $insert->save();
+
+                        $wallet = $var->wallet;
+                        $var->wallet += $amount;
+                        $var->save();
+
+                        walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Team Trading Profit Income', ''.$i.' Level Team Trading Profit Income Amount Added into wallet.');
+                    }
+
+                    $sponsorid = $var['sponsorid'];
+                }
+            }
+            $update = StakingIncome::where('id', $value->id)->update(['level_status' => 1]);
+        }
+    }
+
+    public function dailyTeamInvestmentShare()
+    {
+        $today = date('Y-m-d');
+        $minDirects = DailyTeamInvestmentShareConfiction::getDirectsForLevel(1) ?: 4;
+
+        $members = MemberDetail::where('status', 'Active')
+            ->where('downline', '>=', $minDirects)
+            ->where('daily_team_biz', '>', 0)
+            ->get();
+
+        foreach ($members as $value) {
+            $memberid = $value->memberid;
+            $downline = (int) $value->downline;
+            $dailyTeamBiz = (float) $value->daily_team_biz;
+            $name = getName($memberid);
+
+            // Member jis highest level par hoga, sirf wahi level determine karein
+            $highestLevel = 0;
+            $highestRate = 0;
+
+            for ($level = 10; $level >= 1; $level--) {
+                $levelData = dailyTeamLevelRate($level);
+                $requiredDirects = (int) ($levelData['direct'] ?? 0);
+
+                if ($requiredDirects > 0 && $downline >= $requiredDirects) {
+                    $highestLevel = $level;
+                    $highestRate = (float) ($levelData['rate'] ?? 0);
+                    break;
+                }
+            }
+
+            // Agar member kisi bhi level ke liye qualify nahi karta, toh skip karein
+            if ($highestLevel === 0) {
+                continue;
+            }
+
+            // Ensure income is distributed only once per day for this member
+            $alreadyPaid = DailyTeamShareIncome::where('memberid', $memberid)
+                ->whereDate('created_at', $today)
+                ->exists();
+
+            if ($alreadyPaid) {
+                continue;
+            }
+
+            $amount = ($dailyTeamBiz * $highestRate) / 100;
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $new = new DailyTeamShareIncome;
+            $new->memberid = $memberid;
+            $new->name = $name;
+            $new->level = $highestLevel;
+            $new->rate = $highestRate;
+            $new->downline = $downline;
+            $new->daily_team_biz = $dailyTeamBiz;
+            $new->amount = $amount;
+            $new->type = 'Daily Team Investment Share';
+            $new->status = 'Paid';
+
+            if ($new->save()) {
+                $wallet = $value->wallet;
+                $value->wallet += $amount;
+                $value->save();
+
+                walletTransfer(
+                    $memberid,
+                    $amount,
+                    'debit',
+                    $wallet,
+                    'Daily Team Investment Share Income',
+                    'Level '.$highestLevel.' Daily Team Investment Share Income Amount Added into wallet.'
+                );
+            }
+        }
+    }
+
     public function dailyPartTeamBizUpdate()
     {
-        $update = MemberDetail::where('status', '!=', 'Temp')->update(['part_daily_team_biz' => 0, 'daily_team_biz' => 0]);
+        $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0]);
     }
 
     public function partnershipIncomeDis()

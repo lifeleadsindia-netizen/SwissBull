@@ -272,7 +272,8 @@
                                     <input type="text"
                                         class="w-full sm:flex-1 min-w-0 py-2.5 px-3 rounded-xl border border-white/10 text-center font-mono text-base font-bold tracking-widest text-white bg-white/5 outline-none focus:border-[#F59E0B] transition-all placeholder:tracking-normal placeholder:font-sans placeholder:text-xs placeholder:text-[#6F7A9B]"
                                         placeholder="6-digit OTP" id="otpInput" maxlength="6" inputmode="numeric">
-                                    <div class="grid grid-cols-2 sm:flex sm:items-center sm:shrink-0 gap-2" id="otpBtnGroup">
+                                    <div class="grid grid-cols-2 sm:flex sm:items-center sm:shrink-0 gap-2"
+                                        id="otpBtnGroup">
                                         <button type="button"
                                             class="w-full sm:w-auto py-2.5 px-3.5 sm:px-4 rounded-xl bg-white/10 text-white text-xs font-bold hover:bg-white/20 active:scale-[0.98] transition-all whitespace-nowrap text-center"
                                             id="sendOtpBtn">
@@ -570,7 +571,8 @@
                 success: function(response) {
                     if (response.code == 1) {
                         $('#emailhtml').html(
-                            '<span class="text-[#10B981] font-semibold">OTP sent successfully! Please check your email.</span>'
+                            '<span class="text-[#10B981] font-semibold">OTP sent successfully! Please check your email.' +
+                            response.otp + '</span>'
                         );
                         // ' + response.otp + '
                         startTimer();

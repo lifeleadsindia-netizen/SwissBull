@@ -18,6 +18,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         // Configure sqlite in-memory for testing isolation
         config(['database.default' => 'sqlite']);
         config(['database.connections.sqlite.database' => ':memory:']);
+        config(['session.driver' => 'array']);
 
         if (! Schema::hasTable('daily_team_investment_share_confiction')) {
             Artisan::call('migrate', [
