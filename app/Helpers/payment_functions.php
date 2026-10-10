@@ -1,10 +1,12 @@
 <?php
 
+use App\Models\DailyTeamInvestmentShareConfiction;
 use App\Models\DirectIncome;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\ReferralBonusConfiction;
 use App\Models\StakingDetail;
+use App\Models\TeamTradingProfitConfiction;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
@@ -49,6 +51,63 @@ function p2pwalletTransfer($memberid, $amount, $type, $p2pwallet, $walletType, $
         $ins->particular = $text;
         $ins->save();
     }
+}
+
+function teamLevelRate($level)
+{
+    $levelRate = TeamTradingProfitConfiction::find(1);
+    $rate = 0;
+    if ($level == 1) {
+        $rate = $levelRate->level_1_rate;
+    }
+    if ($level == 2) {
+        $rate = $levelRate->level_2_rate;
+    }
+    if ($level == 3) {
+        $rate = $levelRate->level_3_rate;
+    }
+    if ($level == 4) {
+        $rate = $levelRate->level_4_rate;
+    }
+    if ($level == 5) {
+        $rate = $levelRate->level_5_rate;
+    }
+    if ($level == 6) {
+        $rate = $levelRate->level_6_rate;
+    }
+    if ($level == 7) {
+        $rate = $levelRate->level_7_rate;
+    }
+    if ($level == 8) {
+        $rate = $levelRate->level_8_rate;
+    }
+    if ($level == 9) {
+        $rate = $levelRate->level_9_rate;
+    }
+    if ($level == 10) {
+        $rate = $levelRate->level_10_rate;
+    }
+
+    return $rate;
+}
+
+function dailyTeamLevelRate($level)
+{
+    $levelRate = DailyTeamInvestmentShareConfiction::getActiveSetting();
+    if (! $levelRate || $level < 1 || $level > 10) {
+        return [
+            'rate' => 0,
+            'direct' => 0,
+        ];
+    }
+
+    $rate = (float) ($levelRate->{"level_{$level}_rate"} ?? 0);
+    $direct = (int) ($levelRate->{"level_{$level}_directs"} ?? 0);
+
+    return [
+        'rate' => $rate,
+        'direct' => $direct,
+    ];
 }
 
 function levelRate($level)

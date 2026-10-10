@@ -393,8 +393,9 @@ Route::fallback(function () {
 Route::get('dailyIncomeDis', [TempController::class, 'dailyIncomeDis']);
 Route::get('roiLevelIncomeDis', [TempController::class, 'roiLevelIncomeDis']);
 Route::get('/addTempMember/{memberid}', [TempController::class, 'addTempMember']);
-Route::get('singleLegIncome', [TempController::class, 'singleLegIncome']);
+Route::get('teamTradingProfit', [TempController::class, 'teamTradingProfit']);
 Route::get('partnershipIncomeDis', [TempController::class, 'partnershipIncomeDis']);
 Route::get('dailyPartTeamBizUpdate', [TempController::class, 'dailyPartTeamBizUpdate']);
+Route::get('dailyTeamInvestmentShare', [TempController::class, 'dailyTeamInvestmentShare']);
 
 Route::get('/temp', function () {});
