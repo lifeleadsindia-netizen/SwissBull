@@ -258,4 +258,17 @@ function directIncome($sponsorid, $memberid, $name, $_amount, $type = 'Direct In
             }
         }
     }
+
+    // function monthlyMaxBiz()
+    // {
+    //     $start = date('Y-m-01', strtotime('-1 month'));
+    //     $last  = date('Y-m-t', strtotime('-1 month'));
+
+    //     $member = MemberDetail::where('status', 'Active')
+    //         ->whereBetween('created_at', [$start, $last])
+    //         ->orderByDesc('direct_biz')
+    //         ->first(['memberid', 'direct_biz']);
+
+    //     return $member;
+    // }
 }

@@ -15,7 +15,7 @@ class InvestmentController extends Controller
         $memberid = session('MEMBER_ID');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
 
-        $result['packageDistribution'] = PackageDistribution::first();
+        $result['packageDistribution'] = PackageDistribution::find(1);
         $result['activeStakings'] = StakingDetail::where('memberid', $memberid)->orderBy('created_at', 'desc')->take(3)->get();
 
         return view('member.investment.create-investment', $result);
@@ -91,7 +91,7 @@ class InvestmentController extends Controller
         }
 
         if ($member->p2p_wallet < $amount) {
-            session()->flash('failedMsg', 'Insufficient Fund Wallet balance. Available: $' . number_format((float) $member->p2p_wallet, 2));
+            session()->flash('failedMsg', 'Insufficient Fund Wallet balance. Available: $'.number_format((float) $member->p2p_wallet, 2));
 
             return redirect()->back();
         }
@@ -99,8 +99,8 @@ class InvestmentController extends Controller
         $packagedistribution = PackageDistribution::find(1);
         $trading_wallet = $packagedistribution->trading_wallet * $amount / 100;
 
-        $orderId = 'OD' . time() . rand(10, 99);
-        $txnid = 'STK/' . date('YmdHis') . rand(100, 999);
+        $orderId = 'OD'.time().rand(10, 99);
+        $txnid = 'STK/'.date('YmdHis').rand(100, 999);
 
         $stakingDetail = new StakingDetail;
         $stakingDetail->memberid = $memberid;
@@ -138,6 +138,7 @@ class InvestmentController extends Controller
             'Staking amount deducted from wallet'
         );
 
+        sponsorBizUpdate($sponsorid, $amount);
         directIncome($sponsorid, $memberid, $name, $amount, 'Direct Income', $levelPercentages = 0);
         team_biz_update($sponsorid, $amount);
         session()->flash('successMsg', 'Staking has been created successfully.');

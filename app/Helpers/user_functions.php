@@ -54,6 +54,15 @@ function updateDownline($sponsorid)
     }
 }
 
+function sponsorBizUpdate($sponsorid, $amount)
+{
+    if ($sponsorid != 'Root') {
+        $var = MemberDetail::where('memberid', $sponsorid)->first();
+        $var->direct_biz += $amount;
+        $var->save();
+    }
+}
+
 function updateUpline($sponsorid, $memberid)
 {
     if ($memberid != 'ST1234567') {
@@ -279,4 +288,31 @@ function getCountryData($country)
     $var = Country::where('name', $country)->first();
 
     return $var->symbol;
+}
+
+function monthlyMaxBiz()
+{
+    // $start = date('Y-m-01', strtotime('-1 month'));
+    // $last  = date('Y-m-t', strtotime('-1 month'));
+
+    $query = MemberDetail::where([['status', 'Active'], ['direct_biz', '>', 0]]);
+    // ->whereBetween('created_at', [$start, $last]);
+
+    $maxBiz = (clone $query)->max('direct_biz');
+
+    if ($maxBiz === null) {
+        return [
+            'memberid' => null,
+            'direct_biz' => null,
+            'member_count' => 0,
+        ];
+    }
+
+    $members = (clone $query)
+        ->where('direct_biz', $maxBiz)
+        ->get(['memberid', 'direct_biz']);
+
+    return [
+        'memberid' => $members->pluck('memberid'),
+    ];
 }
