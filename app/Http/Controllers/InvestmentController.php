@@ -16,13 +16,13 @@ class InvestmentController extends Controller
     {
         $memberid = session('MEMBER_ID');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
-       
-        $result['packageDistribution'] = PackageDistribution::first();
+
+        $result['packageDistribution'] = PackageDistribution::find(1);
         $result['activeStakings'] = StakingDetail::where('memberid', $memberid)->orderBy('created_at', 'desc')->take(3)->get();
 
         return view('member.investment.create-investment', $result);
     }
-    
+
     public function createInvestment(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -84,7 +84,6 @@ class InvestmentController extends Controller
             if ($amount < 600 || $amount > 5000) {
                 return redirect()->back()->with('failedMsg', 'For package 600 - 5000, staking amount must be between 600 and 5000 USDT.');
             }
-
         } elseif ($package === 'Package3') {
             if ($amount < 6000) {
                 return redirect()->back()->with('failedMsg', 'For package 6000 and above, staking amount must be at least 6000 USDT.');
@@ -94,7 +93,7 @@ class InvestmentController extends Controller
         }
 
         if ($member->p2p_wallet < $amount) {
-            session()->flash('failedMsg', 'Insufficient Fund Wallet balance. Available: $'.number_format((float) $member->p2p_wallet, 2));
+            session()->flash('failedMsg', 'Insufficient Fund Wallet balance. Available: $' . number_format((float) $member->p2p_wallet, 2));
 
             return redirect()->back();
         }
@@ -102,8 +101,8 @@ class InvestmentController extends Controller
         $packagedistribution = PackageDistribution::find(1);
         $trading_wallet = $packagedistribution->trading_wallet * $amount / 100;
 
-        $orderId = 'OD'.time().rand(10, 99);
-        $txnid = 'STK/'.date('YmdHis').rand(100, 999);
+        $orderId = 'OD' . time() . rand(10, 99);
+        $txnid = 'STK/' . date('YmdHis') . rand(100, 999);
 
         $stakingDetail = new StakingDetail;
         $stakingDetail->memberid = $memberid;
@@ -128,7 +127,6 @@ class InvestmentController extends Controller
         if ($member->status == 'Temp') {
             $member->status = 'Active';
             $member->activated_at = $member->activated_at ?? now();
-            updateUpline($sponsorid, $memberid);
             updateDownline($sponsorid);
         }
         $member->save();
