@@ -741,15 +741,15 @@ class MemberDetailController extends Controller
             $fromAddress = config('mail.from.address', 'support@mathwallet.live');
             $fromName = config('mail.from.name', config('detailsApp.name', 'SYNC TRADE'));
 
-            Mail::send([
-                'html' => 'member.mails.register-otp',
-                'text' => 'member.mails.register-otp-text',
-            ], $mailData, function ($message) use ($user, $fromAddress, $fromName) {
-                $message->from($fromAddress, $fromName);
-                $message->replyTo($fromAddress, $fromName);
-                $message->to($user['to']);
-                $message->subject('Verify Your Email - '.config('detailsApp.name'));
-            });
+            // Mail::send([
+            //     'html' => 'member.mails.register-otp',
+            //     'text' => 'member.mails.register-otp-text',
+            // ], $mailData, function ($message) use ($user, $fromAddress, $fromName) {
+            //     $message->from($fromAddress, $fromName);
+            //     $message->replyTo($fromAddress, $fromName);
+            //     $message->to($user['to']);
+            //     $message->subject('Verify Your Email - '.config('detailsApp.name'));
+            // });
 
             return response()->json([
                 'code' => 1,

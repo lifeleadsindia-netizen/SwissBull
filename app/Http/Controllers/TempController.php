@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DailyTeamInvestmentShareConfiction;
 use App\Models\DailyTeamShareIncome;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
@@ -12,6 +11,7 @@ use App\Models\PartnershipDetail;
 use App\Models\PartnershipIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
+use App\Models\UplineMember;
 
 class TempController extends Controller
 {
@@ -142,11 +142,8 @@ class TempController extends Controller
 
     public function dailyTeamInvestmentShare()
     {
-        $today = date('Y-m-d');
-        $minDirects = DailyTeamInvestmentShareConfiction::getDirectsForLevel(1) ?: 4;
-
         $members = MemberDetail::where('status', 'Active')
-            ->where('downline', '>=', $minDirects)
+            ->where('downline', '>=', 4)
             ->where('daily_team_biz', '>', 0)
             ->get();
 
@@ -156,34 +153,57 @@ class TempController extends Controller
             $dailyTeamBiz = (float) $value->daily_team_biz;
             $name = getName($memberid);
 
-            // Member jis highest level par hoga, sirf wahi level determine karein
-            $highestLevel = 0;
-            $highestRate = 0;
+            // 1. Direct referrals ke hisaab se max qualified level check karein
+            $maxQualifiedLevel = 0;
+            for ($l = 10; $l >= 1; $l--) {
+                $levelData = dailyTeamLevelRate($l);
+                $requiredDirects = (int) ($levelData['direct'] ?? 4);
 
-            for ($level = 10; $level >= 1; $level--) {
-                $levelData = dailyTeamLevelRate($level);
-                $requiredDirects = (int) ($levelData['direct'] ?? 0);
-
-                if ($requiredDirects > 0 && $downline >= $requiredDirects) {
-                    $highestLevel = $level;
-                    $highestRate = (float) ($levelData['rate'] ?? 0);
+                if ($downline >= $requiredDirects) {
+                    $maxQualifiedLevel = $l;
                     break;
                 }
             }
 
-            // Agar member kisi bhi level ke liye qualify nahi karta, toh skip karein
-            if ($highestLevel === 0) {
+            if ($maxQualifiedLevel === 0) {
                 continue;
             }
 
-            // Ensure income is distributed only once per day for this member
-            $alreadyPaid = DailyTeamShareIncome::where('memberid', $memberid)
-                ->whereDate('created_at', $today)
-                ->exists();
+            // 2. Member ki team tree (upline_members) me actual team depth determine karein
+            $maxTeamLevel = 0;
+            for ($l = 10; $l >= 1; $l--) {
+                $downlineMemberIds = UplineMember::where('upline_'.$l, $memberid)->pluck('memberid');
+                if ($downlineMemberIds->isNotEmpty()) {
+                    // Check if any downline member at this level generated business
+                    $hasBiz = MemberDetail::whereIn('memberid', $downlineMemberIds)
+                        ->where('daily_team_biz', '>', 0)
+                        ->exists();
 
-            if ($alreadyPaid) {
+                    if ($hasBiz) {
+                        $maxTeamLevel = $l;
+                        break;
+                    }
+                }
+            }
+
+            // Fallback: Agar specific daily_team_biz match na ho toh overall team depth
+            if ($maxTeamLevel === 0) {
+                for ($l = 10; $l >= 1; $l--) {
+                    if (UplineMember::where('upline_'.$l, $memberid)->exists()) {
+                        $maxTeamLevel = $l;
+                        break;
+                    }
+                }
+            }
+
+            if ($maxTeamLevel === 0) {
                 continue;
             }
+
+            // Member ka final level: Team depth aur Direct referrals qualification ka minimum
+            $highestLevel = min($maxTeamLevel, $maxQualifiedLevel);
+            $levelData = dailyTeamLevelRate($highestLevel);
+            $highestRate = (float) ($levelData['rate'] ?? 1);
 
             $amount = ($dailyTeamBiz * $highestRate) / 100;
 

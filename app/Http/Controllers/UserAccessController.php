@@ -127,7 +127,6 @@ class UserAccessController extends Controller
 
                 // Rule 2: Direct referral registration (inactive) awards 500 PEPE tokens to direct sponsor
                 PepeRewardService::awardDirectRegistrationReward($sponsorid, $var);
-                updateUpline($sponsorid, $var->memberid);
 
                 $data = MemberDetail::find($var->id);
                 $userid = $data->memberid;
@@ -141,12 +140,12 @@ class UserAccessController extends Controller
                         'mobile' => $mobile,
                         'memberid' => $userid,
                     ];
-                    $user['to'] = $email;
-                    Mail::send('member.mails.mail', $mailData, function ($message) use ($user) {
+                    // $user['to'] = $email;
+                    // Mail::send('member.mails.mail', $mailData, function ($message) use ($user) {
 
-                        $message->to($user['to']);
-                        $message->subject('SYNC TRADE Member Login Credentials');
-                    });
+                    //     $message->to($user['to']);
+                    //     $message->subject('SYNC TRADE Member Login Credentials');
+                    // });
                 }
                 $request->session()->put('name', $request->post('name'));
                 $request->session()->put('userid', $userid);
@@ -157,6 +156,8 @@ class UserAccessController extends Controller
                 session()->put('MEMBER_ID', $var->memberid);
                 session()->put('country', $var->country);
                 session()->flash('successMsg', 'Your account has been created successfully. Please check your credentials for login details.');
+
+                updateUpline($sponsorid, $data->memberid);
 
                 return redirect('member/dashboard');
             } else {
