@@ -147,8 +147,7 @@ function totalIn()
         + totalAdminStakingLevelIncome()
         + totalAdminLevelIncome()
         + totalAdminHeroOfTheMonthIncome()
-        + totalAdminPartnershipIncome()
-        + totalAdminSingleLegIncome();
+        + totalAdminPartnershipIncome();
 
     return $sum;
 }
