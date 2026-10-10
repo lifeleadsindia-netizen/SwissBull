@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DailyTeamShareIncome;
+use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
@@ -247,13 +248,46 @@ class TempController extends Controller
         $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0]);
     }
 
-    public function heroOfTheMonthDis(Request $request, HeroOfTheMonthService $service): JsonResponse
+    // public function heroOfTheMonthDis(Request $request, HeroOfTheMonthService $service): JsonResponse
+    // {
+    //     $targetMonth = $request->query('month');
+
+    //     $result = $service->processMonthlyDistribution($targetMonth);
+
+    //     return response()->json($result);
+    // }
+
+    public function heroOfTheMonthDis()
     {
-        $targetMonth = $request->query('month');
+        $max = monthlyMaxBiz();
+        $totalMember = count($max['memberid']);
 
-        $result = $service->processMonthlyDistribution($targetMonth);
+        foreach ($max['memberid'] as $memberid) {
+            $value = MemberDetail::where('memberid', $memberid)->first();
+            $direct_biz = $value->direct_biz;
+            $share = $direct_biz / $totalMember;
 
-        return response()->json($result);
+            $new = new HeroOfTheMonthReward;
+            $new->month = date('M', strtotime('-1 month'));
+            $new->memberid = $memberid;
+            $new->direct_business = $direct_biz;
+            $new->total_members = $totalMember;
+            $new->amount = $share;
+            $new->save();
+
+            $wallet = $value->wallet;
+            $value->wallet += $share;
+            $value->save();
+
+            walletTransfer(
+                $memberid,
+                $share,
+                'debit',
+                $wallet,
+                'Hero of the month Reward',
+                'Hero of the month Reward Amount Added into wallet.'
+            );
+        }
     }
 
     public function partnershipIncomeDis()
@@ -364,7 +398,6 @@ class TempController extends Controller
             $Sponsorid = $var->memberid;
 
             sleep(1);
-
         }
     }
 }
