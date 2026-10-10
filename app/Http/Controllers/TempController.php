@@ -13,9 +13,6 @@ use App\Models\PartnershipIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
 use App\Models\UplineMember;
-use App\Services\HeroOfTheMonthService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class TempController extends Controller
 {
@@ -243,19 +240,17 @@ class TempController extends Controller
         }
     }
 
+    // daily command
     public function dailyPartTeamBizUpdate()
     {
         $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0]);
     }
 
-    // public function heroOfTheMonthDis(Request $request, HeroOfTheMonthService $service): JsonResponse
-    // {
-    //     $targetMonth = $request->query('month');
-
-    //     $result = $service->processMonthlyDistribution($targetMonth);
-
-    //     return response()->json($result);
-    // }
+    // monthly command
+    public function monthlyDirectBizUpdate()
+    {
+        $update = MemberDetail::where('status', '!=', 'Temp')->update(['direct_biz' => 0]);
+    }
 
     public function heroOfTheMonthDis()
     {
