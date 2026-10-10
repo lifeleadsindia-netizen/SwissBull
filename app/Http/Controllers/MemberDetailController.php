@@ -45,7 +45,7 @@ class MemberDetailController extends Controller
         $result['waTodayCount'] = $waTodayCount;
         $result['waTodayStatus'] = $waTodayCount >= PepeRewardService::DAILY_MESSAGE_LIMIT
             ? 'Completed (10/10)'
-            : ($waTodayCount > 0 ? 'Available ('.$waTodayCount.'/10)' : 'Available (0/10)');
+            : ($waTodayCount > 0 ? 'Available (' . $waTodayCount . '/10)' : 'Available (0/10)');
         $result['waTotalReferrals'] = WhatsappReferral::where('member_id', $memberid)->count();
         $result['waDirectRegCount'] = PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_REGISTRATION)->count();
         $result['waDirectActCount'] = PepeRewardLog::where('member_id', $memberid)->where('reward_type', PepeRewardService::TYPE_DIRECT_ACTIVATION)->count();
@@ -291,8 +291,8 @@ class MemberDetailController extends Controller
         $result['fundLockTitle'] = $lockStatus;
         $result['fundUnlocksInText'] = $isFundLocked ? "Fund Unlocks In {$remainingLockDays} Days" : 'Fund Unlocked';
         $result['fundLockReturnMessage'] = $isFundLocked
-            ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns'
-            : 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns';
+            ? 'Fund Locked, You are eligible for total return of ' . number_format($maxReturnPercent, 0) . '% Returns'
+            : 'You are eligible for total return of ' . number_format($maxReturnPercent, 0) . '% Returns';
         $result['packageInvestments'] = collect($processedPackages);
 
         return view('member.dashboard')->with($result);
@@ -496,8 +496,8 @@ class MemberDetailController extends Controller
                 'fund_lock_title' => $isFundLocked ? 'Fund Locked' : 'Fund Unlocked',
                 'fund_unlocks_in_text' => $isFundLocked ? "Fund Unlocks In {$remainingLockDays} Days" : 'Fund Unlocked',
                 'fund_lock_return_message' => $isFundLocked
-                    ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns'
-                    : 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns',
+                    ? 'Fund Locked, You are eligible for total return of ' . number_format($maxReturnPercent, 0) . '% Returns'
+                    : 'You are eligible for total return of ' . number_format($maxReturnPercent, 0) . '% Returns',
                 'packages' => $processedPackages,
             ],
         ]);
@@ -558,7 +558,7 @@ class MemberDetailController extends Controller
 
                 return redirect()->back();
             }
-            $filename = time().'.'.$extension;
+            $filename = time() . '.' . $extension;
             $file->move(public_path('uploads'), $filename);
             $var->profile_image = $filename;
         }
@@ -636,7 +636,7 @@ class MemberDetailController extends Controller
 
     public function lelMemDetails($level)
     {
-        $uplines = 'upline_'.$level;
+        $uplines = 'upline_' . $level;
         $memberid = session('MEMBER_ID');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
         $ids = UplineMember::where($uplines, $memberid)->pluck('memberid');
@@ -654,8 +654,8 @@ class MemberDetailController extends Controller
             if ($data) {
                 return response()->json([
                     'code' => 1,
-                    'data' => '<span class="text-success">Member Name :'.$data['name'].'</span>',
-                    'name' => '<span >'.$data['name'].' wants to lend</span>',
+                    'data' => '<span class="text-success">Member Name :' . $data['name'] . '</span>',
+                    'name' => '<span >' . $data['name'] . ' wants to lend</span>',
                 ]);
             } else {
                 return response()->json([
@@ -681,7 +681,7 @@ class MemberDetailController extends Controller
                 if ($data['status'] == 'Temp') {
                     return response()->json([
                         'code' => 0,
-                        'data' => '<span class="text-success">Sponsor Name :'.$data['name'].'</span>',
+                        'data' => '<span class="text-success">Sponsor Name :' . $data['name'] . '</span>',
                     ]);
                 } elseif ($data['status'] == 'Deactive') {
                     return response()->json([
@@ -691,7 +691,7 @@ class MemberDetailController extends Controller
                 } elseif ($data['status'] == 'Active') {
                     return response()->json([
                         'code' => 1,
-                        'data' => '<span class="text-success">Sponsor Name :'.$data['name'].'</span>',
+                        'data' => '<span class="text-success">Sponsor Name :' . $data['name'] . '</span>',
                     ]);
                 }
             } else {
@@ -748,7 +748,7 @@ class MemberDetailController extends Controller
                 $message->from($fromAddress, $fromName);
                 $message->replyTo($fromAddress, $fromName);
                 $message->to($user['to']);
-                $message->subject('Verify Your Email - '.config('detailsApp.name'));
+                $message->subject('Verify Your Email - ' . config('detailsApp.name'));
             });
 
             return response()->json([
@@ -764,12 +764,12 @@ class MemberDetailController extends Controller
             ]);
 
             $errorText = app()->environment('local')
-                ? 'Server error: '.e($e->getMessage())
+                ? 'Server error: ' . e($e->getMessage())
                 : 'Failed to send OTP. Please try again.';
 
             return response()->json([
                 'code' => 0,
-                'data' => '<span class="text-danger">'.$errorText.'</span>',
+                'data' => '<span class="text-danger">' . $errorText . '</span>',
             ]);
         }
     }
@@ -846,7 +846,7 @@ class MemberDetailController extends Controller
         }
 
         $baseUrl = $request->getSchemeAndHttpHost();
-        $referralLink = $baseUrl.'/member/register/'.($member->memberid ?? '');
+        $referralLink = $baseUrl . '/member/register/' . ($member->memberid ?? '');
 
         return view('member.promotional-banners', compact('data', 'member', 'banners', 'referralLink'));
     }
@@ -864,9 +864,9 @@ class MemberDetailController extends Controller
 
         if ($banner) {
             $candidates = [
-                public_path('uploads/banners/'.$banner->image_path),
-                public_path('uassets/mw_banners/'.$banner->image_path),
-                public_path('uploads/'.$banner->image_path),
+                public_path('uploads/banners/' . $banner->image_path),
+                public_path('uassets/mw_banners/' . $banner->image_path),
+                public_path('uploads/' . $banner->image_path),
             ];
             foreach ($candidates as $cand) {
                 if (file_exists($cand)) {
@@ -875,7 +875,7 @@ class MemberDetailController extends Controller
             }
         }
 
-        $fallback = public_path('uassets/mw_banners/'.$cleanFilename);
+        $fallback = public_path('uassets/mw_banners/' . $cleanFilename);
         if (file_exists($fallback)) {
             return response()->download($fallback, $cleanFilename);
         }
@@ -923,7 +923,7 @@ class MemberDetailController extends Controller
         }
 
         $baseUrl = $request->getSchemeAndHttpHost();
-        $referralLink = $baseUrl.'/member/register/'.($member->memberid ?? '');
+        $referralLink = $baseUrl . '/member/register/' . ($member->memberid ?? '');
 
         return view('member.business-plan-pdf', compact('data', 'member', 'pdfs', 'referralLink'));
     }
@@ -943,7 +943,7 @@ class MemberDetailController extends Controller
             return response()->download($doc->disk_path, basename($doc->disk_path));
         }
 
-        $fallback = public_path('uassets/mw_pdf/'.$cleanFilename);
+        $fallback = public_path('uassets/mw_pdf/' . $cleanFilename);
         if (file_exists($fallback)) {
             return response()->download($fallback, $cleanFilename);
         }
@@ -962,7 +962,7 @@ class MemberDetailController extends Controller
         $member = MemberDetail::where('memberid', $memberid)->first();
         $data = $member;
         $baseUrl = $request->getSchemeAndHttpHost();
-        $referralLink = $baseUrl.'/member/register/'.($member->memberid ?? '');
+        $referralLink = $baseUrl . '/member/register/' . ($member->memberid ?? '');
 
         $query = MemberVideo::where('video_type', 'plan')
             ->where('status', 'active');
@@ -970,9 +970,9 @@ class MemberDetailController extends Controller
         if ($request->filled('search')) {
             $term = trim($request->input('search'));
             $query->where(function ($q) use ($term) {
-                $q->where('title', 'like', '%'.$term.'%')
-                    ->orWhere('tag', 'like', '%'.$term.'%')
-                    ->orWhere('description', 'like', '%'.$term.'%');
+                $q->where('title', 'like', '%' . $term . '%')
+                    ->orWhere('tag', 'like', '%' . $term . '%')
+                    ->orWhere('description', 'like', '%' . $term . '%');
             });
         }
 
@@ -1027,7 +1027,7 @@ class MemberDetailController extends Controller
             return response()->download($video->disk_path, basename($video->disk_path));
         }
 
-        $fallback = public_path('uassets/mw_plan_video/'.$cleanFilename);
+        $fallback = public_path('uassets/mw_plan_video/' . $cleanFilename);
         if (file_exists($fallback)) {
             return response()->download($fallback, 'Math_Wallet_Business_Plan.mp4');
         }
@@ -1046,7 +1046,7 @@ class MemberDetailController extends Controller
         $member = MemberDetail::where('memberid', $memberid)->first();
         $data = $member;
         $baseUrl = $request->getSchemeAndHttpHost();
-        $referralLink = $baseUrl.'/member/register/'.($member->memberid ?? '');
+        $referralLink = $baseUrl . '/member/register/' . ($member->memberid ?? '');
 
         $query = MemberVideo::where('video_type', 'tutorial')
             ->where('status', 'active');
@@ -1054,9 +1054,9 @@ class MemberDetailController extends Controller
         if ($request->filled('search')) {
             $term = trim($request->input('search'));
             $query->where(function ($q) use ($term) {
-                $q->where('title', 'like', '%'.$term.'%')
-                    ->orWhere('tag', 'like', '%'.$term.'%')
-                    ->orWhere('description', 'like', '%'.$term.'%');
+                $q->where('title', 'like', '%' . $term . '%')
+                    ->orWhere('tag', 'like', '%' . $term . '%')
+                    ->orWhere('description', 'like', '%' . $term . '%');
             });
         }
 
@@ -1111,7 +1111,7 @@ class MemberDetailController extends Controller
             return response()->download($video->disk_path, basename($video->disk_path));
         }
 
-        $fallback = public_path('uassets/mw_Tutorial_video/'.$cleanFilename);
+        $fallback = public_path('uassets/mw_Tutorial_video/' . $cleanFilename);
         if (file_exists($fallback)) {
             return response()->download($fallback, 'Math_Wallet_Tutorial_Guide.mp4');
         }
@@ -1183,7 +1183,7 @@ class MemberDetailController extends Controller
         $data = $member;
 
         $baseUrl = $request->getSchemeAndHttpHost();
-        $referralLink = $baseUrl.'/member/register/'.($member->memberid ?? '');
+        $referralLink = $baseUrl . '/member/register/' . ($member->memberid ?? '');
 
         return view('member.business-plan-text', compact('data', 'member', 'referralLink'));
     }
