@@ -447,7 +447,7 @@
                     $('#sponhtml').html('');
                 }
                 $.ajax({
-                    url: '{{ url(' / getSponname ') }}',
+                    url: '{{ url('/getSponname') }}',
                     type: 'POST',
                     data: {
                         'sponsorid': sponsor,
