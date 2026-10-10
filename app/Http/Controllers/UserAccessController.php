@@ -88,11 +88,11 @@ class UserAccessController extends Controller
             return redirect()->back()->withInput();
         }
 
-        if ($spon->status == 'Temp') {
-            session()->flash('failedMsg', 'This sponsorid is not activated');
+        // if ($spon->status == 'Temp') {
+        //     session()->flash('failedMsg', 'This sponsorid is not activated');
 
-            return redirect()->back();
-        }
+        //     return redirect()->back();
+        // }
 
         $check1 = MemberDetail::where('mobile', $mobile)->first();
         if ($check1) {
@@ -127,6 +127,7 @@ class UserAccessController extends Controller
 
                 // Rule 2: Direct referral registration (inactive) awards 500 PEPE tokens to direct sponsor
                 PepeRewardService::awardDirectRegistrationReward($sponsorid, $var);
+                updateUpline($sponsorid, $var->memberid);
 
                 $data = MemberDetail::find($var->id);
                 $userid = $data->memberid;

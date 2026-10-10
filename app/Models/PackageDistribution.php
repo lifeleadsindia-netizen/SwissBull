@@ -25,7 +25,6 @@ class PackageDistribution extends Model
         'team_performance_bonus',
         'hero_of_the_month',
         'lock_days',
-        'withdrawal_percent',
         'status',
         'capping',
         'package_1_rate',
@@ -45,7 +44,6 @@ class PackageDistribution extends Model
         'team_performance_bonus' => 'decimal:2',
         'hero_of_the_month' => 'decimal:2',
         'lock_days' => 'integer',
-        'withdrawal_percent' => 'float',
         'status' => 'string',
         'capping' => 'float',
         'package_1_rate' => 'float',
@@ -66,7 +64,6 @@ class PackageDistribution extends Model
                 'trading_wallet' => 70.00,
                 'hero_of_the_month' => 2.00,
                 'lock_days' => 90,
-                'withdrawal_percent' => 100.00,
                 'status' => 'on',
                 'capping' => 200.00,
                 'package_1_rate' => 5.00,
@@ -83,10 +80,6 @@ class PackageDistribution extends Model
         return (int) (static::getActiveSetting()->lock_days ?? 90);
     }
 
-    public static function getDefaultWithdrawalPercent(): float
-    {
-        return (float) (static::getActiveSetting()->withdrawal_percent ?? 100.00);
-    }
 
     public static function getStatus(): string
     {
@@ -148,7 +141,7 @@ class PackageDistribution extends Model
 
         $setting = static::first();
         if ($setting) {
-            $field = 'package_'.$packageId.'_rate';
+            $field = 'package_' . $packageId . '_rate';
             if (isset($setting->{$field}) && (float) $setting->{$field} > 0) {
                 return (float) $setting->{$field};
             }

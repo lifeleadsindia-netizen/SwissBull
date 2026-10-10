@@ -2937,7 +2937,7 @@
                                                 <i class="fa-solid fa-circle-info me-1"></i> {{ $packageStatus ?? 'No Active Package' }}
                                             </span>
                                         @endif
-                                        <a href="{{ url('/member/fund/import-flt') }}" class="btn btn-sm font-weight-bold" style="background: linear-gradient(135deg, #FFD700, #F59E0B); color: #000; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
+                                        <a href="{{ route('Staking.create') }}" class="btn btn-sm font-weight-bold" style="background: linear-gradient(135deg, #FFD700, #F59E0B); color: #000; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
                                             <i class="fa-solid fa-plus-circle me-1"></i> New Investment
                                         </a>
                                     </div>

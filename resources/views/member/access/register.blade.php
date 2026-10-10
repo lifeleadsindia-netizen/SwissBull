@@ -187,13 +187,13 @@
 
                     <!-- Alert Messages -->
                     @if (session()->has('failedMsg'))
-                        <div class="auth-alert-error mb-6 flex items-start gap-3">
-                            <i class="fa-solid fa-circle-exclamation text-red-400 text-base mt-0.5"></i>
-                            <div>
-                                <span class="font-semibold text-red-200">Registration Warning:</span>
-                                <p class="mt-0.5 text-xs text-red-300">{{ session('failedMsg') }}</p>
-                            </div>
+                    <div class="auth-alert-error mb-6 flex items-start gap-3">
+                        <i class="fa-solid fa-circle-exclamation text-red-400 text-base mt-0.5"></i>
+                        <div>
+                            <span class="font-semibold text-red-200">Registration Warning:</span>
+                            <p class="mt-0.5 text-xs text-red-300">{{ session('failedMsg') }}</p>
                         </div>
+                    </div>
                     @endif
 
                     <!-- Main Form (Preserves exact route, method, inputs, and JavaScript element IDs) -->
@@ -214,7 +214,7 @@
                             </div>
                             <div class="mt-1" id="sponhtml"></div>
                             @error('sponsorid')
-                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -239,7 +239,7 @@
                                     placeholder="Enter Full Name" required>
                             </div>
                             @error('name')
-                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -255,7 +255,7 @@
                             </div>
                             <div class="mt-1 text-xs" id="emailhtml"></div>
                             @error('email')
-                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -307,16 +307,16 @@
                                 <select name="country" id="countrySelect" class="auth-input auth-input-has-icon">
                                     <option value="">Select Country</option>
                                     @foreach ($cdata as $country)
-                                        <option value="{{ $country['nicename'] }}"
-                                            data-phonecode="{{ $country['phonecode'] ?? ($country['phone_code'] ?? ($country['dial_code'] ?? '')) }}"
-                                            {{ old('country') == $country['nicename'] ? 'selected' : '' }}>
-                                            {{ $country['nicename'] }}
-                                        </option>
+                                    <option value="{{ $country['nicename'] }}"
+                                        data-phonecode="{{ $country['phonecode'] ?? ($country['phone_code'] ?? ($country['dial_code'] ?? '')) }}"
+                                        {{ old('country') == $country['nicename'] ? 'selected' : '' }}>
+                                        {{ $country['nicename'] }}
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>
                             @error('country')
-                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -336,7 +336,7 @@
                                     required>
                             </div>
                             @error('mobile')
-                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -446,7 +446,7 @@
                     $('#sponhtml').html('');
                 }
                 $.ajax({
-                    url: '{{ url('/getSponname') }}',
+                    url: '{{ url(' / getSponname ') }}',
                     type: 'POST',
                     data: {
                         'sponsorid': sponsor,
@@ -561,7 +561,7 @@
             $('#emailhtml').html('<span class="text-[#F59E0B] font-semibold">Sending OTP...</span>');
 
             $.ajax({
-                url: '{{ url('/send_register_otp') }}',
+                url: '{{ url(' / send_register_otp ') }}',
                 type: 'POST',
                 data: {
                     'email': email,
@@ -600,7 +600,7 @@
             $('#verifyOtpBtn').prop('disabled', true).html('Verifying...');
 
             $.ajax({
-                url: '{{ url('/verify_register_otp') }}',
+                url: '{{ url(' / verify_register_otp ') }}',
                 type: 'POST',
                 data: {
                     'otp': otp,
