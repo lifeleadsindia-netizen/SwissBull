@@ -14,6 +14,7 @@ use App\Models\PepeRewardLog;
 use App\Models\PepeSetting;
 use App\Models\PromotionBanner;
 use App\Models\StakingDetail;
+use App\Models\StakingIncome;
 use App\Models\TradingWalletSetting;
 use App\Models\UplineMember;
 use App\Models\WhatsappReferral;
@@ -127,8 +128,8 @@ class MemberDetailController extends Controller
                 })->first();
         }
 
-        $defaultSetting = TradingWalletSetting::getActiveSetting();
-        $defaultLockDays = (int) ($defaultSetting->lock_days ?? 30);
+        $defaultSetting = TradingWalletSetting::first();
+        $defaultLockDays = (int) ($defaultSetting->lock_days ?? ($packagePlan->lock_days ?? 30));
 
         // Maximum Return % must come from actual Admin-configured maximum return / capping setting
         $maxReturnPercent = 200.00;
@@ -136,22 +137,44 @@ class MemberDetailController extends Controller
             $maxReturnPercent = (float) $packagePlan->max_return_percent;
         } elseif ($activePackage && (float) $activePackage->max_return_percent > 0) {
             $maxReturnPercent = (float) $activePackage->max_return_percent;
-        } elseif ($activeStaking && (float) $activeStaking->getCappingPercent() > 0) {
-            $maxReturnPercent = (float) $activeStaking->getCappingPercent();
+        } elseif ($activeStaking) {
+            $stkPlan = $packagePlan;
+            if (! $stkPlan && (float) $activeStaking->invest_amount > 0) {
+                $stkAmt = (float) $activeStaking->invest_amount;
+                $stkPlan = PackagePlan::where('min_amount', '<=', $stkAmt)
+                    ->where(function ($q) use ($stkAmt) {
+                        $q->whereNull('max_amount')->orWhere('max_amount', '>=', $stkAmt);
+                    })->first();
+            }
+            if ($stkPlan && (float) $stkPlan->max_return_percent > 0) {
+                $maxReturnPercent = (float) $stkPlan->max_return_percent;
+            }
         }
         $result['maxReturnPercent'] = $maxReturnPercent;
 
         // Daily ROI rate
-        $dailyRoiPercent = $packagePlan && (float) $packagePlan->return_percent > 0
-            ? (float) $packagePlan->return_percent
-            : ($activeStaking ? $activeStaking->getDailyRate() : (float) ($activePackage->return_percent ?? 5.00));
+        $dailyRoiPercent = 5.00;
+        if ($packagePlan && (float) $packagePlan->return_percent > 0) {
+            $dailyRoiPercent = (float) $packagePlan->return_percent;
+        } elseif ($activePackage && (float) ($activePackage->return_percent ?? 0) > 0) {
+            $dailyRoiPercent = (float) $activePackage->return_percent;
+        } elseif ($activeStaking) {
+            $stkAmt = (float) $activeStaking->invest_amount;
+            $stkPlan = $packagePlan ?? PackagePlan::where('min_amount', '<=', $stkAmt)
+                ->where(function ($q) use ($stkAmt) {
+                    $q->whereNull('max_amount')->orWhere('max_amount', '>=', $stkAmt);
+                })->first();
+            $dailyRoiPercent = $stkPlan && (float) $stkPlan->return_percent > 0
+                ? (float) $stkPlan->return_percent
+                : ($stkAmt >= 6000 ? 11.00 : ($stkAmt >= 600 ? 7.00 : 5.00));
+        }
         $result['dailyRoiPercent'] = $dailyRoiPercent;
 
         // 4. Total Earning & Max Earning limit
         $totalEarnQuery = (float) PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
             ->sum('total_earning');
-        $stakingEarnSum = (float) StakingDetail::where('memberid', $memberid)->sum('total_earned');
+        $stakingEarnSum = (float) StakingIncome::where('memberid', $memberid)->sum('amount');
         $totalEarning = round(max($totalEarnQuery, $stakingEarnSum), 2);
         $result['totalPackageEarning'] = $totalEarning;
         $result['totalEarning'] = $totalEarning;
@@ -160,8 +183,8 @@ class MemberDetailController extends Controller
             ->whereIn('status', ['Active', 'Accepted'])
             ->sum('max_earning');
         if ($maxEarningQuery <= 0 && $stakings->count() > 0) {
-            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) {
-                return $stk->getMaxRoiAmount();
+            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) use ($maxReturnPercent) {
+                return round((float) $stk->invest_amount * ($maxReturnPercent / 100), 2);
             });
         }
         $maxEarning = $maxEarningQuery > 0
@@ -239,11 +262,14 @@ class MemberDetailController extends Controller
 
         // Staking details lock checks
         foreach ($stakings as $stk) {
-            if ($stk->isLocked()) {
-                $isAnyLocked = true;
-                $stkUnlock = $stk->locked_until;
-                if ($stkUnlock && (! $primaryUnlockTime || $stkUnlock->gt($primaryUnlockTime))) {
-                    $primaryUnlockTime = $stkUnlock;
+            $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
+            if ($stkActivatedAt && $defaultLockDays > 0) {
+                $stkLockedUntil = $stkActivatedAt->copy()->addDays($defaultLockDays);
+                if (now()->lt($stkLockedUntil)) {
+                    $isAnyLocked = true;
+                    if (! $primaryUnlockTime || $stkLockedUntil->gt($primaryUnlockTime)) {
+                        $primaryUnlockTime = $stkLockedUntil;
+                    }
                 }
             }
         }
@@ -329,30 +355,40 @@ class MemberDetailController extends Controller
                 })->first();
         }
 
-        $defaultSetting = TradingWalletSetting::getActiveSetting();
-        $defaultLockDays = (int) ($defaultSetting->lock_days ?? 30);
+        $defaultSetting = TradingWalletSetting::first();
+        $defaultLockDays = (int) ($defaultSetting->lock_days ?? ($packagePlan->lock_days ?? 30));
 
         $maxReturnPercent = 200.00;
         if ($packagePlan && (float) $packagePlan->max_return_percent > 0) {
             $maxReturnPercent = (float) $packagePlan->max_return_percent;
         } elseif ($activePackage && (float) $activePackage->max_return_percent > 0) {
             $maxReturnPercent = (float) $activePackage->max_return_percent;
-        } elseif ($activeStaking && (float) $activeStaking->getCappingPercent() > 0) {
-            $maxReturnPercent = (float) $activeStaking->getCappingPercent();
+        } elseif ($activeStaking) {
+            $stkPlan = $packagePlan;
+            if (! $stkPlan && (float) $activeStaking->invest_amount > 0) {
+                $stkAmt = (float) $activeStaking->invest_amount;
+                $stkPlan = PackagePlan::where('min_amount', '<=', $stkAmt)
+                    ->where(function ($q) use ($stkAmt) {
+                        $q->whereNull('max_amount')->orWhere('max_amount', '>=', $stkAmt);
+                    })->first();
+            }
+            if ($stkPlan && (float) $stkPlan->max_return_percent > 0) {
+                $maxReturnPercent = (float) $stkPlan->max_return_percent;
+            }
         }
 
         $totalEarnQuery = (float) PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
             ->sum('total_earning');
-        $stakingEarnSum = (float) StakingDetail::where('memberid', $memberid)->sum('total_earned');
+        $stakingEarnSum = (float) StakingIncome::where('memberid', $memberid)->sum('amount');
         $totalEarning = round(max($totalEarnQuery, $stakingEarnSum), 2);
 
         $maxEarningQuery = (float) PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
             ->sum('max_earning');
         if ($maxEarningQuery <= 0 && $stakings->count() > 0) {
-            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) {
-                return $stk->getMaxRoiAmount();
+            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) use ($maxReturnPercent) {
+                return round((float) $stk->invest_amount * ($maxReturnPercent / 100), 2);
             });
         }
         $maxEarning = $maxEarningQuery > 0
@@ -425,11 +461,14 @@ class MemberDetailController extends Controller
         }
 
         foreach ($stakings as $stk) {
-            if ($stk->isLocked()) {
-                $isAnyLocked = true;
-                $stkUnlock = $stk->locked_until;
-                if ($stkUnlock && (! $primaryUnlockTime || $stkUnlock->gt($primaryUnlockTime))) {
-                    $primaryUnlockTime = $stkUnlock;
+            $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
+            if ($stkActivatedAt && $defaultLockDays > 0) {
+                $stkLockedUntil = $stkActivatedAt->copy()->addDays($defaultLockDays);
+                if (now()->lt($stkLockedUntil)) {
+                    $isAnyLocked = true;
+                    if (! $primaryUnlockTime || $stkLockedUntil->gt($primaryUnlockTime)) {
+                        $primaryUnlockTime = $stkLockedUntil;
+                    }
                 }
             }
         }
