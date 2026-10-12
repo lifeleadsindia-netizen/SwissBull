@@ -3028,7 +3028,7 @@
                                                         </span>
                                                     </div>
                                                     <p id="bannerReturnMessage" class="mb-0 text-white-50 mt-1" style="font-size: 0.85rem;">
-                                                        {{ $fundLockReturnMessage ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Locked, You are eligible for total return of '.number_format((float) ($maxReturnPercent ?? 200), 0).'% Returns' : 'You are eligible for total return of '.number_format((float) ($maxReturnPercent ?? 200), 0).'% Returns') }}
+                                                        {{ $fundLockReturnMessage ?? ((isset($isFundLocked) && $isFundLocked) ? 'Fund Locked, You are eligible for total return of '.number_format((float) ($maxReturnPercent ?? 0), 0).'% Returns' : 'You are eligible for total return of '.number_format((float) ($maxReturnPercent ?? 0), 0).'% Returns') }}
                                                     </p>
                                                 </div>
                                             </div>
@@ -3086,7 +3086,7 @@
                                                 </h3>
                                                 <div class="d-flex align-items-center gap-1 text-success mt-2" style="font-size: 0.78rem;">
                                                     <i class="fa-solid fa-coins"></i>
-                                                    <span>70% Allocated: $ {{ number_format((float) ($activePackage->trading_wallet_amount ?? (($activePackageInvestAmount ?? ($totalInvestment ?? 0)) * 0.70)), 2) }}</span>
+                                                    <span>{{ number_format((float) ($activeTradingWalletPercent ?? ($defaultTradingWalletPercent ?? 70)), 0) }}% Allocated: $ {{ number_format((float) ($activeTradingWalletAmount ?? ($activePackage->trading_wallet_amount ?? (($activePackageInvestAmount ?? ($totalInvestment ?? 0)) * (($defaultTradingWalletPercent ?? 70) / 100)))), 2) }}</span>
                                                 </div>
                                                 <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Available for trading &amp; withdrawal after unlock</small>
                                             </div>
@@ -3103,7 +3103,7 @@
                                                     $earnPercent = $mEarn > 0 ? min(100, round(($tEarn / $mEarn) * 100, 1)) : 0;
                                                     @endphp
                                                     <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60A5FA; font-size: 10px; font-weight: 700;">
-                                                        Max Return: {{ number_format((float) ($maxReturnPercent ?? 200), 0) }}%
+                                                        Max Return: {{ number_format((float) ($maxReturnPercent ?? 0), 0) }}%
                                                     </span>
                                                 </div>
                                                 <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem;">
@@ -3118,7 +3118,7 @@
                                                 </div>
                                                 <div class="d-flex justify-content-between text-white-50 mt-1" style="font-size: 0.68rem;">
                                                     <span>Rem: $ {{ number_format((float) ($remainingEligibility ?? max(0, $mEarn - $tEarn)), 2) }}</span>
-                                                    <span>Daily ROI: {{ number_format((float) ($dailyRoiPercent ?? 5.0), 1) }}%</span>
+                                                    <span>Daily ROI: {{ number_format((float) ($dailyRoiPercent ?? 0), 1) }}%</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -3142,13 +3142,13 @@
                                                     <div class="d-flex justify-content-between text-white-50 mb-1">
                                                         <span>Unlock Date:</span>
                                                         <span id="cardUnlockDateVal" class="text-white font-weight-bold">
-                                                            {{ $unlockDateTime ?? 'Unlocked' }}
+                                                             {{ $unlockDateTime ?? 'Unlocked' }}
                                                         </span>
                                                     </div>
                                                     <div class="d-flex justify-content-between text-white-50 mb-1">
                                                         <span>Max Return:</span>
                                                         <span class="text-warning font-weight-bold">
-                                                            {{ number_format((float) ($maxReturnPercent ?? 200), 0) }}% Returns
+                                                            {{ number_format((float) ($maxReturnPercent ?? 0), 0) }}% Returns
                                                         </span>
                                                     </div>
                                                     <div class="d-flex justify-content-between text-white-50">
@@ -3179,7 +3179,7 @@
                                                         <th>Activation Date</th>
                                                         <th>Package</th>
                                                         <th>Deposit</th>
-                                                        <th>Trading Wallet (70%)</th>
+                                                        <th>Trading Wallet</th>
                                                         <th>Max Earning</th>
                                                         <th>Max Return %</th>
                                                         <th>Lock Status</th>
@@ -3193,9 +3193,9 @@
                                                         <td class="text-white">{{ $pkg->activated_at ? date('d-m-Y H:i', strtotime($pkg->activated_at)) : ($pkg->created_at ? date('d-m-Y H:i', strtotime($pkg->created_at)) : '-') }}</td>
                                                         <td class="text-warning font-weight-bold">{{ $pkg->package_range ?? ($pkg->package ?? 'Standard') }}</td>
                                                         <td class="text-white font-weight-bold">$ {{ number_format((float) ($pkg->invest_amount ?? $pkg->package_value), 2) }}</td>
-                                                        <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)), 2) }}</td>
-                                                        <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->computed_max_earning ?? ($pkg->max_earning ?? (($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)) * (($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 200)) / 100)))), 2) }}</td>
-                                                        <td class="text-warning font-weight-bold">{{ number_format((float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 200)), 0) }}%</td>
+                                                        <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 70)) / 100)))), 2) }} <small class="text-white-50">({{ number_format((float) ($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 70)), 0) }}%)</small></td>
+                                                        <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->computed_max_earning ?? ($pkg->max_earning ?? (($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($defaultTradingWalletPercent ?? 70) / 100)))) * (($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)) / 100)))), 2) }}</td>
+                                                        <td class="text-warning font-weight-bold">{{ number_format((float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)), 0) }}%</td>
                                                         <td>
                                                             @if ($pkg->is_locked)
                                                             <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4); font-size: 10px;">
@@ -3996,7 +3996,7 @@ $referralLink = url('/member/register/' . $data['memberid']);
             },
             maxReturnPercent: {
                 {
-                    (float)($maxReturnPercent ?? 200)
+                    (float)($maxReturnPercent ?? 0)
                 }
             },
             remainingDays: {
