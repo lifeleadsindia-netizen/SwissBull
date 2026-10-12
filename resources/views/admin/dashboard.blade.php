@@ -540,7 +540,7 @@ unset($cat);
                     </div>
                 </div>
 
-                <div class="adm-chart-wrap" style="position: relative;">
+                <div class="adm-chart-wrap" style="position: relative;" id="admIncomeChartWrap">
                     <!-- Floating Tooltip Badge Dynamically Positioned Above Peak Interval -->
                     @php
                     $peakPos = $groupCenters[$chartData['peakIndex']] ?? 310;
@@ -548,13 +548,13 @@ unset($cat);
                     $peakH = $chartData['hasData'] ? max(20, round(($chartData['peakAmount'] / $chartData['yMax']) * 140)) : 10;
                     $badgeTop = max(10, 185 - $peakH);
                     @endphp
-                    <div class="adm-chart-floating-badge" style="left: calc({{ $peakPct }}% - 38px); top: {{ $badgeTop }}px;">
-                        $ {{ number_format($chartData['peakAmount'], 2) }}
-                        <span>{{ $chartData['peakLabel'] }}</span>
+                    <div class="adm-chart-floating-badge" id="admChartBadge" style="left: {{ $peakPct }}%; top: {{ $badgeTop }}px;">
+                        <span class="adm-chart-badge-amt">$ {{ number_format($chartData['peakAmount'], 2) }}</span>
+                        <span class="adm-chart-badge-date">{{ $chartData['peakLabel'] }}</span>
                     </div>
 
                     <!-- Pixel-Perfect SVG Bar Chart with 100% Dynamic Data -->
-                    <svg class="adm-svg-chart" viewBox="0 0 650 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="adm-svg-chart" id="admIncomeSvgChart" viewBox="0 0 650 230" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <!-- Horizontal Grid Lines & Dynamic Y-Axis Labels -->
                         <line x1="45" y1="20" x2="640" y2="20" stroke="#F1F5F9" stroke-dasharray="3 3" />
                         <text x="10" y="24" fill="#94A3B8" font-size="11" font-weight="600">{{ $chartData['yMax'] }}</text>
@@ -595,29 +595,52 @@ unset($cat);
                         $h3 = $b3 > 0 ? max(6, min(140, round(($b3 / $chartData['yMax']) * 140))) : ($chartData['hasData'] ? 0 : 2);
 
                         if ($isPeak && $h2 < 18) {
-                            $h2=max(18, min(140, round(($grp['total'] / $chartData['yMax']) * 140)));
-                            }
+                            $h2 = max(18, min(140, round(($grp['total'] / $chartData['yMax']) * 140)));
+                        }
 
-                            $y1=200 - $h1;
-                            $y2=200 - $h2;
-                            $y3=200 - $h3;
-                            @endphp
+                        $y1 = 200 - $h1;
+                        $y2 = 200 - $h2;
+                        $y3 = 200 - $h3;
 
-                            @if ($h1> 0)
-                            <rect x="{{ $cX - 15 }}" y="{{ $y1 }}" width="8" height="{{ $h1 }}" rx="4" fill="url(#barGrad)" />
+                        $minY = 200;
+                        if ($h1 > 0 && $y1 < $minY) { $minY = $y1; }
+                        if ($h2 > 0 && $y2 < $minY) { $minY = $y2; }
+                        if ($h3 > 0 && $y3 < $minY) { $minY = $y3; }
+
+                        $prevCenter = $idx > 0 ? ($groupCenters[$idx - 1] ?? ($cX - 60)) : 45;
+                        $nextCenter = isset($groupCenters[$idx + 1]) ? $groupCenters[$idx + 1] : 640;
+                        $hitX = $idx === 0 ? 45 : ($prevCenter + $cX) / 2;
+                        $hitRight = $idx === count($chartData['groups']) - 1 ? 640 : ($cX + $nextCenter) / 2;
+                        $hitW = max(20, $hitRight - $hitX);
+                        @endphp
+
+                        <g class="adm-chart-col-group {{ $isPeak ? 'is-active is-peak' : '' }}"
+                           data-index="{{ $idx }}"
+                           data-amount="{{ number_format($grp['total'], 2) }}"
+                           data-label="{{ $grp['label'] }}"
+                           data-cx="{{ $cX }}"
+                           data-top-y="{{ $minY }}"
+                           data-is-peak="{{ $isPeak ? '1' : '0' }}">
+
+                            <!-- Hitbox covering the column for smooth hover tracking -->
+                            <rect class="adm-chart-hitbox" x="{{ $hitX }}" y="10" width="{{ $hitW }}" height="215" fill="#000" opacity="0" style="cursor: pointer; pointer-events: all;" />
+
+                            @if ($h1 > 0)
+                            <rect class="adm-bar adm-bar-1" x="{{ $cX - 15 }}" y="{{ $y1 }}" width="8" height="{{ $h1 }}" rx="4" fill="url(#barGrad)" />
                             @endif
 
                             @if ($h2 > 0)
-                            <rect x="{{ $cX - 4 }}" y="{{ $y2 }}" width="9" height="{{ $h2 }}" rx="4.5" fill="{{ $isPeak ? 'url(#barActiveGrad)' : '#93C5FD' }}" />
+                            <rect class="adm-bar adm-bar-center" x="{{ $cX - 4 }}" y="{{ $y2 }}" width="9" height="{{ $h2 }}" rx="4.5" fill="{{ $isPeak ? 'url(#barActiveGrad)' : '#93C5FD' }}" />
                             @endif
 
                             @if ($h3 > 0)
-                            <rect x="{{ $cX + 8 }}" y="{{ $y3 }}" width="8" height="{{ $h3 }}" rx="4" fill="url(#barGrad)" />
+                            <rect class="adm-bar adm-bar-3" x="{{ $cX + 8 }}" y="{{ $y3 }}" width="8" height="{{ $h3 }}" rx="4" fill="url(#barGrad)" />
                             @endif
 
                             <!-- X Axis Date Label -->
                             <text x="{{ $cX }}" y="218" fill="#94A3B8" font-size="11" font-weight="600" text-anchor="middle">{{ $grp['label'] }}</text>
-                            @endforeach
+                        </g>
+                        @endforeach
                     </svg>
                 </div>
             </div>
@@ -782,5 +805,136 @@ unset($cat);
 <script src="{{ asset('adm_assets/assets/js/widget-data.js') }}"></script>
 <script src="{{ asset('adm_assets/assets/js/dashboard-charts.js') }}"></script>
 <script src="{{ asset('adm_assets/assets/js/widgets.js') }}"></script>
+
+<script>
+(function() {
+    function initChartTooltip() {
+        var wrap = document.getElementById('admIncomeChartWrap');
+        var svg = document.getElementById('admIncomeSvgChart');
+        var badge = document.getElementById('admChartBadge');
+        if (!wrap || !svg || !badge) return;
+
+        var amtEl = badge.querySelector('.adm-chart-badge-amt');
+        var dateEl = badge.querySelector('.adm-chart-badge-date');
+        var groups = Array.prototype.slice.call(wrap.querySelectorAll('.adm-chart-col-group'));
+        if (!groups.length) return;
+
+        var peakGroup = wrap.querySelector('.adm-chart-col-group.is-peak');
+        if (!peakGroup) {
+            peakGroup = groups[Math.floor(groups.length / 2)] || groups[0];
+        }
+
+        var currentActiveGroup = peakGroup;
+
+        function updatePosition(group) {
+            if (!group) return;
+
+            var cX = parseFloat(group.getAttribute('data-cx')) || 0;
+            var topY = parseFloat(group.getAttribute('data-top-y')) || 200;
+            var amount = group.getAttribute('data-amount') || '0.00';
+            var label = group.getAttribute('data-label') || '';
+
+            if (amtEl) amtEl.textContent = '$ ' + amount;
+            if (dateEl) dateEl.textContent = label;
+
+            var wrapRect = wrap.getBoundingClientRect();
+            var targetX = 0;
+            var targetY = 0;
+
+            if (typeof svg.getScreenCTM === 'function' && typeof svg.createSVGPoint === 'function') {
+                var ctm = svg.getScreenCTM();
+                if (ctm) {
+                    var pt = svg.createSVGPoint();
+                    pt.x = cX + 0.5;
+                    pt.y = topY;
+                    var screenPt = pt.matrixTransform(ctm);
+                    targetX = screenPt.x - wrapRect.left;
+                    targetY = screenPt.y - wrapRect.top;
+                }
+            }
+
+            if (!targetX) {
+                var centerBar = group.querySelector('.adm-bar-center') || group.querySelector('.adm-chart-hitbox');
+                if (centerBar) {
+                    var bRect = centerBar.getBoundingClientRect();
+                    targetX = (bRect.left + bRect.width / 2) - wrapRect.left;
+                    targetY = bRect.top - wrapRect.top;
+                } else {
+                    targetX = (cX / 650) * wrapRect.width;
+                    targetY = (topY / 230) * wrapRect.height;
+                }
+            }
+
+            var badgeWidth = badge.offsetWidth || 84;
+            var badgeHeight = badge.offsetHeight || 38;
+            var halfBadge = badgeWidth / 2;
+            var wrapWidth = wrap.clientWidth || wrapRect.width;
+
+            var minX = halfBadge + 8;
+            var maxX = Math.max(minX, wrapWidth - halfBadge - 8);
+            var clampedX = Math.max(minX, Math.min(maxX, targetX));
+
+            var arrowOffset = targetX - clampedX;
+            var maxArrowShift = Math.max(0, halfBadge - 12);
+            arrowOffset = Math.max(-maxArrowShift, Math.min(maxArrowShift, arrowOffset));
+
+            var badgeTop = targetY - badgeHeight - 8;
+            if (badgeTop < 6) {
+                badgeTop = 6;
+            }
+
+            badge.style.setProperty('--arrow-offset', arrowOffset.toFixed(1) + 'px');
+            badge.style.left = clampedX.toFixed(1) + 'px';
+            badge.style.top = badgeTop.toFixed(1) + 'px';
+        }
+
+        function setActiveGroup(group) {
+            currentActiveGroup = group;
+            groups.forEach(function(g) {
+                var centerBar = g.querySelector('.adm-bar-center');
+                if (g === group) {
+                    g.classList.add('is-active');
+                    if (centerBar) centerBar.setAttribute('fill', 'url(#barActiveGrad)');
+                } else {
+                    g.classList.remove('is-active');
+                    if (centerBar) centerBar.setAttribute('fill', '#93C5FD');
+                }
+            });
+            updatePosition(group);
+        }
+
+        groups.forEach(function(group) {
+            group.addEventListener('mouseenter', function() {
+                setActiveGroup(group);
+            });
+            group.addEventListener('mousemove', function() {
+                if (currentActiveGroup !== group) {
+                    setActiveGroup(group);
+                }
+            });
+            group.addEventListener('touchstart', function() {
+                setActiveGroup(group);
+            }, { passive: true });
+        });
+
+        wrap.addEventListener('mouseleave', function() {
+            setActiveGroup(peakGroup);
+        });
+
+        window.addEventListener('resize', function() {
+            updatePosition(currentActiveGroup);
+        });
+
+        setActiveGroup(peakGroup);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChartTooltip);
+    } else {
+        initChartTooltip();
+    }
+    window.addEventListener('load', initChartTooltip);
+})();
+</script>
 @endpush
 @endsection

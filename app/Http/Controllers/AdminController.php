@@ -1191,12 +1191,19 @@ class AdminController extends Controller
     public function acheivImage(Request $request)
     {
         $request->validate([
-            // 'rank' => 'required|unique:achivers_images,rank',
+            'rank' => 'nullable|integer',
             'title' => 'required',
             'image' => 'required',
         ]);
+
+        if (Schema::hasTable('achivers_images') && ! Schema::hasColumn('achivers_images', 'rank')) {
+            Schema::table('achivers_images', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->integer('rank')->nullable()->after('id');
+            });
+        }
+
         $var = new AchiversImage;
-        // $var->rank = $request->post('rank');
+        $var->rank = $request->filled('rank') ? (int) $request->post('rank') : null;
         $var->title = $request->post('title');
         $pImage = $request->file('image');
         $ext = $pImage->getClientOriginalExtension();
