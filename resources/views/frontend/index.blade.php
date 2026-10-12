@@ -288,21 +288,23 @@
 
     /* HERO */
     header {
-      min-height: 100vh;
+      min-height: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       text-align: center;
-      padding: 66px 6vw 60px;
+      padding: 26px 5vw 34px;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
     }
 
     .pill {
       display: inline-flex;
       align-items: center;
       gap: 9px;
-      margin-bottom: 24px;
-      padding: 9px 20px;
+      margin-bottom: 14px;
+      padding: 7px 18px;
       border-radius: 100px;
       font-size: .72rem;
       letter-spacing: 2px;
@@ -310,8 +312,7 @@
       border: 1px solid var(--line);
       background: var(--surface);
       color: var(--gold);
-      opacity: 0;
-      animation: rise .8s ease .1s forwards;
+      animation: rise .5s ease forwards;
     }
 
     .pill i {
@@ -339,8 +340,8 @@
 
     @keyframes rise {
       from {
-        opacity: 0;
-        transform: translateY(26px)
+        opacity: 0.2;
+        transform: translateY(12px)
       }
 
       to {
@@ -352,21 +353,24 @@
     /* animated logo stage */
     .logo-stage {
       position: relative;
-      width: min(560px, 92vw);
-      aspect-ratio: 1/0.62;
-      display: grid;
-      place-items: center;
-      margin: 2px auto;
-      opacity: 0;
-      animation: rise 1s ease .2s forwards;
+      width: min(340px, 86vw);
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      animation: rise .5s ease forwards;
     }
 
     .hero-logo {
       position: relative;
       z-index: 5;
-      width: min(440px, 78vw);
-      filter: drop-shadow(0 10px 34px rgba(34, 197, 94, 0.45));
-      animation: float 6s ease-in-out 1.2s infinite;
+      width: min(250px, 68vw);
+      max-height: 120px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 22px rgba(34, 197, 94, 0.35));
+      animation: float 6s ease-in-out infinite;
     }
 
     @keyframes float {
@@ -377,7 +381,7 @@
       }
 
       50% {
-        transform: translateY(-13px)
+        transform: translateY(-8px)
       }
     }
 
@@ -385,11 +389,12 @@
     .ls-glow {
       position: absolute;
       z-index: 1;
-      width: 58%;
-      aspect-ratio: 1;
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(34, 197, 94, 0.35), rgba(245, 196, 81, 0.14) 45%, transparent 70%);
-      filter: blur(26px);
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.24) 0%, rgba(245, 196, 81, 0.1) 45%, transparent 72%);
+      filter: blur(20px);
+      pointer-events: none;
       animation: halo 4.5s ease-in-out infinite;
     }
 
@@ -397,12 +402,12 @@
 
       0%,
       100% {
-        transform: scale(0.9);
+        transform: scale(0.92);
         opacity: .75
       }
 
       50% {
-        transform: scale(1.15);
+        transform: scale(1.1);
         opacity: 1
       }
     }
@@ -416,28 +421,28 @@
     }
 
     .ls-ring.r1 {
-      width: 52%;
-      aspect-ratio: 1;
-      border: 1.5px dashed rgba(245, 196, 81, 0.5);
-      animation: spin 18s linear infinite;
+      width: 175px;
+      height: 175px;
+      border: 1px dashed rgba(245, 196, 81, 0.45);
+      animation: spin 20s linear infinite;
     }
 
     .ls-ring.r2 {
-      width: 66%;
-      aspect-ratio: 1;
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      border-top-color: rgba(34, 197, 94, 0.9);
-      border-right-color: transparent;
-      animation: spin 11s linear infinite reverse;
+      width: 215px;
+      height: 215px;
+      border: 1.5px solid transparent;
+      border-top-color: rgba(34, 197, 94, 0.85);
+      border-bottom-color: rgba(245, 196, 81, 0.6);
+      animation: spin 14s linear infinite reverse;
     }
 
     .ls-ring.r3 {
-      width: 80%;
-      aspect-ratio: 1;
-      border: 1px solid transparent;
-      border-top-color: rgba(239, 68, 68, 0.7);
-      border-bottom-color: rgba(245, 196, 81, 0.5);
-      animation: spin 26s linear infinite;
+      width: 250px;
+      height: 250px;
+      border: 1px solid rgba(34, 197, 94, 0.18);
+      border-left: 1.5px solid rgba(245, 196, 81, 0.5);
+      border-right: 1.5px solid rgba(34, 197, 94, 0.55);
+      animation: spin 28s linear infinite;
     }
 
     @keyframes spin {
@@ -455,108 +460,126 @@
     }
 
     .ls-orbit.o1 {
-      width: 52%;
-      aspect-ratio: 1;
-      animation: spin 7s linear infinite;
+      width: 175px;
+      height: 175px;
+      animation: spin 20s linear infinite;
     }
 
     .ls-orbit.o2 {
-      width: 66%;
-      aspect-ratio: 1;
-      animation: spin 10s linear infinite reverse;
-    }
-
-    .ls-orbit.o3 {
-      width: 80%;
-      aspect-ratio: 1;
-      animation: spin 14s linear infinite;
+      width: 215px;
+      height: 215px;
+      animation: spin 14s linear infinite reverse;
     }
 
     .ls-orbit i {
       position: absolute;
-      top: -5px;
+      top: -4px;
       left: 50%;
-      width: 10px;
-      height: 10px;
-      margin-left: -5px;
+      width: 8px;
+      height: 8px;
+      margin-left: -4px;
       border-radius: 50%;
     }
 
     .ls-orbit.o1 i {
       background: var(--gold);
-      box-shadow: 0 0 14px var(--gold);
+      box-shadow: 0 0 12px var(--gold);
     }
 
     .ls-orbit.o2 i {
       background: var(--green);
-      box-shadow: 0 0 14px var(--green);
-    }
-
-    .ls-orbit.o3 i {
-      background: var(--red);
-      box-shadow: 0 0 14px var(--red);
+      box-shadow: 0 0 12px var(--green);
     }
 
     @media(max-width:560px) {
       .logo-stage {
-        width: 96vw;
+        width: 250px;
+        height: 190px;
+        margin: 0 auto 10px;
+      }
+
+      .hero-logo {
+        width: min(190px, 62vw);
+        max-height: 90px;
+      }
+
+      .ls-glow {
+        width: 160px;
+        height: 160px;
       }
 
       .ls-ring.r1,
       .ls-orbit.o1 {
-        width: 60%;
+        width: 145px;
+        height: 145px;
       }
 
       .ls-ring.r2,
       .ls-orbit.o2 {
-        width: 74%;
+        width: 175px;
+        height: 175px;
       }
 
-      .ls-ring.r3,
-      .ls-orbit.o3 {
-        width: 90%;
+      .ls-ring.r3 {
+        width: 205px;
+        height: 205px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-logo,
+      .ls-ring,
+      .ls-orbit,
+      .ls-glow,
+      .pill,
+      .pill i,
+      h1,
+      .hero-sub,
+      .hero-cta,
+      .stats {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
       }
     }
 
     h1 {
-      font-size: clamp(2rem, 5.6vw, 4.1rem);
+      font-size: clamp(2rem, 5.2vw, 3.8rem);
       font-weight: 900;
-      line-height: 1.05;
+      line-height: 1.08;
       letter-spacing: -1px;
-      margin: 18px 0 12px;
-      max-width: 18ch;
+      margin: 0 0 12px;
+      max-width: 20ch;
       color: var(--heading);
-      opacity: 0;
-      animation: rise 1s ease .35s forwards;
+      animation: rise .5s ease forwards;
       overflow-wrap: break-word;
     }
 
     .hero-sub {
       max-width: 680px;
       color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.18rem);
-      margin-bottom: 28px;
-      opacity: 0;
-      animation: rise 1s ease .5s forwards;
+      font-size: clamp(0.95rem, 1.8vw, 1.12rem);
+      line-height: 1.55;
+      margin: 0 0 20px;
+      animation: rise .5s ease forwards;
     }
 
     .hero-cta {
       display: flex;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
-      opacity: 0;
-      animation: rise 1s ease .7s forwards;
+      margin-bottom: 24px;
+      animation: rise .5s ease forwards;
     }
 
     .stats {
       display: flex;
-      gap: 26px 44px;
+      gap: 20px 40px;
       flex-wrap: wrap;
       justify-content: center;
-      margin-top: 58px;
-      opacity: 0;
-      animation: rise 1s ease .85s forwards;
+      margin-top: 4px;
+      animation: rise .5s ease forwards;
     }
 
     .stat b {
@@ -1676,7 +1699,7 @@
 
     @media(max-width:640px) {
       header {
-        padding: 52px 5vw 44px;
+        padding: 20px 4vw 26px;
       }
 
       section {
@@ -1766,7 +1789,6 @@
 
     <!-- HERO -->
     <header id="home">
-      <span class="pill"><i></i> Algorithmic · Copy Trading · Market Analysis</span>
       <div class="logo-stage">
         <span class="ls-glow"></span>
         <span class="ls-ring r1"></span>
@@ -1774,9 +1796,9 @@
         <span class="ls-ring r3"></span>
         <span class="ls-orbit o1"><i></i></span>
         <span class="ls-orbit o2"><i></i></span>
-        <span class="ls-orbit o3"><i></i></span>
         <img src="{{ asset('fs_assets/logo.png') }}" class="hero-logo" alt="{{ config('detailsApp.name', 'Sync-Trade') }}" />
       </div>
+      <span class="pill"><i></i> Algorithmic · Copy Trading · Market Analysis</span>
       <h1>Where <span class="grn">Trading Intelligence</span> Meets <span class="gold">Technology</span></h1>
       <p class="hero-sub">A technology-driven forex trading &amp; investment platform combining algorithmic systems, copy trading and structured market analysis — built on transparency, discipline and responsible risk management.</p>
       <div class="hero-cta">
