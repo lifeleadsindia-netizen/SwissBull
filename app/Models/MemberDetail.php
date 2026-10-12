@@ -63,11 +63,12 @@ class MemberDetail extends Model
 
     /**
      * Accessor: Default maximum withdrawal percentage from active setting.
+     * (Feature disabled: Max Withdrawal Percentage cap removed)
      */
-    public function getTradingWalletWithdrawalPercentAttribute(): float
-    {
-        return PackageDistribution::getDefaultWithdrawalPercent();
-    }
+    // public function getTradingWalletWithdrawalPercentAttribute(): float
+    // {
+    //     return PackageDistribution::getDefaultWithdrawalPercent();
+    // }
 
     /**
      * Accessor: Dynamic locked until timestamp.
@@ -95,22 +96,11 @@ class MemberDetail extends Model
             }
         }
 
-        $packages = $this->relationLoaded('packageDetails')
-            ? $this->packageDetails
-            : $this->packageDetails()->get();
-
-        foreach ($packages as $pkg) {
-            $unl = $pkg->locked_until;
-            if ($unl && (! $latest || $unl->gt($latest))) {
-                $latest = $unl;
-            }
-        }
-
         return $latest;
     }
 
     /**
-     * Check if the member's trading wallet is currently locked based on staking_details or package_details.
+     * Check if the member's trading wallet is currently locked based on staking_details.
      */
     public function isTradingWalletLocked(): bool
     {
@@ -118,18 +108,8 @@ class MemberDetail extends Model
             ? $this->stakingDetails
             : $this->stakingDetails()->get();
 
-        if ($stakings->contains(function ($stk) {
+        return $stakings->contains(function ($stk) {
             return $stk->isLocked();
-        })) {
-            return true;
-        }
-
-        $packages = $this->relationLoaded('packageDetails')
-            ? $this->packageDetails
-            : $this->packageDetails()->get();
-
-        return $packages->contains(function ($pkg) {
-            return $pkg->isLocked();
         });
     }
 
@@ -148,6 +128,7 @@ class MemberDetail extends Model
 
     /**
      * Calculate maximum withdrawable amount from Trading Wallet (using P2P Wallet balance).
+     * (Feature disabled: Max Withdrawal Percentage cap removed - full available balance allowed once unlocked)
      */
     public function tradingWalletMaxWithdrawable(): float
     {
@@ -155,15 +136,17 @@ class MemberDetail extends Model
             return 0.00;
         }
 
-        $percent = PackageDistribution::getDefaultWithdrawalPercent();
-        $balance = (float) ($this->trading_wallet ?? 0.00);
-        $max = ($balance * (float) $percent) / 100.00;
+        // Feature disabled: Max Withdrawal Percentage cap calculation removed.
+        // $percent = PackageDistribution::getDefaultWithdrawalPercent();
+        // $balance = (float) ($this->trading_wallet ?? 0.00);
+        // $max = ($balance * (float) $percent) / 100.00;
+        // return max(0.00, round($max, 2));
 
-        return max(0.00, round($max, 2));
+        return max(0.00, round((float) ($this->trading_wallet ?? 0.00), 2));
     }
 
     /**
-     * Validate Trading Wallet withdrawal request against Condition A (Lock) and Condition B (Max %).
+     * Validate Trading Wallet withdrawal request against Lock Period and available balance.
      */
     public function canWithdrawTradingWallet(float $amount, ?string &$errorMessage = null): bool
     {
@@ -190,14 +173,13 @@ class MemberDetail extends Model
             return false;
         }
 
-        // CONDITION B: Maximum Withdrawal Percentage (Post-lock)
-        $maxWithdrawable = $this->tradingWalletMaxWithdrawable();
-        if ($amount > $maxWithdrawable) {
-            $percent = PackageDistribution::getDefaultWithdrawalPercent();
-            $errorMessage = 'Requested amount ($'.number_format($amount, 2).") exceeds the maximum allowed withdrawal limit of {$percent}% ($".number_format($maxWithdrawable, 2).') from your Trading Wallet.';
-
-            return false;
-        }
+        // CONDITION B: Maximum Withdrawal Percentage (Post-lock) - DISABLED
+        // $maxWithdrawable = $this->tradingWalletMaxWithdrawable();
+        // if ($amount > $maxWithdrawable) {
+        //     $percent = PackageDistribution::getDefaultWithdrawalPercent();
+        //     $errorMessage = 'Requested amount ($'.number_format($amount, 2).") exceeds the maximum allowed withdrawal limit of {$percent}% ($".number_format($maxWithdrawable, 2).') from your Trading Wallet.';
+        //     return false;
+        // }
 
         return true;
     }
