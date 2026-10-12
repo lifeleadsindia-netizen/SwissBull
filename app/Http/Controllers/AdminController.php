@@ -923,7 +923,6 @@ class AdminController extends Controller
             'trading_wallet' => 'nullable|numeric|min:0|max:100',
             'hero_of_the_month' => 'nullable|numeric|min:0|max:100',
             'lock_days' => 'nullable|integer|min:0',
-            'withdrawal_percent' => 'nullable|numeric|min:0|max:100',
             'status' => 'nullable|in:on,off,lock,unlock,On,Off',
             'capping' => 'nullable|numeric|min:0',
             'capping_percent' => 'nullable|numeric|min:0',
@@ -951,13 +950,14 @@ class AdminController extends Controller
             $distribution->hero_of_the_month = (float) $request->input('hero_of_the_month');
         }
 
-        // 2. Trading Wallet Control: Lock Days, Withdrawal %, Status
+        // 2. Trading Wallet Control: Lock Days, Status
         if ($request->has('lock_days')) {
             $distribution->lock_days = (int) $request->input('lock_days');
         }
-        if (Schema::hasColumn('package_distributions', 'withdrawal_percent') && $request->filled('withdrawal_percent')) {
-            $distribution->withdrawal_percent = (float) $request->input('withdrawal_percent');
-        }
+        // Feature disabled: Max Withdrawal Percentage
+        // if (Schema::hasColumn('package_distributions', 'withdrawal_percent') && $request->filled('withdrawal_percent')) {
+        //     $distribution->withdrawal_percent = (float) $request->input('withdrawal_percent');
+        // }
         if ($request->has('status')) {
             $rawStatus = strtolower((string) $request->input('status'));
             $distribution->status = in_array($rawStatus, ['on', 'lock']) ? 'on' : 'off';

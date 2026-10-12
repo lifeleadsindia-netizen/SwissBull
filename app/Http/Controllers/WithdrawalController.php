@@ -824,7 +824,8 @@ class WithdrawalController extends Controller
     }
 
     /**
-     * Validate Trading Wallet withdrawal request based on Lock Period (Condition A) and Max Percentage (Condition B).
+     * Validate Trading Wallet withdrawal request based on Lock Period (Condition A) and available balance.
+     * (Condition B: Max Percentage cap has been disabled).
      */
     public function tradingWalletValidate(Request $request)
     {

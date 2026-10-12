@@ -82,11 +82,13 @@ class PackageDistribution extends Model
         return (int) ($setting?->lock_days ?? 0);
     }
 
+    /**
+     * Obsolete: Default maximum withdrawal percentage (Feature disabled: Max Withdrawal Percentage removed).
+     * Retained as safe fallback returning 100.00 without querying database column.
+     */
     public static function getDefaultWithdrawalPercent(): float
     {
-        $setting = static::first();
-
-        return (float) ($setting?->withdrawal_percent ?? 100.00);
+        return 100.00;
     }
 
     public static function getStatus(): string
@@ -172,7 +174,7 @@ class PackageDistribution extends Model
             'team_performance_bonus' => (float) ($config->team_performance_bonus ?? 10.0),
             'hero_of_the_month' => (float) ($config->hero_of_the_month ?? 2.0),
             'lock_days' => (int) ($config->lock_days ?? 0),
-            'withdrawal_percent' => (float) ($config->withdrawal_percent ?? 100.0),
+            // 'withdrawal_percent' => (float) ($config->withdrawal_percent ?? 100.0),
             'status' => (string) ($config->status ?? 'on'),
             'capping' => (float) ($config->capping ?? 200.0),
             'capping_percent' => (float) ($config->capping ?? 200.0),

@@ -149,26 +149,6 @@
                                         @enderror
                                     </div>
 
-                                    <div class="form-group mb-3">
-                                        <label for="withdrawal_percent" class="font-weight-bold text-dark">
-                                            {{ __('Max Withdrawal Percentage') }}
-                                        </label>
-                                        <div class="input-group">
-                                            <input type="number" step="any" min="0" max="100"
-                                                class="form-control font-weight-bold @error('withdrawal_percent') is-invalid @enderror"
-                                                id="withdrawal_percent"
-                                                name="withdrawal_percent"
-                                                value="{{ old('withdrawal_percent', optional($distribution)->withdrawal_percent !== null ? number_format((float) $distribution->withdrawal_percent, 2, '.', '') : '100.00') }}"
-                                                placeholder="100.00">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text font-weight-bold bg-light">%</span>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            {{ __('Allowable withdrawal percentage from trading wallet after lock expires.') }}
-                                        </small>
-                                    </div>
-
                                     {{-- Trading Wallet Status (ON / OFF) --}}
                                     <div class="form-group mb-0">
                                         <label class="font-weight-bold text-dark d-block">{{ __('Trading Wallet Status') }}</label>
