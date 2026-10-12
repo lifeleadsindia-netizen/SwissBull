@@ -259,32 +259,6 @@
         letter-spacing: 0.02em;
     }
 
-    .withdrawal-stat-card-trading {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(18, 22, 32, 0.75));
-        border-color: rgba(16, 185, 129, 0.28);
-    }
-
-    .withdrawal-stat-card-trading::before,
-    .withdrawal-stat-card-trading::after {
-        background: #10B981;
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.9);
-    }
-
-    .withdrawal-icon-trading {
-        background: rgba(16, 185, 129, 0.20);
-        border-color: rgba(16, 185, 129, 0.55);
-        color: #34D399;
-    }
-
-    .withdrawal-progress-trading span {
-        background: linear-gradient(90deg, #10B981, #34D399 52%, #06B6D4);
-        box-shadow: 0 0 18px rgba(16, 185, 129, 0.7);
-    }
-
-    .withdrawal-meta-trading {
-        color: rgba(52, 211, 153, 0.85);
-    }
-
     .admin-pool-btn {
         position: relative;
         overflow: hidden;
@@ -1927,7 +1901,7 @@
                             $('#btnVerifyWa').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Verifying...');
 
                             $.ajax({
-                                url: '{{ route('member.whatsapp.verify') }}',
+                                url: "{{ route('member.whatsapp.verify') }}",
                                 type: 'POST',
                                 data: {
                                     mobile_number: mobile,
@@ -2011,7 +1985,7 @@
                             $('#btnSendWa').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processing...');
 
                             $.ajax({
-                                url: '{{ route('member.whatsapp.process') }}',
+                                url: "{{ route('member.whatsapp.process') }}",
                                 type: 'POST',
                                 data: {
                                     mobile_number: mobile,
@@ -2781,7 +2755,7 @@
                                 <h3 class="mt-2 mb-2 text-white">Congratulations
                                 </h3>
                                 <h2 class="mb-0 text-white">{{ $data['memberid'] }}</h2>
-                                <h5 class="mb-0 mt-3 text-white">{{ getName($data['memberid']) }}</h5>
+                                <h4 class="mb-0 mt-3 text-white">{{ getName($data['memberid']) }}</h4>
                             </div>
                             <div class="card-body" style="background-color: #0c0e14;">
                                 <div class="row g-3 text-center">
@@ -2829,14 +2803,27 @@
                                         <li>
                                             <div class="timeline-panel">
                                                 <div class="media-body">
-                                                    <h5 class="mb-0">Monthly Direct Business</h5>
+                                                    <h5 class="mb-0">Monthly Direct Biz </h5>
                                                     <small class="text-muted"></small>
                                                 </div>
                                                 <div class="dropdown">
-                                                    <button type="button" class="btn btn-success light sharp"
-                                                        data-bs-toggle="dropdown">
-                                                        {{ $data['direct_biz'] }}
-                                                    </button>
+                                                    <small>
+                                                        $
+                                                        {{ number_format((float) $data['direct_biz'], 2) }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="timeline-panel">
+                                                <div class="media-body">
+                                                    <h5 class="mb-0">Daily Team Biz</h5>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <small>
+                                                        $
+                                                        {{ number_format((float) ($data['daily_team_biz'] + $data['part_daily_team_biz']), 2) }}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </li>
@@ -2907,18 +2894,7 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Daily Team Biz</h5>
-                                                </div>
-                                                <div class="dropdown">
-                                                    <small>
-                                                        $
-                                                        {{ $data['daily_team_biz'] + $data['part_daily_team_biz'] }}</small>
-                                                </div>
-                                            </div>
-                                        </li>
+
                                         <!--<li>-->
                                         <!--    <div class="timeline-panel">-->
                                         <!--        <div class="media-body">-->
@@ -3270,7 +3246,6 @@
                 <h4 class="withdrawal-overview-title mb-3">Withdrawal Overview</h4>
 
                 <div class="row g-3">
-                    <!-- 1. Today's Withdrawal (Income Wallet) -->
                     <div class="col-xl-6 col-lg-6 col-sm-12">
                         <div class="withdrawal-stat-card">
                             <div class="withdrawal-stat-inner">
@@ -3294,7 +3269,6 @@
                         </div>
                     </div>
 
-                    <!-- 2. Total Withdrawal (Income Wallet) -->
                     <div class="col-xl-6 col-lg-6 col-sm-12">
                         <div class="withdrawal-stat-card">
                             <div class="withdrawal-stat-inner">
