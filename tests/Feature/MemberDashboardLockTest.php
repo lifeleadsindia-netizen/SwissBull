@@ -13,10 +13,22 @@ class MemberDashboardLockTest extends TestCase
 {
     private string $memberId;
 
+    private ?string $originalDistStatus = null;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->withoutMiddleware(PreventRequestForgery::class);
+
+        $dist = \DB::table('package_distributions')->where('id', 1)->first();
+        if ($dist && isset($dist->status)) {
+            $this->originalDistStatus = $dist->status;
+        }
+        \DB::table('package_distributions')->where('id', 1)->update([
+            'status' => 'on',
+            'lock_days' => 30,
+            'withdrawal_percent' => 100.00,
+        ]);
 
         TradingWalletSetting::updateOrCreate(['id' => 1], [
             'lock_days' => 30,
@@ -31,6 +43,7 @@ class MemberDashboardLockTest extends TestCase
             'email' => 'mbtest'.rand(1000, 9999).'@test.com',
             'password' => bcrypt('password123'),
             'p2p_wallet' => 350.00,
+            'trading_wallet' => 350.00,
             'wallet' => 100.00,
             'country' => 'India',
             'status' => 'Active',
@@ -39,6 +52,10 @@ class MemberDashboardLockTest extends TestCase
 
     protected function tearDown(): void
     {
+        if ($this->originalDistStatus !== null) {
+            \DB::table('package_distributions')->where('id', 1)->update(['status' => $this->originalDistStatus]);
+        }
+
         PackageDetail::where('memberid', $this->memberId)->delete();
         StakingDetail::where('memberid', $this->memberId)->delete();
         MemberDetail::where('memberid', $this->memberId)->delete();
@@ -66,7 +83,7 @@ class MemberDashboardLockTest extends TestCase
             'expires_at' => now()->addDays(1200),
             'return_percent' => 5.00,
             'total_earning' => 25.00,
-            'max_earning' => 1000.00,
+            'max_earning' => 700.00,
             'max_return_percent' => 200.00,
             'lock_days' => 30,
             'lock_applied_at' => now(),
@@ -84,7 +101,7 @@ class MemberDashboardLockTest extends TestCase
         $response->assertSee('500.00');
         $response->assertSee('350.00');
         $response->assertSee('25.00');
-        $response->assertSee('1,000.00');
+        $response->assertSee('700.00');
 
         // Required Exact Text Strings
         $response->assertSee('Fund Locked');
@@ -112,7 +129,7 @@ class MemberDashboardLockTest extends TestCase
             'expires_at' => now()->addDays(1165),
             'return_percent' => 5.00,
             'total_earning' => 10.00,
-            'max_earning' => 400.00,
+            'max_earning' => 280.00,
             'max_return_percent' => 200.00,
             'lock_days' => 30,
             'lock_applied_at' => now()->subDays(35),
@@ -125,6 +142,7 @@ class MemberDashboardLockTest extends TestCase
         ])->get('/member/dashboard');
 
         $response->assertStatus(200);
+        $response->assertSee('280.00');
         $response->assertSee('Fund Unlocked');
         $response->assertSee('You are eligible for total return of 200% Returns');
     }
@@ -235,7 +253,7 @@ class MemberDashboardLockTest extends TestCase
             'activated_at' => now(),
             'expires_at' => now()->addDays(1200),
             'total_earning' => 15.00,
-            'max_earning' => 600.00,
+            'max_earning' => 420.00,
             'max_return_percent' => 200.00,
             'lock_days' => 30,
             'locked_until' => now()->addDays(30),
@@ -243,7 +261,7 @@ class MemberDashboardLockTest extends TestCase
 
         $response = $this->withSession([
             'MEMBER_ID' => $this->memberId,
-        ])->getJson('/member/trading-wallet/status');
+        ])->getJson('/member/trading-wallet-status');
 
         $response->assertStatus(200);
         $response->assertJson([
@@ -252,7 +270,7 @@ class MemberDashboardLockTest extends TestCase
                 'investment' => 300.00,
                 'trading_wallet' => 350.00,
                 'total_earning' => 15.00,
-                'max_earning' => 600.00,
+                'max_earning' => 420.00,
                 'package_status' => 'Active',
                 'is_locked' => true,
                 'lock_status' => 'Fund Locked',

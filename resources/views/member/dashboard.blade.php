@@ -3194,7 +3194,7 @@
                                                         <td class="text-warning font-weight-bold">{{ $pkg->package_range ?? ($pkg->package ?? 'Standard') }}</td>
                                                         <td class="text-white font-weight-bold">$ {{ number_format((float) ($pkg->invest_amount ?? $pkg->package_value), 2) }}</td>
                                                         <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)), 2) }}</td>
-                                                        <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->max_earning ?? (($pkg->invest_amount ?? $pkg->package_value) * 3.0)), 2) }}</td>
+                                                        <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->computed_max_earning ?? ($pkg->max_earning ?? (($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)) * (($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 200)) / 100)))), 2) }}</td>
                                                         <td class="text-warning font-weight-bold">{{ number_format((float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 200)), 0) }}%</td>
                                                         <td>
                                                             @if ($pkg->is_locked)

@@ -185,17 +185,30 @@ class MemberDetailController extends Controller
         $result['totalPackageEarning'] = $totalEarning;
         $result['totalEarning'] = $totalEarning;
 
-        $maxEarningQuery = (float) PackageDetail::where('memberid', $memberid)
+        // Capping is calculated based on Trading Wallet allocation
+        $activePackages = PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
-            ->sum('max_earning');
-        if ($maxEarningQuery <= 0 && $stakings->count() > 0) {
-            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) use ($maxReturnPercent) {
-                return round((float) $stk->invest_amount * ($maxReturnPercent / 100), 2);
+            ->get();
+
+        if ($activePackages->count() > 0) {
+            $maxEarning = (float) $activePackages->sum(function ($pkg) use ($maxReturnPercent) {
+                $tw = (float) ($pkg->trading_wallet_amount > 0 ? $pkg->trading_wallet_amount : (($pkg->invest_amount ?? $pkg->package_value) * 0.70));
+                $ret = (float) ($pkg->max_return_percent > 0 ? $pkg->max_return_percent : $maxReturnPercent);
+
+                return round($tw * ($ret / 100), 2);
             });
+        } elseif ($stakings->count() > 0) {
+            $maxEarning = (float) $stakings->where('status', 'Active')->sum(function ($stk) use ($maxReturnPercent) {
+                $tw = (float) ($stk->trading_wallet_amount > 0 ? $stk->trading_wallet_amount : ((float) $stk->invest_amount * 0.70));
+
+                return round($tw * ($maxReturnPercent / 100), 2);
+            });
+        } else {
+            $maxEarning = $tradingWalletBalance > 0
+                ? round($tradingWalletBalance * ($maxReturnPercent / 100), 2)
+                : 0.00;
         }
-        $maxEarning = $maxEarningQuery > 0
-            ? round($maxEarningQuery, 2)
-            : ($totalInvestment > 0 ? round($totalInvestment * ($maxReturnPercent / 100), 2) : 0.00);
+
         $result['maxPackageEarning'] = $maxEarning;
         $result['maxEarning'] = $maxEarning;
 
@@ -255,6 +268,9 @@ class MemberDetailController extends Controller
             $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
             $pkgMaxReturn = $pkgPlan ? (float) $pkgPlan->max_return_percent : (float) ($pkg->max_return_percent ?: $maxReturnPercent);
 
+            $pkgTradingWallet = (float) ($pkg->trading_wallet_amount > 0 ? $pkg->trading_wallet_amount : (($pkg->invest_amount ?? $pkg->package_value) * 0.70));
+            $pkgMaxEarning = round($pkgTradingWallet * ($pkgMaxReturn / 100), 2);
+
             $pkg->is_locked = $pkgIsLocked;
             $pkg->lock_status_label = $pkgIsLocked ? 'Fund Locked' : 'Fund Unlocked';
             $pkg->remaining_lock_days = $pkgRemainingDays;
@@ -262,6 +278,8 @@ class MemberDetailController extends Controller
             $pkg->unlock_datetime = $pkgLockedUntil ? $pkgLockedUntil->format('d M Y, H:i') : null;
             $pkg->unlock_timestamp = $pkgLockedUntil ? $pkgLockedUntil->timestamp * 1000 : null;
             $pkg->computed_max_return_percent = $pkgMaxReturn;
+            $pkg->computed_max_earning = $pkgMaxEarning;
+            $pkg->max_earning = $pkgMaxEarning;
 
             $processedPackages[] = $pkg;
         }
@@ -389,17 +407,28 @@ class MemberDetailController extends Controller
         $stakingEarnSum = (float) StakingIncome::where('memberid', $memberid)->sum('amount');
         $totalEarning = round(max($totalEarnQuery, $stakingEarnSum), 2);
 
-        $maxEarningQuery = (float) PackageDetail::where('memberid', $memberid)
+        $activePackages = PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
-            ->sum('max_earning');
-        if ($maxEarningQuery <= 0 && $stakings->count() > 0) {
-            $maxEarningQuery = (float) $stakings->where('status', 'Active')->sum(function ($stk) use ($maxReturnPercent) {
-                return round((float) $stk->invest_amount * ($maxReturnPercent / 100), 2);
+            ->get();
+
+        if ($activePackages->count() > 0) {
+            $maxEarning = (float) $activePackages->sum(function ($pkg) use ($maxReturnPercent) {
+                $tw = (float) ($pkg->trading_wallet_amount > 0 ? $pkg->trading_wallet_amount : (($pkg->invest_amount ?? $pkg->package_value) * 0.70));
+                $ret = (float) ($pkg->max_return_percent > 0 ? $pkg->max_return_percent : $maxReturnPercent);
+
+                return round($tw * ($ret / 100), 2);
             });
+        } elseif ($stakings->count() > 0) {
+            $maxEarning = (float) $stakings->where('status', 'Active')->sum(function ($stk) use ($maxReturnPercent) {
+                $tw = (float) ($stk->trading_wallet_amount > 0 ? $stk->trading_wallet_amount : ((float) $stk->invest_amount * 0.70));
+
+                return round($tw * ($maxReturnPercent / 100), 2);
+            });
+        } else {
+            $maxEarning = $tradingWalletBalance > 0
+                ? round($tradingWalletBalance * ($maxReturnPercent / 100), 2)
+                : 0.00;
         }
-        $maxEarning = $maxEarningQuery > 0
-            ? round($maxEarningQuery, 2)
-            : ($totalInvestment > 0 ? round($totalInvestment * ($maxReturnPercent / 100), 2) : 0.00);
 
         $remainingEligibility = max(0.00, round($maxEarning - $totalEarning, 2));
 
@@ -447,12 +476,14 @@ class MemberDetailController extends Controller
 
             $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
             $pkgMaxReturn = $pkgPlan ? (float) $pkgPlan->max_return_percent : (float) ($pkg->max_return_percent ?: $maxReturnPercent);
+            $pkgTradingWallet = (float) ($pkg->trading_wallet_amount > 0 ? $pkg->trading_wallet_amount : (($pkg->invest_amount ?? $pkg->package_value) * 0.70));
+            $pkgMaxEarning = round($pkgTradingWallet * ($pkgMaxReturn / 100), 2);
 
             $processedPackages[] = [
                 'id' => $pkg->id,
                 'package_range' => $pkg->package_range,
                 'invest_amount' => (float) ($pkg->invest_amount ?? $pkg->package_value),
-                'trading_wallet_amount' => (float) ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * 0.70)),
+                'trading_wallet_amount' => $pkgTradingWallet,
                 'is_locked' => $pkgIsLocked,
                 'lock_status_label' => $pkgIsLocked ? 'Fund Locked' : 'Fund Unlocked',
                 'remaining_lock_days' => $pkgRemainingDays,
@@ -460,7 +491,7 @@ class MemberDetailController extends Controller
                 'unlock_datetime' => $pkgLockedUntil ? $pkgLockedUntil->format('d M Y, H:i') : null,
                 'unlock_timestamp' => $pkgLockedUntil ? $pkgLockedUntil->timestamp * 1000 : null,
                 'max_return_percent' => $pkgMaxReturn,
-                'max_earning' => (float) ($pkg->max_earning ?? 0.0),
+                'max_earning' => $pkgMaxEarning,
                 'total_earning' => (float) ($pkg->total_earning ?? 0.0),
                 'status' => $pkg->status,
             ];
