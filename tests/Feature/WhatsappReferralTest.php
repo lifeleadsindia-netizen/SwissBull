@@ -287,4 +287,76 @@ class WhatsappReferralTest extends TestCase
         WhatsappReferral::where('member_id', $memberId)->delete();
         PepeRewardLog::where('member_id', $memberId)->delete();
     }
+
+    public function test_direct_activation_via_staking_and_sync(): void
+    {
+        $this->withoutMiddleware();
+
+        $sponsorId = 'SPSTK'.rand(1000, 9999);
+        $sponsor = MemberDetail::create([
+            'memberid' => $sponsorId,
+            'sponsorid' => 'ROOT',
+            'name' => 'Staking Sponsor',
+            'mobile' => '9811223344',
+            'email' => 'sponstk'.rand(100, 999).'@example.com',
+            'password' => bcrypt('password'),
+            'pepe_wallet' => 0,
+            'status' => 'Active',
+        ]);
+
+        $directMemberId = 'DIRSTK'.rand(1000, 9999);
+        $directMember = MemberDetail::create([
+            'memberid' => $directMemberId,
+            'sponsorid' => $sponsorId,
+            'name' => 'Direct Staking Member',
+            'mobile' => '9899887766',
+            'email' => 'dirstk'.rand(100, 999).'@example.com',
+            'password' => bcrypt('password'),
+            'status' => 'Temp',
+            'p2p_wallet' => 500,
+            'pepe_wallet' => 0,
+        ]);
+
+        // Direct Registration reward (Rule 2)
+        PepeRewardService::awardDirectRegistrationReward($sponsorId, $directMember);
+        $sponsor->refresh();
+        $this->assertEquals(500.0, (float) $sponsor->pepe_wallet);
+
+        // Direct Member activates via staking
+        $res = $this->withSession(['MEMBER_ID' => $directMemberId])
+            ->post('/member/createInvestment', [
+                'memberid' => $directMemberId,
+                'package' => 'Package1',
+                'amount' => 100,
+            ]);
+
+        $res->assertSessionHasNoErrors();
+        $res->assertRedirect();
+
+        $sponsor->refresh();
+        $directMember->refresh();
+
+        $this->assertEquals('Active', $directMember->status);
+        // Sponsor should have earned 500 more PEPE tokens for Rule 3
+        $this->assertEquals(1000.0, (float) $sponsor->pepe_wallet);
+
+        $this->assertDatabaseHas('pepe_reward_logs', [
+            'member_id' => $sponsorId,
+            'referred_member_id' => $directMemberId,
+            'reward_type' => 'direct_activation',
+            'reward_amount' => 500.00,
+        ]);
+
+        // Calling syncDirectActivationRewards should not duplicate
+        $newlyAwarded = PepeRewardService::syncDirectActivationRewards($sponsorId);
+        $this->assertEquals(0, $newlyAwarded);
+        $sponsor->refresh();
+        $this->assertEquals(1000.0, (float) $sponsor->pepe_wallet);
+
+        // Cleanup
+        $sponsor->delete();
+        $directMember->delete();
+        \App\Models\StakingDetail::where('memberid', $directMemberId)->delete();
+        PepeRewardLog::where('member_id', $sponsorId)->delete();
+    }
 }

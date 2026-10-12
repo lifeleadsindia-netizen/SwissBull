@@ -23,9 +23,9 @@ use App\Models\RoiLevelIncome;
 use App\Models\SetRate;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
+use App\Services\PepeRewardService;
 use App\Models\StakingIncome;
 use App\Models\TeamTradingProfitConfiction;
-use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
@@ -334,9 +334,13 @@ class AdminController extends Controller
             session()->flash('statusDeact', 'Status has been Deactive successfully!');
 
             return redirect()->back();
-        } elseif ($status == 'Deactive') {
+        } elseif ($status == 'Deactive' || $status == 'Temp') {
             $var->status = 'Active';
+            $var->activated_at = $var->activated_at ?? now();
             $var->save();
+            if (! empty($var->sponsorid)) {
+                PepeRewardService::awardDirectActivationReward($var->sponsorid, $var);
+            }
             session()->flash('statusAct', 'Status has been Activated successfully!');
 
             return redirect()->back();
@@ -1917,13 +1921,13 @@ class AdminController extends Controller
             ->latest('created_at')
             ->first();
 
-        $setting = TradingWalletSetting::getActiveSetting();
-        $lockDays = (int) ($setting->lock_days ?? 90);
+        $setting = PackageDistribution::getActiveSetting();
+        $lockDays = (int) ($setting->lock_days ?? 0);
         $withPercent = (float) ($setting->withdrawal_percent ?? 100.00);
 
         $activationTime = $latestStk && $latestStk->created_at
             ? Carbon::parse($latestStk->created_at)
-            : ($latestStk && $latestStk->invest_date ? Carbon::parse($latestStk->invest_date) : null);
+            : null;
 
         $lockedUntil = ($activationTime && $lockDays > 0) ? $activationTime->copy()->addDays($lockDays) : null;
         $isLocked = $lockedUntil ? now()->lt($lockedUntil) : false;

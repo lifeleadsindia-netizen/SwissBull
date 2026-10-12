@@ -46,11 +46,13 @@
         };
 
         function showPopup() {
-            document.getElementById('popup').style.display = 'block';
+            var popup = document.getElementById('popup');
+            if (popup) popup.style.display = 'block';
         }
 
         function closePopup() {
-            document.getElementById('popup').style.display = 'none';
+            var popup = document.getElementById('popup');
+            if (popup) popup.style.display = 'none';
         }
     </script>
 
@@ -65,7 +67,14 @@
             }
         }
 
+        let lastProfileToggleTime = 0;
         function toggleProfileDropdown(e) {
+            const now = Date.now();
+            if (now - lastProfileToggleTime < 150) {
+                return;
+            }
+            lastProfileToggleTime = now;
+
             if (e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1311,7 +1320,7 @@
                         <li>
                             <div class="dropdown header-profile2" id="headerProfileDropdown">
                                 <a class="nav-link" href="javascript:void(0);" role="button"
-                                    onclick="toggleProfileDropdown(event)" data-bs-toggle="dropdown"
+                                    onclick="toggleProfileDropdown(event)"
                                     aria-expanded="false">
                                     <div class="header-info2 d-flex align-items-center">
                                         <div class="d-flex align-items-center sidebar-info">

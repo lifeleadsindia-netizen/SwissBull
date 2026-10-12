@@ -31,7 +31,7 @@ class TempController extends Controller
             //     $value->status = 'Deactive';
             //     $value->save();
             // }
-            $stak_amount = ($value->invest_amount / 100 * $rate) / 30;
+            $stak_amount = ($value->trading_wallet_amount / 100 * $rate) / 30;
             if (rand(0, 1) == 1) {
                 $stak_amount += $stak_amount / 100 * rand(1, 10);
             } else {
@@ -60,7 +60,7 @@ class TempController extends Controller
                 $qry = new StakingIncome;
                 $qry->date = date('Y-m-d');
                 $qry->memberid = $memberid;
-                $qry->total_investment = $value->invest_amount;
+                $qry->total_investment = $value->trading_wallet_amount;
                 $qry->rate = $rate;
                 $qry->amount = $amount;
                 $qry->installment = $installment;
@@ -243,7 +243,7 @@ class TempController extends Controller
     // daily command
     public function dailyPartTeamBizUpdate()
     {
-        $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0]);
+        $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0, 'part_daily_team_biz' => 0]);
     }
 
     // monthly command

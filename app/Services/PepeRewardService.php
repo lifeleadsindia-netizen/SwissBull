@@ -216,6 +216,10 @@ class PepeRewardService
             return null;
         }
 
+        if (strtoupper($sponsorId) === strtoupper($activatedMember->memberid)) {
+            return null;
+        }
+
         // Check if already awarded for this activated member
         $alreadyAwarded = PepeRewardLog::where('reward_type', self::TYPE_DIRECT_ACTIVATION)
             ->where('referred_member_id', $activatedMember->memberid)
@@ -270,6 +274,41 @@ class PepeRewardService
 
             return null;
         }
+    }
+
+    /**
+     * Sync any missed Direct Referral Activation Rewards for active direct referrals.
+     * Safe & idempotent: Only awards if not already rewarded for that member.
+     *
+     * @param  string|null  $sponsorId  If provided, only syncs for this sponsor.
+     * @return int Number of newly awarded rewards.
+     */
+    public static function syncDirectActivationRewards(?string $sponsorId = null): int
+    {
+        $query = MemberDetail::where('status', 'Active')
+            ->whereNotNull('sponsorid')
+            ->where('sponsorid', '!=', '')
+            ->where('sponsorid', '!=', 'Root')
+            ->where('sponsorid', '!=', 'ROOT');
+
+        if (! empty($sponsorId)) {
+            if (strtoupper($sponsorId) === 'ROOT') {
+                return 0;
+            }
+            $query->where('sponsorid', $sponsorId);
+        }
+
+        $activeDirects = $query->get();
+        $awardedCount = 0;
+
+        foreach ($activeDirects as $direct) {
+            $reward = self::awardDirectActivationReward($direct->sponsorid, $direct);
+            if ($reward !== null) {
+                $awardedCount++;
+            }
+        }
+
+        return $awardedCount;
     }
 
     /**

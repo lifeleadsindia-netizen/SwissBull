@@ -196,6 +196,7 @@ var themeOptionArr = {
 	}
 
 	function handleSetThemeOption(item, index, arr) {
+		if (!item || !item.name) return;
 
 		var attrName = item.name.replace('data-','').replace('-','_');
 
@@ -203,27 +204,39 @@ var themeOptionArr = {
 			if(item.value === "color_1"){
 				return false;
 			}
-			var attrNameColor = attrName.replace("bg","")
-			document.getElementById(attrNameColor+"_"+item.value).checked = true;
+			var attrNameColor = attrName.replace("bg","");
+			var el = document.getElementById(attrNameColor+"_"+item.value);
+			if (el) el.checked = true;
 		}else if(attrName === "navigationbarimg"){
-			document.getElementById("sidebar_img_"+item.value.split('sidebar-img/index.html')[1].split('.')[0]).checked = true;
+			var parts = item.value ? item.value.split('sidebar-img/index.html') : null;
+			if (parts && parts[1]) {
+				var el = document.getElementById("sidebar_img_"+parts[1].split('.')[0]);
+				if (el) el.checked = true;
+			}
 		}else if(attrName === "sidebartext"){
-			document.getElementById("sidebar_text_"+item.value).checked = true;
+			var el = document.getElementById("sidebar_text_"+item.value);
+			if (el) el.checked = true;
 		}else if(attrName === "direction" || attrName === "nav_headerbg" || attrName === "headerbg"){
-			document.getElementById("theme_direction").value = item.value;
+			var el = document.getElementById("theme_direction");
+			if (el) el.value = item.value;
 		}else if(attrName === "sidebar_style" || attrName === "sidebar_position" || attrName === "header_position" || attrName === "typography" || attrName === "theme_version" ){
 			if(item.value === "cairo" || item.value === "full" || item.value === "fixed"|| item.value === "dark"){return false}
-			document.getElementById(attrName).value = item.value;
+			var el = document.getElementById(attrName);
+			if (el) el.value = item.value;
 		}else if(attrName === "layout"){
 			if(item.value === "vertical"){return false}
-			document.getElementById("theme_layout").value = item.value;
+			var el = document.getElementById("theme_layout");
+			if (el) el.value = item.value;
 		}
 		else if(attrName === "container"){
 			if(item.value === "wide"){return false}
-			document.getElementById("container_layout").value = item.value;
+			var el = document.getElementById("container_layout");
+			if (el) el.value = item.value;
 		}
 
-		$('.default-select').selectpicker('refresh');
+		if (window.jQuery && typeof $.fn.selectpicker === 'function') {
+			$('.default-select').selectpicker('refresh');
+		}
 	}
 	/* / set switcher option end / */
 

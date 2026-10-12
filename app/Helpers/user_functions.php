@@ -93,17 +93,18 @@ function totalsingleLevel($memberid, $level)
 
 function team_update($sponsorid)
 {
-
     $limit = 11;
     for ($i = 1; $i < $limit; $i++) {
-        if ($sponsorid != 'Root') {
-            $query = MemberDetail::where('memberid', $sponsorid)->first();
-            $query->team += 1;
-            $query->save();
-            $sponsorid = $query->sponsorid;
-        } else {
+        if (empty($sponsorid) || strtoupper($sponsorid) === 'ROOT') {
             break;
         }
+        $query = MemberDetail::where('memberid', $sponsorid)->first();
+        if (! $query) {
+            break;
+        }
+        $query->team += 1;
+        $query->save();
+        $sponsorid = $query->sponsorid;
     }
 }
 
@@ -111,15 +112,17 @@ function team_biz_update($sponsorid, $value)
 {
     $limit = 11;
     for ($i = 1; $i < $limit; $i++) {
-        if ($sponsorid != 'Root') {
-            $query = MemberDetail::where('memberid', $sponsorid)->first();
-            $query->team_biz += $value;
-            $query->daily_team_biz += $value;
-            $query->save();
-            $sponsorid = $query->sponsorid;
-        } else {
+        if (empty($sponsorid) || strtoupper($sponsorid) === 'ROOT') {
             break;
         }
+        $query = MemberDetail::where('memberid', $sponsorid)->first();
+        if (! $query) {
+            break;
+        }
+        $query->team_biz += $value;
+        $query->daily_team_biz += $value;
+        $query->save();
+        $sponsorid = $query->sponsorid;
     }
 }
 
@@ -127,15 +130,17 @@ function part_team_biz_update($sponsorid, $value)
 {
     $limit = 11;
     for ($i = 1; $i < $limit; $i++) {
-        if ($sponsorid != 'Root') {
-            $query = MemberDetail::where('memberid', $sponsorid)->first();
-            $query->partnership_team_biz += $value;
-            $query->part_daily_team_biz += $value;
-            $query->save();
-            $sponsorid = $query->sponsorid;
-        } else {
+        if (empty($sponsorid) || strtoupper($sponsorid) === 'ROOT') {
             break;
         }
+        $query = MemberDetail::where('memberid', $sponsorid)->first();
+        if (! $query) {
+            break;
+        }
+        $query->partnership_team_biz += $value;
+        $query->part_daily_team_biz += $value;
+        $query->save();
+        $sponsorid = $query->sponsorid;
     }
 }
 
@@ -190,7 +195,7 @@ function totalMemberDirectIncome($memberid)
 
 function totalMemberHeroOfTheMonthIncome($memberid)
 {
-    $sum = HeroOfTheMonthReward::where([['memberid', $memberid], ['status', 'Paid']])->sum('prize_amount');
+    $sum = HeroOfTheMonthReward::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
 
     return $sum;
 }

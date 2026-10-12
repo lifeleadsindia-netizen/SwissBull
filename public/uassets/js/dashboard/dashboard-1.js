@@ -15,6 +15,7 @@
     }
 
     var widgetChart1 = function () {
+      if (jQuery("#widgetChart1").length > 0) {
       var options = {
         series: [
           {
@@ -134,6 +135,7 @@
       };
       var chartBar1 = new ApexCharts(document.querySelector("#widgetChart1"), options);
       chartBar1.render();
+      }
 
     }
     var widgetChart5 = function () {
@@ -264,6 +266,7 @@
 
 
     var widgetChart2 = function () {
+      if (jQuery("#widgetChart2").length > 0) {
       var options = {
         series: [
           {
@@ -385,10 +388,12 @@
 
       var chartBar1 = new ApexCharts(document.querySelector("#widgetChart2"), options);
       chartBar1.render();
+      }
 
     }
 
     var widgetChart3 = function () {
+      if (jQuery("#widgetChart3").length > 0) {
       var options = {
         series: [
           {
@@ -509,10 +514,12 @@
 
       var chartBar1 = new ApexCharts(document.querySelector("#widgetChart3"), options);
       chartBar1.render();
+      }
 
     }
 
     var widgetChart4 = function () {
+      if (jQuery("#widgetChart4").length > 0) {
       var options = {
         series: [
           {
@@ -633,6 +640,7 @@
 
       var chartBar1 = new ApexCharts(document.querySelector("#widgetChart4"), options);
       chartBar1.render();
+      }
 
     }
     var widgetChart6 = function () {

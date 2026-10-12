@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Country;
 use App\Models\MemberDetail;
+use App\Models\PackageDistribution;
 use App\Models\PepeSetting;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
-use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalRequest;
 use App\Services\PepeRewardService;
@@ -818,7 +818,7 @@ class WithdrawalController extends Controller
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
         $result['country'] = Country::where('name', $country)->first();
         $result['staking_details'] = StakingDetail::where('memberid', $memberid)->orderBy('id', 'desc')->get();
-        $result['trading_settings'] = TradingWalletSetting::getActiveSetting();
+        $result['trading_settings'] = PackageDistribution::getActiveSetting();
 
         return view('member.wallet.trading-withdrawal')->with($result);
     }
@@ -840,7 +840,7 @@ class WithdrawalController extends Controller
             ], 404);
         }
 
-        $tradingSetting = TradingWalletSetting::getActiveSetting();
+        $tradingSetting = PackageDistribution::getActiveSetting();
         $adminStatus = $tradingSetting->isOn() ? 'on' : 'off';
 
         if ($tradingSetting->isOff()) {
@@ -905,7 +905,7 @@ class WithdrawalController extends Controller
         }
 
         // CONDITION TWO: Admin Trading Wallet ON/OFF status
-        $tradingSetting = TradingWalletSetting::getActiveSetting();
+        $tradingSetting = PackageDistribution::getActiveSetting();
         if ($tradingSetting->isOff()) {
             return response()->json([
                 'code' => 0,

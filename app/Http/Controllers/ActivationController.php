@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
-use App\Models\TradingWalletSetting;
+use App\Models\PackageDistribution;
 use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 
@@ -53,14 +53,14 @@ class ActivationController extends Controller
             PepeRewardService::awardDirectActivationReward($sponsorid, $member);
         }
 
-        $setting = TradingWalletSetting::getActiveSetting();
+        $setting = PackageDistribution::getActiveSetting();
 
         $new = new PackageDetail;
         $new->memberid = $memberid;
         $new->package_type = 'Account Activation';
         $new->package_value = $amount;
         $new->payment_mode = 'Fund Wallet';
-        $new->txnid = 'A/' . date('YmdHis');
+        $new->txnid = 'A/'.date('YmdHis');
         $new->status = 'Accepted';
         $new->applyLock($setting->lock_days);
         $new->save();
@@ -68,12 +68,12 @@ class ActivationController extends Controller
         $member->activation_amount = $amount;
         $wallet = $member->p2p_wallet;
         $member->p2p_wallet -= $amount;
-        $member->applyTradingWalletLock($setting->lock_days, $setting->withdrawal_percent);
+        $member->applyTradingWalletLock($setting->lock_days);
         $member->save();
 
         directIncome($sponsorid, $memberid, $name, $amount, 'Referral Bonus');
         // levelIncome($sponsorid, $memberid, $name, $amount, 'Daily Team Investment Share');
-        walletTransfer($memberid, $amount, 'credit', $wallet, 'Activate account', '$ ' . $amount . ' deducted for account activation.');
+        walletTransfer($memberid, $amount, 'credit', $wallet, 'Activate account', '$ '.$amount.' deducted for account activation.');
 
         session()->flash('successMsg', 'Account activated successfully.');
 
