@@ -23,30 +23,35 @@ class TempController extends Controller
         foreach ($stakings as $value) {
             $memberid = $value->memberid;
             $staking_id = $value->id;
-            $total_installments = $value->total_installments;
             $installment = $value->installments + 1;
-            $rate = $value->rate;
-            // if ($installment >= $total_installments) {
-            //     $value->status = 'Deactive';
-            //     $value->save();
-            // }
-            $stak_amount = ($value->trading_wallet_amount / 100 * $rate) / 30;
-            if (rand(0, 1) == 1) {
-                $stak_amount += ($stak_amount / 100) * rand(1, 10);
-            } else {
-                $stak_amount -= ($stak_amount / 100) * rand(1, 10);
-            }
 
+            $packageDis = PackageDistribution::find(1);
+            if ($value->package == 'Package1') {
+                $rate = $packageDis->package_1_rate;
+            } elseif ($value->package == 'Package2') {
+                $rate = $packageDis->package_2_rate;
+            } elseif ($value->package == 'Package3') {
+                $rate = $packageDis->package_3_rate;
+            } else {
+                $rate = 0;
+            }
+            $tradingWalletAmount = $value->trading_wallet_amount;
+
+            $stak_amount = ($tradingWalletAmount / 100 * $rate) / 30;
+            if (rand(0, 1) == 1) {
+                $stak_amount += $stak_amount / 100 * rand(1, 10);
+            } else {
+                $stak_amount -= $stak_amount / 100 * rand(1, 10);
+            }
             $memUpdate = MemberDetail::where('memberid', $memberid)->first();
-            $capping = PackageDistribution::find(1);
-            $cap = $capping->capping;
+            $cap = $packageDis->capping;
             if ($cap == 0) {
                 $amount = $stak_amount;
                 $balance = 0;
             } else {
-                $capvalue = ($stak_amount / 100) * $cap;
-                $achieved = StakingIncome::where([['status', 'Paid'], ['memberid', $staking_id]])->sum('amount');
-                $balance = $capvalue - $achieved;
+                $capValue = ($tradingWalletAmount / 100) * $cap;
+                $achieved = StakingIncome::where([['status', 'Paid'], ['staking_id', $staking_id], ['memberid', $memberid]])->sum('amount');
+                $balance = $capValue - $achieved;
                 if ($balance <= $stak_amount) {
                     $amount = $balance;
                 } else {
@@ -58,8 +63,9 @@ class TempController extends Controller
 
                 $qry = new StakingIncome;
                 $qry->date = date('Y-m-d');
+                $qry->staking_id = $value->id;
                 $qry->memberid = $memberid;
-                $qry->total_investment = $value->trading_wallet_amount;
+                $qry->total_investment = $tradingWalletAmount;
                 $qry->rate = $rate;
                 $qry->amount = $amount;
                 $qry->installment = $installment;
@@ -80,10 +86,6 @@ class TempController extends Controller
 
                 walletTransfer($memberid, $amount, 'debit', $wallet, 'Staking Income', 'Staking Income amount has been transfered into wallet.');
 
-                if ($installment == $total_installments) {
-                    $value->status = 'Deactive';
-                    $value->save();
-                }
             } else {
                 $value->status = 'Deactive';
                 $value->save();
