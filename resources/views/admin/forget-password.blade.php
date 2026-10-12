@@ -30,13 +30,16 @@
             --card-border: rgba(255, 255, 255, 0.95);
         }
 
-        *, *::before, *::after {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        html, body {
+        html,
+        body {
             width: 100%;
             min-height: 100vh;
             overflow-x: hidden;
@@ -72,8 +75,8 @@
             padding: 42px 38px 36px;
             border: 1px solid var(--card-border);
             box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.10),
-                        0 8px 20px -6px rgba(37, 99, 235, 0.08),
-                        0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+                0 8px 20px -6px rgba(37, 99, 235, 0.08),
+                0 0 0 1px rgba(255, 255, 255, 0.8) inset;
             transition: transform 0.25s ease, box-shadow 0.25s ease;
             width: 100%;
         }
@@ -85,7 +88,7 @@
         }
 
         .brand-logo-img {
-            max-height: 54px;
+            /* max-height: 54px; */
             max-width: 200px;
             object-fit: contain;
             margin-bottom: 6px;
@@ -271,10 +274,10 @@
             </div>
 
             @if (session()->has('succMsg'))
-                <div class="alert-custom-success">
-                    <i class="ik ik-check-circle"></i>
-                    <span>{{ session('succMsg') }}</span>
-                </div>
+            <div class="alert-custom-success">
+                <i class="ik ik-check-circle"></i>
+                <span>{{ session('succMsg') }}</span>
+            </div>
             @endif
 
             <form method="POST" action="{{ route('retrivePassword') }}">

@@ -54,7 +54,7 @@
             <!-- Top Header / Brand Logo -->
             <div class="flex items-center justify-between mb-5">
                 <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-                    <img src="{{ asset('logo/logo.png') }}" alt="{{ config('detailsApp.name') }}"
+                    <img style="height: 7.5rem;" src=" {{ asset('logo/name-logo.png') }}" alt="{{ config('detailsApp.name') }}"
                         class="h-12 w-auto object-contain transition-transform group-hover:scale-105">
                 </a>
                 <div class="brand-badge">
@@ -135,9 +135,9 @@
 
                 <!-- Mobile Brand Header -->
                 <div class="lg:hidden text-center mb-6 sm:mb-8">
-                    <img src="{{ asset('logo/logo.png') }}" alt="{{ config('detailsApp.name') }}"
-                        class="h-10 sm:h-12 mx-auto mb-2 sm:mb-3 object-contain">
-                    <h2 class="text-xl sm:text-2xl font-bold text-white">{{ config('detailsApp.name') }}</h2>
+                    <img style="height: 5.5rem;" src=" {{ asset('logo/name-logo.png') }}"
+                        alt="{{ config('detailsApp.name') }}" class="h-10 sm:h-12 mx-auto mb-2 sm:mb-3 object-contain">
+                    <!-- <h2 class="text-xl sm:text-2xl font-bold text-white">{{ config('detailsApp.name') }}</h2> -->
                     <p class="text-xs text-[#98A2C3]">Create Account</p>
                 </div>
 
@@ -447,7 +447,7 @@
                     $('#sponhtml').html('');
                 }
                 $.ajax({
-                    url: '{{ url('/getSponname') }}',
+                    url: '{{ url(' / getSponname ') }}',
                     type: 'POST',
                     data: {
                         'sponsorid': sponsor,
@@ -562,7 +562,7 @@
             $('#emailhtml').html('<span class="text-[#F59E0B] font-semibold">Sending OTP...</span>');
 
             $.ajax({
-                url: '{{ url('/send_register_otp') }}',
+                url: '{{ url(' / send_register_otp ') }}',
                 type: 'POST',
                 data: {
                     'email': email,
@@ -602,7 +602,7 @@
             $('#verifyOtpBtn').prop('disabled', true).html('Verifying...');
 
             $.ajax({
-                url: '{{ url('/verify_register_otp') }}',
+                url: '{{ url(' / verify_register_otp ') }}',
                 type: 'POST',
                 data: {
                     'otp': otp,
