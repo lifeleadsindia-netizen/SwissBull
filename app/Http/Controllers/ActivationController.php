@@ -60,7 +60,7 @@ class ActivationController extends Controller
         $new->package_type = 'Account Activation';
         $new->package_value = $amount;
         $new->payment_mode = 'Fund Wallet';
-        $new->txnid = 'A/' . date('YmdHis');
+        $new->txnid = 'A/'.date('YmdHis');
         $new->status = 'Accepted';
         $new->applyLock($setting->lock_days);
         $new->save();
@@ -73,7 +73,7 @@ class ActivationController extends Controller
 
         directIncome($sponsorid, $memberid, $name, $amount, 'Referral Bonus');
         // levelIncome($sponsorid, $memberid, $name, $amount, 'Daily Team Investment Share');
-        walletTransfer($memberid, $amount, 'credit', $wallet, 'Activate account', '$ ' . $amount . ' deducted for account activation.');
+        walletTransfer($memberid, $amount, 'credit', $wallet, 'Activate account', '$ '.$amount.' deducted for account activation.');
 
         session()->flash('successMsg', 'Account activated successfully.');
 

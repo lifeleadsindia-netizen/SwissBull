@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MemberDetail;
 use App\Models\PackageDistribution;
 use App\Models\StakingDetail;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -128,6 +129,11 @@ class InvestmentController extends Controller
             updateDownline($sponsorid);
         }
         $member->save();
+
+        // Rule 3: Direct referral activation awards 500 PEPE tokens to sponsor
+        if ($member->status === 'Active' && ! empty($sponsorid)) {
+            PepeRewardService::awardDirectActivationReward($sponsorid, $member);
+        }
 
         walletTransfer(
             $memberid,
