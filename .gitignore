@@ -40,4 +40,3 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-resources/views/frontend/index.blade.php
