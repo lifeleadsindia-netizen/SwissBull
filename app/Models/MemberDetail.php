@@ -96,11 +96,22 @@ class MemberDetail extends Model
             }
         }
 
+        $packages = $this->relationLoaded('packageDetails')
+            ? $this->packageDetails
+            : $this->packageDetails()->get();
+
+        foreach ($packages as $pkg) {
+            $unl = $pkg->locked_until;
+            if ($unl && (! $latest || $unl->gt($latest))) {
+                $latest = $unl;
+            }
+        }
+
         return $latest;
     }
 
     /**
-     * Check if the member's trading wallet is currently locked based on staking_details.
+     * Check if the member's trading wallet is currently locked based on staking_details or package_details.
      */
     public function isTradingWalletLocked(): bool
     {
@@ -108,8 +119,18 @@ class MemberDetail extends Model
             ? $this->stakingDetails
             : $this->stakingDetails()->get();
 
-        return $stakings->contains(function ($stk) {
+        if ($stakings->contains(function ($stk) {
             return $stk->isLocked();
+        })) {
+            return true;
+        }
+
+        $packages = $this->relationLoaded('packageDetails')
+            ? $this->packageDetails
+            : $this->packageDetails()->get();
+
+        return $packages->contains(function ($pkg) {
+            return $pkg->isLocked();
         });
     }
 
