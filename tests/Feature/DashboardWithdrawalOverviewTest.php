@@ -169,5 +169,7 @@ class DashboardWithdrawalOverviewTest extends TestCase
         $response->assertSee('Total withdrawal');
         $response->assertSee('Today Trading Withdrawal');
         $response->assertSee('Total Trading Withdrawal');
+        $response->assertSee('Trading Wallet');
+        $response->assertSee('500.00');
     }
 }

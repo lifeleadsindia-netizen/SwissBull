@@ -832,12 +832,35 @@
             height: 32px !important;
         }
     }
+
+    /* Dashboard side spacing equalization & reduction */
+    .content-body .dashboard-container {
+        padding-top: 1.5rem !important;
+        padding-right: 1.25rem !important;
+        padding-left: 1.25rem !important;
+    }
+
+    @media (max-width: 768px) {
+        .content-body .dashboard-container {
+            padding-top: 1rem !important;
+            padding-right: 0.85rem !important;
+            padding-left: 0.85rem !important;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .content-body .dashboard-container {
+            padding-top: 0.75rem !important;
+            padding-right: 0.65rem !important;
+            padding-left: 0.65rem !important;
+        }
+    }
 </style>
 
 <!--********************************** Content body start ***********************************-->
 <div class="content-body">
     <!-- row -->
-    <div class="container-fluid">
+    <div class="container-fluid dashboard-container">
         <!-- Announcement Ticker Strip Card -->
         <div class="row mb-2">
             <div class="col-sm-12">
@@ -2745,25 +2768,25 @@
                     <!--            <span id="msgText"> Copy</span></span>-->
                     <!--    </div>-->
                     <!--</div>-->
-                    <div class="col-xl-6 col-lg-12 col-sm-12">
-                        <div class="card overflow-hidden member-highlight-card"
-                            style="background-color: #0c0e14 !important; border: 1px solid rgba(245, 158, 11, 0.25);">
-                            <div class="text-center p-5 overlay-box"
+                    <div class="col-xl-6 col-lg-6 col-12 mb-4">
+                        <div class="card overflow-hidden h-100 member-highlight-card d-flex flex-column justify-content-between"
+                            style="background-color: #0c0e14 !important; border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 1.25rem;">
+                            <div class="text-center p-4 p-md-5 overlay-box flex-grow-1 d-flex flex-column justify-content-center align-items-center"
                                 style="background-color: #0c0e14; background-image: linear-gradient(rgba(12, 14, 20, 0.85), rgba(12, 14, 20, 0.85)), url('{{ asset('logo/bg.jpeg') }}'); background-size: cover; background-position: center;">
-                                <img src="{{ asset('logo/name-logo.png') }}" width="400" class="img-fluid"
+                                <img src="{{ asset('logo/name-logo.png') }}" width="380" class="img-fluid"
                                     alt="">
                                 <h3 class="mt-2 mb-2 text-white">Congratulations
                                 </h3>
                                 <h2 class="mb-0 text-white">{{ $data['memberid'] }}</h2>
                                 <h4 class="mb-0 mt-3 text-white">{{ getName($data['memberid']) }}</h4>
                             </div>
-                            <div class="card-body" style="background-color: #0c0e14;">
+                            <div class="card-body pt-3 pb-4 px-3 px-md-4 mt-auto" style="background-color: #0c0e14;">
                                 <div class="row g-3 text-center">
                                     <div class="col-6">
                                         <div class="rounded p-3 text-white h-100 d-flex flex-column justify-content-center align-items-center shadow-sm"
                                             style="background: linear-gradient(135deg, rgba(245,158,11,0.20), rgba(12,14,20,0.95)); border: 1px solid rgba(245,158,11,0.25); min-height: 150px;">
                                             <div class="d-flex align-items-center justify-content-center rounded-circle mb-3"
-                                                style="width: 54px; height: 54px; background: rgba(245,158,11,0.15); color: #fbbf24; font-size: 1.3rem;">
+                                                style="width: 52px; height: 52px; background: rgba(245,158,11,0.15); color: #fbbf24; font-size: 1.3rem;">
                                                 <i class="fa-solid fa-wallet"></i>
                                             </div>
                                             <small class="text-uppercase text-white-50 mb-2"
@@ -2777,7 +2800,7 @@
                                         <div class="rounded p-3 text-white h-100 d-flex flex-column justify-content-center align-items-center shadow-sm"
                                             style="background: linear-gradient(135deg, rgba(16,185,129,0.20), rgba(12,14,20,0.95)); border: 1px solid rgba(16,185,129,0.25); min-height: 150px;">
                                             <div class="d-flex align-items-center justify-content-center rounded-circle mb-3"
-                                                style="width: 54px; height: 54px; background: rgba(16,185,129,0.15); color: #10b981; font-size: 1.3rem;">
+                                                style="width: 52px; height: 52px; background: rgba(16,185,129,0.15); color: #10b981; font-size: 1.3rem;">
                                                 <i class="fa-solid fa-landmark"></i>
                                             </div>
                                             <small class="text-uppercase text-white-50 mb-2"
@@ -2791,154 +2814,226 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-6 col-lg-6">
-                        <div class="card border-0 pb-0">
-                            <div class="card-header border-0 pb-0">
-                                <h4 class="card-title">User Details</h4>
+                    <div class="col-xl-6 col-lg-6 col-12 mb-4">
+                        <div class="card overflow-hidden h-100 member-highlight-card d-flex flex-column justify-content-between"
+                            style="background-color: #0c0e14 !important; border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 1.25rem;">
+                            <div class="card-header border-0 pb-0 pt-3 pt-md-4 px-3 px-md-4 d-flex justify-content-between align-items-center">
+                                <h4 class="card-title text-white mb-0" style="font-weight: 700;">User Details</h4>
+                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 11px; padding: 5px 10px; border-radius: 8px;">
+                                    <i class="fa-solid fa-id-badge me-1"></i> {{ $data['memberid'] }}
+                                </span>
                             </div>
-                            <div class="card-body p-0 ">
-                                <div id="DZ_W_Todo4" class="widget-media dlab-scroll  px-4 my-4 height370">
-                                    <ul class="timeline">
+                            <div class="card-body p-0 d-flex flex-column justify-content-between flex-grow-1">
+                                <!-- USER DETAILS EXECUTIVE STATS (BEAUTIFULLY STYLED, ZERO VOID) -->
+                                <div class="px-3 px-md-4 pt-3 pb-2">
+                                    <div class="row g-2 g-md-3">
+                                        <!-- 1. Monthly Direct Biz -->
+                                        <div class="col-6 col-sm-6">
+                                            <div class="p-2 p-sm-3 rounded-3 h-100 position-relative overflow-hidden"
+                                                style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(12, 14, 20, 0.95) 100%); border: 1px solid rgba(245, 158, 11, 0.28); box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+                                                <div class="d-flex align-items-center justify-content-between mb-1 mb-sm-2">
+                                                    <span class="text-uppercase text-white-50 font-weight-bold"
+                                                        style="font-size: clamp(0.62rem, 1.1vw, 0.72rem); letter-spacing: 0.04em;">Monthly Direct</span>
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                        style="width: 28px; height: 28px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.8rem; border: 1px solid rgba(245, 158, 11, 0.35);">
+                                                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                                                    </div>
+                                                </div>
+                                                <h4 class="mb-0 text-white font-weight-bold" style="font-size: clamp(0.95rem, 1.8vw, 1.25rem); letter-spacing: -0.01em;">
+                                                    $ {{ number_format((float) $data['direct_biz'], 2) }}
+                                                </h4>
+                                                <small class="text-white-50 d-none d-sm-inline-block" style="font-size: 0.68rem;">Direct volume</small>
+                                            </div>
+                                        </div>
 
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Monthly Direct Biz </h5>
-                                                    <small class="text-muted"></small>
+                                        <!-- 2. Daily Team Biz -->
+                                        <div class="col-6 col-sm-6">
+                                            <div class="p-2 p-sm-3 rounded-3 h-100 position-relative overflow-hidden"
+                                                style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.14) 0%, rgba(12, 14, 20, 0.95) 100%); border: 1px solid rgba(59, 130, 246, 0.28); box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+                                                <div class="d-flex align-items-center justify-content-between mb-1 mb-sm-2">
+                                                    <span class="text-uppercase text-white-50 font-weight-bold"
+                                                        style="font-size: clamp(0.62rem, 1.1vw, 0.72rem); letter-spacing: 0.04em;">Daily Team Biz</span>
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                        style="width: 28px; height: 28px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; font-size: 0.8rem; border: 1px solid rgba(59, 130, 246, 0.35);">
+                                                        <i class="fa-solid fa-users-rays"></i>
+                                                    </div>
                                                 </div>
-                                                <div class="dropdown">
-                                                    <small>
-                                                        $
-                                                        {{ number_format((float) $data['direct_biz'], 2) }}
-                                                    </small>
-                                                </div>
+                                                <h4 class="mb-0 text-white font-weight-bold" style="font-size: clamp(0.95rem, 1.8vw, 1.25rem); letter-spacing: -0.01em;">
+                                                    $ {{ number_format((float) ($data['daily_team_biz'] + $data['part_daily_team_biz']), 2) }}
+                                                </h4>
+                                                <small class="text-white-50 d-none d-sm-inline-block" style="font-size: 0.68rem;">Team turnover</small>
                                             </div>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Daily Team Biz</h5>
+                                        </div>
+
+                                        <!-- 3. Downline Members -->
+                                        <div class="col-6 col-sm-6">
+                                            <div class="p-2 p-sm-3 rounded-3 h-100 position-relative overflow-hidden"
+                                                style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(12, 14, 20, 0.95) 100%); border: 1px solid rgba(168, 85, 247, 0.25); box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+                                                <div class="d-flex align-items-center justify-content-between mb-1 mb-sm-2">
+                                                    <span class="text-uppercase text-white-50 font-weight-bold"
+                                                        style="font-size: clamp(0.62rem, 1.1vw, 0.72rem); letter-spacing: 0.04em;">Total Downline</span>
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                        style="width: 28px; height: 28px; background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.8rem; border: 1px solid rgba(168, 85, 247, 0.35);">
+                                                        <i class="fa-solid fa-sitemap"></i>
+                                                    </div>
                                                 </div>
-                                                <div class="dropdown">
-                                                    <small>
-                                                        $
-                                                        {{ number_format((float) ($data['daily_team_biz'] + $data['part_daily_team_biz']), 2) }}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Downline</h5>
-                                                    <small class="text-muted"></small>
-                                                </div>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-primary light sharp"
-                                                        data-bs-toggle="dropdown">
+                                                <div class="d-flex align-items-baseline gap-1 gap-sm-2">
+                                                    <h4 class="mb-0 text-white font-weight-bold" style="font-size: clamp(0.95rem, 1.8vw, 1.25rem);">
                                                         {{ $data['downline'] }}
-                                                    </button>
+                                                    </h4>
+                                                    <small class="text-white-50" style="font-size: 0.7rem;">Active</small>
                                                 </div>
+                                                <small class="text-white-50 d-none d-sm-inline-block" style="font-size: 0.68rem;">Team network</small>
                                             </div>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">SponsorId</h5>
-                                                    <small class="text-muted"></small>
+                                        </div>
+
+                                        <!-- 4. Sponsor ID -->
+                                        <div class="col-6 col-sm-6">
+                                            <div class="p-2 p-sm-3 rounded-3 h-100 position-relative overflow-hidden"
+                                                style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, rgba(12, 14, 20, 0.95) 100%); border: 1px solid rgba(234, 179, 8, 0.25); box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
+                                                <div class="d-flex align-items-center justify-content-between mb-1 mb-sm-2">
+                                                    <span class="text-uppercase text-white-50 font-weight-bold"
+                                                        style="font-size: clamp(0.62rem, 1.1vw, 0.72rem); letter-spacing: 0.04em;">Sponsor ID</span>
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                        style="width: 28px; height: 28px; background: rgba(234, 179, 8, 0.2); color: #facc15; font-size: 0.8rem; border: 1px solid rgba(234, 179, 8, 0.35);">
+                                                        <i class="fa-solid fa-user-tie"></i>
+                                                    </div>
                                                 </div>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-warning light sharp"
-                                                        data-bs-toggle="dropdown">
+                                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
+                                                    <h4 class="mb-0 text-white font-weight-bold" style="font-size: clamp(0.85rem, 1.6vw, 1.15rem);">
                                                         {{ $data['sponsorid'] }}
-                                                    </button>
+                                                    </h4>
+                                                    <span class="badge" style="background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.35); font-size: 10px; padding: 2px 6px; border-radius: 4px;">
+                                                        Upline
+                                                    </span>
+                                                </div>
+                                                <small class="text-white-50 d-none d-sm-inline-block" style="font-size: 0.68rem;">Referral upline</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- 5. Profile Status & Region Bar -->
+                                        <div class="col-12">
+                                            <div class="p-2 px-3 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2"
+                                                style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07);">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <small class="text-white-50" style="font-size: 0.74rem;">Account Status:</small>
+                                                    @if (strtolower(trim($data['status'] ?? '')) === 'active')
+                                                        <span class="badge d-inline-flex align-items-center gap-1"
+                                                            style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700; border-radius: 6px; font-size: 11px; padding: 4px 10px; border: 1px solid rgba(16, 185, 129, 0.4);">
+                                                            <i class="fa-solid fa-circle-check"></i> Active
+                                                        </span>
+                                                    @else
+                                                        <span class="badge d-inline-flex align-items-center gap-1"
+                                                            style="background: rgba(239, 68, 68, 0.2); color: #f87171; font-weight: 700; border-radius: 6px; font-size: 11px; padding: 4px 10px; border: 1px solid rgba(239, 68, 68, 0.4);">
+                                                            {{ $data['status'] == 'Temp' ? 'Inactive' : 'Blocked' }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <small class="text-white-50" style="font-size: 0.74rem;">Country:</small>
+                                                    <span class="text-white font-weight-bold" style="font-size: 0.78rem;">
+                                                        <i class="fa-solid fa-earth-americas text-warning me-1"></i> {{ $data['country'] }}
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <small class="text-white-50" style="font-size: 0.74rem;">Joined:</small>
+                                                    <span class="text-white-50 font-weight-bold" style="font-size: 0.78rem;">
+                                                        <i class="fa-regular fa-calendar-check text-info me-1"></i> {{ date('d M Y', strtotime($data['created_at'])) }}
+                                                    </span>
                                                 </div>
                                             </div>
-                                        </li>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Status</h5>
-                                                    <small class="text-muted"></small>
+                                <!-- TRADING WALLET HERO CARD (DIRECTLY BELOW STATS WITH PROPER SPACING, ZERO UNWANTED VOID) -->
+                                <div class="px-3 px-md-4 pb-3 pb-md-4 pt-2 mt-auto">
+                                    <div class="trading-wallet-card rounded-4 p-3 p-md-4 text-white position-relative overflow-hidden shadow-lg"
+                                        style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(6, 182, 212, 0.15) 50%, rgba(12, 14, 20, 0.98) 100%);
+                                               border: 1px solid rgba(16, 185, 129, 0.45);
+                                               box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(16, 185, 129, 0.35);
+                                               transition: transform 0.25s ease, box-shadow 0.25s ease;
+                                               min-height: 165px;">
+
+                                        <!-- Background Watermark Icon -->
+                                        <div style="position: absolute; right: -15px; bottom: -20px; font-size: 7.5rem; color: rgba(16, 185, 129, 0.06); pointer-events: none; z-index: 0;">
+                                            <i class="fa-solid fa-chart-line"></i>
+                                        </div>
+
+                                        <div class="position-relative" style="z-index: 1;">
+                                            <!-- Top row: Icon + Label + Status Badge -->
+                                            <div class="d-flex align-items-center justify-content-between mb-2 mb-md-3 flex-wrap gap-2">
+                                                <div class="d-flex align-items-center gap-2 gap-sm-3">
+                                                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                                        style="width: 44px; height: 44px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 182, 212, 0.25)); border: 1.5px solid rgba(16, 185, 129, 0.6); color: #34d399; font-size: 1.25rem; box-shadow: 0 0 18px rgba(16, 185, 129, 0.45);">
+                                                        <i class="fa-solid fa-coins"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="d-block text-uppercase font-weight-bold"
+                                                            style="color: #6EE7B7; font-size: 0.78rem; letter-spacing: 0.1em;">
+                                                            Trading Wallet
+                                                        </span>
+                                                        <small class="text-white-50" style="font-size: 0.72rem;">Trading &amp; Staking Balance</small>
+                                                    </div>
                                                 </div>
-                                                <div class="dropdown">
 
-                                                    @if (strtolower(trim($data['status'] ?? '')) === 'active')
-                                                    <button type="button" class="btn btn-primary light sharp"
-                                                        data-bs-toggle="dropdown">
-                                                        Active
-                                                    </button>
+                                                <div>
+                                                    @if (isset($isFundLocked) && $isFundLocked)
+                                                        <span class="badge d-inline-flex align-items-center gap-1"
+                                                            style="background: rgba(239, 68, 68, 0.22); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.5); font-size: 11px; font-weight: 700; border-radius: 20px; padding: 5px 12px; box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);">
+                                                            <i class="fa-solid fa-lock"></i> Locked ({{ $remainingLockDays ?? 0 }}D)
+                                                        </span>
                                                     @else
-                                                    <button type="button" class="btn btn-danger light sharp"
-                                                        data-bs-toggle="dropdown">
-                                                        {{ $data['status'] == 'Temp' ? 'Inactive' : 'Blocked' }}
-                                                    </button>
+                                                        <span class="badge d-inline-flex align-items-center gap-1"
+                                                            style="background: rgba(16, 185, 129, 0.22); color: #6EE7B7; border: 1px solid rgba(16, 185, 129, 0.5); font-size: 11px; font-weight: 700; border-radius: 20px; padding: 5px 12px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);">
+                                                            <i class="fa-solid fa-circle-check"></i> Active &bull; Unlocked
+                                                        </span>
                                                     @endif
                                                 </div>
                                             </div>
-                                        </li>
 
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Joining Date</h5>
-                                                    <small class="text-muted"></small>
+                                            <!-- Middle row: Big Hero Amount & Return info -->
+                                            <div class="d-flex align-items-baseline justify-content-between flex-wrap gap-2 mb-3">
+                                                <div>
+                                                    <small class="text-white-50 d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.08em;">CURRENT BALANCE</small>
+                                                    <h2 class="mb-0 font-weight-bold text-white"
+                                                        style="font-size: clamp(1.6rem, 2.5vw, 2.1rem); letter-spacing: -0.02em; text-shadow: 0 0 25px rgba(16, 185, 129, 0.5); line-height: 1.1;">
+                                                        $ {{ number_format((float) ($data['trading_wallet'] ?? ($tradingWalletBalance ?? 0)), 2) }}
+                                                    </h2>
                                                 </div>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-info light sharp"
-                                                        data-bs-toggle="dropdown">
-                                                        {{ date('d-m-Y', strtotime($data['created_at'])) }}
-                                                    </button>
-
+                                                <div class="text-end">
+                                                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 8px;">
+                                                        <i class="fa-solid fa-bolt me-1"></i> Return: {{ number_format($maxReturnPercent ?? 300, 0) }}% Max
+                                                    </span>
                                                 </div>
                                             </div>
-                                        </li>
 
-                                        <!--<li>-->
-                                        <!--    <div class="timeline-panel">-->
-                                        <!--        <div class="media-body">-->
-                                        <!--            <h5 class="mb-0">Daily Self Biz</h5>-->
-                                        <!--        </div>-->
-                                        <!--        <div class="dropdown">-->
-                                        <!--            <small>-->
-                                        <!--                $ {{ $data['daily_team_biz'] - $data['part_daily_team_biz'] }}</small>-->
-                                        <!--        </div>-->
-                                        <!--    </div>-->
-                                        <!--</li>-->
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Member Wallet</h5>
-                                                </div>
-                                                <div class="dropdown">
-                                                    <small>
-                                                        {{ $data['member_wallet'] }}</small>
+                                            <!-- Bottom row: Subtext & Action Buttons -->
+                                            <div class="d-flex align-items-center justify-content-between pt-2 border-top flex-wrap gap-2"
+                                                style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                                                <span class="text-white-50" style="font-size: 0.74rem;">
+                                                    {{ (isset($isFundLocked) && $isFundLocked) ? 'Fund locked under package policy • Daily ROI active' : 'Full balance available for trading & withdrawal' }}
+                                                </span>
+                                                <div class="d-flex align-items-center gap-2 ms-auto ms-sm-0">
+                                                    <a href="{{ url('member/trading-dashboard') }}" class="btn btn-sm"
+                                                        style="background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 8px; font-weight: 600; padding: 5px 12px; font-size: 0.78rem; transition: all 0.2s ease;">
+                                                        <i class="fa-solid fa-gauge-high me-1"></i> Trade
+                                                    </a>
+                                                    <a href="{{ url('member/wallet/trading-withdrawal') }}" class="btn btn-sm"
+                                                        style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border-radius: 8px; font-weight: 600; padding: 5px 14px; font-size: 0.78rem; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); transition: all 0.2s ease;">
+                                                        <i class="fa-solid fa-money-bill-transfer me-1"></i> Withdraw
+                                                    </a>
                                                 </div>
                                             </div>
-                                        </li>
-                                        <li>
-                                            <div class="timeline-panel">
-                                                <div class="media-body">
-                                                    <h5 class="mb-0">Country</h5>
-                                                    <small class="text-muted"></small>
-                                                </div>
-                                                <div class="dropdown">
-                                                    <button type="button" class="btn btn-success light sharp"
-                                                        data-bs-toggle="dropdown">
-                                                        {{ $data['country'] }}
-                                                    </button>
-
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- PACKAGE & INVESTMENT OVERVIEW (PHASE 2 & TRADING WALLET LOCK) -->
-                    <div class="row mb-4">
+                </div>
+                <!-- PACKAGE & INVESTMENT OVERVIEW (PHASE 2 & TRADING WALLET LOCK) -->
+                <div class="row mb-4 mt-1 mt-md-2">
                         <div class="col-12">
                             <div class="card admin-pool-wrapper" style="border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 20px; overflow: hidden; background: linear-gradient(135deg, rgba(16, 20, 30, 0.98), rgba(10, 12, 18, 0.95)); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);">
                                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap" style="background: linear-gradient(90deg, rgba(245, 158, 11, 0.18), rgba(255, 215, 0, 0.05)); border-bottom: 1px solid rgba(245, 158, 11, 0.25); padding: 1.2rem 1.5rem;">
