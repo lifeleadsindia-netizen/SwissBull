@@ -696,34 +696,60 @@ unset($cat);
         </div>
     </div>
 
-    <!-- 5. SECONDARY TOKEN & WITHDRAWAL ACTIVITY SUMMARY STRIP -->
+    <!-- 5. PLATFORM TOKEN & WITHDRAWAL LIVE METRICS STRIP -->
     <div class="row">
         <div class="col-12">
             <div class="adm-activity-strip">
-                <p class="adm-strip-title">Platform Token & Withdrawal Live Metrics</p>
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                    <p class="adm-strip-title mb-0">Platform Token &amp; Withdrawal Live Metrics</p>
+                    <span class="badge badge-primary px-3 py-1 font-weight-bold" style="font-size: 11px; border-radius: 8px;">Withdrawal Overview</span>
+                </div>
                 <div class="row">
-                    <div class="col-xl-3 col-md-6 col-6 mb-2 mb-xl-0">
-                        <div class="adm-strip-item">
-                            <p class="adm-strip-item-label">Today PEPE Withdrawal</p>
-                            <h5 class="adm-strip-item-val text-success">{{ number_format((float) todayPEPEWithdrawal(), 2) }} PEPE</h5>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 col-6 mb-2 mb-xl-0">
-                        <div class="adm-strip-item">
-                            <p class="adm-strip-item-label">Total PEPE Withdrawal</p>
-                            <h5 class="adm-strip-item-val text-danger">{{ number_format((float) totalPEPEWithdrawal(), 2) }} PEPE</h5>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 col-6">
+                    <!-- 1. Today's Withdrawal -->
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
                         <div class="adm-strip-item">
                             <p class="adm-strip-item-label">Today's Withdrawal</p>
                             <h5 class="adm-strip-item-val text-primary">$ {{ number_format((float) todaysWithdrawal(), 2) }}</h5>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-md-6 col-6">
+
+                    <!-- 2. Total Withdrawal -->
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
                         <div class="adm-strip-item">
                             <p class="adm-strip-item-label">Total Withdrawal</p>
                             <h5 class="adm-strip-item-val text-danger">$ {{ number_format((float) totalWithdrawal(), 2) }}</h5>
+                        </div>
+                    </div>
+
+                    <!-- 3. Today Trading Withdrawal -->
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                        <div class="adm-strip-item">
+                            <p class="adm-strip-item-label">Today Trading Withdrawal</p>
+                            <h5 class="adm-strip-item-val text-success">$ {{ number_format((float) todayTradingWithdrawal(), 2) }}</h5>
+                        </div>
+                    </div>
+
+                    <!-- 4. Total Trading Withdrawal -->
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                        <div class="adm-strip-item">
+                            <p class="adm-strip-item-label">Total Trading Withdrawal</p>
+                            <h5 class="adm-strip-item-val text-success">$ {{ number_format((float) totalTradingWithdrawal(), 2) }}</h5>
+                        </div>
+                    </div>
+
+                    <!-- 5. Today PEPE Withdrawal -->
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                        <div class="adm-strip-item">
+                            <p class="adm-strip-item-label">Today PEPE Withdrawal</p>
+                            <h5 class="adm-strip-item-val text-info">{{ number_format((float) todayPEPEWithdrawal(), 2) }} PEPE</h5>
+                        </div>
+                    </div>
+
+                    <!-- 6. Total PEPE Withdrawal -->
+                    <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                        <div class="adm-strip-item">
+                            <p class="adm-strip-item-label">Total PEPE Withdrawal</p>
+                            <h5 class="adm-strip-item-val text-warning">{{ number_format((float) totalPEPEWithdrawal(), 2) }} PEPE</h5>
                         </div>
                     </div>
                 </div>

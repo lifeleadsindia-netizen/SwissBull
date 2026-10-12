@@ -259,6 +259,32 @@
             letter-spacing: 0.02em;
         }
 
+        .withdrawal-stat-card-trading {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(18, 22, 32, 0.75));
+            border-color: rgba(16, 185, 129, 0.28);
+        }
+
+        .withdrawal-stat-card-trading::before,
+        .withdrawal-stat-card-trading::after {
+            background: #10B981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.9);
+        }
+
+        .withdrawal-icon-trading {
+            background: rgba(16, 185, 129, 0.20);
+            border-color: rgba(16, 185, 129, 0.55);
+            color: #34D399;
+        }
+
+        .withdrawal-progress-trading span {
+            background: linear-gradient(90deg, #10B981, #34D399 52%, #06B6D4);
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.7);
+        }
+
+        .withdrawal-meta-trading {
+            color: rgba(52, 211, 153, 0.85);
+        }
+
         .admin-pool-btn {
             position: relative;
             overflow: hidden;
@@ -3204,6 +3230,7 @@
                                     <h4 class="withdrawal-overview-title mb-3">Withdrawal Overview</h4>
 
                                     <div class="row g-3">
+                                        <!-- 1. Today's Withdrawal (Income Wallet) -->
                                         <div class="col-xl-6 col-lg-6 col-sm-12">
                                             <div class="withdrawal-stat-card">
                                                 <div class="withdrawal-stat-inner">
@@ -3227,6 +3254,7 @@
                                             </div>
                                         </div>
 
+                                        <!-- 2. Total Withdrawal (Income Wallet) -->
                                         <div class="col-xl-6 col-lg-6 col-sm-12">
                                             <div class="withdrawal-stat-card">
                                                 <div class="withdrawal-stat-inner">
@@ -3245,6 +3273,53 @@
                                                         <span style="width: 100%;"></span>
                                                     </div>
                                                     <div class="withdrawal-meta">Total Withdrawal</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 3. Today's Trading Withdrawal -->
+                                        <div class="col-xl-6 col-lg-6 col-sm-12">
+                                            <div class="withdrawal-stat-card withdrawal-stat-card-trading">
+                                                <div class="withdrawal-stat-inner">
+                                                    <div class="withdrawal-stat-header">
+                                                        <div class="withdrawal-label">
+                                                            <span class="withdrawal-icon withdrawal-icon-trading">
+                                                                <i class="fa-solid fa-arrow-trend-down"></i>
+                                                            </span>
+                                                            <span>Today Trading Withdrawal</span>
+                                                        </div>
+                                                    </div>
+                                                    <h3 class="withdrawal-amount">$
+                                                        {{ number_format((float) todayTradingWithdrawals($data['memberid']), 2) }}
+                                                    </h3>
+                                                    <div class="withdrawal-progress withdrawal-progress-trading">
+                                                        <span
+                                                            style="width: {{ min(100, max(18, ((float) todayTradingWithdrawals($data['memberid']) / max((float) totalTradingWithdrawals($data['memberid']), 1)) * 100)) }}%;"></span>
+                                                    </div>
+                                                    <div class="withdrawal-meta withdrawal-meta-trading">Today's trading withdrawal</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 4. Total Trading Withdrawal -->
+                                        <div class="col-xl-6 col-lg-6 col-sm-12">
+                                            <div class="withdrawal-stat-card withdrawal-stat-card-trading">
+                                                <div class="withdrawal-stat-inner">
+                                                    <div class="withdrawal-stat-header">
+                                                        <div class="withdrawal-label">
+                                                            <span class="withdrawal-icon withdrawal-icon-trading">
+                                                                <i class="fa-solid fa-money-bill-transfer"></i>
+                                                            </span>
+                                                            <span>Total Trading Withdrawal</span>
+                                                        </div>
+                                                    </div>
+                                                    <h3 class="withdrawal-amount">$
+                                                        {{ number_format((float) totalTradingWithdrawals($data['memberid']), 2) }}
+                                                    </h3>
+                                                    <div class="withdrawal-progress withdrawal-progress-trading">
+                                                        <span style="width: 100%;"></span>
+                                                    </div>
+                                                    <div class="withdrawal-meta withdrawal-meta-trading">Total Trading Withdrawal</div>
                                                 </div>
                                             </div>
                                         </div>

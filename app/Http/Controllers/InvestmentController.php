@@ -108,6 +108,7 @@ class InvestmentController extends Controller
         $stakingDetail->invest_date = now();
         $stakingDetail->invest_amount = $amount;
         $stakingDetail->package = $package;
+        $stakingDetail->trade_percentage = $packagedistribution->trading_wallet;
         $stakingDetail->trading_wallet_amount = $trading_wallet;
         $stakingDetail->txnid = $txnid;
         $stakingDetail->order_id = $orderId;
