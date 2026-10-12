@@ -16,6 +16,7 @@ use App\Models\TicketText;
 use App\Models\WhatsappReferral;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
+use Illuminate\Support\Facades\Schema;
 
 function totalMembersadmin()
 {
@@ -61,16 +62,54 @@ function totalTradingWalletBalance()
 
 function todaysWithdrawal()
 {
-    $sum = WithdrawalRequest::where('status', 'Approved')->whereDate('payment_date', date('Y-m-d'))->sum('gross_amount');
+    $sum = WithdrawalRequest::where('status', 'Approved')
+        ->whereNotIn('type', ['Airdrop Withdrawal', 'Trading Withdrawal'])
+        ->where(function ($q) {
+            $q->whereDate('payment_date', date('Y-m-d'))
+                ->orWhereDate('created_at', date('Y-m-d'));
+        })
+        ->sum('gross_amount');
 
-    return $sum;
+    return (float) $sum;
 }
 
 function totalWithdrawal()
 {
-    $sum = WithdrawalRequest::where('status', 'Approved')->sum('gross_amount');
+    $sum = WithdrawalRequest::where('status', 'Approved')
+        ->whereNotIn('type', ['Airdrop Withdrawal', 'Trading Withdrawal'])
+        ->sum('gross_amount');
 
-    return $sum;
+    return (float) $sum;
+}
+
+function todayTradingWithdrawal()
+{
+    $sum = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Trading Withdrawal']])
+        ->where(function ($q) {
+            $q->whereDate('payment_date', date('Y-m-d'))
+                ->orWhereDate('created_at', date('Y-m-d'));
+        })
+        ->sum('gross_amount');
+
+    return (float) $sum;
+}
+
+function todayTradingWithdrawalAdmin()
+{
+    return todayTradingWithdrawal();
+}
+
+function totalTradingWithdrawal()
+{
+    $sum = WithdrawalRequest::where([['status', 'Approved'], ['type', 'Trading Withdrawal']])
+        ->sum('gross_amount');
+
+    return (float) $sum;
+}
+
+function totalTradingWithdrawalAdmin()
+{
+    return totalTradingWithdrawal();
 }
 
 function AdmUnread($ticketid)
@@ -115,9 +154,10 @@ function totalAdminDirectIncome()
 
 function totalAdminHeroOfTheMonthIncome()
 {
-    $sum = HeroOfTheMonthReward::where('status', 'Paid')->sum('amount');
+    $col = Schema::hasColumn('hero_of_the_month_rewards', 'amount') ? 'amount' : 'prize_amount';
+    $sum = HeroOfTheMonthReward::where('status', 'Paid')->sum($col);
 
-    return $sum;
+    return (float) $sum;
 }
 
 function totalAdminMonthlyTradingProfit()

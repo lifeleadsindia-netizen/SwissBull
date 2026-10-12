@@ -20,7 +20,6 @@ class TempController extends Controller
     {
         // Monthly Income(Run Daily)
         $stakings = StakingDetail::where('status', 'Active')->get();
-        // $stakings = StakingDetail::where([['status', 'Active'], ['invest_date', date('Y-m-d H:i:s')]])->get();
         foreach ($stakings as $value) {
             $memberid = $value->memberid;
             $staking_id = $value->id;
@@ -33,9 +32,9 @@ class TempController extends Controller
             // }
             $stak_amount = ($value->trading_wallet_amount / 100 * $rate) / 30;
             if (rand(0, 1) == 1) {
-                $stak_amount += $stak_amount / 100 * rand(1, 10);
+                $stak_amount += ($stak_amount / 100) * rand(1, 10);
             } else {
-                $stak_amount -= $stak_amount / 100 * rand(1, 10);
+                $stak_amount -= ($stak_amount / 100) * rand(1, 10);
             }
 
             $memUpdate = MemberDetail::where('memberid', $memberid)->first();
@@ -45,9 +44,9 @@ class TempController extends Controller
                 $amount = $stak_amount;
                 $balance = 0;
             } else {
-                $capping = $stak_amount / 100 * $capping;
+                $capvalue = ($stak_amount / 100) * $cap;
                 $achieved = StakingIncome::where([['status', 'Paid'], ['memberid', $staking_id]])->sum('amount');
-                $balance = $capping - $achieved;
+                $balance = $capvalue - $achieved;
                 if ($balance <= $stak_amount) {
                     $amount = $balance;
                 } else {

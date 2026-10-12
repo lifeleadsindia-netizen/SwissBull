@@ -12,6 +12,7 @@ use App\Models\StakingIncome;
 use App\Models\UplineMember;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
+use Illuminate\Support\Facades\Schema;
 
 function userId()
 {
@@ -195,9 +196,10 @@ function totalMemberDirectIncome($memberid)
 
 function totalMemberHeroOfTheMonthIncome($memberid)
 {
-    $sum = HeroOfTheMonthReward::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
+    $col = Schema::hasColumn('hero_of_the_month_rewards', 'amount') ? 'amount' : 'prize_amount';
+    $sum = HeroOfTheMonthReward::where([['memberid', $memberid], ['status', 'Paid']])->sum($col);
 
-    return $sum;
+    return (float) $sum;
 }
 
 function totalMemberMonthlyTradingProfit($memberid)
@@ -249,16 +251,44 @@ function totalRoiIncome($memberid)
 
 function todayWithdrawals($memberid)
 {
-    $var = WithdrawalRequest::where([['memberid', $memberid], ['status', 'Approved'], ['type', 'USDT']])->whereDate('created_at', date('Y-m-d'))->sum('gross_amount');
+    $var = WithdrawalRequest::where([['memberid', $memberid], ['status', 'Approved']])
+        ->whereNotIn('type', ['Airdrop Withdrawal', 'Trading Withdrawal'])
+        ->where(function ($q) {
+            $q->whereDate('payment_date', date('Y-m-d'))
+                ->orWhereDate('created_at', date('Y-m-d'));
+        })
+        ->sum('gross_amount');
 
-    return $var;
+    return (float) $var;
 }
 
 function totalWithdrawals($memberid)
 {
-    $var = WithdrawalRequest::where([['memberid', $memberid], ['status', 'Approved'], ['type', 'USDT']])->sum('gross_amount');
+    $var = WithdrawalRequest::where([['memberid', $memberid], ['status', 'Approved']])
+        ->whereNotIn('type', ['Airdrop Withdrawal', 'Trading Withdrawal'])
+        ->sum('gross_amount');
 
-    return number_format($var, 2);
+    return (float) $var;
+}
+
+function todayTradingWithdrawals($memberid)
+{
+    $var = WithdrawalRequest::where([['memberid', $memberid], ['status', 'Approved'], ['type', 'Trading Withdrawal']])
+        ->where(function ($q) {
+            $q->whereDate('payment_date', date('Y-m-d'))
+                ->orWhereDate('created_at', date('Y-m-d'));
+        })
+        ->sum('gross_amount');
+
+    return (float) $var;
+}
+
+function totalTradingWithdrawals($memberid)
+{
+    $var = WithdrawalRequest::where([['memberid', $memberid], ['status', 'Approved'], ['type', 'Trading Withdrawal']])
+        ->sum('gross_amount');
+
+    return (float) $var;
 }
 
 function totalLevelMembers($memberid)

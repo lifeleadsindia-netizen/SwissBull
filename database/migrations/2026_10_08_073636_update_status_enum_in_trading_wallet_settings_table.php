@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 return new class extends Migration
 {
@@ -9,8 +10,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Convert status column to VARCHAR temporarily so data can be safely converted
-        DB::statement("ALTER TABLE `trading_wallet_settings` MODIFY COLUMN `status` VARCHAR(20) NOT NULL DEFAULT 'on'");
+        if (! Schema::hasColumn('trading_wallet_settings', 'status')) {
+            Schema::table('trading_wallet_settings', function (Blueprint $table) {
+                $table->string('status', 20)->default('on');
+            });
+        } else {
+            // 1. Convert status column to VARCHAR temporarily so data can be safely converted
+            DB::statement("ALTER TABLE `trading_wallet_settings` MODIFY COLUMN `status` VARCHAR(20) NOT NULL DEFAULT 'on'");
+        }
 
         // 2. Convert existing values: lock -> on, unlock -> off
         DB::statement("UPDATE `trading_wallet_settings` SET `status` = 'on' WHERE `status` = 'lock'");

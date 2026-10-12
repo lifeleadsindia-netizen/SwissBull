@@ -46,11 +46,11 @@
                                             Income</span>
                                     </div>
                                     <div class="col-4 pt-3 pb-3 border-end">
-                                        <h3 class="mb-1">${{ totalWithdrawals($data['memberid']) }}</h3><span>Total
+                                        <h3 class="mb-1">${{ number_format((float) totalWithdrawals($data['memberid']), 2) }}</h3><span>Total
                                             Withdrawal</span>
                                     </div>
                                     <div class="col-4 pt-3 pb-3">
-                                        <h3 class="mb-1">${{ todayWithdrawals($data['memberid']) }}</h3><span>Today
+                                        <h3 class="mb-1">${{ number_format((float) todayWithdrawals($data['memberid']), 2) }}</h3><span>Today
                                             Withdrawal</span>
                                     </div>
                                 </div>

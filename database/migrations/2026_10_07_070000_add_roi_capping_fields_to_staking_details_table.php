@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,7 +15,10 @@ return new class extends Migration
         if (Schema::hasTable('staking_details')) {
             Schema::table('staking_details', function (Blueprint $table) {
                 if (! Schema::hasColumn('staking_details', 'capping_percent')) {
-                    $table->decimal('capping_percent', 8, 2)->default(200.00)->after('rate');
+                    $col = $table->decimal('capping_percent', 8, 2)->default(200.00);
+                    if (Schema::hasColumn('staking_details', 'rate')) {
+                        $col->after('rate');
+                    }
                 }
                 if (! Schema::hasColumn('staking_details', 'max_amount')) {
                     $table->decimal('max_amount', 15, 2)->default(0.00)->after('capping_percent');
@@ -40,8 +44,8 @@ return new class extends Migration
             });
 
             try {
-                \Illuminate\Support\Facades\DB::statement('ALTER TABLE staking_details MODIFY total_installments INT(11) NOT NULL DEFAULT 0');
-            } catch (\Throwable $e) {
+                DB::statement('ALTER TABLE staking_details MODIFY total_installments INT(11) NOT NULL DEFAULT 0');
+            } catch (Throwable $e) {
                 // Ignore if driver does not support or already modified
             }
         }
