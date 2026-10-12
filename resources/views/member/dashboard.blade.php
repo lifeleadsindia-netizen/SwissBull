@@ -1927,8 +1927,7 @@
                             $('#btnVerifyWa').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Verifying...');
 
                             $.ajax({
-                                url: '{{ route('
-                                member.whatsapp.verify ') }}',
+                                url: '{{ route('member.whatsapp.verify') }}',
                                 type: 'POST',
                                 data: {
                                     mobile_number: mobile,
@@ -2012,8 +2011,7 @@
                             $('#btnSendWa').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processing...');
 
                             $.ajax({
-                                url: '{{ route('
-                                member.whatsapp.process ') }}',
+                                url: '{{ route('member.whatsapp.process') }}',
                                 type: 'POST',
                                 data: {
                                     mobile_number: mobile,

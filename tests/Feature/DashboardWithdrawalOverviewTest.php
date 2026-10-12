@@ -144,7 +144,23 @@ class DashboardWithdrawalOverviewTest extends TestCase
 
     public function test_member_dashboard_renders_withdrawal_overview_and_trading_cards(): void
     {
-        $response = $this->withSession(['MEMBER_ID' => 'ST1234567', 'country' => 'India'])
+        $memberId = 'ST1234567';
+
+        DB::table('member_details')->insert([
+            'memberid' => $memberId,
+            'name' => 'Test Member',
+            'mobile' => '9876543210',
+            'email' => 'test@example.com',
+            'status' => 'Active',
+            'wallet' => 1000,
+            'trading_wallet' => 500,
+            'pepe_wallet' => 200,
+            'country' => 'India',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->withSession(['MEMBER_ID' => $memberId, 'country' => 'India'])
             ->get('/member/dashboard');
 
         $response->assertStatus(200);
