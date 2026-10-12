@@ -3012,13 +3012,13 @@
                                             <div class="d-flex align-items-center justify-content-between pt-2 border-top flex-wrap gap-2"
                                                 style="border-color: rgba(255, 255, 255, 0.08) !important;">
                                                 <span class="text-white-50" style="font-size: 0.74rem;">
-                                                    {{ (isset($isFundLocked) && $isFundLocked) ? 'Fund locked under package policy • Daily ROI active' : 'Full balance available for trading & withdrawal' }}
+                                                    {{ (isset($isFundLocked) && $isFundLocked) ? 'Fund locked under package policy • Daily ROI active' : 'Full balance available for withdrawal' }}
                                                 </span>
                                                 <div class="d-flex align-items-center gap-2 ms-auto ms-sm-0">
-                                                    <a href="{{ url('member/trading-dashboard') }}" class="btn btn-sm"
+                                                    {{-- <a href="{{ url('member/trading-dashboard') }}" class="btn btn-sm"
                                                         style="background: rgba(16, 185, 129, 0.18); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 8px; font-weight: 600; padding: 5px 12px; font-size: 0.78rem; transition: all 0.2s ease;">
                                                         <i class="fa-solid fa-gauge-high me-1"></i> Trade
-                                                    </a>
+                                                    </a> --}}
                                                     <a href="{{ url('member/wallet/trading-withdrawal') }}" class="btn btn-sm"
                                                         style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border-radius: 8px; font-weight: 600; padding: 5px 14px; font-size: 0.78rem; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); transition: all 0.2s ease;">
                                                         <i class="fa-solid fa-money-bill-transfer me-1"></i> Withdraw
