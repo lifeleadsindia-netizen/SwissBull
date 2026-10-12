@@ -31,48 +31,25 @@ class StakingDetail extends Model
     }
 
     /**
-     * Get the actual activation timestamp from staking_details.created_at (fallback to invest_date).
+     * Get activation timestamp directly from staking_details.created_at.
      */
     public function getActivationDateAttribute(): ?Carbon
     {
-        if ($this->created_at) {
-            return Carbon::parse($this->created_at);
-        }
-
-        if ($this->invest_date) {
-            return Carbon::parse($this->invest_date);
-        }
-
-        return null;
+        return $this->created_at ? Carbon::parse($this->created_at) : null;
     }
 
     /**
-     * Calculate unlock date/time based on matching package detail or activation date + configured lock days.
+     * Calculate unlock date/time based ONLY on staking_details.created_at + package_distributions.lock_days.
      */
     public function getLockedUntilAttribute(): ?Carbon
     {
-        if (! empty($this->txnid)) {
-            $pkg = PackageDetail::where('txnid', $this->txnid)->first();
-            if ($pkg && $pkg->locked_until) {
-                return Carbon::parse($pkg->locked_until);
-            }
-        }
-
-        if (! empty($this->order_id)) {
-            $pkg = PackageDetail::where('order_id', $this->order_id)->first();
-            if ($pkg && $pkg->locked_until) {
-                return Carbon::parse($pkg->locked_until);
-            }
-        }
-
-        $activation = $this->activation_date;
-        if (! $activation) {
+        if (! $this->created_at) {
             return null;
         }
 
-        $lockDays = TradingWalletSetting::getDefaultLockDays();
+        $lockDays = PackageDistribution::getDefaultLockDays();
 
-        return $lockDays > 0 ? $activation->copy()->addDays($lockDays) : null;
+        return Carbon::parse($this->created_at)->copy()->addDays(max(0, $lockDays));
     }
 
     /**

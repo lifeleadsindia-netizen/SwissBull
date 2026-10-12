@@ -58,7 +58,7 @@ class MemberDetail extends Model
      */
     public function getTradingWalletLockDaysAttribute(): int
     {
-        return TradingWalletSetting::getDefaultLockDays();
+        return PackageDistribution::getDefaultLockDays();
     }
 
     /**
@@ -66,7 +66,7 @@ class MemberDetail extends Model
      */
     public function getTradingWalletWithdrawalPercentAttribute(): float
     {
-        return TradingWalletSetting::getDefaultWithdrawalPercent();
+        return PackageDistribution::getDefaultWithdrawalPercent();
     }
 
     /**
@@ -78,7 +78,7 @@ class MemberDetail extends Model
     }
 
     /**
-     * Get the latest unlock timestamp across member's staking details and package details.
+     * Get the latest unlock timestamp across member's staking details.
      */
     public function tradingWalletLockedUntil(): ?Carbon
     {
@@ -95,22 +95,11 @@ class MemberDetail extends Model
             }
         }
 
-        $packages = $this->relationLoaded('packageDetails')
-            ? $this->packageDetails
-            : $this->packageDetails()->get();
-
-        foreach ($packages as $pkg) {
-            $unl = $pkg->locked_until;
-            if ($unl && (! $latest || $unl->gt($latest))) {
-                $latest = $unl;
-            }
-        }
-
         return $latest;
     }
 
     /**
-     * Check if the member's trading wallet is currently locked based on staking_details or package_details.
+     * Check if the member's trading wallet is currently locked based on staking_details.
      */
     public function isTradingWalletLocked(): bool
     {
@@ -118,18 +107,8 @@ class MemberDetail extends Model
             ? $this->stakingDetails
             : $this->stakingDetails()->get();
 
-        if ($stakings->contains(function ($stk) {
+        return $stakings->contains(function ($stk) {
             return $stk->isLocked();
-        })) {
-            return true;
-        }
-
-        $packages = $this->relationLoaded('packageDetails')
-            ? $this->packageDetails
-            : $this->packageDetails()->get();
-
-        return $packages->contains(function ($pkg) {
-            return $pkg->isLocked();
         });
     }
 
@@ -155,7 +134,7 @@ class MemberDetail extends Model
             return 0.00;
         }
 
-        $percent = TradingWalletSetting::getDefaultWithdrawalPercent();
+        $percent = PackageDistribution::getDefaultWithdrawalPercent();
         $balance = (float) ($this->trading_wallet ?? 0.00);
         $max = ($balance * (float) $percent) / 100.00;
 
@@ -193,7 +172,7 @@ class MemberDetail extends Model
         // CONDITION B: Maximum Withdrawal Percentage (Post-lock)
         $maxWithdrawable = $this->tradingWalletMaxWithdrawable();
         if ($amount > $maxWithdrawable) {
-            $percent = TradingWalletSetting::getDefaultWithdrawalPercent();
+            $percent = PackageDistribution::getDefaultWithdrawalPercent();
             $errorMessage = 'Requested amount ($'.number_format($amount, 2).") exceeds the maximum allowed withdrawal limit of {$percent}% ($".number_format($maxWithdrawable, 2).') from your Trading Wallet.';
 
             return false;
@@ -218,6 +197,6 @@ class MemberDetail extends Model
      */
     public function applyTradingWalletLock(?int $lockDays = null, ?float $withdrawalPercent = null, ?Carbon $appliedAt = null): void
     {
-        // Lock calculation is anchored dynamically to staking_details.created_at + TradingWalletSetting.
+        // Lock calculation is anchored dynamically to staking_details.created_at + PackageDistribution.
     }
 }

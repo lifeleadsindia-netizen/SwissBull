@@ -9,13 +9,13 @@ use App\Models\DashMessage;
 use App\Models\MemberDetail;
 use App\Models\MemberVideo;
 use App\Models\PackageDetail;
+use App\Models\PackageDistribution;
 use App\Models\PackagePlan;
 use App\Models\PepeRewardLog;
 use App\Models\PepeSetting;
 use App\Models\PromotionBanner;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
-use App\Models\TradingWalletSetting;
 use App\Models\UplineMember;
 use App\Models\WhatsappReferral;
 use App\Models\WithdrawalRequest;
@@ -134,8 +134,8 @@ class MemberDetailController extends Controller
                 })->first();
         }
 
-        $defaultSetting = TradingWalletSetting::first();
-        $defaultLockDays = (int) ($defaultSetting->lock_days ?? ($packagePlan->lock_days ?? 30));
+        $defaultSetting = PackageDistribution::first();
+        $defaultLockDays = (int) ($defaultSetting?->lock_days ?? 0);
 
         // Maximum Return % must come from actual Admin-configured maximum return / capping setting
         $maxReturnPercent = 200.00;
@@ -268,7 +268,7 @@ class MemberDetailController extends Controller
 
         // Staking details lock checks
         foreach ($stakings as $stk) {
-            $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
+            $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : null;
             if ($stkActivatedAt && $defaultLockDays > 0) {
                 $stkLockedUntil = $stkActivatedAt->copy()->addDays($defaultLockDays);
                 if (now()->lt($stkLockedUntil)) {
@@ -361,8 +361,8 @@ class MemberDetailController extends Controller
                 })->first();
         }
 
-        $defaultSetting = TradingWalletSetting::first();
-        $defaultLockDays = (int) ($defaultSetting->lock_days ?? ($packagePlan->lock_days ?? 30));
+        $defaultSetting = PackageDistribution::first();
+        $defaultLockDays = (int) ($defaultSetting?->lock_days ?? 0);
 
         $maxReturnPercent = 200.00;
         if ($packagePlan && (float) $packagePlan->max_return_percent > 0) {
@@ -467,7 +467,7 @@ class MemberDetailController extends Controller
         }
 
         foreach ($stakings as $stk) {
-            $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
+            $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : null;
             if ($stkActivatedAt && $defaultLockDays > 0) {
                 $stkLockedUntil = $stkActivatedAt->copy()->addDays($defaultLockDays);
                 if (now()->lt($stkLockedUntil)) {

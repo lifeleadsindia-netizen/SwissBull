@@ -65,48 +65,48 @@ class PackageDetail extends Model
     /**
      * Check if this package entry is currently expired.
      */
-     public function isExpired(): bool
-     {
-         if (! $this->expires_at) {
-             return false;
-         }
+    public function isExpired(): bool
+    {
+        if (! $this->expires_at) {
+            return false;
+        }
 
-         return now()->gt($this->expires_at);
-     }
+        return now()->gt($this->expires_at);
+    }
 
-     /**
-      * Check if this package entry is active.
-      */
-     public function isPackageActive(): bool
-     {
-         if ($this->isExpired()) {
-             return false;
-         }
+    /**
+     * Check if this package entry is active.
+     */
+    public function isPackageActive(): bool
+    {
+        if ($this->isExpired()) {
+            return false;
+        }
 
-         $status = strtolower(trim((string) $this->status));
+        $status = strtolower(trim((string) $this->status));
 
-         return in_array($status, ['active', 'accepted']);
-     }
+        return in_array($status, ['active', 'accepted']);
+    }
 
-     /**
-      * Get remaining days until package expiry.
-      */
-     public function remainingExpiryDays(): int
-     {
-         if (! $this->expires_at || $this->isExpired()) {
-             return 0;
-         }
+    /**
+     * Get remaining days until package expiry.
+     */
+    public function remainingExpiryDays(): int
+    {
+        if (! $this->expires_at || $this->isExpired()) {
+            return 0;
+        }
 
-         return (int) ceil(now()->diffInSeconds($this->expires_at, false) / 86400);
-     }
+        return (int) ceil(now()->diffInSeconds($this->expires_at, false) / 86400);
+    }
 
     /**
      * Apply Lock Period to this package entry.
      */
     public function applyLock(?int $lockDays = null, ?Carbon $appliedAt = null): void
     {
-        $setting = TradingWalletSetting::getActiveSetting();
-        $lockDays = $lockDays !== null ? $lockDays : $setting->lock_days;
+        $setting = PackageDistribution::getActiveSetting();
+        $lockDays = $lockDays !== null ? $lockDays : (int) ($setting->lock_days ?? 0);
         $appliedAt = $appliedAt ?? now();
 
         $this->lock_days = $lockDays;

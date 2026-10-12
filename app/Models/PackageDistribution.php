@@ -63,7 +63,7 @@ class PackageDistribution extends Model
             $setting = static::create([
                 'trading_wallet' => 70.00,
                 'hero_of_the_month' => 2.00,
-                'lock_days' => 90,
+                'lock_days' => 0,
                 'status' => 'on',
                 'capping' => 200.00,
                 'package_1_rate' => 5.00,
@@ -77,9 +77,17 @@ class PackageDistribution extends Model
 
     public static function getDefaultLockDays(): int
     {
-        return (int) (static::getActiveSetting()->lock_days ?? 90);
+        $setting = static::first();
+
+        return (int) ($setting?->lock_days ?? 0);
     }
 
+    public static function getDefaultWithdrawalPercent(): float
+    {
+        $setting = static::first();
+
+        return (float) ($setting?->withdrawal_percent ?? 100.00);
+    }
 
     public static function getStatus(): string
     {
@@ -141,7 +149,7 @@ class PackageDistribution extends Model
 
         $setting = static::first();
         if ($setting) {
-            $field = 'package_' . $packageId . '_rate';
+            $field = 'package_'.$packageId.'_rate';
             if (isset($setting->{$field}) && (float) $setting->{$field} > 0) {
                 return (float) $setting->{$field};
             }
@@ -163,7 +171,7 @@ class PackageDistribution extends Model
             'team_trading_profit' => (float) ($config->team_trading_profit ?? 8.0),
             'team_performance_bonus' => (float) ($config->team_performance_bonus ?? 10.0),
             'hero_of_the_month' => (float) ($config->hero_of_the_month ?? 2.0),
-            'lock_days' => (int) ($config->lock_days ?? 90),
+            'lock_days' => (int) ($config->lock_days ?? 0),
             'withdrawal_percent' => (float) ($config->withdrawal_percent ?? 100.0),
             'status' => (string) ($config->status ?? 'on'),
             'capping' => (float) ($config->capping ?? 200.0),

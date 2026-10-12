@@ -156,7 +156,7 @@
 
         // Header Profile Dropdown Handler (Desktop & Mobile)
         $(document).on('click',
-            '.header-profile2 > a.nav-link, .header-profile2 .header-info2, .header-profile2 [data-bs-toggle="dropdown"]',
+            '.header-profile2 > a.nav-link, .header-profile2 .header-info2',
             function(e) {
                 e.preventDefault();
                 e.stopPropagation();
