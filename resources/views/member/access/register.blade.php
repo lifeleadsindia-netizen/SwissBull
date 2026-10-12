@@ -447,7 +447,7 @@
                     $('#sponhtml').html('');
                 }
                 $.ajax({
-                    url: '{{ url(' / getSponname ') }}',
+                    url: '{{ url('/getSponname') }}',
                     type: 'POST',
                     data: {
                         'sponsorid': sponsor,
@@ -562,7 +562,7 @@
             $('#emailhtml').html('<span class="text-[#F59E0B] font-semibold">Sending OTP...</span>');
 
             $.ajax({
-                url: '{{ url(' / send_register_otp ') }}',
+                url: '{{ url('/send_register_otp') }}',
                 type: 'POST',
                 data: {
                     'email': email,
@@ -602,7 +602,7 @@
             $('#verifyOtpBtn').prop('disabled', true).html('Verifying...');
 
             $.ajax({
-                url: '{{ url(' / verify_register_otp ') }}',
+                url: '{{ url('/verify_register_otp') }}',
                 type: 'POST',
                 data: {
                     'otp': otp,
