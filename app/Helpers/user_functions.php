@@ -190,7 +190,7 @@ function totalMemberDirectIncome($memberid)
 
 function totalMemberHeroOfTheMonthIncome($memberid)
 {
-    $sum = HeroOfTheMonthReward::where([['memberid', $memberid], ['status', 'Paid']])->sum('prize_amount');
+    $sum = HeroOfTheMonthReward::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
 
     return $sum;
 }

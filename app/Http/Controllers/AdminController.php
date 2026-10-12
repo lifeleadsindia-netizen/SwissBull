@@ -25,7 +25,6 @@ use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
 use App\Models\TeamTradingProfitConfiction;
-use App\Models\TradingWalletSetting;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
@@ -1910,13 +1909,13 @@ class AdminController extends Controller
             ->latest('created_at')
             ->first();
 
-        $setting = TradingWalletSetting::getActiveSetting();
-        $lockDays = (int) ($setting->lock_days ?? 90);
+        $setting = PackageDistribution::getActiveSetting();
+        $lockDays = (int) ($setting->lock_days ?? 0);
         $withPercent = (float) ($setting->withdrawal_percent ?? 100.00);
 
         $activationTime = $latestStk && $latestStk->created_at
             ? Carbon::parse($latestStk->created_at)
-            : ($latestStk && $latestStk->invest_date ? Carbon::parse($latestStk->invest_date) : null);
+            : null;
 
         $lockedUntil = ($activationTime && $lockDays > 0) ? $activationTime->copy()->addDays($lockDays) : null;
         $isLocked = $lockedUntil ? now()->lt($lockedUntil) : false;

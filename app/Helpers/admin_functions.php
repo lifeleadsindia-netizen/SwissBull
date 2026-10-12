@@ -115,7 +115,7 @@ function totalAdminDirectIncome()
 
 function totalAdminHeroOfTheMonthIncome()
 {
-    $sum = HeroOfTheMonthReward::where('status', 'Paid')->sum('prize_amount');
+    $sum = HeroOfTheMonthReward::where('status', 'Paid')->sum('amount');
 
     return $sum;
 }

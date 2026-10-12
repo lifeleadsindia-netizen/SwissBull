@@ -53,19 +53,16 @@
                                                 $adminStatusOn = isset($trading_settings) && $trading_settings->isOn();
                                                 $targetTimeMs = $list->locked_until ? $list->locked_until->timestamp * 1000 : 0;
                                                 $isLockActive = $list->isLocked();
-                                                $hasValidExpiry = ($list->locked_until !== null);
                                                 $isDeactive = ($list->status === 'Deactive');
                                                 $hasBalance = ((float) $list->trading_wallet_amount > 0);
 
-                                                $canWithdraw = $adminStatusOn && !$isLockActive && $hasValidExpiry && !$isDeactive && $hasBalance;
+                                                $canWithdraw = $adminStatusOn && !$isLockActive && !$isDeactive && $hasBalance;
 
                                                 $disabledReason = '';
                                                 if ($isDeactive) {
                                                     $disabledReason = 'Package is deactivated';
                                                 } elseif (!$adminStatusOn) {
                                                     $disabledReason = 'Trading Wallet withdrawals are currently OFF';
-                                                } elseif (!$hasValidExpiry) {
-                                                    $disabledReason = 'Lock expiry information unavailable';
                                                 } elseif ($isLockActive) {
                                                     $disabledReason = 'Lock period active (' . $list->remainingLockDays() . ' day(s) remaining)';
                                                 } elseif (!$hasBalance) {
@@ -102,8 +99,7 @@
                                                              data-staking-id="{{ $list->id }}"
                                                              data-target-time="{{ $targetTimeMs }}"
                                                              data-amount="{{ (float) $list->trading_wallet_amount }}"
-                                                             data-status="{{ $list->status }}"
-                                                             data-has-expiry="{{ $hasValidExpiry ? '1' : '0' }}">
+                                                             data-status="{{ $list->status }}">
                                                             @if ($canWithdraw)
                                                                 <span href="javascript:void(0)"
                                                                     onclick="requestTradingWithdrawal({{ $list->id }}, {{ $list->trading_wallet_amount }})"
@@ -164,7 +160,6 @@
     function isRowEligible(container) {
         let targetTimeMs = parseInt(container.getAttribute('data-target-time') || 0);
         let status = container.getAttribute('data-status');
-        let hasExpiry = container.getAttribute('data-has-expiry') === '1';
         let amount = parseFloat(container.getAttribute('data-amount') || 0);
 
         if (status === 'Deactive') {
@@ -177,10 +172,6 @@
 
         if (adminTradingStatus !== 'on') {
             return { eligible: false, reason: 'Trading Wallet withdrawals are currently OFF' };
-        }
-
-        if (!hasExpiry || targetTimeMs <= 0) {
-            return { eligible: false, reason: 'Lock expiry information unavailable' };
         }
 
         let now = new Date().getTime();
@@ -222,7 +213,8 @@
         
         clearInterval(countdownInterval);
         
-        if (!targetTimeMs) {
+        let now = new Date().getTime();
+        if (!targetTimeMs || targetTimeMs <= now) {
             document.getElementById('unlock-timer').innerText = "Unlocked / Ready";
             revalidateAdminStatus(function() {
                 updateAllWithdrawalButtons();
@@ -269,11 +261,10 @@
             let hasNewlyExpired = false;
             document.querySelectorAll('.withdraw-btn-container').forEach(function(container) {
                 let targetTimeMs = parseInt(container.getAttribute('data-target-time') || 0);
-                let hasExpiry = container.getAttribute('data-has-expiry') === '1';
                 let btn = container.querySelector('.btn-withdraw');
-                if (hasExpiry && targetTimeMs > 0 && targetTimeMs <= now && btn && btn.classList.contains('disabled')) {
+                if (targetTimeMs <= now && btn && btn.classList.contains('disabled')) {
                     let title = btn.getAttribute('title') || '';
-                    if (title.indexOf('Lock period active') !== -1) {
+                    if (title.indexOf('Lock period active') !== -1 || title.indexOf('Lock expiry') !== -1) {
                         hasNewlyExpired = true;
                     }
                 }
@@ -292,11 +283,13 @@
                 updateAllWithdrawalButtons();
             });
         }, 15000);
-    });
 
-    // Handle DataTables pagination and search redraws
-    $(document).on('draw.dt', '#example3', function() {
-        updateAllWithdrawalButtons();
+        // Handle DataTables pagination and search redraws
+        if (window.jQuery) {
+            window.jQuery(document).on('draw.dt', '#example3', function() {
+                updateAllWithdrawalButtons();
+            });
+        }
     });
 
     function requestTradingWithdrawal(stakingId, amount) {
