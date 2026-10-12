@@ -922,7 +922,7 @@ body#app,
 .adm-chart-floating-badge {
     position: absolute;
     top: 0;
-    left: 47%;
+    left: 0;
     transform: translateX(-50%);
     background: #0f172a;
     color: #ffffff;
@@ -933,26 +933,58 @@ body#app,
     text-align: center;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
     z-index: 5;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: left 0.15s cubic-bezier(0.4, 0, 0.2, 1), top 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: left, top;
 }
 
+.adm-chart-floating-badge .adm-chart-badge-amt {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+.adm-chart-floating-badge .adm-chart-badge-date,
 .adm-chart-floating-badge span {
     display: block;
     font-size: 9.5px;
     color: #94a3b8;
     font-weight: 500;
+    line-height: 1.2;
 }
 
 .adm-chart-floating-badge::after {
     content: "";
     position: absolute;
     bottom: -5px;
-    left: 50%;
+    left: calc(50% + var(--arrow-offset, 0px));
     transform: translateX(-50%);
     width: 0;
     height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-top: 5px solid #0f172a;
+    transition: left 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.adm-chart-col-group {
+    cursor: pointer;
+}
+
+.adm-chart-col-group text {
+    transition: fill 0.15s ease, font-weight 0.15s ease;
+}
+
+.adm-chart-col-group.is-active text {
+    fill: #0f172a;
+    font-weight: 700;
+}
+
+.adm-chart-col-group .adm-bar-center {
+    transition: fill 0.15s ease;
 }
 
 /* Custom SVG Bar Chart */
@@ -1323,9 +1355,5 @@ body#app,
     .adm-date-badge {
         width: 100%;
         justify-content: space-between;
-    }
-
-    .adm-chart-floating-badge {
-        left: 50%;
     }
 }

@@ -118,7 +118,6 @@
                     </div>
                 </div>
 
-
         <div class="nav-item {{ (request()->is('*promotion-banners*') || request()->is('*business-plan-pdfs*') || request()->is('*plan-videos*') || request()->is('*tutorial-videos*')) ? 'active open' : '' }} has-sub">
             <a href="#"><i class="ik ik-film"></i><span>{{ __('Promotional Media') }}</span></a>
             <div class="submenu-content">
