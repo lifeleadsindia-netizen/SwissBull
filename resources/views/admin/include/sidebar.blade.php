@@ -118,17 +118,6 @@
                     </div>
                 </div>
 
-        <!--<div class="nav-item {{ $segment1 == 'rest-api' ? 'active' : '' }}">-->
-        <!--    <a href="{{ url('admin/setRate') }}"><i class="ik ik-sliders"></i><span>Set Rate</span> </a>-->
-        <!--</div>-->
-
-        <div class="nav-item {{ ($segment1 == 'whatsapp-messages' || $segment1 == 'whatsapp-reports') ? 'active open' : '' }} has-sub">
-            <a href="#"><i class="ik ik-share-2"></i><span>{{ __('Marketing') }}</span></a>
-            <div class="submenu-content">
-                {{-- <a href="{{ url('admin/whatsapp-messages') }}" class="menu-item {{ ($segment1 == 'whatsapp-messages') ? 'active' : '' }}">{{ __('WhatsApp Messages') }}</a> --}}
-                <a href="{{ url('admin/whatsapp-reports') }}" class="menu-item {{ ($segment1 == 'whatsapp-reports') ? 'active' : '' }}">{{ __('WhatsApp Reports') }}</a>
-            </div>
-        </div>
 
         <div class="nav-item {{ (request()->is('*promotion-banners*') || request()->is('*business-plan-pdfs*') || request()->is('*plan-videos*') || request()->is('*tutorial-videos*')) ? 'active open' : '' }} has-sub">
             <a href="#"><i class="ik ik-film"></i><span>{{ __('Promotional Media') }}</span></a>

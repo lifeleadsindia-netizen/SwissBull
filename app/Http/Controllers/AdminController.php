@@ -23,6 +23,7 @@ use App\Models\RoiLevelIncome;
 use App\Models\SetRate;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
+use App\Services\PepeRewardService;
 use App\Models\StakingIncome;
 use App\Models\TeamTradingProfitConfiction;
 use App\Models\TradingWalletSetting;
@@ -334,9 +335,13 @@ class AdminController extends Controller
             session()->flash('statusDeact', 'Status has been Deactive successfully!');
 
             return redirect()->back();
-        } elseif ($status == 'Deactive') {
+        } elseif ($status == 'Deactive' || $status == 'Temp') {
             $var->status = 'Active';
+            $var->activated_at = $var->activated_at ?? now();
             $var->save();
+            if (! empty($var->sponsorid)) {
+                PepeRewardService::awardDirectActivationReward($var->sponsorid, $var);
+            }
             session()->flash('statusAct', 'Status has been Activated successfully!');
 
             return redirect()->back();

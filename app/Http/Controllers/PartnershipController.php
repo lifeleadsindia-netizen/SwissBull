@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
 use App\Models\PartnershipDetail;
+use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
 
 class PartnershipController extends Controller
@@ -16,8 +17,7 @@ class PartnershipController extends Controller
         return view('member.partnership.create-investment', $result);
     }
 
-    
-      public function partCreateInvest(Request $request)
+    public function partCreateInvest(Request $request)
     {
         $request->validate([
             'memberid' => 'required',
@@ -57,7 +57,7 @@ class PartnershipController extends Controller
         //     return redirect()->back();
         // }
 
-         if ($amount == 1000) {
+        if ($amount == 1000) {
             $rate = 2;
             $capping = 2;
             $rank = 'Silver';
@@ -107,7 +107,17 @@ class PartnershipController extends Controller
         $member->part_daily_team_biz += $amount;
         $wallet = $member->p2p_wallet;
         $member->p2p_wallet -= $amount;
+        if ($member->status == 'Temp') {
+            $member->status = 'Active';
+            $member->activated_at = $member->activated_at ?? now();
+            updateDownline($sponsorid);
+        }
         $member->save();
+
+        // Rule 3: Direct referral activation awards 500 PEPE tokens to sponsor
+        if ($member->status === 'Active' && ! empty($sponsorid)) {
+            PepeRewardService::awardDirectActivationReward($sponsorid, $member);
+        }
 
         walletTransfer(
             $memberid,

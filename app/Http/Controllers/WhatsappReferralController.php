@@ -319,6 +319,9 @@ class WhatsappReferralController extends Controller
         $memberid = session('MEMBER_ID');
         $member = MemberDetail::where('memberid', $memberid)->first();
 
+        // Sync any missed Rule 3 direct activation rewards for active directs
+        PepeRewardService::syncDirectActivationRewards($memberid);
+
         $today = now()->toDateString();
         $waTodayCount = WhatsappReferral::where('member_id', $memberid)
             ->whereDate('created_at', $today)
