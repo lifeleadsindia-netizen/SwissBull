@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DailyTeamShareIncome;
 use App\Models\DirectIncome;
 use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
@@ -41,7 +42,7 @@ class IncomeController extends Controller
     public function levelIncome()
     {
         $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
-        $result['lData'] = LevelIncome::where('memberid', $result['data']['memberid'])->orderby('created_at', 'desc')->get();
+        $result['lData'] = DailyTeamShareIncome::where('memberid', $result['data']['memberid'])->orderby('created_at', 'desc')->get();
 
         return view('member.income.level-incomes')->with($result);
     }
