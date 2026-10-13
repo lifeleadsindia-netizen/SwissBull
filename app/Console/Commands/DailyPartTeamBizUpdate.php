@@ -16,6 +16,6 @@ class DailyPartTeamBizUpdate extends Command
      */
     public function handle()
     {
-        $update = MemberDetail::where('status', '!=', 'Temp')->update(['part_daily_team_biz' => 0, 'daily_team_biz' => 0]);
+        $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0, 'part_daily_team_biz' => 0]);
     }
 }

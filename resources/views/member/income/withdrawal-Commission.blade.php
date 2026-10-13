@@ -52,7 +52,7 @@
                                 <td>{{ $item['level_id'] ?? '' }}</td>
                                 <td>{{ !empty($item['name']) ? $item['name'] : getName($item['level_id'] ?? '') }}</td>
                                 <td>$ {{ number_format($item['withdrawal_amount'] ?? $item['package'] ?? 0, 2) }}</td>
-                                <td>{{ $item['rate'] ?? 2 }}%</td>
+                                <td>{{ $item['rate'] ?? 0 }}%</td>
                                 <td>$ {{ number_format($item['amount'] ?? 0, 2) }}</td>
                                 <td>
                                     @if (($item['status'] ?? '') == 'Unpaid')

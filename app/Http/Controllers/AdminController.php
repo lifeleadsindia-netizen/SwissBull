@@ -23,14 +23,15 @@ use App\Models\RoiLevelIncome;
 use App\Models\SetRate;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
-use App\Services\PepeRewardService;
 use App\Models\StakingIncome;
 use App\Models\TeamTradingProfitConfiction;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
+use App\Services\PepeRewardService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -1201,7 +1202,7 @@ class AdminController extends Controller
         ]);
 
         if (Schema::hasTable('achivers_images') && ! Schema::hasColumn('achivers_images', 'rank')) {
-            Schema::table('achivers_images', function (\Illuminate\Database\Schema\Blueprint $table) {
+            Schema::table('achivers_images', function (Blueprint $table) {
                 $table->integer('rank')->nullable()->after('id');
             });
         }

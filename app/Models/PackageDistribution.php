@@ -53,7 +53,7 @@ class PackageDistribution extends Model
 
     public function getP2pWalletAttribute(): float
     {
-        return (float) ($this->attributes['trading_wallet'] ?? 70.00);
+        return (float) ($this->attributes['trading_wallet'] ?? (PackagePlan::value('trading_wallet_percent') ?? 0.0));
     }
 
     public static function getActiveSetting(): self
@@ -61,14 +61,14 @@ class PackageDistribution extends Model
         $setting = static::first();
         if (! $setting) {
             $setting = static::create([
-                'trading_wallet' => 70.00,
-                'hero_of_the_month' => 2.00,
-                'lock_days' => 0,
+                'trading_wallet' => (float) (PackagePlan::value('trading_wallet_percent') ?? 0.0),
+                'hero_of_the_month' => 0.0,
+                'lock_days' => (int) (PackagePlan::value('lock_days') ?? 0),
                 'status' => 'on',
-                'capping' => 200.00,
-                'package_1_rate' => 5.00,
-                'package_2_rate' => 7.00,
-                'package_3_rate' => 11.00,
+                'capping' => (float) (PackagePlan::value('max_return_percent') ?? 0.0),
+                'package_1_rate' => (float) (PackagePlan::where('id', 1)->value('return_percent') ?? 0.0),
+                'package_2_rate' => (float) (PackagePlan::where('id', 2)->value('return_percent') ?? 0.0),
+                'package_3_rate' => (float) (PackagePlan::where('id', 3)->value('return_percent') ?? 0.0),
             ]);
         }
 
@@ -79,7 +79,7 @@ class PackageDistribution extends Model
     {
         $setting = static::first();
 
-        return (int) ($setting?->lock_days ?? 0);
+        return (int) ($setting?->lock_days ?? (PackagePlan::value('lock_days') ?? 0));
     }
 
     /**
@@ -122,7 +122,7 @@ class PackageDistribution extends Model
 
     public function getCappingPercentAttribute(): float
     {
-        return (float) ($this->attributes['capping'] ?? $this->attributes['capping_percent'] ?? 200.00);
+        return (float) ($this->attributes['capping'] ?? $this->attributes['capping_percent'] ?? (PackagePlan::value('max_return_percent') ?? 0.0));
     }
 
     public static function getCapping(): float
@@ -134,7 +134,7 @@ class PackageDistribution extends Model
 
         $planCapping = PackagePlan::whereNotNull('max_return_percent')->where('max_return_percent', '>', 0)->value('max_return_percent');
 
-        return $planCapping ? (float) $planCapping : 200.00;
+        return $planCapping ? (float) $planCapping : (float) (static::first()?->capping ?? 0.0);
     }
 
     public static function getCappingPercent(): float
@@ -157,27 +157,26 @@ class PackageDistribution extends Model
             }
         }
 
-        return 5.00;
+        return (float) (PackagePlan::where('id', $packageId)->value('return_percent') ?? 0.0);
     }
 
     public static function getDistributionConfig(): array
     {
         $config = static::getActiveSetting();
 
-        $walletPercent = (float) ($config->p2p_wallet ?? $config->trading_wallet ?? 70.0);
+        $walletPercent = (float) ($config->p2p_wallet ?? $config->trading_wallet ?? (PackagePlan::value('trading_wallet_percent') ?? 0.0));
 
         return [
             'p2p_wallet' => $walletPercent,
             'trading_wallet' => $walletPercent,
-            'referral_bonus' => (float) ($config->referral_bonus ?? 10.0),
-            'team_trading_profit' => (float) ($config->team_trading_profit ?? 8.0),
-            'team_performance_bonus' => (float) ($config->team_performance_bonus ?? 10.0),
-            'hero_of_the_month' => (float) ($config->hero_of_the_month ?? 2.0),
+            'referral_bonus' => (float) ($config->referral_bonus ?? 0.0),
+            'team_trading_profit' => (float) ($config->team_trading_profit ?? 0.0),
+            'team_performance_bonus' => (float) ($config->team_performance_bonus ?? 0.0),
+            'hero_of_the_month' => (float) ($config->hero_of_the_month ?? 0.0),
             'lock_days' => (int) ($config->lock_days ?? 0),
-            // 'withdrawal_percent' => (float) ($config->withdrawal_percent ?? 100.0),
             'status' => (string) ($config->status ?? 'on'),
-            'capping' => (float) ($config->capping ?? 200.0),
-            'capping_percent' => (float) ($config->capping ?? 200.0),
+            'capping' => (float) ($config->capping ?? (PackagePlan::value('max_return_percent') ?? 0.0)),
+            'capping_percent' => (float) ($config->capping ?? (PackagePlan::value('max_return_percent') ?? 0.0)),
         ];
     }
 }

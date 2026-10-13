@@ -37,14 +37,33 @@ class PackagePlan extends Model
             return null;
         }
 
-        $normalized = match (trim($range)) {
-            '50-500', '50 - 500' => '50-500',
-            '600-5000', '600 - 5000' => '600-5000',
-            '6000+', '6000 and above' => '6000+',
+        $clean = strtolower(trim(str_replace([' ', '-', '_'], '', $range)));
+        $normalized = match ($clean) {
+            '50500', 'package1', 'pkg1' => '50-500',
+            '6005000', 'package2', 'pkg2' => '600-5000',
+            '6000+', '6000plus', '6000andabove', 'package3', 'pkg3' => '6000+',
             default => trim($range),
         };
 
-        return static::where('package_range', $normalized)->first();
+        $plan = static::where('package_range', $normalized)->first();
+        if ($plan) {
+            return $plan;
+        }
+
+        return static::where('name', 'LIKE', '%'.$range.'%')->first();
+    }
+
+    /**
+     * Find plan matching an investment amount.
+     */
+    public static function findForAmount(float $amount): ?self
+    {
+        return static::where('min_amount', '<=', $amount)
+            ->where(function ($query) use ($amount) {
+                $query->whereNull('max_amount')
+                    ->orWhere('max_amount', '>=', $amount);
+            })
+            ->first();
     }
 
     /**
@@ -68,7 +87,9 @@ class PackagePlan extends Model
      */
     public function calculateTradingWalletAmount(float $amount): float
     {
-        $percent = $this->trading_wallet_percent > 0 ? (float) $this->trading_wallet_percent : 70.00;
+        $percent = $this->trading_wallet_percent > 0
+            ? (float) $this->trading_wallet_percent
+            : (float) (PackageDistribution::getActiveSetting()->trading_wallet ?? 0);
 
         return round($amount * ($percent / 100), 2);
     }
@@ -78,7 +99,9 @@ class PackagePlan extends Model
      */
     public function calculateMaxEarning(float $amount): float
     {
-        $percent = $this->max_return_percent > 0 ? (float) $this->max_return_percent : 200.00;
+        $percent = $this->max_return_percent > 0
+            ? (float) $this->max_return_percent
+            : (float) PackageDistribution::getCapping();
 
         return round($amount * ($percent / 100), 2);
     }

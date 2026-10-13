@@ -46,7 +46,7 @@
                                 <td>{{ $list['member_name'] ?? getName($list['memberid']) }}</td>
                                 <td>$ {{ number_format((float) ($list['direct_business'] ?? 0), 2) }}</td>
                                 <td>$ {{ number_format((float) ($list['total_pool'] ?? $list['total_pool_business'] ?? 0), 2) }}</td>
-                                <td>{{ number_format((float) ($list['pool_percentage'] ?? $list['pool_rate'] ?? 2.0), 1) }}%</td>
+                                <td>{{ number_format((float) ($list['pool_percentage'] ?? $list['pool_rate'] ?? (\App\Models\PackageDistribution::first()?->hero_of_the_month ?? 0)), 1) }}%</td>
                                 <td><strong class="text-success">$ {{ number_format((float) ($list['prize_amount'] ?? 0), 2) }}</strong></td>
                                 <td><span class="badge bg-warning text-dark font-weight-bold">#{{ $list['rank'] ?? 1 }} Hero</span></td>
                                 <td>
