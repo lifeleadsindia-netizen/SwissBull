@@ -147,7 +147,6 @@ class TempController extends Controller
     {
         $members = MemberDetail::where('status', 'Active')
             ->where('downline', '>=', 4)
-            ->where('daily_team_biz', '>', 0)
             ->get();
 
         foreach ($members as $value) {
@@ -159,54 +158,49 @@ class TempController extends Controller
                 $limit = 11;
                 for ($i = 1; $i < $limit; $i++) {
                     $level = $i;
+                    $levelData = dailyTeamLevelRate($level);
+                    $requiredDirects = (int) ($levelData['direct'] ?? 4);
+                    $rate = (int) ($levelData['rate'] ?? 1);
 
-                    $downlineMemberIds = UplineMember::where('upline_'.$level, $memberid)->pluck('memberid');
-                    $levelData = MemberDetail::whereIn('memberid', $downlineMemberIds)->first();
-                    if (! $levelData) {
-                        continue;
+                    if ($downline < $requiredDirects) {
+                        break;
                     }
-                    $dailyTeamBiz = $levelData['daily_team_biz'];
-                    $levelId = $levelData->memberid;
-                    $levelName = getName($levelId);
-                    $levelRateInfo = dailyTeamLevelRate($level);
-                    $requiredDirects = (int) ($levelRateInfo['direct'] ?? 0);
-                    $rate = (float) ($levelRateInfo['rate'] ?? 0);
+
+                    $downlineMemberIds = UplineMember::where('upline_'.$level, $memberid)->pluck('memberid')->toArray();
+                    if (count($downlineMemberIds) == 0) {
+                        break;
+                    }
+                    $dailyTeamBiz = StakingDetail::whereIn('memberid', $downlineMemberIds)->where('invest_date', date('Y-m-d', strtotime('-1 day')))->sum('trading_wallet_amount');
+
                     $amount = $dailyTeamBiz * $rate / 100;
 
                     if ($amount > 0) {
 
                         $new = new DailyTeamShareIncome;
                         $new->memberid = $memberid;
-                        $new->name = $levelName;
                         $new->level = $level;
-                        $new->level_id = $levelId;
+                        $new->total_members = count($downlineMemberIds);
                         $new->rate = $rate;
                         $new->downline = $downline;
                         $new->daily_team_biz = $dailyTeamBiz;
                         $new->amount = $amount;
                         $new->type = 'Daily Team Investment Share';
-                        if ($downline >= $requiredDirects) {
-                            $new->status = 'Paid';
-                            $new->save();
-                            $wallet = $value->wallet;
-                            $value->wallet += $amount;
-                            $value->save();
+                        $new->status = 'Paid';
+                        $new->save();
 
-                            walletTransfer(
-                                $memberid,
-                                $amount,
-                                'debit',
-                                $wallet,
-                                'Daily Team Investment Share Income',
-                                'Level '.$level.' Daily Team Investment Share Income Amount Added into wallet.'
-                            );
-                        } else {
-                            $new->status = 'Flushed';
-                            $new->save();
-                        }
+                        $wallet = $value->wallet;
+                        $value->wallet += $amount;
+                        $value->save();
 
-                        $inc = MemberDetail::where('memberid', $memberid)->first();
-                        $memberid = $inc['memberid'];
+                        walletTransfer(
+                            $memberid,
+                            $amount,
+                            'debit',
+                            $wallet,
+                            'Daily Team Investment Share Income',
+                            'Level '.$level.' Daily Team Investment Share Income Amount Added into wallet.'
+                        );
+
                     } else {
                         break;
                     }
