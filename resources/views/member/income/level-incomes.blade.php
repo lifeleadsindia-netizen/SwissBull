@@ -8,8 +8,12 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
+            @php
+                $dtConfig = \App\Models\DailyTeamInvestmentShareConfiction::first();
+                $l1Share = number_format((float) ($dtConfig?->level_1_rate ?? 0), 0);
+            @endphp
             <h1><i class="fa-solid fa-diagram-successor me-2"></i>Daily Team Investment Share</h1>
-            <p>1% share from downline team investment across 10 levels (Requires 4 direct referrals for L1, +2 for each additional level).</p>
+            <p>{{ $l1Share }}% share from downline team investment across 10 levels (Requires 4 direct referrals for L1, +2 for each additional level).</p>
         </div>
 
         <div class="inc-card">

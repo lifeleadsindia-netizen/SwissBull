@@ -8,8 +8,11 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
+            @php
+                $heroPercent = number_format((float) (\App\Models\PackageDistribution::getActiveSetting()->hero_of_the_month ?? 0), 0);
+            @endphp
             <h1><i class="fa-solid fa-trophy me-2"></i>Hero of the Month</h1>
-            <p>2% monthly pool reward dedicated to the highest direct business performer of the month.</p>
+            <p>{{ $heroPercent }}% monthly pool reward dedicated to the highest direct business performer of the month.</p>
         </div>
 
         <div class="inc-card">
@@ -17,7 +20,7 @@
                 <div class="inc-header-icon"><i class="fa-solid fa-award"></i></div>
                 <div>
                     <div class="inc-header-title">Hero of the Month Reward History</div>
-                    <div class="inc-header-sub">Monthly 2% pool distributions credited to your account</div>
+                    <div class="inc-header-sub">Monthly {{ $heroPercent }}% pool distributions credited to your account</div>
                 </div>
             </div>
             <div class="inc-table-shell">

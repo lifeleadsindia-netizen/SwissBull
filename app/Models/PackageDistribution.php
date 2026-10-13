@@ -128,13 +128,13 @@ class PackageDistribution extends Model
     public static function getCapping(): float
     {
         $setting = static::first();
-        if ($setting && (float) ($setting->capping ?? 0) > 0) {
+        if ($setting && isset($setting->capping) && $setting->capping !== null) {
             return (float) $setting->capping;
         }
 
-        $planCapping = PackagePlan::whereNotNull('max_return_percent')->where('max_return_percent', '>', 0)->value('max_return_percent');
+        $planCapping = PackagePlan::whereNotNull('max_return_percent')->value('max_return_percent');
 
-        return $planCapping ? (float) $planCapping : (float) (static::first()?->capping ?? 0.0);
+        return $planCapping !== null ? (float) $planCapping : 0.0;
     }
 
     public static function getCappingPercent(): float

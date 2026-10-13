@@ -910,7 +910,7 @@ class AdminController extends Controller
         $distribution = PackageDistribution::getActiveSetting();
         $packagePlans = PackagePlan::orderBy('min_amount', 'asc')->get();
         $currentStatus = strtolower((string) ($distribution->status ?? 'on'));
-        $capping = (float) ($distribution->capping ?? $distribution->capping_percent ?? 200.00);
+        $capping = (float) ($distribution->capping ?? $distribution->capping_percent ?? (PackagePlan::value('max_return_percent') ?? 0.0));
 
         return view('admin.set-packages', compact('distribution', 'packagePlans', 'currentStatus', 'capping'));
     }
@@ -947,6 +947,7 @@ class AdminController extends Controller
         if ($request->filled('trading_wallet') || $request->filled('p2p_wallet')) {
             $tradingWalletVal = (float) ($request->input('trading_wallet') ?? $request->input('p2p_wallet'));
             $distribution->trading_wallet = $tradingWalletVal;
+            PackagePlan::query()->update(['trading_wallet_percent' => $tradingWalletVal]);
         }
         if (Schema::hasColumn('package_distributions', 'hero_of_the_month') && $request->filled('hero_of_the_month')) {
             $distribution->hero_of_the_month = (float) $request->input('hero_of_the_month');
@@ -954,7 +955,9 @@ class AdminController extends Controller
 
         // 2. Trading Wallet Control: Lock Days, Status
         if ($request->has('lock_days')) {
-            $distribution->lock_days = (int) $request->input('lock_days');
+            $lockDays = (int) $request->input('lock_days');
+            $distribution->lock_days = $lockDays;
+            PackagePlan::query()->update(['lock_days' => $lockDays]);
         }
         // Feature disabled: Max Withdrawal Percentage
         // if (Schema::hasColumn('package_distributions', 'withdrawal_percent') && $request->filled('withdrawal_percent')) {
@@ -995,7 +998,7 @@ class AdminController extends Controller
                 if ($plan) {
                     $planTradingWallet = (isset($planData['trading_wallet_percent']) && $planData['trading_wallet_percent'] !== '')
                         ? (float) $planData['trading_wallet_percent']
-                        : ($distribution->trading_wallet ?? 70.00);
+                        : (float) ($distribution->trading_wallet ?? (PackagePlan::value('trading_wallet_percent') ?? 0.0));
 
                     $plan->update([
                         'name' => $planData['name'],
