@@ -143,9 +143,7 @@ class MemberDetailController extends Controller
         $adminCappingPercent = (float) PackageDistribution::getCapping();
 
         // Maximum Return % dynamically fetched from admin settings
-        $maxReturnPercent = $adminCappingPercent > 0
-            ? $adminCappingPercent
-            : (float) ($packagePlan?->max_return_percent ?: 0.0);
+        $maxReturnPercent = $adminCappingPercent;
         $result['maxReturnPercent'] = $maxReturnPercent;
 
         // Daily ROI rate dynamically fetched from Admin configuration
@@ -234,9 +232,7 @@ class MemberDetailController extends Controller
                     ? $defaultTradingWalletPercent
                     : (float) ($pkgPlan?->trading_wallet_percent ?: 0.0);
                 $tw = (float) ($pkg->trading_wallet_amount > 0 ? $pkg->trading_wallet_amount : ($pkgInvest * ($pkgAlloc / 100)));
-                $ret = $maxReturnPercent > 0
-                    ? $maxReturnPercent
-                    : (float) ($pkgPlan?->max_return_percent ?: 0.0);
+                $ret = (float) $maxReturnPercent;
 
                 return round($tw * ($ret / 100), 2);
             });
@@ -248,9 +244,7 @@ class MemberDetailController extends Controller
                     ? $defaultTradingWalletPercent
                     : (float) ($stkPlan?->trading_wallet_percent ?: 0.0);
                 $tw = (float) ($stk->trading_wallet_amount > 0 ? $stk->trading_wallet_amount : ($stkInvest * ($stkAlloc / 100)));
-                $ret = $maxReturnPercent > 0
-                    ? $maxReturnPercent
-                    : (float) ($stkPlan?->max_return_percent ?: 0.0);
+                $ret = (float) $maxReturnPercent;
 
                 return round($tw * ($ret / 100), 2);
             });
@@ -319,9 +313,7 @@ class MemberDetailController extends Controller
             }
 
             $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
-            $pkgMaxReturn = $maxReturnPercent > 0
-                ? (float) $maxReturnPercent
-                : ($pkgPlan && (float) $pkgPlan->max_return_percent > 0 ? (float) $pkgPlan->max_return_percent : 0.0);
+            $pkgMaxReturn = (float) $maxReturnPercent;
 
             $pkgInvest = (float) ($pkg->invest_amount ?? $pkg->package_value);
             $pkgAllocPercent = $defaultTradingWalletPercent > 0
@@ -394,9 +386,7 @@ class MemberDetailController extends Controller
             $stkMins = (int) floor(($stkRemSecs % 3600) / 60);
             $stkSec = (int) ($stkRemSecs % 60);
 
-            $stkMaxReturn = $maxReturnPercent > 0
-                ? (float) $maxReturnPercent
-                : ($stkPlan && (float) $stkPlan->max_return_percent > 0 ? (float) $stkPlan->max_return_percent : 0.0);
+            $stkMaxReturn = (float) $maxReturnPercent;
 
             $stkInvest = (float) $stk->invest_amount;
             $stkAllocPercent = $defaultTradingWalletPercent > 0
@@ -460,8 +450,8 @@ class MemberDetailController extends Controller
         $result['fundLockTitle'] = $lockStatus;
         $result['fundUnlocksInText'] = $isFundLocked ? "Fund Unlocks In {$remainingLockDays} Days" : 'Fund Unlocked';
         $result['fundLockReturnMessage'] = $isFundLocked
-            ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns'
-            : 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns';
+            ? ($maxReturnPercent > 0 ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'Fund Locked, You are eligible for Unlimited Returns')
+            : ($maxReturnPercent > 0 ? 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'You are eligible for Unlimited Returns');
         $result['packageInvestments'] = $processedCollection;
 
         return view('member.dashboard')->with($result);
@@ -529,9 +519,7 @@ class MemberDetailController extends Controller
         $defaultTradingWalletPercent = (float) ($defaultSetting?->trading_wallet ?? (PackagePlan::value('trading_wallet_percent') ?? 0.0));
         $adminCappingPercent = (float) PackageDistribution::getCapping();
 
-        $maxReturnPercent = $adminCappingPercent > 0
-            ? $adminCappingPercent
-            : (float) ($packagePlan?->max_return_percent ?: 0.0);
+        $maxReturnPercent = $adminCappingPercent;
 
         $totalEarnQuery = (float) PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
@@ -551,9 +539,7 @@ class MemberDetailController extends Controller
                     ? $defaultTradingWalletPercent
                     : (float) ($pkgPlan?->trading_wallet_percent ?: 0.0);
                 $tw = (float) ($pkg->trading_wallet_amount > 0 ? $pkg->trading_wallet_amount : ($pkgInvest * ($pkgAlloc / 100)));
-                $ret = $maxReturnPercent > 0
-                    ? $maxReturnPercent
-                    : (float) ($pkgPlan?->max_return_percent ?: 0.0);
+                $ret = (float) $maxReturnPercent;
 
                 return round($tw * ($ret / 100), 2);
             });
@@ -565,9 +551,7 @@ class MemberDetailController extends Controller
                     ? $defaultTradingWalletPercent
                     : (float) ($stkPlan?->trading_wallet_percent ?: 0.0);
                 $tw = (float) ($stk->trading_wallet_amount > 0 ? $stk->trading_wallet_amount : ($stkInvest * ($stkAlloc / 100)));
-                $ret = $maxReturnPercent > 0
-                    ? $maxReturnPercent
-                    : (float) ($stkPlan?->max_return_percent ?: 0.0);
+                $ret = (float) $maxReturnPercent;
 
                 return round($tw * ($ret / 100), 2);
             });
@@ -624,9 +608,7 @@ class MemberDetailController extends Controller
             }
 
             $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
-            $pkgMaxReturn = $maxReturnPercent > 0
-                ? (float) $maxReturnPercent
-                : ($pkgPlan && (float) $pkgPlan->max_return_percent > 0 ? (float) $pkgPlan->max_return_percent : 0.0);
+            $pkgMaxReturn = (float) $maxReturnPercent;
 
             $pkgInvest = (float) ($pkg->invest_amount ?? $pkg->package_value);
             $pkgAllocPercent = $defaultTradingWalletPercent > 0
@@ -696,9 +678,7 @@ class MemberDetailController extends Controller
             $stkMins = (int) floor(($stkRemSecs % 3600) / 60);
             $stkSec = (int) ($stkRemSecs % 60);
 
-            $stkMaxReturn = $maxReturnPercent > 0
-                ? (float) $maxReturnPercent
-                : ($stkPlan && (float) $stkPlan->max_return_percent > 0 ? (float) $stkPlan->max_return_percent : 0.0);
+            $stkMaxReturn = (float) $maxReturnPercent;
 
             $stkInvest = (float) $stk->invest_amount;
             $stkAllocPercent = $defaultTradingWalletPercent > 0
@@ -764,8 +744,8 @@ class MemberDetailController extends Controller
                 'fund_lock_title' => $isFundLocked ? 'Fund Locked' : 'Fund Unlocked',
                 'fund_unlocks_in_text' => $isFundLocked ? "Fund Unlocks In {$remainingLockDays} Days" : 'Fund Unlocked',
                 'fund_lock_return_message' => $isFundLocked
-                    ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns'
-                    : 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns',
+                    ? ($maxReturnPercent > 0 ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'Fund Locked, You are eligible for Unlimited Returns')
+                    : ($maxReturnPercent > 0 ? 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'You are eligible for Unlimited Returns'),
                 'packages' => $processedPackages,
             ],
         ]);

@@ -76,6 +76,7 @@ class TempController extends Controller
                 $update->installments += 1;
                 $update->invest_date = date('Y-m-d');
                 if ($cap != 0 && $balance <= $stak_amount) {
+                    $memUpdate->trading_wallet -= $tradingWalletAmount;
                     $update->status = 'Deactive';
                 }
                 $update->save();

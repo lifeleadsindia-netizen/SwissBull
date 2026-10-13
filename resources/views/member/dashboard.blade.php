@@ -2963,7 +2963,7 @@
                                                 </div>
                                                 <div class="text-end">
                                                     <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 8px;">
-                                                        <i class="fa-solid fa-bolt me-1"></i> Return: {{ number_format((float) ($maxReturnPercent ?? 0), 0) }}% Max
+                                                        <i class="fa-solid fa-bolt me-1"></i> Return: {{ (float) ($maxReturnPercent ?? 0) > 0 ? number_format((float) ($maxReturnPercent ?? 0), 0).'% Max' : 'Unlimited' }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -3145,7 +3145,7 @@
                                                     $earnPercent = $mEarn > 0 ? min(100, round(($tEarn / $mEarn) * 100, 1)) : 0;
                                                     @endphp
                                                     <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60A5FA; font-size: 10px; font-weight: 700;">
-                                                        Max Return: {{ number_format((float) ($maxReturnPercent ?? 0), 0) }}%
+                                                        Max Return: {{ (float) ($maxReturnPercent ?? 0) > 0 ? number_format((float) ($maxReturnPercent ?? 0), 0).'%' : 'Unlimited' }}
                                                     </span>
                                                 </div>
                                                 <h3 class="text-white font-weight-bold mb-1" style="font-size: 1.5rem;">
@@ -3156,10 +3156,10 @@
                                                 </div>
                                                 <div class="d-flex justify-content-between text-white-50" style="font-size: 0.72rem;">
                                                     <span>Earned: {{ $earnPercent }}%</span>
-                                                    <span class="text-warning">Max: $ {{ number_format($mEarn, 2) }}</span>
+                                                    <span class="text-warning">Max: {{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}</span>
                                                 </div>
                                                 <div class="d-flex justify-content-between text-white-50 mt-1" style="font-size: 0.68rem;">
-                                                    <span>Rem: $ {{ number_format((float) ($remainingEligibility ?? max(0, $mEarn - $tEarn)), 2) }}</span>
+                                                    <span>Rem: {{ $mEarn > 0 ? '$ '.number_format((float) ($remainingEligibility ?? max(0, $mEarn - $tEarn)), 2) : 'Unlimited' }}</span>
                                                     <span>Daily ROI: {{ number_format((float) ($dailyRoiPercent ?? 0), 1) }}%</span>
                                                 </div>
                                             </div>
@@ -3190,7 +3190,7 @@
                                                     <div class="d-flex justify-content-between text-white-50 mb-1">
                                                         <span>Max Return:</span>
                                                         <span class="text-warning font-weight-bold">
-                                                            {{ number_format((float) ($maxReturnPercent ?? 0), 0) }}% Returns
+                                                            {{ (float) ($maxReturnPercent ?? 0) > 0 ? number_format((float) ($maxReturnPercent ?? 0), 0).'% Returns' : 'Unlimited Returns' }}
                                                         </span>
                                                     </div>
                                                     <div class="d-flex justify-content-between text-white-50">
@@ -3248,7 +3248,17 @@
                                                         <td class="text-warning font-weight-bold">{{ $pkg->package_range ?? ($pkg->package ?? 'Standard') }}</td>
                                                         <td class="text-white font-weight-bold">$ {{ number_format((float) ($pkg->invest_amount ?? $pkg->package_value), 2) }}</td>
                                                         <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 0)) / 100)))), 2) }} <small class="text-white-50">({{ number_format((float) ($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 0)), 0) }}%)</small></td>
-                                                        <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->computed_max_earning ?? ($pkg->max_earning ?? (($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($defaultTradingWalletPercent ?? 0) / 100)))) * (($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)) / 100)))), 2) }} <small class="text-white-50">({{ number_format((float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)), 0) }}%)</small></td>
+                                                        @php
+                                                            $pkgMaxEarnVal = (float) ($pkg->computed_max_earning ?? ($pkg->max_earning ?? (($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($defaultTradingWalletPercent ?? 0) / 100)))) * (($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)) / 100))));
+                                                            $pkgMaxRetPct = (float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0));
+                                                        @endphp
+                                                        <td class="text-info font-weight-bold">
+                                                            @if ($pkgMaxEarnVal > 0)
+                                                                $ {{ number_format($pkgMaxEarnVal, 2) }} <small class="text-white-50">({{ number_format($pkgMaxRetPct, 0) }}%)</small>
+                                                            @else
+                                                                Unlimited
+                                                            @endif
+                                                        </td>
                                                         <td>
                                                             <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px; padding: 4px 8px;">
                                                                 <i class="fa-regular fa-clock me-1"></i>{{ $pkg->lock_days ?? ($defaultLockDays ?? 0) }} Days
