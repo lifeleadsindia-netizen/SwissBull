@@ -30,50 +30,66 @@
     <!-- Summary Stats Cards (All 3 Rules + Grand Total) -->
     <div class="row">
         <div class="col-xl-3 col-md-6 col-12">
-            <div class="card card-sm bg-primary text-white">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-white-50 d-block text-uppercase font-weight-bold">Rule 1: Messages</small>
-                        <h4 class="mb-0 font-weight-bold">{{ number_format($msgCount ?? 0) }}</h4>
-                        <small>{{ number_format($msgTokens ?? 0, 0) }} PEPE</small>
+            <div class="card" style="border-radius: 10px; background-color: #4361ee !important; color: #fff !important;">
+                <div class="card-body" style="padding: 18px 20px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div style="min-width: 0; flex: 1;">
+                            <p class="mb-1 text-uppercase font-weight-bold" style="font-size: 11px; letter-spacing: 0.5px; color: rgba(255,255,255,0.65);">Rule 1: Messages</p>
+                            <h3 class="mb-1 font-weight-bold" style="font-size: 28px; line-height: 1.1; color: #fff !important;">{{ number_format($msgCount ?? 0) }}</h3>
+                            <p class="mb-0" style="font-size: 13px; color: rgba(255,255,255,0.85);">{{ number_format($msgTokens ?? 0, 0) }} PEPE</p>
+                        </div>
+                        <div class="ml-3 flex-shrink-0" style="opacity: 0.35; color: #fff;">
+                            <i class="ik ik-send" style="font-size: 38px;"></i>
+                        </div>
                     </div>
-                    <i class="ik ik-send ik-2x opacity-50"></i>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6 col-12">
-            <div class="card card-sm bg-info text-white">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-white-50 d-block text-uppercase font-weight-bold">Rule 2: Direct Reg</small>
-                        <h4 class="mb-0 font-weight-bold">{{ number_format($regCount ?? 0) }}</h4>
-                        <small>{{ number_format($regTokens ?? 0, 0) }} PEPE</small>
+            <div class="card" style="border-radius: 10px; background-color: #0ea5e9 !important; color: #fff !important;">
+                <div class="card-body" style="padding: 18px 20px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div style="min-width: 0; flex: 1;">
+                            <p class="mb-1 text-uppercase font-weight-bold" style="font-size: 11px; letter-spacing: 0.5px; color: rgba(255,255,255,0.65);">Rule 2: Direct Reg</p>
+                            <h3 class="mb-1 font-weight-bold" style="font-size: 28px; line-height: 1.1; color: #fff !important;">{{ number_format($regCount ?? 0) }}</h3>
+                            <p class="mb-0" style="font-size: 13px; color: rgba(255,255,255,0.85);">{{ number_format($regTokens ?? 0, 0) }} PEPE</p>
+                        </div>
+                        <div class="ml-3 flex-shrink-0" style="opacity: 0.35; color: #fff;">
+                            <i class="ik ik-user-plus" style="font-size: 38px;"></i>
+                        </div>
                     </div>
-                    <i class="ik ik-user-plus ik-2x opacity-50"></i>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6 col-12">
-            <div class="card card-sm bg-warning text-dark">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-dark d-block text-uppercase font-weight-bold">Rule 3: Direct Act</small>
-                        <h4 class="mb-0 font-weight-bold">{{ number_format($actCount ?? 0) }}</h4>
-                        <small>{{ number_format($actTokens ?? 0, 0) }} PEPE</small>
+            <div class="card" style="border-radius: 10px; background-color: #f59e0b !important; color: #1a1a1a !important;">
+                <div class="card-body" style="padding: 18px 20px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div style="min-width: 0; flex: 1;">
+                            <p class="mb-1 text-uppercase font-weight-bold" style="font-size: 11px; letter-spacing: 0.5px; color: rgba(0,0,0,0.6);">Rule 3: Direct Act</p>
+                            <h3 class="mb-1 font-weight-bold" style="font-size: 28px; line-height: 1.1; color: #1a1a1a !important;">{{ number_format($actCount ?? 0) }}</h3>
+                            <p class="mb-0" style="font-size: 13px; color: rgba(0,0,0,0.7);">{{ number_format($actTokens ?? 0, 0) }} PEPE</p>
+                        </div>
+                        <div class="ml-3 flex-shrink-0" style="opacity: 0.25; color: #1a1a1a;">
+                            <i class="ik ik-zap" style="font-size: 38px;"></i>
+                        </div>
                     </div>
-                    <i class="ik ik-zap ik-2x opacity-50"></i>
                 </div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6 col-12">
-            <div class="card card-sm bg-success text-white">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <small class="text-white-50 d-block text-uppercase font-weight-bold">Total Distributed</small>
-                        <h4 class="mb-0 font-weight-bold">{{ number_format($totalPepeDistributed ?? 0, 0) }} PEPE</h4>
-                        <small>{{ number_format($totalReferrals ?? 0) }} total events</small>
+            <div class="card" style="border-radius: 10px; background-color: #10b981 !important; color: #fff !important;">
+                <div class="card-body" style="padding: 18px 20px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div style="min-width: 0; flex: 1;">
+                            <p class="mb-1 text-uppercase font-weight-bold" style="font-size: 11px; letter-spacing: 0.5px; color: rgba(255,255,255,0.65);">Total Distributed</p>
+                            <h3 class="mb-1 font-weight-bold" style="font-size: 22px; line-height: 1.1; color: #fff !important;">{{ number_format(($msgTokens ?? 0) + ($regTokens ?? 0) + ($actTokens ?? 0), 0) }} PEPE</h3>
+                            <p class="mb-0" style="font-size: 13px; color: rgba(255,255,255,0.85);">{{ number_format(($msgCount ?? 0) + ($regCount ?? 0) + ($actCount ?? 0)) }} total events</p>
+                        </div>
+                        <div class="ml-3 flex-shrink-0" style="opacity: 0.35; color: #fff;">
+                            <i class="ik ik-award" style="font-size: 38px;"></i>
+                        </div>
                     </div>
-                    <i class="ik ik-award ik-2x opacity-50"></i>
                 </div>
             </div>
         </div>
