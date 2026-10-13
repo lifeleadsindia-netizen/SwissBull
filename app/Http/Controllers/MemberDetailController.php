@@ -180,16 +180,18 @@ class MemberDetailController extends Controller
             ? $defaultTradingWalletPercent
             : ($packagePlan && (float) $packagePlan->trading_wallet_percent > 0 ? (float) $packagePlan->trading_wallet_percent : 0.0);
 
-        if ($activePackage) {
-            $pkgInv = (float) ($activePackage->invest_amount ?? $activePackage->package_value);
-            $activeTradingWalletAmount = (float) ($activePackage->trading_wallet_amount > 0
-                ? $activePackage->trading_wallet_amount
-                : round($pkgInv * ($activeTradingWalletPercent / 100), 2));
-        } elseif ($activeStaking) {
-            $stkInv = (float) $activeStaking->invest_amount;
-            $activeTradingWalletAmount = (float) ($activeStaking->trading_wallet_amount > 0
-                ? $activeStaking->trading_wallet_amount
-                : round($stkInv * ($activeTradingWalletPercent / 100), 2));
+        if ($activePackages->count() > 0) {
+            $activeTradingWalletAmount = (float) $activePackages->sum(function ($pkg) use ($activeTradingWalletPercent) {
+                return (float) ($pkg->trading_wallet_amount > 0
+                    ? $pkg->trading_wallet_amount
+                    : round((float) ($pkg->invest_amount ?? $pkg->package_value) * ($activeTradingWalletPercent / 100), 2));
+            });
+        } elseif ($stakings->count() > 0) {
+            $activeTradingWalletAmount = (float) $stakings->where('status', 'Active')->sum(function ($stk) use ($activeTradingWalletPercent) {
+                return (float) ($stk->trading_wallet_amount > 0
+                    ? $stk->trading_wallet_amount
+                    : round((float) $stk->invest_amount * ($activeTradingWalletPercent / 100), 2));
+            });
         } elseif ($totalInvestment > 0) {
             $activeTradingWalletAmount = round($totalInvestment * ($activeTradingWalletPercent / 100), 2);
         } else {
