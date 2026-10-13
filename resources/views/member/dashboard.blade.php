@@ -3185,94 +3185,210 @@
 
                                         <!-- 4. Earning & Capping Card (Full Width col-12) -->
                                         <div class="col-12">
-                                            <div class="p-3 p-md-4 rounded" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 14px;">
-                                                <div class="row align-items-center g-3">
-                                                    <!-- Left Side: Capping Summary & Progress -->
-                                                    <div class="col-xl-6 col-lg-6 col-md-12">
-                                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                                            <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Earning &amp; Capping</span>
-                                                            @php
-                                                            $tEarn = (float) ($totalEarning ?? ($totalPackageEarning ?? 0));
-                                                            $mEarn = (float) ($maxEarning ?? ($maxPackageEarning ?? 0));
-                                                            $earnPercent = $mEarn > 0 ? min(100, round(($tEarn / $mEarn) * 100, 1)) : 0;
-                                                            $twTotal = (float) ($activeTradingWalletAmount ?? ($tradingWalletBalance ?? 0));
-                                                            @endphp
-                                                            <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60A5FA; font-size: 10px; font-weight: 700; border: 1px solid rgba(59, 130, 246, 0.35);">
-                                                                Max Return: {{ (float) ($maxReturnPercent ?? 0) > 0 ? number_format((float) ($maxReturnPercent ?? 0), 0).'%' : 'Unlimited' }}
-                                                            </span>
+                                            @php
+                                            $tEarn = (float) ($totalEarning ?? ($totalPackageEarning ?? 0));
+                                            $mEarn = (float) ($maxEarning ?? ($maxPackageEarning ?? 0));
+                                            $earnPercent = $mEarn > 0 ? min(100, round(($tEarn / $mEarn) * 100, 2)) : 0;
+                                            $twTotal = (float) ($activeTradingWalletAmount ?? ($tradingWalletBalance ?? 0));
+                                            $remLimit = (float) ($remainingEligibility ?? max(0, $mEarn - $tEarn));
+                                            $maxRetVal = (float) ($maxReturnPercent ?? 0);
+                                            @endphp
+                                            <div class="p-3 p-md-4 rounded-3" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.16), rgba(12, 14, 20, 0.96)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);">
+                                                
+                                                <!-- Card Header -->
+                                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-3 border-bottom" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 46px; height: 46px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60A5FA; font-size: 1.25rem;">
+                                                            <i class="fa-solid fa-chart-pie"></i>
                                                         </div>
-                                                        <div class="d-flex align-items-baseline gap-2 mb-1">
-                                                            <h3 class="text-white font-weight-bold mb-0" style="font-size: 1.65rem; color: #60A5FA !important;">
-                                                                {{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}
+                                                        <div>
+                                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                <h5 class="text-white font-weight-bold mb-0" style="font-size: 1.15rem; letter-spacing: 0.02em;">
+                                                                    Earning &amp; Capping Overview
+                                                                </h5>
+                                                                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; font-size: 11px; padding: 4px 8px; border: 1px solid rgba(59, 130, 246, 0.3);">
+                                                                    Dynamic Capping System
+                                                                </span>
+                                                            </div>
+                                                            <small class="text-white-50 d-block mt-1" style="font-size: 0.78rem;">
+                                                                Capping limit is dynamically calculated as <strong>{{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : 'Unlimited' }}</strong> of your active Trading Wallet balance (<strong class="text-success">${{ number_format($twTotal, 2) }} TW</strong>).
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                        <span class="badge px-3 py-2" style="background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 12px; font-weight: 600;">
+                                                            <i class="fa-solid fa-arrows-spin me-1 text-info"></i>Max Return: <strong class="ms-1">{{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : 'Unlimited' }}</strong>
+                                                        </span>
+                                                        <span class="badge px-3 py-2" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 12px; font-weight: 600;">
+                                                            <i class="fa-solid fa-bolt me-1 text-success"></i>Daily ROI: <strong class="ms-1">{{ number_format((float) ($dailyRoiPercent ?? 0), 1) }}%</strong>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 4 Spacious Key Metric Tiles -->
+                                                <div class="row g-3 mb-3">
+                                                    <!-- Tile 1: Active Trading Wallet -->
+                                                    <div class="col-xl-3 col-md-6 col-12">
+                                                        <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07);">
+                                                            <div class="d-flex justify-content-between align-items-center text-white-50 mb-2">
+                                                                <span class="text-uppercase font-weight-bold" style="font-size: 0.70rem; letter-spacing: 0.06em;">Trading Wallet (Base)</span>
+                                                                <i class="fa-solid fa-wallet text-success" style="font-size: 1rem;"></i>
+                                                            </div>
+                                                            <h3 class="font-weight-bold mb-1 text-success" style="font-size: 1.45rem;">
+                                                                $ {{ number_format($twTotal, 2) }}
                                                             </h3>
-                                                            <span class="text-info font-weight-bold" style="font-size: 0.78rem;" title="Capping calculated on Trading Wallet (${{ number_format($twTotal, 2) }})">
-                                                                <i class="fa-solid fa-coins me-1 text-success"></i>Capping on TW (${{ number_format($twTotal, 2) }})
-                                                            </span>
-                                                        </div>
-                                                        <div class="d-flex align-items-center justify-content-between text-white-50 mb-1" style="font-size: 0.74rem;">
-                                                            <span>Progress towards capping</span>
-                                                            <span>Daily ROI: <strong>{{ number_format((float) ($dailyRoiPercent ?? 0), 1) }}%</strong></span>
-                                                        </div>
-                                                        <div class="progress my-2" style="height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 6px;">
-                                                            <div class="progress-bar progress-animated" role="progressbar" style="width: {{ $mEarn > 0 ? max(4, $earnPercent) : 100 }}%; background: linear-gradient(90deg, #3B82F6, #10B981); border-radius: 6px;"></div>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between text-white-50" style="font-size: 0.74rem;">
-                                                            <span>Earned: <strong class="text-white">$ {{ number_format($tEarn, 2) }}</strong> ({{ $earnPercent }}%)</span>
-                                                            <span>Remaining: <strong class="text-white">{{ $mEarn > 0 ? '$ '.number_format((float) ($remainingEligibility ?? max(0, $mEarn - $tEarn)), 2) : 'Unlimited' }}</strong></span>
+                                                            <small class="text-white-50 d-block" style="font-size: 0.72rem;">
+                                                                Base amount for {{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : '0%' }} capping
+                                                            </small>
                                                         </div>
                                                     </div>
 
-                                                    <!-- Right Side: Staking Trading Wallet Capping Breakdown -->
-                                                    <div class="col-xl-6 col-lg-6 col-md-12">
-                                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                                            <span class="text-uppercase" style="font-size: 0.70rem; letter-spacing: 0.05em; color: #93C5FD; font-weight: 600;">
-                                                                <i class="fa-solid fa-layer-group text-info me-1"></i>Trading Wallet Capping Breakdown
-                                                            </span>
-                                                            <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; font-size: 10px;">
-                                                                {{ isset($packageInvestments) ? $packageInvestments->count() : 0 }} Staking TW
-                                                            </span>
+                                                    <!-- Tile 2: Total Capping Limit -->
+                                                    <div class="col-xl-3 col-md-6 col-12">
+                                                        <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07);">
+                                                            <div class="d-flex justify-content-between align-items-center text-white-50 mb-2">
+                                                                <span class="text-uppercase font-weight-bold" style="font-size: 0.70rem; letter-spacing: 0.06em;">Total Capping Limit</span>
+                                                                <i class="fa-solid fa-trophy text-primary" style="font-size: 1rem;"></i>
+                                                            </div>
+                                                            <h3 class="font-weight-bold mb-1" style="font-size: 1.45rem; color: #60A5FA;">
+                                                                {{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}
+                                                            </h3>
+                                                            <small class="text-white-50 d-block" style="font-size: 0.72rem;">
+                                                                Maximum return capacity
+                                                            </small>
                                                         </div>
+                                                    </div>
 
-                                                        @if (isset($packageInvestments) && $packageInvestments->count() > 0)
-                                                            <div class="row g-2">
-                                                                @foreach ($packageInvestments->take(4) as $idx => $stkItem)
-                                                                    @php
-                                                                        $sTW = (float) ($stkItem->computed_trading_wallet_amount ?? ($stkItem->trading_wallet_amount ?? 0));
-                                                                        $sCap = (float) ($stkItem->computed_max_earning ?? ($stkItem->max_earning ?? 0));
-                                                                        $sRange = $stkItem->package_range ?? ($stkItem->package ?? 'Staking');
-                                                                    @endphp
-                                                                    <div class="col-sm-6">
-                                                                        <div class="p-2 rounded d-flex justify-content-between align-items-center" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 8px;">
-                                                                            <div class="text-truncate me-2" style="max-width: 65%;">
-                                                                                <div class="text-white font-weight-bold" style="font-size: 0.74rem;">
-                                                                                    <i class="fa-solid fa-coins text-success me-1"></i>TW #{{ $idx + 1 }}: ${{ number_format($sTW, 2) }}
+                                                    <!-- Tile 3: Total Earned -->
+                                                    <div class="col-xl-3 col-md-6 col-12">
+                                                        <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07);">
+                                                            <div class="d-flex justify-content-between align-items-center text-white-50 mb-2">
+                                                                <span class="text-uppercase font-weight-bold" style="font-size: 0.70rem; letter-spacing: 0.06em;">Total Earned</span>
+                                                                <i class="fa-solid fa-coins text-warning" style="font-size: 1rem;"></i>
+                                                            </div>
+                                                            <h3 class="font-weight-bold mb-1 text-warning" style="font-size: 1.45rem;">
+                                                                $ {{ number_format($tEarn, 2) }}
+                                                            </h3>
+                                                            <small class="text-white-50 d-block" style="font-size: 0.72rem;">
+                                                                {{ $earnPercent }}% of total cap reached
+                                                            </small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Tile 4: Remaining Limit -->
+                                                    <div class="col-xl-3 col-md-6 col-12">
+                                                        <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.07);">
+                                                            <div class="d-flex justify-content-between align-items-center text-white-50 mb-2">
+                                                                <span class="text-uppercase font-weight-bold" style="font-size: 0.70rem; letter-spacing: 0.06em;">Remaining to Earn</span>
+                                                                <i class="fa-solid fa-hourglass-half text-info" style="font-size: 1rem;"></i>
+                                                            </div>
+                                                            <h3 class="font-weight-bold mb-1 text-white" style="font-size: 1.45rem;">
+                                                                {{ $mEarn > 0 ? '$ '.number_format($remLimit, 2) : 'Unlimited' }}
+                                                            </h3>
+                                                            <small class="text-white-50 d-block" style="font-size: 0.72rem;">
+                                                                Remaining before re-stake
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Full-Width Progress Section -->
+                                                <div class="p-3 rounded-3 mb-3" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06);">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <span class="text-white font-weight-bold" style="font-size: 0.80rem;">
+                                                            <i class="fa-solid fa-chart-line text-primary me-2"></i>Capping Progress
+                                                        </span>
+                                                        <span class="text-white font-weight-bold" style="font-size: 0.80rem;">
+                                                            <span class="text-warning font-weight-bold">{{ $earnPercent }}%</span> Achieved
+                                                        </span>
+                                                    </div>
+                                                    <div class="progress" style="height: 10px; background: rgba(255, 255, 255, 0.08); border-radius: 8px;">
+                                                        <div class="progress-bar progress-animated" role="progressbar" style="width: {{ $mEarn > 0 ? max(3, $earnPercent) : 100 }}%; background: linear-gradient(90deg, #3B82F6, #10B981); border-radius: 8px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.35);"></div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between align-items-center mt-2 text-white-50" style="font-size: 0.76rem;">
+                                                        <span><i class="fa-solid fa-circle-check text-success me-1"></i>Earned: <strong class="text-white">$ {{ number_format($tEarn, 2) }}</strong></span>
+                                                        <span class="d-none d-md-inline"><i class="fa-solid fa-calculator text-primary me-1"></i>Calculation: <strong class="text-white-50">${{ number_format($twTotal, 2) }} TW &times; {{ $maxRetVal }}% = {{ $mEarn > 0 ? '$'.number_format($mEarn, 2) : 'Unlimited' }}</strong></span>
+                                                        <span><i class="fa-solid fa-arrow-trend-up text-info me-1"></i>Remaining: <strong class="text-white">{{ $mEarn > 0 ? '$ '.number_format($remLimit, 2) : 'Unlimited' }}</strong></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Staking-Wise Trading Wallet & Capping Breakdown -->
+                                                <div class="pt-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <div>
+                                                            <span class="text-uppercase text-white font-weight-bold" style="font-size: 0.78rem; letter-spacing: 0.05em;">
+                                                                <i class="fa-solid fa-layer-group text-info me-2"></i>Active Stakings Trading Wallet Breakdown
+                                                            </span>
+                                                            <small class="text-white-50 d-block mt-0" style="font-size: 0.72rem;">
+                                                                Individual Trading Wallet allocation and {{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : '' }} capping limit for each active staking package
+                                                            </small>
+                                                        </div>
+                                                        <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; font-size: 11px; padding: 5px 10px;">
+                                                            {{ isset($packageInvestments) ? $packageInvestments->count() : 0 }} Active {{ (isset($packageInvestments) && $packageInvestments->count() == 1) ? 'Staking' : 'Stakings' }}
+                                                        </span>
+                                                    </div>
+
+                                                    @if (isset($packageInvestments) && $packageInvestments->count() > 0)
+                                                        <div class="row g-3">
+                                                            @foreach ($packageInvestments->take(6) as $idx => $stkItem)
+                                                                @php
+                                                                    $sTW = (float) ($stkItem->computed_trading_wallet_amount ?? ($stkItem->trading_wallet_amount ?? 0));
+                                                                    $sCap = (float) ($stkItem->computed_max_earning ?? ($stkItem->max_earning ?? 0));
+                                                                    $sInvest = (float) ($stkItem->invest_amount ?? ($stkItem->package_value ?? 0));
+                                                                    $sTWPct = ($sInvest > 0 && $sTW > 0) ? round(($sTW / $sInvest) * 100, 0) : (float) ($stkItem->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 0));
+                                                                    $sRange = $stkItem->package_range ?? ($stkItem->package ?? 'Staking');
+                                                                @endphp
+                                                                <div class="col-xl-6 col-12">
+                                                                    <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                                            <!-- Staking Title & Info -->
+                                                                            <div class="d-flex align-items-center gap-3">
+                                                                                <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; background: rgba(59, 130, 246, 0.15); color: #60A5FA; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(59, 130, 246, 0.3);">
+                                                                                    #{{ $idx + 1 }}
                                                                                 </div>
-                                                                                <small class="text-white-50 text-truncate d-block" style="font-size: 0.65rem;" title="{{ $sRange }}">{{ $sRange }}</small>
+                                                                                <div>
+                                                                                    <span class="text-white font-weight-bold d-block" style="font-size: 0.85rem;">{{ $sRange }}</span>
+                                                                                    <small class="text-white-50" style="font-size: 0.72rem;">Investment: <strong class="text-white">${{ number_format($sInvest, 2) }}</strong></small>
+                                                                                </div>
                                                                             </div>
-                                                                            <div class="text-end">
-                                                                                <div class="text-warning font-weight-bold" style="font-size: 0.80rem;">
-                                                                                    {{ $sCap > 0 ? '$ '.number_format($sCap, 2) : 'Unlimited' }}
+
+                                                                            <!-- Metrics for this Staking -->
+                                                                            <div class="d-flex align-items-center gap-3 ms-auto">
+                                                                                <div class="text-end">
+                                                                                    <small class="text-white-50 d-block" style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;">Trading Wallet</small>
+                                                                                    <span class="text-success font-weight-bold" style="font-size: 0.95rem;">
+                                                                                        <i class="fa-solid fa-coins me-1"></i>${{ number_format($sTW, 2) }}
+                                                                                    </span>
+                                                                                    <small class="text-white-50 d-block" style="font-size: 0.68rem;">({{ number_format($sTWPct, 0) }}% Allocation)</small>
                                                                                 </div>
-                                                                                <small class="text-white-50 d-block" style="font-size: 0.62rem;">Cap ({{ (float) $maxReturnPercent }}%)</small>
+                                                                                <div class="text-end ps-3 border-start" style="border-color: rgba(255, 255, 255, 0.1) !important;">
+                                                                                    <small class="text-white-50 d-block" style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em;">Max Capping</small>
+                                                                                    <span class="text-warning font-weight-bold" style="font-size: 0.95rem;">
+                                                                                        {{ $sCap > 0 ? '$ '.number_format($sCap, 2) : 'Unlimited' }}
+                                                                                    </span>
+                                                                                    <small class="text-white-50 d-block" style="font-size: 0.68rem;">({{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : 'Unlimited' }} Cap)</small>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                @endforeach
-                                                            </div>
-                                                            @if ($packageInvestments->count() > 4)
-                                                                <div class="text-end mt-1" style="font-size: 0.68rem;">
-                                                                    <span class="text-white-50">+{{ $packageInvestments->count() - 4 }} more in table below</span>
-                                                                    <a href="#staking-investments-section" class="text-info text-decoration-none ms-1 font-weight-bold">View All &darr;</a>
                                                                 </div>
-                                                            @endif
-                                                        @else
-                                                            <div class="p-2 rounded text-white-50" style="background: rgba(255, 255, 255, 0.04); font-size: 0.74rem;">
-                                                                <span>Trading Wallet Capping: </span>
-                                                                <strong class="text-warning">{{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}</strong>
+                                                            @endforeach
+                                                        </div>
+                                                        @if ($packageInvestments->count() > 6)
+                                                            <div class="d-flex justify-content-between align-items-center mt-2 px-1" style="font-size: 0.75rem;">
+                                                                <span class="text-white-50">+{{ $packageInvestments->count() - 6 }} more active stakings</span>
+                                                                <a href="#staking-investments-section" class="text-info text-decoration-none font-weight-bold">
+                                                                    View All Stakings in Table Below <i class="fa-solid fa-arrow-down ms-1"></i>
+                                                                </a>
                                                             </div>
                                                         @endif
-                                                    </div>
+                                                    @else
+                                                        <div class="p-3 rounded text-white-50" style="background: rgba(255, 255, 255, 0.03); font-size: 0.8rem;">
+                                                            <i class="fa-solid fa-circle-info text-info me-1"></i> No active stakings found. Trading Wallet Capping limit: <strong class="text-warning">{{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}</strong>
+                                                        </div>
+                                                    @endif
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>
