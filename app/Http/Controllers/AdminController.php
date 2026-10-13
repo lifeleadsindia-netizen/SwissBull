@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AchiversImage;
 use App\Models\Admin;
 use App\Models\DailyTeamInvestmentShareConfiction;
+use App\Models\DailyTeamShareIncome;
 use App\Models\DashMessage;
 use App\Models\DirectIncome;
 use App\Models\HeroOfTheMonthReward;
@@ -1423,7 +1424,7 @@ class AdminController extends Controller
     public function levelInc(Request $request)
     {
         $memberId = trim((string) $request->query('member_id', ''));
-        $query = LevelIncome::query();
+        $query = DailyTeamShareIncome::query();
         if ($memberId !== '') {
             $query->where('memberid', $memberId);
         }

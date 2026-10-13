@@ -34,7 +34,8 @@
                             <th>Level</th>
                             <th>Level ID</th>
                             <th>Name</th>
-                            <th>Package Amount</th>
+                            <th>Downline</th>
+                            <th>Daily Team Biz</th>
                             <th>Rate</th>
                             <th>Amount</th>
                             <th>Status</th>
@@ -50,8 +51,9 @@
                                 <td>Level {{ $list['level'] }}</td>
                                 <td>{{ $list['level_id'] }}</td>
                                 <td>{{ !empty($list['name']) ? $list['name'] : getName($list['level_id']) }}</td>
-                                <td>$ {{ number_format($list['package'] ?? $list['staking_income'] ?? 0, 2) }}</td>
-                                <td>{{ $list['rate'] ?? levelRate($list['level']) }}%</td>
+                                <td>{{ $list['downline']  }}</td>
+                                <td>$ {{ number_format($list['daily_team_biz'] ) }}</td>
+                                <td>{{ $list['rate']  }}%</td>
                                 <td>$ {{ number_format($list['amount'], 2) }}</td>
                                 <td>
                                     @if ($list['status'] == 'Unpaid')

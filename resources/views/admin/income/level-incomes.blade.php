@@ -53,7 +53,8 @@
                                         <th>{{ __('Level') }}</th>
                                         <th>{{ __('Level ID') }}</th>
                                         <th>{{ __('Name') }}</th>
-                                        <th>{{ __('Package Amount') }}</th>
+                                        <th>{{ __('Downline') }}</th>
+                                        <th>{{ __('Daily Team Biz') }}</th>
                                         <th>{{ __('Rate') }}</th>
                                         <th>{{ __('Amount') }}</th>
                                         <th>{{ __('Status') }}</th>
@@ -69,8 +70,9 @@
                                             <td>Level {{ $list['level'] }}</td>
                                             <td>{{ $list['level_id'] }}</td>
                                             <td>{{ !empty($list['name']) ? $list['name'] : getName($list['level_id']) }}</td>
-                                            <td>$ {{ number_format($list['package'] ?? $list['staking_income'] ?? 0, 2) }}</td>
-                                            <td>{{ $list['rate'] ?? levelRate($list['level']) }}%</td>
+                                            <td>$ {{ number_format($list['daily_team_biz'] )}}</td>
+                                            <td>{{ $list['downline']  }}</td>
+                                            <td>{{ $list['rate']  }}%</td>
                                             <td>$ {{ number_format($list['amount'], 2) }}</td>
                                             <td>
                                                 @if ($list['status'] == 'Paid')
