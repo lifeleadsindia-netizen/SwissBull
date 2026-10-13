@@ -394,6 +394,9 @@ class MemberDetailController extends Controller
             $stkAllocPercent = $defaultTradingWalletPercent > 0
                 ? (float) $defaultTradingWalletPercent
                 : ($stkPlan && (float) $stkPlan->trading_wallet_percent > 0 ? (float) $stkPlan->trading_wallet_percent : 0.0);
+            if ((float) $stk->trading_wallet_amount > 0 && $stkInvest > 0) {
+                $stkAllocPercent = round(((float) $stk->trading_wallet_amount / $stkInvest) * 100, 2);
+            }
             $stkTradingWallet = (float) ($stk->trading_wallet_amount > 0 ? $stk->trading_wallet_amount : ($stkInvest * ($stkAllocPercent / 100)));
             $stkMaxEarning = round($stkTradingWallet * ($stkMaxReturn / 100), 2);
 
