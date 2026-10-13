@@ -3152,8 +3152,8 @@
                                                     {{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}
                                                 </h3>
                                                 <div class="d-flex align-items-center justify-content-between text-white-50 mb-1" style="font-size: 0.74rem;">
-                                                    <span class="text-info font-weight-bold">
-                                                        <i class="fa-solid fa-chart-pie me-1"></i>Total Capping Limit
+                                                    <span class="text-info font-weight-bold" title="Capping calculated on Trading Wallet (${{ number_format((float) ($activeTradingWalletAmount ?? ($tradingWalletBalance ?? 0)), 2) }})">
+                                                        <i class="fa-solid fa-coins me-1 text-success"></i>Capping on TW (${{ number_format((float) ($activeTradingWalletAmount ?? ($tradingWalletBalance ?? 0)), 2) }})
                                                     </span>
                                                     <span>Daily ROI: {{ number_format((float) ($dailyRoiPercent ?? 0), 1) }}%</span>
                                                 </div>
@@ -3166,22 +3166,21 @@
                                                 </div>
                                                 <div class="mt-2 pt-2 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important; font-size: 0.72rem;">
                                                     <div class="d-flex justify-content-between text-white-50 mb-1">
-                                                        <span class="text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.05em; color: #93C5FD; font-weight: 600;">Staking Capping:</span>
-                                                        <span style="font-size: 0.68rem;" class="text-white-50">{{ isset($packageInvestments) ? $packageInvestments->count() : 0 }} Staking(s)</span>
+                                                        <span class="text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.05em; color: #93C5FD; font-weight: 600;">Trading Wallet Capping:</span>
+                                                        <span style="font-size: 0.68rem;" class="text-white-50">{{ isset($packageInvestments) ? $packageInvestments->count() : 0 }} Staking TW</span>
                                                     </div>
                                                     @if (isset($packageInvestments) && $packageInvestments->count() > 0)
                                                         @foreach ($packageInvestments->take(2) as $idx => $stkItem)
                                                             @php
-                                                                $sInvest = (float) ($stkItem->invest_amount ?? $stkItem->package_value ?? 0);
                                                                 $sTW = (float) ($stkItem->computed_trading_wallet_amount ?? ($stkItem->trading_wallet_amount ?? 0));
                                                                 $sCap = (float) ($stkItem->computed_max_earning ?? ($stkItem->max_earning ?? 0));
                                                             @endphp
                                                             <div class="d-flex justify-content-between text-white-50 mb-1" style="font-size: 0.70rem;">
-                                                                <span class="text-truncate" style="max-width: 58%;" title="Invest: ${{ number_format($sInvest, 2) }} (TW: ${{ number_format($sTW, 2) }})">
-                                                                    <i class="fa-solid fa-cube text-info me-1" style="font-size: 0.65rem;"></i>
-                                                                    Stk #{{ $idx + 1 }} (${{ number_format($sInvest, 0) }}):
+                                                                <span class="text-truncate" style="max-width: 58%;" title="Trading Wallet: ${{ number_format($sTW, 2) }}">
+                                                                    <i class="fa-solid fa-coins text-success me-1" style="font-size: 0.65rem;"></i>
+                                                                    TW #{{ $idx + 1 }} (${{ number_format($sTW, 2) }}):
                                                                 </span>
-                                                                <span class="text-warning font-weight-bold" title="TW ${{ number_format($sTW, 2) }} &times; {{ (float) $maxReturnPercent }}%">
+                                                                <span class="text-warning font-weight-bold" title="${{ number_format($sTW, 2) }} &times; {{ (float) $maxReturnPercent }}%">
                                                                     {{ $sCap > 0 ? '$ '.number_format($sCap, 2) : 'Unlimited' }}
                                                                 </span>
                                                             </div>
