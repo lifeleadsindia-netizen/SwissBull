@@ -59,7 +59,7 @@ class TempController extends Controller
                 }
             }
 
-            if ($amount > 0) {
+            if ($amount > 0.00) {
 
                 $qry = new StakingIncome;
                 $qry->date = date('Y-m-d');
@@ -75,7 +75,7 @@ class TempController extends Controller
                 $update = StakingDetail::where('id', $value->id)->first();
                 $update->installments += 1;
                 $update->invest_date = date('Y-m-d');
-                if ($balance <= $stak_amount) {
+                if ($cap != 0 && $balance <= $stak_amount) {
                     $update->status = 'Deactive';
                 }
                 $update->save();
@@ -167,9 +167,9 @@ class TempController extends Controller
                     $dailyTeamBiz = $levelData['daily_team_biz'];
                     $levelId = $levelData->memberid;
                     $levelName = getName($levelId);
-                    $levelData = dailyTeamLevelRate($level);
-                    $requiredDirects = (int) ($levelData['direct'] ?? 4);
-                    $rate = (int) ($levelData['rate'] ?? 4);
+                    $levelRateInfo = dailyTeamLevelRate($level);
+                    $requiredDirects = (int) ($levelRateInfo['direct'] ?? 0);
+                    $rate = (float) ($levelRateInfo['rate'] ?? 0);
                     $amount = $dailyTeamBiz * $rate / 100;
 
                     if ($amount > 0) {

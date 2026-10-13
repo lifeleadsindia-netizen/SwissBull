@@ -3231,7 +3231,7 @@
                                                     <tr class="text-white-50" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
                                                         <th>Activation Date</th>
                                                         <th>Package</th>
-                                                        <th>Deposit</th>
+                                                        <th>Investment</th>
                                                         <th>Trading Wallet</th>
                                                         <th>Max Earning</th>
                                                         <th>Lock Period</th>
@@ -3532,7 +3532,7 @@
                                             </div>
                                             <small
                                                 class="d-flex justify-content-between align-items-center">
-                                                <span>L1–L10 Daily Profit</span>
+                                                <span>L1–L10: {{ number_format((float) ($teamTradingProfitConfig?->level_10_rate ?? 0), 0) }}%–{{ number_format((float) ($teamTradingProfitConfig?->level_1_rate ?? 0), 0) }}% Daily</span>
                                                 <span>View Details <i
                                                         class="la la-arrow-right"></i></span>
                                             </small>
@@ -3628,7 +3628,7 @@
                                             </div>
                                             <small
                                                 class="d-flex justify-content-between align-items-center">
-                                                <span>Silver to Diamond 2%–8%</span>
+                                                <span>Silver to Diamond Partnership Levels</span>
                                                 <span>View Details <i
                                                         class="la la-arrow-right"></i></span>
                                             </small>

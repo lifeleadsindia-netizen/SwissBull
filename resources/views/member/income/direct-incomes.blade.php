@@ -8,8 +8,13 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
-            <h1><i class="fa-solid fa-user-plus me-2"></i>Referral Bonus</h1>
-            <p>Direct referral commissions earned from your 3-tier sponsor network: Level 1 (5%), Level 2 (3%), Level 3 (2%).</p>
+            @php
+                $refCfg = \App\Models\ReferralBonusConfiction::first();
+                $l1Rate = number_format((float) ($refCfg?->level_1_rate ?? 0), 0);
+                $l2Rate = number_format((float) ($refCfg?->level_2_rate ?? 0), 0);
+                $l3Rate = number_format((float) ($refCfg?->level_3_rate ?? 0), 0);
+            @endphp
+            <p>Direct referral commissions earned from your 3-tier sponsor network: Level 1 ({{ $l1Rate }}%), Level 2 ({{ $l2Rate }}%), Level 3 ({{ $l3Rate }}%).</p>
         </div>
 
         <div class="inc-card">

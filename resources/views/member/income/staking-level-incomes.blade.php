@@ -8,8 +8,16 @@
 
         <div class="inc-hero">
             <div class="inc-eyebrow">Income Section</div>
+            @php
+                $ttpCfg = \App\Models\TeamTradingProfitConfiction::getActiveSetting();
+                $r1 = number_format((float) ($ttpCfg->level_1_rate ?? 0), 0);
+                $r3 = number_format((float) ($ttpCfg->level_3_rate ?? 0), 0);
+                $r5 = number_format((float) ($ttpCfg->level_5_rate ?? 0), 0);
+                $r7 = number_format((float) ($ttpCfg->level_7_rate ?? 0), 0);
+                $r9 = number_format((float) ($ttpCfg->level_9_rate ?? 0), 0);
+            @endphp
             <h1><i class="fa-solid fa-layer-group me-2"></i>Team Trading Profit</h1>
-            <p>Team trading profit share calculated across 10 levels: L1-L2 (5%), L3-L4 (4%), L5-L6 (3%), L7-L8 (2%), L9-L10 (1%).</p>
+            <p>Team trading profit share calculated across 10 levels: L1-L2 ({{ $r1 }}%), L3-L4 ({{ $r3 }}%), L5-L6 ({{ $r5 }}%), L7-L8 ({{ $r7 }}%), L9-L10 ({{ $r9 }}%).</p>
         </div>
 
         <div class="inc-card">
