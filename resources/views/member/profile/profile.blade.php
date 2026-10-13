@@ -100,18 +100,19 @@
                                         <div class="col-sm-6">
                                             <div class="mb-3">
                                                 <label class="form-label required">Mobile</label>
-                                                <div class="row">
-                                                    <div class="col-2 me-0 pe-0">
-                                                        <input type="text" class="form-control px-2"
-                                                            value="{{ $data['phonecode'] }}" readonly
-                                                            style="border-top-right-radius: 0px; border-bottom-right-radius:0px;">
-                                                    </div>
-                                                    <div class="col-10 ms-0 ps-0">
-                                                        <input type="text" class="form-control" name="mobile"
-                                                            value="{{ $data['mobile'] }}" minlength="4"
-                                                            placeholder="Enter Mobile"
-                                                            style="border-top-left-radius: 0px; border-bottom-left-radius:0px; width: 100%">
-                                                    </div>
+                                                @php
+                                                    $activePhonecode = !empty($phonecode) ? $phonecode : (!empty($data['phonecode']) ? (str_starts_with($data['phonecode'], '+') ? $data['phonecode'] : '+'.$data['phonecode']) : '00');
+                                                @endphp
+                                                <div class="input-group">
+                                                    <span class="input-group-text font-weight-bold text-center"
+                                                        style="background: rgba(245, 158, 11, 0.15); color: #FFD700; border: 1px solid rgba(255, 255, 255, 0.18); border-right: none; min-width: 75px; justify-content: center; font-size: 0.92rem; font-weight: 700; letter-spacing: 0.5px;">
+                                                        <i style="font-size: 11px; opacity: 0.85;"></i>{{ $activePhonecode }}
+                                                    </span>
+                                                    <input type="hidden" name="phonecode" value="{{ $activePhonecode }}">
+                                                    <input type="text" class="form-control" name="mobile"
+                                                        value="{{ $data['mobile'] }}" minlength="4"
+                                                        placeholder="Enter Mobile"
+                                                        style="border-top-left-radius: 0px; border-bottom-left-radius: 0px;">
                                                 </div>
                                                 @error('mobile')
                                                     <span class="text-danger"> {{ $message }}</span>
@@ -170,9 +171,18 @@
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="mb-3">
-                                            <label class="form-label">Phone</label>
-                                            <input type="number" class="form-control" value="{{ $data['mobile'] }}"
-                                                readonly>
+                                            <label class="form-label">Mobile</label>
+                                            @php
+                                                $activePhonecode = !empty($phonecode) ? $phonecode : (!empty($data['phonecode']) ? (str_starts_with($data['phonecode'], '+') ? $data['phonecode'] : '+'.$data['phonecode']) : '+91');
+                                            @endphp
+                                            <div class="input-group">
+                                                <span class="input-group-text font-weight-bold text-center"
+                                                    style="background: rgba(245, 158, 11, 0.15); color: #FFD700; border: 1px solid rgba(255, 255, 255, 0.18); border-right: none; min-width: 75px; justify-content: center; font-size: 0.92rem; font-weight: 700; letter-spacing: 0.5px;">
+                                                    <i class="fa-solid fa-phone me-1" style="font-size: 11px; opacity: 0.85;"></i>{{ $activePhonecode }}
+                                                </span>
+                                                <input type="text" class="form-control" value="{{ $data['mobile'] }}" readonly
+                                                    style="border-top-left-radius: 0px; border-bottom-left-radius: 0px;">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-6">

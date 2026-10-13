@@ -152,91 +152,64 @@ class TempController extends Controller
         foreach ($members as $value) {
             $memberid = $value->memberid;
             $downline = (int) $value->downline;
-            $dailyTeamBiz = (float) $value->daily_team_biz;
-            $name = getName($memberid);
+            // $dailyTeamBiz = (float) $value->daily_team_biz;
 
-            // 1. Direct referrals ke hisaab se max qualified level check karein
-            $maxQualifiedLevel = 0;
-            for ($l = 10; $l >= 1; $l--) {
-                $levelData = dailyTeamLevelRate($l);
-                $requiredDirects = (int) ($levelData['direct'] ?? 4);
+            if ($memberid != 'Root') {
+                $limit = 11;
+                for ($i = 1; $i < $limit; $i++) {
+                    $level = $i;
 
-                if ($downline >= $requiredDirects) {
-                    $maxQualifiedLevel = $l;
-                    break;
-                }
-            }
+                    $downlineMemberIds = UplineMember::where('upline_'.$level, $memberid)->pluck('memberid');
+                    $levelData = MemberDetail::whereIn('memberid', $downlineMemberIds)->first();
+                    if (! $levelData) {
+                        continue;
+                    }
+                    $dailyTeamBiz = $levelData['daily_team_biz'];
+                    $levelId = $levelData->memberid;
+                    $levelName = getName($levelId);
+                    $levelData = dailyTeamLevelRate($level);
+                    $requiredDirects = (int) ($levelData['direct'] ?? 4);
+                    $rate = (int) ($levelData['rate'] ?? 4);
+                    $amount = $dailyTeamBiz * $rate / 100;
 
-            if ($maxQualifiedLevel === 0) {
-                continue;
-            }
+                    if ($amount > 0) {
 
-            // 2. Member ki team tree (upline_members) me actual team depth determine karein
-            $maxTeamLevel = 0;
-            for ($l = 10; $l >= 1; $l--) {
-                $downlineMemberIds = UplineMember::where('upline_'.$l, $memberid)->pluck('memberid');
-                if ($downlineMemberIds->isNotEmpty()) {
-                    // Check if any downline member at this level generated business
-                    $hasBiz = MemberDetail::whereIn('memberid', $downlineMemberIds)
-                        ->where('daily_team_biz', '>', 0)
-                        ->exists();
+                        $new = new DailyTeamShareIncome;
+                        $new->memberid = $memberid;
+                        $new->name = $levelName;
+                        $new->level = $level;
+                        $new->level_id = $levelId;
+                        $new->rate = $rate;
+                        $new->downline = $downline;
+                        $new->daily_team_biz = $dailyTeamBiz;
+                        $new->amount = $amount;
+                        $new->type = 'Daily Team Investment Share';
+                        if ($downline >= $requiredDirects) {
+                            $new->status = 'Paid';
+                            $new->save();
+                            $wallet = $value->wallet;
+                            $value->wallet += $amount;
+                            $value->save();
 
-                    if ($hasBiz) {
-                        $maxTeamLevel = $l;
+                            walletTransfer(
+                                $memberid,
+                                $amount,
+                                'debit',
+                                $wallet,
+                                'Daily Team Investment Share Income',
+                                'Level '.$level.' Daily Team Investment Share Income Amount Added into wallet.'
+                            );
+                        } else {
+                            $new->status = 'Flushed';
+                            $new->save();
+                        }
+
+                        $inc = MemberDetail::where('memberid', $memberid)->first();
+                        $memberid = $inc['memberid'];
+                    } else {
                         break;
                     }
                 }
-            }
-
-            // Fallback: Agar specific daily_team_biz match na ho toh overall team depth
-            if ($maxTeamLevel === 0) {
-                for ($l = 10; $l >= 1; $l--) {
-                    if (UplineMember::where('upline_'.$l, $memberid)->exists()) {
-                        $maxTeamLevel = $l;
-                        break;
-                    }
-                }
-            }
-
-            if ($maxTeamLevel === 0) {
-                continue;
-            }
-
-            // Member ka final level: Team depth aur Direct referrals qualification ka minimum
-            $highestLevel = min($maxTeamLevel, $maxQualifiedLevel);
-            $levelData = dailyTeamLevelRate($highestLevel);
-            $highestRate = (float) ($levelData['rate'] ?? 1);
-
-            $amount = ($dailyTeamBiz * $highestRate) / 100;
-
-            if ($amount <= 0) {
-                continue;
-            }
-
-            $new = new DailyTeamShareIncome;
-            $new->memberid = $memberid;
-            $new->name = $name;
-            $new->level = $highestLevel;
-            $new->rate = $highestRate;
-            $new->downline = $downline;
-            $new->daily_team_biz = $dailyTeamBiz;
-            $new->amount = $amount;
-            $new->type = 'Daily Team Investment Share';
-            $new->status = 'Paid';
-
-            if ($new->save()) {
-                $wallet = $value->wallet;
-                $value->wallet += $amount;
-                $value->save();
-
-                walletTransfer(
-                    $memberid,
-                    $amount,
-                    'debit',
-                    $wallet,
-                    'Daily Team Investment Share Income',
-                    'Level '.$highestLevel.' Daily Team Investment Share Income Amount Added into wallet.'
-                );
             }
         }
     }

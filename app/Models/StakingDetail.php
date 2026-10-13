@@ -73,4 +73,20 @@ class StakingDetail extends Model
 
         return (int) ceil(now()->diffInSeconds($this->locked_until, false) / 86400);
     }
+
+    /**
+     * Check if staking is active.
+     */
+    public function isPackageActive(): bool
+    {
+        return $this->status === 'Active';
+    }
+
+    /**
+     * Check if staking is expired.
+     */
+    public function isExpired(): bool
+    {
+        return $this->status === 'Expired' || $this->status === 'Deactive';
+    }
 }

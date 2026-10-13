@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\MemberDetail;
 use App\Models\PackageDistribution;
+use App\Models\PackagePlan;
 use App\Models\StakingDetail;
 use App\Services\PepeRewardService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -157,7 +159,63 @@ class InvestmentController extends Controller
     {
         $memberid = session('MEMBER_ID');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
-        $result['investment_data'] = StakingDetail::where('memberid', $memberid)->orderBy('created_at', 'desc')->get();
+
+        $defaultLockDays = PackageDistribution::getDefaultLockDays();
+        $result['defaultLockDays'] = $defaultLockDays;
+
+        $stakings = StakingDetail::where('memberid', $memberid)->orderBy('created_at', 'desc')->get();
+        foreach ($stakings as $stk) {
+            $stkPlan = $stk->package ? PackagePlan::findByRange($stk->package) : null;
+            if (! $stkPlan && (float) $stk->invest_amount > 0) {
+                $stkPlan = PackagePlan::findForAmount((float) $stk->invest_amount);
+            }
+
+            $stkLockDays = $stkPlan && (int) $stkPlan->lock_days > 0
+                ? (int) $stkPlan->lock_days
+                : (int) $defaultLockDays;
+
+            $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
+            $stkLockedUntil = ($stkActivatedAt && $stkLockDays > 0) ? $stkActivatedAt->copy()->addDays($stkLockDays) : null;
+
+            $stkIsLocked = false;
+            $stkRemainingSeconds = 0;
+            $stkRemainingDays = 0;
+
+            if ($stkLockedUntil && now()->lt($stkLockedUntil)) {
+                $stkIsLocked = true;
+                $stkRemainingSeconds = (int) now()->diffInSeconds($stkLockedUntil, false);
+                $stkRemainingDays = (int) ceil($stkRemainingSeconds / 86400);
+            }
+
+            $stkRemSecs = max(0, $stkRemainingSeconds);
+            $stkDays = (int) floor($stkRemSecs / 86400);
+            $stkHours = (int) floor(($stkRemSecs % 86400) / 3600);
+            $stkMins = (int) floor(($stkRemSecs % 3600) / 60);
+            $stkSec = (int) ($stkRemSecs % 60);
+
+            $pkgRangeLabel = $stkPlan?->name ?? ($stk->package ?? 'Standard');
+            if ($stk->package === 'Package1') {
+                $pkgRangeLabel = 'Package 1 ($50 - $500)';
+            } elseif ($stk->package === 'Package2') {
+                $pkgRangeLabel = 'Package 2 ($600 - $5000)';
+            } elseif ($stk->package === 'Package3') {
+                $pkgRangeLabel = 'Package 3 ($6000+)';
+            }
+
+            $stk->package_range = $pkgRangeLabel;
+            $stk->lock_days = $stkLockDays;
+            $stk->is_locked = $stkIsLocked;
+            $stk->lock_status_label = $stkIsLocked ? 'Fund Locked' : 'Fund Unlocked';
+            $stk->remaining_lock_days = $stkRemainingDays;
+            $stk->remaining_lock_seconds = $stkRemainingSeconds;
+            $stk->remaining_lock_formatted = $stkIsLocked
+                ? "{$stkDays}d ".sprintf('%02d', $stkHours).'h '.sprintf('%02d', $stkMins).'m '.sprintf('%02d', $stkSec).'s'
+                : 'Unlocked';
+            $stk->unlock_datetime = $stkLockedUntil ? $stkLockedUntil->format('d M Y, H:i') : '-';
+            $stk->unlock_timestamp = $stkLockedUntil ? $stkLockedUntil->timestamp * 1000 : null;
+        }
+
+        $result['investment_data'] = $stakings;
 
         return view('member.investment.investment-details', $result);
     }

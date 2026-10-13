@@ -2032,11 +2032,7 @@
                                         $('#pepeWalletDisplay').text(Number(window.pepeWalletBalance).toLocaleString() +
                                             ' PEPE');
 
-                                        var currentTodayCount = res.today_count !== undefined ? res.today_count : (({
-                                            {
-                                                $waTodayCount ?? 0
-                                            }
-                                        }) + 1);
+                                        var currentTodayCount = res.today_count !== undefined ? res.today_count : (({{ (int) ($waTodayCount ?? 0) }}) + 1);
                                         if (currentTodayCount >= 10) {
                                             $('#waTodayStatusBadge').removeClass('bg-warning text-dark').addClass(
                                                 'bg-success text-white').html(
@@ -2094,55 +2090,23 @@
                             });
                         }
 
-                        window.pepeWalletBalance = {
-                            {
-                                (float)($waAvailablePepe ?? ($data['pepe_wallet'] ?? 0))
-                            }
-                        };
-                        window.waAvailablePepe = {
-                            {
-                                (float)($waAvailablePepe ?? ($data['pepe_wallet'] ?? 0))
-                            }
-                        };
+                        window.pepeWalletBalance = {{ (float) ($waAvailablePepe ?? ($data['pepe_wallet'] ?? 0)) }};
+                        window.waAvailablePepe = {{ (float) ($waAvailablePepe ?? ($data['pepe_wallet'] ?? 0)) }};
                         window.pepeDappSettings = {
                             contract_address: "{{ $pepeSettings->contract_address ?? '0x25d887Ce7a35172C62FeBFD67a1856F20FaEbB00' }}",
                             claim_contract_address: "{{ $pepeSettings->claim_contract_address ?? '' }}",
                             token_symbol: "{{ $pepeSettings->token_symbol ?? 'PEPE' }}",
                             token_name: "{{ $pepeSettings->token_name ?? 'PEPE BEP-20' }}",
-                            token_decimals: {
-                                {
-                                    (int)($pepeSettings - > token_decimals ?? 18)
-                                }
-                            },
-                            chain_id: {
-                                {
-                                    (int)($pepeSettings - > chain_id ?? 56)
-                                }
-                            },
+                            token_decimals: {{ (int) ($pepeSettings->token_decimals ?? 18) }},
+                            chain_id: {{ (int) ($pepeSettings->chain_id ?? 56) }},
                             network_name: "{{ $pepeSettings->network_name ?? 'BNB Smart Chain (BEP20)' }}",
                             rpc_url: "{{ $pepeSettings->rpc_url ?? 'https://bsc-dataseed.binance.org/' }}",
                             explorer_url: "{{ rtrim($pepeSettings->explorer_url ?? 'https://bscscan.com', '/') }}",
-                            gas_limit: {
-                                {
-                                    (int)($pepeSettings - > gas_limit ?? 180000)
-                                }
-                            },
-                            min_redeem: {
-                                {
-                                    (float)($pepeSettings - > min_redeem ?? 1)
-                                }
-                            },
-                            is_active: {
-                                {
-                                    $pepeSettings - > is_active ?? true ? 'true' : 'false'
-                                }
-                            },
-                            token_abi: {
-                                !!json_encode(json_decode($pepeSettings - > getEffectiveAbi())) !!
-                            },
-                            claim_contract_abi: {
-                                !!json_encode(json_decode($pepeSettings - > getEffectiveClaimAbi())) !!
-                            }
+                            gas_limit: {{ (int) ($pepeSettings->gas_limit ?? 180000) }},
+                            min_redeem: {{ (float) ($pepeSettings->min_redeem ?? 1) }},
+                            is_active: {{ ($pepeSettings->is_active ?? true) ? 'true' : 'false' }},
+                            token_abi: {!! json_encode(json_decode($pepeSettings->getEffectiveAbi() ?? '[]')) !!},
+                            claim_contract_abi: {!! json_encode(json_decode($pepeSettings->getEffectiveClaimAbi() ?? '[]')) !!}
                         };
 
                         function getActiveWeb3Provider() {
@@ -2188,11 +2152,7 @@
 
                             var availableBalance = typeof window.pepeWalletBalance !== 'undefined' ?
                                 window.pepeWalletBalance :
-                                (typeof window.waAvailablePepe !== 'undefined' ? window.waAvailablePepe : {
-                                    {
-                                        (float)($data['pepe_wallet'] ?? 0)
-                                    }
-                                });
+                                (typeof window.waAvailablePepe !== 'undefined' ? window.waAvailablePepe : {{ (float) ($data['pepe_wallet'] ?? 0) }});
                             var walletAddress = "{{ $data['member_wallet'] ?? ($data['wallet_address'] ?? session('address')) }}";
                             var minRedeem = settings.min_redeem || 1;
 
@@ -3003,7 +2963,7 @@
                                                 </div>
                                                 <div class="text-end">
                                                     <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px; font-weight: 600; padding: 5px 10px; border-radius: 8px;">
-                                                        <i class="fa-solid fa-bolt me-1"></i> Return: {{ number_format($maxReturnPercent ?? 300, 0) }}% Max
+                                                        <i class="fa-solid fa-bolt me-1"></i> Return: {{ number_format((float) ($maxReturnPercent ?? 0), 0) }}% Max
                                                     </span>
                                                 </div>
                                             </div>
@@ -3046,7 +3006,7 @@
                                                 Active Package &amp; Investment Details
                                             </h4>
                                             <small class="text-white-50" style="font-size: 0.8rem;">
-                                                Tiered package allocation &bull; 70% Trading Wallet credit &bull; Dynamic Capping Return
+                                                Tiered package allocation &bull; {{ number_format((float) ($activeTradingWalletPercent ?? ($defaultTradingWalletPercent ?? 0)), 0) }}% Trading Wallet credit &bull; Dynamic Capping Return
                                             </small>
                                         </div>
                                     </div>
@@ -3114,7 +3074,18 @@
                                                     <small class="text-white-50 d-block" style="font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase;">Remaining Lock Time</small>
                                                     <span id="liveCountdownDisplay" class="badge font-weight-bold px-3 py-2"
                                                         style="background: #000; color: {{ (isset($isFundLocked) && $isFundLocked) ? '#F59E0B' : '#10B981' }}; border: 1px solid {{ (isset($isFundLocked) && $isFundLocked) ? 'rgba(245, 158, 11, 0.5)' : 'rgba(16, 185, 129, 0.5)' }}; font-size: 12px; font-family: monospace;">
-                                                        {{ (isset($isFundLocked) && $isFundLocked) ? ($remainingLockDays ?? 0).' Days' : 'Unlocked' }}
+                                                        @if (isset($isFundLocked) && $isFundLocked && isset($remainingLockSeconds) && $remainingLockSeconds > 0)
+                                                            @php
+                                                                $initSecs = (int) $remainingLockSeconds;
+                                                                $iDays = (int) floor($initSecs / 86400);
+                                                                $iHours = (int) floor(($initSecs % 86400) / 3600);
+                                                                $iMins = (int) floor(($initSecs % 3600) / 60);
+                                                                $iSec = (int) ($initSecs % 60);
+                                                            @endphp
+                                                            {{ $iDays }}d {{ sprintf('%02d', $iHours) }}h {{ sprintf('%02d', $iMins) }}m {{ sprintf('%02d', $iSec) }}s
+                                                        @else
+                                                            {{ (isset($isFundLocked) && $isFundLocked) ? ($remainingLockDays ?? 0).' Days' : 'Unlocked' }}
+                                                        @endif
                                                     </span>
                                                 </div>
                                             </div>
@@ -3157,7 +3128,7 @@
                                                 </h3>
                                                 <div class="d-flex align-items-center gap-1 text-success mt-2" style="font-size: 0.78rem;">
                                                     <i class="fa-solid fa-coins"></i>
-                                                    <span>{{ number_format((float) ($activeTradingWalletPercent ?? ($defaultTradingWalletPercent ?? 70)), 0) }}% Allocated: $ {{ number_format((float) ($activeTradingWalletAmount ?? ($activePackage->trading_wallet_amount ?? (($activePackageInvestAmount ?? ($totalInvestment ?? 0)) * (($defaultTradingWalletPercent ?? 70) / 100)))), 2) }}</span>
+                                                    <span>{{ number_format((float) ($activeTradingWalletPercent ?? ($defaultTradingWalletPercent ?? 0)), 0) }}% Allocated: $ {{ number_format((float) ($activeTradingWalletAmount ?? ($activePackage->trading_wallet_amount ?? (($activePackageInvestAmount ?? ($totalInvestment ?? 0)) * (($defaultTradingWalletPercent ?? 0) / 100)))), 2) }}</span>
                                                 </div>
                                                 <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Available for trading &amp; withdrawal after unlock</small>
                                             </div>
@@ -3225,7 +3196,18 @@
                                                     <div class="d-flex justify-content-between text-white-50">
                                                         <span>Live Timer:</span>
                                                         <span id="cardLiveTimerVal" class="text-warning font-weight-bold font-monospace">
-                                                            {{ (isset($isFundLocked) && $isFundLocked) ? ($remainingLockDays ?? 0).' Days' : 'Unlocked' }}
+                                                            @if (isset($isFundLocked) && $isFundLocked && isset($remainingLockSeconds) && $remainingLockSeconds > 0)
+                                                                @php
+                                                                    $initSecs = (int) $remainingLockSeconds;
+                                                                    $iDays = (int) floor($initSecs / 86400);
+                                                                    $iHours = (int) floor(($initSecs % 86400) / 3600);
+                                                                    $iMins = (int) floor(($initSecs % 3600) / 60);
+                                                                    $iSec = (int) ($initSecs % 60);
+                                                                @endphp
+                                                                {{ $iDays }}d {{ sprintf('%02d', $iHours) }}h {{ sprintf('%02d', $iMins) }}m {{ sprintf('%02d', $iSec) }}s
+                                                            @else
+                                                                {{ (isset($isFundLocked) && $isFundLocked) ? ($remainingLockDays ?? 0).' Days' : 'Unlocked' }}
+                                                            @endif
                                                         </span>
                                                     </div>
                                                 </div>
@@ -3237,10 +3219,10 @@
                                     <div class="mt-3 pt-3 border-top" style="border-color: rgba(245, 158, 11, 0.15) !important;">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <span class="text-white font-weight-bold" style="font-size: 0.85rem;">
-                                                <i class="fa-solid fa-list-check text-warning me-1"></i> Package Investments &amp; Individual Lock Status
+                                                <i class="fa-solid fa-list-check text-warning me-1"></i> Staking Investments &amp; Individual Lock Period &amp; Live Timers
                                             </span>
-                                            <a href="{{ url('/member/partnership/my-investment') }}" class="text-warning text-decoration-none" style="font-size: 0.75rem;">
-                                                View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                                            <a href="{{ Route::has('Staking.details') ? route('Staking.details') : url('/member/Staking/details') }}" class="text-warning text-decoration-none" style="font-size: 0.75rem;">
+                                                View All Stakings <i class="fa-solid fa-arrow-right ms-1"></i>
                                             </a>
                                         </div>
                                         <div class="table-responsive">
@@ -3252,9 +3234,10 @@
                                                         <th>Deposit</th>
                                                         <th>Trading Wallet</th>
                                                         <th>Max Earning</th>
-                                                        <th>Max Return %</th>
+                                                        <th>Lock Period</th>
+                                                        <th>Unlock Date</th>
+                                                        <th>Remaining Timer</th>
                                                         <th>Lock Status</th>
-                                                        <th>Unlock Date / Remaining</th>
                                                         <th>Status</th>
                                                     </tr>
                                                 </thead>
@@ -3264,27 +3247,38 @@
                                                         <td class="text-white">{{ $pkg->activated_at ? date('d-m-Y H:i', strtotime($pkg->activated_at)) : ($pkg->created_at ? date('d-m-Y H:i', strtotime($pkg->created_at)) : '-') }}</td>
                                                         <td class="text-warning font-weight-bold">{{ $pkg->package_range ?? ($pkg->package ?? 'Standard') }}</td>
                                                         <td class="text-white font-weight-bold">$ {{ number_format((float) ($pkg->invest_amount ?? $pkg->package_value), 2) }}</td>
-                                                        <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 70)) / 100)))), 2) }} <small class="text-white-50">({{ number_format((float) ($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 70)), 0) }}%)</small></td>
-                                                        <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->computed_max_earning ?? ($pkg->max_earning ?? (($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($defaultTradingWalletPercent ?? 70) / 100)))) * (($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)) / 100)))), 2) }}</td>
-                                                        <td class="text-warning font-weight-bold">{{ number_format((float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)), 0) }}%</td>
+                                                        <td class="text-success font-weight-bold">$ {{ number_format((float) ($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 0)) / 100)))), 2) }} <small class="text-white-50">({{ number_format((float) ($pkg->computed_trading_wallet_percent ?? ($defaultTradingWalletPercent ?? 0)), 0) }}%)</small></td>
+                                                        <td class="text-info font-weight-bold">$ {{ number_format((float) ($pkg->computed_max_earning ?? ($pkg->max_earning ?? (($pkg->computed_trading_wallet_amount ?? ($pkg->trading_wallet_amount ?? (($pkg->invest_amount ?? $pkg->package_value) * (($defaultTradingWalletPercent ?? 0) / 100)))) * (($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)) / 100)))), 2) }} <small class="text-white-50">({{ number_format((float) ($pkg->computed_max_return_percent ?? ($maxReturnPercent ?? 0)), 0) }}%)</small></td>
                                                         <td>
-                                                            @if ($pkg->is_locked)
-                                                            <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4); font-size: 10px;">
-                                                                <i class="fa-solid fa-lock me-1"></i> Fund Locked
+                                                            <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px; padding: 4px 8px;">
+                                                                <i class="fa-regular fa-clock me-1"></i>{{ $pkg->lock_days ?? ($defaultLockDays ?? 0) }} Days
                                                             </span>
-                                                            @else
-                                                            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 10px;">
-                                                                <i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked
-                                                            </span>
-                                                            @endif
                                                         </td>
-                                                        <td class="text-white-50">
-                                                            @if ($pkg->is_locked)
-                                                            <div class="text-warning font-weight-bold">Fund Unlocks In {{ $pkg->remaining_lock_days }} Days</div>
-                                                            <small class="text-white-50" style="font-size: 10px;">{{ $pkg->unlock_datetime }}</small>
-                                                            @else
-                                                            <span class="text-success font-weight-bold">Fund Unlocked</span>
-                                                            @endif
+                                                        <td>
+                                                            <div class="text-white-50" style="font-size: 11px;">
+                                                                <i class="fa-regular fa-calendar-check text-info me-1"></i>{{ $pkg->unlock_datetime ?? '-' }}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="staking-timer-wrapper"
+                                                                 data-unlock-timestamp="{{ $pkg->unlock_timestamp }}"
+                                                                 data-remaining-seconds="{{ (int) ($pkg->remaining_lock_seconds ?? 0) }}"
+                                                                 data-locked="{{ $pkg->is_locked ? 1 : 0 }}">
+                                                                @if ($pkg->is_locked && ($pkg->remaining_lock_seconds ?? 0) > 0)
+                                                                <span class="badge font-monospace staking-timer-badge" style="background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.35); font-size: 11px; padding: 4px 8px; letter-spacing: 0.5px;">
+                                                                    <i class="fa-solid fa-stopwatch me-1 text-danger"></i><span class="staking-timer-text">{{ $pkg->remaining_lock_formatted ?? 'Calculating...' }}</span>
+                                                                </span>
+                                                                @else
+                                                                <span class="badge font-monospace staking-timer-badge" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.35); font-size: 11px; padding: 4px 8px;">
+                                                                    <i class="fa-solid fa-lock-open me-1"></i><span class="staking-timer-text">Unlocked</span>
+                                                                </span>
+                                                                @endif
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge staking-row-lock-badge" style="background: {{ $pkg->is_locked ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)' }}; color: {{ $pkg->is_locked ? '#EF4444' : '#10B981' }}; border: 1px solid {{ $pkg->is_locked ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)' }}; font-size: 10px;">
+                                                                <i class="fa-solid {{ $pkg->is_locked ? 'fa-lock' : 'fa-lock-open' }} me-1"></i> {{ $pkg->is_locked ? 'Fund Locked' : 'Fund Unlocked' }}
+                                                            </span>
                                                         </td>
                                                         <td>
                                                             @if ($pkg->isPackageActive())
@@ -3474,7 +3468,7 @@
                                             </div>
                                             <small
                                                 class="d-flex justify-content-between align-items-center">
-                                                <span>Up to 5% - 10% Monthly</span>
+                                                <span>Up to {{ number_format((float) ($minReturnRate ?? 0), 0) }}% - {{ number_format((float) ($maxReturnRate ?? 0), 0) }}% Monthly</span>
                                                 <span>View Details <i
                                                         class="la la-arrow-right"></i></span>
                                             </small>
@@ -3506,7 +3500,7 @@
                                             </div>
                                             <small
                                                 class="d-flex justify-content-between align-items-center">
-                                                <span>L1: 5%, L2: 3%, L3: 2%</span>
+                                                <span>L1: {{ number_format((float) ($referralBonusConfig?->level_1_rate ?? 0), 0) }}%, L2: {{ number_format((float) ($referralBonusConfig?->level_2_rate ?? 0), 0) }}%, L3: {{ number_format((float) ($referralBonusConfig?->level_3_rate ?? 0), 0) }}%</span>
                                                 <span>View Details <i
                                                         class="la la-arrow-right"></i></span>
                                             </small>
@@ -3570,7 +3564,7 @@
                                             </div>
                                             <small
                                                 class="d-flex justify-content-between align-items-center">
-                                                <span>L1–L10: 1% Each</span>
+                                                <span>L1–L10: {{ number_format((float) ($dailyTeamShareConfig?->level_10_rate ?? 0), 0) }}%–{{ number_format((float) ($dailyTeamShareConfig?->level_1_rate ?? 0), 0) }}% Daily</span>
                                                 <span>View Details <i
                                                         class="la la-arrow-right"></i></span>
                                             </small>
@@ -3602,7 +3596,7 @@
                                             </div>
                                             <small
                                                 class="d-flex justify-content-between align-items-center">
-                                                <span>2% Monthly Pool</span>
+                                                <span>{{ number_format((float) ($heroOfTheMonthPercent ?? 0), 0) }}% Monthly Pool</span>
                                                 <span>View Details <i
                                                         class="la la-arrow-right"></i></span>
                                             </small>
@@ -4051,35 +4045,20 @@ $referralLink = url('/member/register/' . $data['memberid']);
 
 <!-- TRADING WALLET LIVE COUNTDOWN & AUTO-UNLOCK TRANSITION -->
 <script>
-    (function($) {
+    (function() {
         window.tradingWalletLockConfig = {
-            isLocked: {
-                {
-                    (isset($isFundLocked) && $isFundLocked) ? 'true' : 'false'
-                }
-            },
-            unlockTimestamp: {
-                {
-                    (isset($unlockTimestamp) && $unlockTimestamp) ? $unlockTimestamp: 'null'
-                }
-            },
-            maxReturnPercent: {
-                {
-                    (float)($maxReturnPercent ?? 0)
-                }
-            },
-            remainingDays: {
-                {
-                    (int)($remainingLockDays ?? 0)
-                }
-            },
+            isLocked: {{ (isset($isFundLocked) && $isFundLocked) ? 'true' : 'false' }},
+            unlockTimestamp: {{ (isset($unlockTimestamp) && $unlockTimestamp) ? $unlockTimestamp : 'null' }},
+            remainingSeconds: {{ (int) ($remainingLockSeconds ?? 0) }},
+            maxReturnPercent: {{ (float) ($maxReturnPercent ?? 0) }},
+            remainingDays: {{ (int) ($remainingLockDays ?? 0) }},
             unlockDateTime: "{{ $unlockDateTime ?? 'Unlocked' }}",
             statusUrl: "{{ Route::has('member.tradingWalletStatus') ? route('member.tradingWalletStatus') : url('/member/trading-wallet-status') }}"
         };
 
         function startTradingWalletCountdown() {
             var cfg = window.tradingWalletLockConfig;
-            if (!cfg || !cfg.unlockTimestamp || !cfg.isLocked) {
+            if (!cfg || !cfg.isLocked) {
                 return;
             }
 
@@ -4096,6 +4075,17 @@ $referralLink = url('/member/register/' . $data['memberid']);
             var cardHeader = document.getElementById('cardUnlocksInHeader');
             var cardSubtext = document.getElementById('cardLockSubtext');
             var walletCardBadge = document.getElementById('tradingWalletLockCardBadge');
+
+            var targetTimestamp = null;
+            if (cfg.remainingSeconds && cfg.remainingSeconds > 0) {
+                targetTimestamp = Date.now() + (Number(cfg.remainingSeconds) * 1000);
+            } else if (cfg.unlockTimestamp) {
+                targetTimestamp = Number(cfg.unlockTimestamp);
+            }
+
+            if (!targetTimestamp) {
+                return;
+            }
 
             function applyUnlockedState() {
                 cfg.isLocked = false;
@@ -4165,24 +4155,35 @@ $referralLink = url('/member/register/' . $data['memberid']);
 
             function tick() {
                 var now = Date.now();
-                var diff = cfg.unlockTimestamp - now;
+                var diff = targetTimestamp - now;
 
                 if (diff <= 0) {
                     applyUnlockedState();
                     if (cfg.statusUrl) {
-                        $.get(cfg.statusUrl).done(function(res) {
-                            if (res && res.status && res.data && !res.data.is_locked) {
-                                applyUnlockedState();
-                            }
-                        });
+                        if (window.jQuery) {
+                            window.jQuery.get(cfg.statusUrl).done(function(res) {
+                                if (res && res.status && res.data && !res.data.is_locked) {
+                                    applyUnlockedState();
+                                }
+                            });
+                        } else {
+                            fetch(cfg.statusUrl)
+                                .then(function(r) { return r.json(); })
+                                .then(function(res) {
+                                    if (res && res.status && res.data && !res.data.is_locked) {
+                                        applyUnlockedState();
+                                    }
+                                }).catch(function() {});
+                        }
                     }
                     return;
                 }
 
-                var days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                var totalSecs = Math.floor(diff / 1000);
+                var days = Math.floor(totalSecs / 86400);
+                var hours = Math.floor((totalSecs % 86400) / 3600);
+                var minutes = Math.floor((totalSecs % 3600) / 60);
+                var seconds = totalSecs % 60;
 
                 var timeStr = days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
                 var daysStr = 'Fund Unlocks In ' + (days > 0 ? days : '<1') + ' Days';
@@ -4203,10 +4204,97 @@ $referralLink = url('/member/register/' . $data['memberid']);
             }, 1000);
         }
 
-        $(document).ready(function() {
+        function startIndividualStakingTimers() {
+            var wrappers = document.querySelectorAll('.staking-timer-wrapper[data-locked="1"]');
+            if (!wrappers || wrappers.length === 0) {
+                return;
+            }
+
+            var items = [];
+            wrappers.forEach(function(wrap) {
+                var remSecs = wrap.getAttribute('data-remaining-seconds');
+                var unlockTs = wrap.getAttribute('data-unlock-timestamp');
+                var target = null;
+                if (remSecs && Number(remSecs) > 0) {
+                    target = Date.now() + (Number(remSecs) * 1000);
+                } else if (unlockTs && Number(unlockTs) > 0) {
+                    target = Number(unlockTs);
+                }
+                if (target) {
+                    items.push({
+                        element: wrap,
+                        target: target,
+                        textEl: wrap.querySelector('.staking-timer-text')
+                    });
+                }
+            });
+
+            if (items.length === 0) {
+                return;
+            }
+
+            function tickStakings() {
+                var now = Date.now();
+                var activeCount = 0;
+
+                items.forEach(function(item) {
+                    var diff = item.target - now;
+                    if (diff <= 0) {
+                        item.element.setAttribute('data-locked', '0');
+                        var badge = item.element.querySelector('.staking-timer-badge');
+                        if (badge) {
+                            badge.style.background = 'rgba(16, 185, 129, 0.15)';
+                            badge.style.color = '#34D399';
+                            badge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+                            badge.innerHTML = '<i class="fa-solid fa-lock-open me-1"></i><span class="staking-timer-text">Unlocked</span>';
+                        }
+                        var row = item.element.closest('tr');
+                        if (row) {
+                            var rowBadge = row.querySelector('.staking-row-lock-badge');
+                            if (rowBadge) {
+                                rowBadge.style.background = 'rgba(16, 185, 129, 0.2)';
+                                rowBadge.style.color = '#10B981';
+                                rowBadge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                                rowBadge.innerHTML = '<i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked';
+                            }
+                        }
+                    } else {
+                        activeCount++;
+                        var totalSecs = Math.floor(diff / 1000);
+                        var days = Math.floor(totalSecs / 86400);
+                        var hours = Math.floor((totalSecs % 86400) / 3600);
+                        var minutes = Math.floor((totalSecs % 3600) / 60);
+                        var seconds = totalSecs % 60;
+                        var str = days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
+                        if (item.textEl) {
+                            item.textEl.innerText = str;
+                        }
+                    }
+                });
+
+                return activeCount;
+            }
+
+            tickStakings();
+            var stakingInterval = setInterval(function() {
+                var remaining = tickStakings();
+                if (remaining === 0) {
+                    clearInterval(stakingInterval);
+                }
+            }, 1000);
+        }
+
+        function initAllTimers() {
             startTradingWalletCountdown();
-        });
-    })(jQuery);
+            startIndividualStakingTimers();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initAllTimers);
+        } else {
+            initAllTimers();
+        }
+    })();
 </script>
 
 @endsection

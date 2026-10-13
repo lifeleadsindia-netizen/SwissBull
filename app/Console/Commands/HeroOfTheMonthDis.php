@@ -2,31 +2,49 @@
 
 namespace App\Console\Commands;
 
-use App\Services\HeroOfTheMonthService;
+use App\Models\HeroOfTheMonthReward;
+use App\Models\MemberDetail;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('app:hero-of-the-month-dis {month? : Optional target month in YYYY-MM format}')]
-#[Description('Distribute 2% Hero of the Month pool to top Level-1 direct referral volume achievers')]
+#[Signature('app:hero-of-the-month-dis')]
+#[Description('Command description')]
 class HeroOfTheMonthDis extends Command
 {
     /**
      * Execute the console command.
      */
-    public function handle(HeroOfTheMonthService $service): int
+    public function handle()
     {
-        $targetMonth = $this->argument('month');
-        $this->info('Starting Hero of the Month distribution'.($targetMonth ? " for month: {$targetMonth}" : ' for previous month'));
+        $max = monthlyMaxBiz();
+        $totalMember = count($max['memberid']);
 
-        $result = $service->processMonthlyDistribution($targetMonth);
+        foreach ($max['memberid'] as $memberid) {
+            $value = MemberDetail::where('memberid', $memberid)->first();
+            $direct_biz = $value->direct_biz;
+            $share = $direct_biz / $totalMember;
 
-        if ($result['status'] === 'success') {
-            $this->info("Successfully distributed \${$result['total_pool']} to {$result['winner_count']} winner(s) (\${$result['prize_per_winner']} each) for {$result['month']}.");
-        } else {
-            $this->warn("Distribution status: {$result['status']}. Message: {$result['message']}");
+            $new = new HeroOfTheMonthReward;
+            $new->month = date('M', strtotime('-1 month'));
+            $new->memberid = $memberid;
+            $new->direct_business = $direct_biz;
+            $new->total_members = $totalMember;
+            $new->amount = $share;
+            $new->save();
+
+            $wallet = $value->wallet;
+            $value->wallet += $share;
+            $value->save();
+
+            walletTransfer(
+                $memberid,
+                $share,
+                'debit',
+                $wallet,
+                'Hero of the month Reward',
+                'Hero of the month Reward Amount Added into wallet.'
+            );
         }
-
-        return Command::SUCCESS;
     }
 }
