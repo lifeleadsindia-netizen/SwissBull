@@ -170,9 +170,9 @@ class InvestmentController extends Controller
                 $stkPlan = PackagePlan::findForAmount((float) $stk->invest_amount);
             }
 
-            $stkLockDays = $stkPlan && (int) $stkPlan->lock_days > 0
-                ? (int) $stkPlan->lock_days
-                : (int) $defaultLockDays;
+            $stkLockDays = $defaultLockDays > 0
+                ? (int) $defaultLockDays
+                : ($stkPlan && (int) $stkPlan->lock_days > 0 ? (int) $stkPlan->lock_days : 0);
 
             $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
             $stkLockedUntil = ($stkActivatedAt && $stkLockDays > 0) ? $stkActivatedAt->copy()->addDays($stkLockDays) : null;

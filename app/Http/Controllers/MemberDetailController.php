@@ -321,13 +321,15 @@ class MemberDetailController extends Controller
         $primaryUnlockTime = null;
 
         foreach ($packageList as $pkg) {
-            $pkgLockDays = $pkg->lock_days > 0 ? (int) $pkg->lock_days : (int) $defaultLockDays;
+            $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
+            $pkgLockDays = $defaultLockDays > 0
+                ? (int) $defaultLockDays
+                : ($pkg->lock_days > 0 ? (int) $pkg->lock_days : (int) ($pkgPlan?->lock_days ?? 0));
             $pkgActivatedAt = $pkg->activated_at ? Carbon::parse($pkg->activated_at) : ($pkg->created_at ? Carbon::parse($pkg->created_at) : null);
 
-            $pkgLockedUntil = $pkg->locked_until;
-            if (! $pkgLockedUntil && $pkgActivatedAt && $pkgLockDays > 0) {
-                $pkgLockedUntil = $pkgActivatedAt->copy()->addDays($pkgLockDays);
-            }
+            $pkgLockedUntil = ($pkgActivatedAt && $pkgLockDays > 0)
+                ? $pkgActivatedAt->copy()->addDays($pkgLockDays)
+                : ($pkg->locked_until ? Carbon::parse($pkg->locked_until) : null);
 
             $pkgIsLocked = false;
             $pkgRemainingSeconds = 0;
@@ -392,9 +394,9 @@ class MemberDetailController extends Controller
                 $stkPlan = PackagePlan::findForAmount((float) $stk->invest_amount);
             }
 
-            $stkLockDays = $stkPlan && (int) $stkPlan->lock_days > 0
-                ? (int) $stkPlan->lock_days
-                : (int) $defaultLockDays;
+            $stkLockDays = $defaultLockDays > 0
+                ? (int) $defaultLockDays
+                : ($stkPlan && (int) $stkPlan->lock_days > 0 ? (int) $stkPlan->lock_days : 0);
 
             $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
             $stkLockedUntil = ($stkActivatedAt && $stkLockDays > 0) ? $stkActivatedAt->copy()->addDays($stkLockDays) : null;
@@ -634,12 +636,14 @@ class MemberDetailController extends Controller
         $primaryUnlockTime = null;
 
         foreach ($packageList as $pkg) {
-            $pkgLockDays = $pkg->lock_days > 0 ? (int) $pkg->lock_days : $defaultLockDays;
+            $pkgPlan = $pkg->package_range ? PackagePlan::findByRange($pkg->package_range) : null;
+            $pkgLockDays = $defaultLockDays > 0
+                ? (int) $defaultLockDays
+                : ($pkg->lock_days > 0 ? (int) $pkg->lock_days : (int) ($pkgPlan?->lock_days ?? 0));
             $pkgActivatedAt = $pkg->activated_at ? Carbon::parse($pkg->activated_at) : ($pkg->created_at ? Carbon::parse($pkg->created_at) : null);
-            $pkgLockedUntil = $pkg->locked_until;
-            if (! $pkgLockedUntil && $pkgActivatedAt && $pkgLockDays > 0) {
-                $pkgLockedUntil = $pkgActivatedAt->copy()->addDays($pkgLockDays);
-            }
+            $pkgLockedUntil = ($pkgActivatedAt && $pkgLockDays > 0)
+                ? $pkgActivatedAt->copy()->addDays($pkgLockDays)
+                : ($pkg->locked_until ? Carbon::parse($pkg->locked_until) : null);
 
             $pkgIsLocked = false;
             $pkgRemainingSeconds = 0;
@@ -701,9 +705,9 @@ class MemberDetailController extends Controller
                 $stkPlan = PackagePlan::findForAmount((float) $stk->invest_amount);
             }
 
-            $stkLockDays = $stkPlan && (int) $stkPlan->lock_days > 0
-                ? (int) $stkPlan->lock_days
-                : (int) $defaultLockDays;
+            $stkLockDays = $defaultLockDays > 0
+                ? (int) $defaultLockDays
+                : ($stkPlan && (int) $stkPlan->lock_days > 0 ? (int) $stkPlan->lock_days : 0);
 
             $stkActivatedAt = $stk->created_at ? Carbon::parse($stk->created_at) : ($stk->invest_date ? Carbon::parse($stk->invest_date) : null);
             $stkLockedUntil = ($stkActivatedAt && $stkLockDays > 0) ? $stkActivatedAt->copy()->addDays($stkLockDays) : null;

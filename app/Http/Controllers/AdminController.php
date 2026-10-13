@@ -953,7 +953,9 @@ class AdminController extends Controller
 
         // 2. Trading Wallet Control: Lock Days, Status
         if ($request->has('lock_days')) {
-            $distribution->lock_days = (int) $request->input('lock_days');
+            $lockDays = (int) $request->input('lock_days');
+            $distribution->lock_days = $lockDays;
+            PackagePlan::query()->update(['lock_days' => $lockDays]);
         }
         // Feature disabled: Max Withdrawal Percentage
         // if (Schema::hasColumn('package_distributions', 'withdrawal_percent') && $request->filled('withdrawal_percent')) {
