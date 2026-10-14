@@ -3491,8 +3491,8 @@
 
                     <!-- WALLETS ROW -->
                     <div class="row mb-2 transactions-row">
-                        <!-- Fund Wallet -->
-                        {{-- <div class="col-xl-6 col-lg-6 col-sm-12">
+                        {{-- Fund Wallet (Temporarily hidden)
+                        <div class="col-xl-6 col-lg-6 col-sm-12">
                             <div class="widget-stat card dash-3d-card row-theme-1">
                                 <div class="card-body p-4">
                                     <div class="media">
@@ -3502,23 +3502,160 @@
                                         <div class="media-body text-white">
                                             <p class="mb-1">Fund Wallet</p>
                                             <h3 class="text-white">$ {{ $data['p2p_wallet'] }}</h3>
-                        <div class="progress mb-2 bg-secondary">
-                            <div class="progress-bar progress-animated bg-white" style="width: 30%">
+                                            <div class="progress mb-2 bg-secondary">
+                                                <div class="progress-bar progress-animated bg-white" style="width: 30%">
+                                                </div>
+                                            </div>
+                                            <small>Fund Wallet Balance</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <small>Fund Wallet Balance</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> --}}
+                        --}}
 
+                        <!-- HERO OF THE MONTH SECTION (ABOVE WITHDRAWAL OVERVIEW) -->
+                        <div class="col-12 mb-4">
+                            <div class="card hero-overview-shell"
+                                style="border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 28px; background: linear-gradient(135deg, rgba(16, 20, 30, 0.96), rgba(10, 12, 18, 0.92)); box-shadow: inset 0 1px 0 rgba(245, 158, 11, 0.15), 0 22px 48px rgba(0, 0, 0, 0.6); overflow: hidden;">
+                                <div class="card-body" style="padding: 1.4rem 1.6rem 1.6rem;">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-3 d-flex align-items-center justify-content-center"
+                                                style="width: 48px; height: 48px; border-radius: 14px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #FFD700;">
+                                                <i class="la la-trophy" style="font-size: 2rem;"></i>
+                                            </span>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                    <h3 class="mb-0 font-weight-bold"
+                                                        style="font-size: 1.8rem; font-weight: 800; color: #FFD700; text-shadow: 0 0 24px rgba(245, 158, 11, 0.45); letter-spacing: -0.02em;">
+                                                        Hero of the Month
+                                                    </h3>
+                                                    <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 11px;">
+                                                        <i class="fa-solid fa-circle text-danger me-1" style="font-size: 8px;"></i> LIVE ({{ date('F Y') }})
+                                                    </span>
+                                                </div>
+                                                <small class="text-white-50">Highest direct investment performers of current month ({{ number_format((float) ($heroOfTheMonthPercent ?? 2), 0) }}% Company Pool)</small>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <a href="{{ url('member/income/hero-of-the-month') }}"
+                                                class="btn btn-sm btn-outline-warning font-weight-bold"
+                                                style="border-radius: 10px; padding: 6px 14px; font-size: 12px; border-color: rgba(245, 158, 11, 0.5);">
+                                                <i class="fa-solid fa-award me-1"></i> Reward History
+                                            </a>
+                                        </div>
+                                    </div>
 
+                                    @if (!empty($heroLeaders) && $heroLeaders->count() > 0)
+                                        @if ($heroIsTie)
+                                            <!-- TIE CONDITION: Continuous Scrolling Banner -->
+                                            <div class="p-3 rounded mb-3" style="background: rgba(239, 68, 68, 0.10); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 16px !important;">
+                                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                                    <span class="badge bg-danger text-white font-weight-bold px-2 py-1" style="font-size: 11px; letter-spacing: 0.5px;">
+                                                        <i class="fa-solid fa-fire me-1"></i> TIE CONDITION ({{ $heroLeaderCount }} MEMBERS TIED FOR #1)
+                                                    </span>
+                                                    <span class="text-white" style="font-size: 13px;">
+                                                        Leading Volume: <strong class="text-warning">${{ number_format($heroMaxBiz, 2) }}</strong>
+                                                    </span>
+                                                </div>
 
+                                                <!-- Continuous Scrolling Marquee for Tied Members (ID Number and Country) -->
+                                                <div class="py-2 px-3 rounded" style="background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px;">
+                                                    <marquee behavior="scroll" direction="left" scrollamount="5" onmouseover="this.stop();" onmouseout="this.start();">
+                                                        <div class="d-inline-flex align-items-center">
+                                                            @for ($repeat = 0; $repeat < 3; $repeat++)
+                                                                @foreach ($heroLeaders as $leader)
+                                                                    <span class="me-4 text-white" style="font-size: 13px;">
+                                                                        <i class="fa-solid fa-crown text-warning me-1"></i>
+                                                                        <strong>ID Number:</strong> <span class="text-warning font-weight-bold">{{ $leader->memberid }}</span>
+                                                                        <span class="mx-2 text-white-50">|</span>
+                                                                        <i class="fa-solid fa-earth-americas text-info me-1"></i>
+                                                                        <strong>Country:</strong> <span class="text-info font-weight-bold">{{ $leader->country ?? 'N/A' }}</span>
+                                                                        <span class="mx-2 text-white-50">|</span>
+                                                                        <strong>Direct Investment:</strong> <span class="text-success font-weight-bold">${{ number_format((float) $leader->direct_biz, 2) }}</span>
+                                                                    </span>
+                                                                    <span class="me-4 text-warning">&bull;</span>
+                                                                @endforeach
+                                                            @endfor
+                                                        </div>
+                                                    </marquee>
+                                                </div>
+                                            </div>
 
+                                            <!-- Tied Members Cards Grid -->
+                                            <div class="row g-3">
+                                                @foreach ($heroLeaders as $leader)
+                                                    <div class="col-xl-6 col-lg-6 col-md-6 col-12">
+                                                        <div class="p-3 d-flex align-items-center justify-content-between"
+                                                            style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.10), rgba(18, 22, 32, 0.75)); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 18px;">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="badge rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                                    style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; width: 42px; height: 42px; font-size: 16px;">
+                                                                    <i class="fa-solid fa-trophy"></i>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="text-white font-weight-bold" style="font-size: 15px;">
+                                                                        <span class="text-white-50" style="font-size: 11px;">ID NUMBER:</span> <span class="text-warning">{{ $leader->memberid }}</span>
+                                                                    </div>
+                                                                    <small class="text-info font-weight-bold">
+                                                                        <i class="fa-solid fa-location-dot me-1"></i> Country: <span class="text-white">{{ $leader->country ?? 'N/A' }}</span>
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="text-end">
+                                                                <span class="text-white-50 d-block" style="font-size: 10px; text-transform: uppercase;">Direct Investment</span>
+                                                                <span class="text-warning font-weight-bold" style="font-size: 16px;">
+                                                                    ${{ number_format((float) $leader->direct_biz, 2) }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <!-- SINGLE LEADER DISPLAY -->
+                                            @php $topLeader = $heroLeaders->first(); @endphp
+                                            <div class="p-3 p-md-4 d-flex align-items-center justify-content-between flex-wrap gap-3"
+                                                style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(18, 22, 32, 0.75)); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 20px;">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="badge rounded-circle p-3 me-3 d-flex align-items-center justify-content-center"
+                                                        style="background: rgba(245, 158, 11, 0.25); color: #F59E0B; width: 52px; height: 52px; font-size: 22px;">
+                                                        <i class="fa-solid fa-crown"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="badge bg-warning text-dark font-weight-bold mb-1" style="font-size: 10px;">CURRENT #1 LEADER</span>
+                                                        <h4 class="text-white font-weight-bold mb-0" style="font-size: 20px;">
+                                                            <span class="text-white-50" style="font-size: 13px;">ID NUMBER:</span> <span class="text-warning">{{ $topLeader->memberid }}</span>
+                                                        </h4>
+                                                        <div class="text-info font-weight-bold mt-1" style="font-size: 14px;">
+                                                            <i class="fa-solid fa-earth-americas me-1"></i> Country: <span class="text-white">{{ $topLeader->country ?? 'N/A' }}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-end">
+                                                    <span class="text-white-50 d-block" style="font-size: 11px; text-transform: uppercase;">Highest Direct Investment</span>
+                                                    <h3 class="text-warning font-weight-bold mb-0" style="font-size: 26px;">
+                                                        ${{ number_format((float) $topLeader->direct_biz, 2) }}
+                                                    </h3>
+                                                    <small class="text-success font-weight-bold"><i class="fa-solid fa-arrow-trend-up me-1"></i> Leading Current Month</small>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="p-3 text-center" style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 16px;">
+                                            <i class="fa-solid fa-trophy text-white-50 mb-2" style="font-size: 24px;"></i>
+                                            <p class="text-white mb-0" style="font-size: 13px;">No direct investment recorded yet for {{ date('F Y') }}.</p>
+                                            <small class="text-white-50">Be the first to invest and become the Hero of the Month!</small>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
 
-    <div class="col-12">
-        <div class="card withdrawal-overview-shell">
+                        <!-- WITHDRAWAL OVERVIEW -->
+                        <div class="col-12 mb-4">
+                            <div class="card withdrawal-overview-shell">
             <div class="card-body">
                 <h4 class="withdrawal-overview-title mb-3">Withdrawal Overview</h4>
 

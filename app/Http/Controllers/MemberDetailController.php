@@ -459,6 +459,29 @@ class MemberDetailController extends Controller
             : ($maxReturnPercent > 0 ? 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'You are eligible for Unlimited Returns');
         $result['packageInvestments'] = $processedCollection;
 
+        // =========================================================================
+        // Hero of the Month: Current Month ke Top Performer Members nikalna
+        // =========================================================================
+        // 1. Active members me se current month ka maximum direct business nikalna
+        $maxHeroBiz = (float) MemberDetail::where('status', 'Active')
+            ->where('direct_biz', '>', 0)
+            ->max('direct_biz');
+
+        $heroLeaders = collect();
+        if ($maxHeroBiz > 0) {
+            // 2. Wo sabhi members jinka direct business highest ($maxHeroBiz) ke barabar hai
+            $heroLeaders = MemberDetail::where('status', 'Active')
+                ->where('direct_biz', $maxHeroBiz)
+                ->get(['memberid', 'name', 'country', 'direct_biz']);
+        }
+
+        // 3. View ke liye data set karna
+        $result['heroLeaders']            = $heroLeaders;
+        $result['heroMaxBiz']             = $maxHeroBiz;
+        $result['heroIsTie']              = $heroLeaders->count() > 1; // Agar 1 se zyada members hain to Tie hai
+        $result['heroLeaderCount']        = $heroLeaders->count();
+        $result['heroOfTheMonthPercent']  = (float) (\App\Models\PackageDistribution::first()?->hero_of_the_month ?? 2.0);
+
         return view('member.dashboard')->with($result);
     }
 
@@ -1455,6 +1478,24 @@ class MemberDetailController extends Controller
         $baseUrl = $request->getSchemeAndHttpHost();
         $referralLink = $baseUrl.'/member/register/'.($member->memberid ?? '');
 
-        return view('member.business-plan-text', compact('data', 'member', 'referralLink'));
+        // Dynamic System Configurations matching the official business plan document
+        $packagePlans = PackagePlan::where('status', 'Active')->orderBy('min_amount', 'asc')->get();
+        $distribution = PackageDistribution::getActiveSetting();
+        $referralBonus = ReferralBonusConfiction::first();
+        $teamTradingProfit = TeamTradingProfitConfiction::first();
+        $dailyTeamShare = DailyTeamInvestmentShareConfiction::first();
+        $pepeSettings = PepeSetting::getSettings();
+
+        return view('member.business-plan-text', compact(
+            'data',
+            'member',
+            'referralLink',
+            'packagePlans',
+            'distribution',
+            'referralBonus',
+            'teamTradingProfit',
+            'dailyTeamShare',
+            'pepeSettings'
+        ));
     }
 }
