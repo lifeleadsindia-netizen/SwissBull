@@ -310,8 +310,8 @@
                                                 <th>Date</th>
                                                 <th>Package Range</th>
                                                 <th>Trading Amount</th>
-                                                <th>Txnid</th>
-                                                <th>Installments</th>
+                                                <th>Total Earning</th>
+                                                <th>Max Earning</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
@@ -335,14 +335,14 @@
                                                     <td class="text-warning font-weight-bold">
                                                         ${{ number_format((float) $stk->trading_wallet_amount, 2) }}</td>
                                                     <td class="text-warning font-weight-bold">
-                                                        ${{ totalEarning($list->id) }}</td>
+                                                        ${{ totalEarning($stk->id) }}</td>
                                                     <td>
-                                                        @if (maxEarning($list->id) == 'No Limit')
+                                                        @if (maxEarning($stk->id) == 'No Limit')
                                                             <span class="badge"
                                                                 style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">No
                                                                 Limit</span>
                                                         @else
-                                                            <span>${{ maxEarning($list->id) }}</span>
+                                                            <span>${{ maxEarning($stk->id) }}</span>
                                                         @endif
                                                     </td>
                                                     <td>
