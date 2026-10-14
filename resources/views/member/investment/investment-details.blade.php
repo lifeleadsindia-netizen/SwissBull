@@ -26,13 +26,13 @@
                                         <th>#</th>
                                         <th>Date</th>
                                         <th>Package Range</th>
-                                        <th>Invested</th>
+                                        <th>Trading Amount</th>
                                         <th>Lock Period</th>
                                         <th>Unlock Date</th>
                                         <th>Remaining Timer</th>
                                         <th>Lock Status</th>
-                                        <th>Txnid</th>
-                                        <th>Installments</th>
+                                        <th>Total Earning</th>
+                                        <th>Max Earning</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -49,7 +49,7 @@
                                                 <span class="text-white font-weight-bold">{{ $list->package_range ?? $list->package }}</span>
                                             </td>
                                             <td class="text-warning font-weight-bold">
-                                                ${{ number_format((float) $list->invest_amount, 2) }}</td>
+                                                ${{ number_format((float) $list->trading_wallet_amount, 2) }}</td>
                                             <td>
                                                 <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 4px 8px;">
                                                     <i class="fa-regular fa-clock me-1"></i>{{ $list->lock_days ?? ($defaultLockDays ?? 0) }} Days
@@ -80,8 +80,14 @@
                                                 </span>
                                             </td>
                                             <td class="text-warning font-weight-bold">
-                                                {{ $list->txnid }}</td>
-                                            <td>{{ $list->installments }}</td>
+                                                ${{ totalEarning($list->id) }}</td>
+                                            <td>
+                                                @if ( maxEarning($list->id) == 'No Limit')
+                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">No Limit</span>
+                                                @else
+                                                    <span>${{ maxEarning($list->id) }}</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 @if ($list->status === 'Active')
                                                     <span class="badge"
