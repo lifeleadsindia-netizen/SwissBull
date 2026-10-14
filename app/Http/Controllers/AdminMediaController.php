@@ -13,13 +13,11 @@ class AdminMediaController extends Controller
 {
     /**
      * Bootstrap default media assets if tables are empty.
+     * Note: Kept as no-op during web requests so admin deletions are permanent.
      */
     public static function ensureBootstrapped(): void
     {
-        if (PromotionBanner::count() === 0 || BusinessPlanDocument::count() === 0) {
-            $seeder = new MediaManagementSeeder;
-            $seeder->run();
-        }
+        // No-op during web requests to respect admin deletions of all media items.
     }
 
     // ==========================================
@@ -28,7 +26,6 @@ class AdminMediaController extends Controller
 
     public function banners()
     {
-        self::ensureBootstrapped();
         $banners = PromotionBanner::orderBy('sort_order', 'asc')->orderBy('id', 'desc')->get();
 
         return view('admin.media.banners', compact('banners'));
@@ -107,7 +104,6 @@ class AdminMediaController extends Controller
 
     public function pdfs()
     {
-        self::ensureBootstrapped();
         $pdfs = BusinessPlanDocument::orderBy('sort_order', 'asc')->orderBy('id', 'desc')->get();
 
         return view('admin.media.pdfs', compact('pdfs'));
@@ -200,7 +196,6 @@ class AdminMediaController extends Controller
 
     public function planVideos(Request $request)
     {
-        self::ensureBootstrapped();
         $query = MemberVideo::where('video_type', 'plan');
 
         if ($request->filled('search')) {
@@ -228,7 +223,6 @@ class AdminMediaController extends Controller
 
     public function tutorialVideos(Request $request)
     {
-        self::ensureBootstrapped();
         $query = MemberVideo::where('video_type', 'tutorial');
 
         if ($request->filled('search')) {

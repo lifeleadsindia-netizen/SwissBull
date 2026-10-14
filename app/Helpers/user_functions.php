@@ -1,14 +1,13 @@
 <?php
 
-use App\Console\Commands\DailyTeamInvestmentShare;
 use App\Models\Country;
+use App\Models\DailyTeamShareIncome;
 use App\Models\DirectIncome;
 use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PackageDistribution;
 use App\Models\PartnershipIncome;
-use App\Models\RoiLevelIncome;
 use App\Models\SingleLegIncome;
 use App\Models\StakingDetail;
 use App\Models\StakingIncome;
@@ -158,7 +157,7 @@ function totalMemberStakingLevelIncome($memberid)
 
 function totalMemberLevelIncome($memberid)
 {
-    $sum = DailyTeamInvestmentShare::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
+    $sum = DailyTeamShareIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
     return $sum;
 }
 
