@@ -83,7 +83,8 @@
                                             style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 12px;">
                                             <div>
                                                 <small class="text-white-50 text-uppercase d-block"
-                                                    style="font-size: 11px; letter-spacing: 0.5px;">Fund Wallet Balance</small>
+                                                    style="font-size: 11px; letter-spacing: 0.5px;">Fund Wallet
+                                                    Balance</small>
                                                 <span class="text-warning font-weight-bold"
                                                     style="font-size: 18px;">${{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }}
                                                     USDT</span>
@@ -308,7 +309,7 @@
                                                 <th>#</th>
                                                 <th>Date</th>
                                                 <th>Package Range</th>
-                                                <th>Invested</th>
+                                                <th>Trading Amount</th>
                                                 <th>Txnid</th>
                                                 <th>Installments</th>
                                                 <th>Status</th>
@@ -332,10 +333,18 @@
                                                         @endif
                                                     </td>
                                                     <td class="text-warning font-weight-bold">
-                                                        ${{ number_format((float) $stk->invest_amount, 2) }}</td>
+                                                        ${{ number_format((float) $stk->trading_wallet_amount, 2) }}</td>
                                                     <td class="text-warning font-weight-bold">
-                                                        {{ $stk->txnid }}</td>
-                                                    <td>{{ $stk->installments }}</td>
+                                                        ${{ totalEarning($list->id) }}</td>
+                                                    <td>
+                                                        @if (maxEarning($list->id) == 'No Limit')
+                                                            <span class="badge"
+                                                                style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">No
+                                                                Limit</span>
+                                                        @else
+                                                            <span>${{ maxEarning($list->id) }}</span>
+                                                        @endif
+                                                    </td>
                                                     <td>
                                                         @if ($stk->status === 'Active')
                                                             <span class="badge"

@@ -33,7 +33,7 @@ class IncomeController extends Controller
     public function stakingLevelIncome()
     {
         $result['data'] = MemberDetail::where('memberid', session('MEMBER_ID'))->first();
-        $result['sData'] = RoiLevelIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
+        $result['sData'] = LevelIncome::where([['memberid', $result['data']['memberid']], ['status', 'Paid']])->orderby('created_at', 'desc')->get();
 
         return view('member.income.staking-level-incomes')->with($result);
     }

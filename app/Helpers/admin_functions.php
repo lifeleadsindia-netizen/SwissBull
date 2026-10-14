@@ -7,10 +7,12 @@ use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
+use App\Models\PackageDistribution;
 use App\Models\PartnershipIncome;
 use App\Models\PepeRewardLog;
 use App\Models\RoiLevelIncome;
 use App\Models\SingleLegIncome;
+use App\Models\StakingDetail;
 use App\Models\StakingIncome;
 use App\Models\TicketText;
 use App\Models\WhatsappReferral;
@@ -201,7 +203,7 @@ function totalAdminRoiIncome()
 
 function totalAdminStakingLevelIncome()
 {
-    $sum = RoiLevelIncome::where('status', 'Paid')->sum('amount');
+    $sum = LevelIncome::where('status', 'Paid')->sum('amount');
 
     return $sum;
 }
@@ -388,10 +390,10 @@ function totalPEPEWithdrawal()
 
 function adminIncomeOverviewChartData($month = null, $year = null)
 {
-    if (! $month) {
+    if (!$month) {
         $month = date('m');
     }
-    if (! $year) {
+    if (!$year) {
         $year = date('Y');
     }
 
@@ -489,3 +491,6 @@ function adminIncomeOverviewChartData($month = null, $year = null)
         'hasData' => ($maxVal > 0),
     ];
 }
+
+
+
