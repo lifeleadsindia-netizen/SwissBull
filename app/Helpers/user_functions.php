@@ -1,13 +1,16 @@
 <?php
 
+use App\Console\Commands\DailyTeamInvestmentShare;
 use App\Models\Country;
 use App\Models\DirectIncome;
 use App\Models\HeroOfTheMonthReward;
 use App\Models\LevelIncome;
 use App\Models\MemberDetail;
+use App\Models\PackageDistribution;
 use App\Models\PartnershipIncome;
 use App\Models\RoiLevelIncome;
 use App\Models\SingleLegIncome;
+use App\Models\StakingDetail;
 use App\Models\StakingIncome;
 use App\Models\UplineMember;
 use App\Models\WithdrawalIncome;
@@ -16,7 +19,7 @@ use Illuminate\Support\Facades\Schema;
 
 function userId()
 {
-    $userid = 'ST'.rand(1000000, 9999999);
+    $userid = 'ST' . rand(1000000, 9999999);
     $member = MemberDetail::where('memberid', $userid)->count();
     if ($member > 0) {
         userId();
@@ -28,21 +31,18 @@ function userId()
 function getName($memberid)
 {
     $member = MemberDetail::where('memberid', $memberid)->first();
-
     return $member ? $member->name : ($memberid ?? 'N/A');
 }
 
 function getMobile($memberid)
 {
     $member = MemberDetail::where('memberid', $memberid)->first();
-
     return $member ? $member->mobile : '';
 }
 
 function getMobileCode($memberid)
 {
     $member = MemberDetail::where('memberid', $memberid)->first();
-
     return $member ? $member->phonecode : '';
 }
 
@@ -86,9 +86,8 @@ function updateUpline($sponsorid, $memberid)
 
 function totalsingleLevel($memberid, $level)
 {
-    $upline = 'upline_'.$level;
+    $upline = 'upline_' . $level;
     $var = UplineMember::where($upline, $memberid)->count();
-
     return $var;
 }
 
@@ -100,7 +99,7 @@ function team_update($sponsorid)
             break;
         }
         $query = MemberDetail::where('memberid', $sponsorid)->first();
-        if (! $query) {
+        if (!$query) {
             break;
         }
         $query->team += 1;
@@ -117,7 +116,7 @@ function team_biz_update($sponsorid, $value)
             break;
         }
         $query = MemberDetail::where('memberid', $sponsorid)->first();
-        if (! $query) {
+        if (!$query) {
             break;
         }
         $query->team_biz += $value;
@@ -135,7 +134,7 @@ function part_team_biz_update($sponsorid, $value)
             break;
         }
         $query = MemberDetail::where('memberid', $sponsorid)->first();
-        if (! $query) {
+        if (!$query) {
             break;
         }
         $query->partnership_team_biz += $value;
@@ -148,49 +147,42 @@ function part_team_biz_update($sponsorid, $value)
 function totalMemberRoiIncome($memberid)
 {
     $sum = StakingIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
     return $sum;
 }
 
 function totalMemberStakingLevelIncome($memberid)
 {
-    $sum = RoiLevelIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
+    $sum = LevelIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
     return $sum;
 }
 
 function totalMemberLevelIncome($memberid)
 {
-    $sum = LevelIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
+    $sum = DailyTeamInvestmentShare::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
     return $sum;
 }
 
 function totalMemberSingleLegIncome($memberid)
 {
     $sum = SingleLegIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
     return $sum;
 }
 
 function totalMemberPartnershipIncome($memberid)
 {
     $sum = PartnershipIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
     return $sum;
 }
 
 function totalMemberTeamWithdrawalCommissionIncome($memberid)
 {
     $sum = WithdrawalIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
     return $sum;
 }
 
 function totalMemberDirectIncome($memberid)
 {
     $sum = DirectIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
     return $sum;
 }
 
@@ -238,14 +230,12 @@ function totalIncome($memberid)
 function totalWithdrawalIncome($memberid)
 {
     $var = WithdrawalIncome::where([['memberid', $memberid], ['status', 'Paid'], ['type', 'Withdrawal']])->sum('amount');
-
     return $var;
 }
 
 function totalRoiIncome($memberid)
 {
     $var = StakingIncome::where([['memberid', $memberid], ['status', 'Paid']])->sum('amount');
-
     return $var;
 }
 
@@ -276,12 +266,14 @@ function todayTradingWithdrawals($memberid)
     $var = WithdrawalRequest::where([['memberid', $memberid], ['status', 'Approved'], ['type', 'Trading Withdrawal']])
         ->where(function ($q) {
             $q->whereDate('payment_date', date('Y-m-d'))
+
                 ->orWhereDate('created_at', date('Y-m-d'));
         })
         ->sum('gross_amount');
 
     return (float) $var;
 }
+
 
 function totalTradingWithdrawals($memberid)
 {
@@ -296,7 +288,7 @@ function totalLevelMembers($memberid)
     $total = 0;
     $limit = 11;
     for ($i = 1; $i < $limit; $i++) {
-        $upline = 'upline_'.$i;
+        $upline = 'upline_' . $i;
         $var = UplineMember::where($upline, $memberid)->count();
         $total += $var;
     }
@@ -307,22 +299,40 @@ function totalLevelMembers($memberid)
 function getSponsorid($memberid)
 {
     $member = MemberDetail::where('memberid', $memberid)->first();
-
     return $member['sponsorid'];
 }
 
 function getAllData($memberid)
 {
     $var = MemberDetail::where('memberid', $memberid)->first();
-
     return $var;
 }
 
 function getCountryData($country)
 {
     $var = Country::where('name', $country)->first();
-
     return $var->symbol;
+}
+
+function totalEarning($id)
+{
+    $totalEarning = StakingIncome::where('staking_id', $id)->sum('amount');
+    return $totalEarning;
+}
+
+function maxEarning($id)
+{
+    $maxEarning = StakingDetail::find($id);
+    $trading_wallet_amount = $maxEarning->trading_wallet_amount;
+
+    $cap = PackageDistribution::find(1);
+    $capping = $cap->capping;
+
+    if ($capping == 0) {
+        return 'No Limit';
+    } else {
+        return $trading_wallet_amount * ($capping / 100);
+    }
 }
 
 function monthlyMaxBiz()

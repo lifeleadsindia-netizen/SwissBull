@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AchiversImage;
 use App\Models\Admin;
+use App\Models\AdminSettingLog;
 use App\Models\DailyTeamInvestmentShareConfiction;
 use App\Models\DailyTeamShareIncome;
 use App\Models\DashMessage;
@@ -1015,6 +1016,28 @@ class AdminController extends Controller
             }
         }
 
+        // Capture new values for logging
+        $newData = [
+            'trading_wallet' => $distribution->trading_wallet,
+            'hero_of_the_month' => $distribution->hero_of_the_month,
+            'lock_days' => $distribution->lock_days,
+            'status' => $distribution->status,
+            'capping' => $distribution->capping,
+        ];
+        // Add package rates dynamically
+        foreach ($packagePlans as $index => $plan) {
+            $field = 'package_'.($index + 1).'_rate';
+            $newData[$field] = $distribution->{$field};
+        }
+
+        AdminSettingLog::logChanges(
+            'package_distributions',
+            $distribution->getOriginal(),
+            $newData,
+            'admin',
+            request()->ip()
+        );
+
         $distribution->save();
 
         session()->flash('successMsg', 'Package configuration updated successfully.');
@@ -1075,9 +1098,31 @@ class AdminController extends Controller
         ]);
 
         $setting = ReferralBonusConfiction::getActiveSetting();
+
+        $oldData = [
+            'level_1_rate' => $setting->level_1_rate,
+            'level_2_rate' => $setting->level_2_rate,
+            'level_3_rate' => $setting->level_3_rate,
+        ];
+
         $setting->level_1_rate = (float) $request->input('level_1_rate');
         $setting->level_2_rate = (float) $request->input('level_2_rate');
         $setting->level_3_rate = (float) $request->input('level_3_rate');
+
+        $newData = [
+            'level_1_rate' => $setting->level_1_rate,
+            'level_2_rate' => $setting->level_2_rate,
+            'level_3_rate' => $setting->level_3_rate,
+        ];
+
+        AdminSettingLog::logChanges(
+            'referral_bonus_confiction',
+            $oldData,
+            $newData,
+            'admin',
+            $request->ip()
+        );
+
         $setting->save();
 
         session()->flash('successMsg', 'Referral Bonus configuration saved successfully.');
@@ -1113,9 +1158,29 @@ class AdminController extends Controller
         $request->validate($rules, $messages);
 
         $setting = TeamTradingProfitConfiction::getActiveSetting();
+
+        $oldData = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $oldData["level_{$i}_rate"] = $setting->{"level_{$i}_rate"};
+        }
+
         for ($i = 1; $i <= 10; $i++) {
             $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
         }
+
+        $newData = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $newData["level_{$i}_rate"] = $setting->{"level_{$i}_rate"};
+        }
+
+        AdminSettingLog::logChanges(
+            'team_trading_profit_confiction',
+            $oldData,
+            $newData,
+            'admin',
+            $request->ip()
+        );
+
         $setting->save();
 
         session()->flash('successMsg', 'Team Trading Profit configuration saved successfully.');
@@ -1183,10 +1248,32 @@ class AdminController extends Controller
         $validator->validate();
 
         $setting = DailyTeamInvestmentShareConfiction::getActiveSetting();
+
+        $oldData = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $oldData["level_{$i}_rate"] = $setting->{"level_{$i}_rate"};
+            $oldData["level_{$i}_directs"] = $setting->{"level_{$i}_directs"};
+        }
+
         for ($i = 1; $i <= 10; $i++) {
             $setting->{"level_{$i}_rate"} = (float) $request->input("level_{$i}_rate");
             $setting->{"level_{$i}_directs"} = (int) $request->input("level_{$i}_directs");
         }
+
+        $newData = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $newData["level_{$i}_rate"] = $setting->{"level_{$i}_rate"};
+            $newData["level_{$i}_directs"] = $setting->{"level_{$i}_directs"};
+        }
+
+        AdminSettingLog::logChanges(
+            'daily_team_investment_share_confiction',
+            $oldData,
+            $newData,
+            'admin',
+            $request->ip()
+        );
+
         $setting->save();
 
         session()->flash('successMsg', 'Daily Team Investment Share configuration saved successfully.');
@@ -1490,7 +1577,7 @@ class AdminController extends Controller
     public function stakLevelInc(Request $request)
     {
         $memberId = trim((string) $request->query('member_id', ''));
-        $query = RoiLevelIncome::query();
+        $query = LevelIncome::query();
         if ($memberId !== '') {
             $query->where('memberid', $memberId);
         }
