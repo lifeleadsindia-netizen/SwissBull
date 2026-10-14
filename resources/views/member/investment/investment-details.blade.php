@@ -4,8 +4,8 @@
     @include('member.income._income-styles')
 
     <!--**********************************
-                            Content body start
-                        ***********************************-->
+                                Content body start
+                            ***********************************-->
     <div class="content-body inc-page">
         <div class="container-fluid py-4">
             <!-- row -->
@@ -46,37 +46,49 @@
                                                     class="d-block text-white-50">{{ $list->created_at ? $list->created_at->format('d M Y, H:i') : '' }}</small>
                                             </td>
                                             <td>
-                                                <span class="text-white font-weight-bold">{{ $list->package_range ?? $list->package }}</span>
+                                                <span
+                                                    class="text-white font-weight-bold">{{ $list->package_range ?? $list->package }}</span>
                                             </td>
                                             <td class="text-warning font-weight-bold">
                                                 ${{ number_format((float) $list->invest_amount, 2) }}</td>
                                             <td>
-                                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 4px 8px;">
-                                                    <i class="fa-regular fa-clock me-1"></i>{{ $list->lock_days ?? ($defaultLockDays ?? 0) }} Days
+                                                <span class="badge"
+                                                    style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 4px 8px;">
+                                                    <i
+                                                        class="fa-regular fa-clock me-1"></i>{{ $list->lock_days ?? ($defaultLockDays ?? 0) }}
+                                                    Days
                                                 </span>
                                             </td>
                                             <td>
-                                                <small class="text-white-50"><i class="fa-regular fa-calendar-check text-info me-1"></i>{{ $list->unlock_datetime ?? '-' }}</small>
+                                                <small class="text-white-50"><i
+                                                        class="fa-regular fa-calendar-check text-info me-1"></i>{{ $list->unlock_datetime ?? '-' }}</small>
                                             </td>
                                             <td>
                                                 <div class="staking-timer-wrapper"
-                                                     data-unlock-timestamp="{{ $list->unlock_timestamp }}"
-                                                     data-remaining-seconds="{{ (int) ($list->remaining_lock_seconds ?? 0) }}"
-                                                     data-locked="{{ $list->is_locked ? 1 : 0 }}">
+                                                    data-unlock-timestamp="{{ $list->unlock_timestamp }}"
+                                                    data-remaining-seconds="{{ (int) ($list->remaining_lock_seconds ?? 0) }}"
+                                                    data-locked="{{ $list->is_locked ? 1 : 0 }}">
                                                     @if ($list->is_locked && ($list->remaining_lock_seconds ?? 0) > 0)
-                                                    <span class="badge font-monospace staking-timer-badge" style="background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 4px 8px; letter-spacing: 0.5px;">
-                                                        <i class="fa-solid fa-stopwatch me-1 text-danger"></i><span class="staking-timer-text">{{ $list->remaining_lock_formatted ?? 'Calculating...' }}</span>
-                                                    </span>
+                                                        <span class="badge font-monospace staking-timer-badge"
+                                                            style="background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; padding: 4px 8px; letter-spacing: 0.5px;">
+                                                            <i class="fa-solid fa-stopwatch me-1 text-danger"></i><span
+                                                                class="staking-timer-text">{{ $list->remaining_lock_formatted ?? 'Calculating...' }}</span>
+                                                        </span>
                                                     @else
-                                                    <span class="badge font-monospace staking-timer-badge" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 6px; padding: 4px 8px;">
-                                                        <i class="fa-solid fa-lock-open me-1"></i><span class="staking-timer-text">Unlocked</span>
-                                                    </span>
+                                                        <span class="badge font-monospace staking-timer-badge"
+                                                            style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 6px; padding: 4px 8px;">
+                                                            <i class="fa-solid fa-lock-open me-1"></i><span
+                                                                class="staking-timer-text">Unlocked</span>
+                                                        </span>
                                                     @endif
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class="badge staking-row-lock-badge" style="background: {{ $list->is_locked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)' }}; color: {{ $list->is_locked ? '#EF4444' : '#10B981' }}; border: 1px solid {{ $list->is_locked ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)' }}; border-radius: 6px; padding: 4px 8px;">
-                                                    <i class="fa-solid {{ $list->is_locked ? 'fa-lock' : 'fa-lock-open' }} me-1"></i> {{ $list->is_locked ? 'Fund Locked' : 'Fund Unlocked' }}
+                                                <span class="badge staking-row-lock-badge"
+                                                    style="background: {{ $list->is_locked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)' }}; color: {{ $list->is_locked ? '#EF4444' : '#10B981' }}; border: 1px solid {{ $list->is_locked ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)' }}; border-radius: 6px; padding: 4px 8px;">
+                                                    <i
+                                                        class="fa-solid {{ $list->is_locked ? 'fa-lock' : 'fa-lock-open' }} me-1"></i>
+                                                    {{ $list->is_locked ? 'Fund Locked' : 'Fund Unlocked' }}
                                                 </span>
                                             </td>
                                             <td class="text-warning font-weight-bold">
@@ -103,8 +115,8 @@
         </div>
     </div>
     <!--**********************************
-                            Content body end
-                        ***********************************-->
+                                Content body end
+                            ***********************************-->
 
     <script>
         (function() {
@@ -146,7 +158,8 @@
                                 badge.style.background = 'rgba(16, 185, 129, 0.15)';
                                 badge.style.color = '#34D399';
                                 badge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
-                                badge.innerHTML = '<i class="fa-solid fa-lock-open me-1"></i><span class="staking-timer-text">Unlocked</span>';
+                                badge.innerHTML =
+                                    '<i class="fa-solid fa-lock-open me-1"></i><span class="staking-timer-text">Unlocked</span>';
                             }
                             var row = item.element.closest('tr');
                             if (row) {
@@ -155,7 +168,8 @@
                                     rowBadge.style.background = 'rgba(16, 185, 129, 0.15)';
                                     rowBadge.style.color = '#10B981';
                                     rowBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-                                    rowBadge.innerHTML = '<i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked';
+                                    rowBadge.innerHTML =
+                                        '<i class="fa-solid fa-lock-open me-1"></i> Fund Unlocked';
                                 }
                             }
                         } else {
@@ -165,7 +179,8 @@
                             var hours = Math.floor((totalSecs % 86400) / 3600);
                             var minutes = Math.floor((totalSecs % 3600) / 60);
                             var seconds = totalSecs % 60;
-                            var str = days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes).padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
+                            var str = days + 'd ' + String(hours).padStart(2, '0') + 'h ' + String(minutes)
+                                .padStart(2, '0') + 'm ' + String(seconds).padStart(2, '0') + 's';
                             if (item.textEl) {
                                 item.textEl.innerText = str;
                             }

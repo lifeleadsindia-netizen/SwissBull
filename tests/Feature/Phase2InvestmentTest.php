@@ -6,7 +6,7 @@ use App\Models\ImportFund;
 use App\Models\MemberDetail;
 use App\Models\PackageDetail;
 use App\Models\PackagePlan;
-use App\Models\TradingWalletSetting;
+use App\Models\StakingDetail;
 use App\Models\WalletTransfer;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Tests\TestCase;
@@ -23,7 +23,7 @@ class Phase2InvestmentTest extends TestCase
         // Clean any leftovers from past test runs
         PackageDetail::where('txnid', 'like', '0x_phase2_%')->delete();
         ImportFund::where('txnid', 'like', '0x_phase2_%')->delete();
-        \App\Models\StakingDetail::where('txnid', 'like', '0x_phase2_%')->delete();
+        StakingDetail::where('txnid', 'like', '0x_phase2_%')->delete();
 
         $this->memberId = 'P2MEM'.rand(10000, 99999);
         MemberDetail::create([
@@ -43,7 +43,7 @@ class Phase2InvestmentTest extends TestCase
     {
         PackageDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_phase2_%')->delete();
         ImportFund::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_phase2_%')->delete();
-        \App\Models\StakingDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_phase2_%')->delete();
+        StakingDetail::where('memberid', $this->memberId)->orWhere('txnid', 'like', '0x_phase2_%')->delete();
         WalletTransfer::where('memberid', $this->memberId)->delete();
         MemberDetail::where('memberid', $this->memberId)->delete();
         parent::tearDown();

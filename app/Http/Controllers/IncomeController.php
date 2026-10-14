@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\DailyTeamShareIncome;
 use App\Models\DirectIncome;
 use App\Models\HeroOfTheMonthReward;
-use App\Models\LevelIncome;
 use App\Models\MemberDetail;
 use App\Models\PartnershipIncome;
 use App\Models\RoiLevelIncome;
