@@ -2816,6 +2816,9 @@
       draw();
     })();
   </script>
+
+  {{-- Tawk.to Style Apollo AI Chatbot Widget --}}
+  @include('frontend.chatbot')
 </body>
 
 </html>

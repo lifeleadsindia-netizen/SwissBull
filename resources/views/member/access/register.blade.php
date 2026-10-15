@@ -54,7 +54,8 @@
             <!-- Top Header / Brand Logo -->
             <div class="flex items-center justify-between mb-5">
                 <a href="{{ url('/') }}" class="flex items-center gap-3 group">
-                    <img style="height: 7.5rem;" src="{{ asset('logo/name-logo.png') }}" alt="{{ config('detailsApp.name') }}"
+                    <img style="height: 7.5rem;" src="{{ asset('logo/name-logo.png') }}"
+                        alt="{{ config('detailsApp.name') }}"
                         class="h-12 w-auto object-contain transition-transform group-hover:scale-105">
                 </a>
                 <div class="brand-badge">
@@ -135,8 +136,8 @@
 
                 <!-- Mobile Brand Header -->
                 <div class="lg:hidden text-center mb-6 sm:mb-8">
-                    <img style="height: 5.5rem;" src="{{ asset('logo/name-logo.png') }}" alt="{{ config('detailsApp.name') }}"
-                        class="h-10 sm:h-12 mx-auto mb-2 sm:mb-3 object-contain">
+                    <img style="height: 5.5rem;" src="{{ asset('logo/name-logo.png') }}"
+                        alt="{{ config('detailsApp.name') }}" class="h-10 sm:h-12 mx-auto mb-2 sm:mb-3 object-contain">
                     <!--<h2 class="text-xl sm:text-2xl font-bold text-white">{{ config('detailsApp.name') }}</h2>-->
                     <p class="text-xs text-[#98A2C3]">Create Account</p>
                 </div>
@@ -169,7 +170,8 @@
                                     <i class="fa-solid fa-wallet"></i>
                                 </div>
                                 <div class="overflow-hidden">
-                                    <div class="text-[10px] uppercase font-bold tracking-wider text-[#98A2C3]">Connected
+                                    <div class="text-[10px] uppercase font-bold tracking-wider text-[#98A2C3]">
+                                        Connected
                                         Wallet Address</div>
                                     <div class="text-xs font-mono font-bold text-white truncate"
                                         id="connectedWalletDisplay">
@@ -187,13 +189,13 @@
 
                     <!-- Alert Messages -->
                     @if (session()->has('failedMsg'))
-                    <div class="auth-alert-error mb-6 flex items-start gap-3">
-                        <i class="fa-solid fa-circle-exclamation text-red-400 text-base mt-0.5"></i>
-                        <div>
-                            <span class="font-semibold text-red-200">Registration Warning:</span>
-                            <p class="mt-0.5 text-xs text-red-300">{{ session('failedMsg') }}</p>
+                        <div class="auth-alert-error mb-6 flex items-start gap-3">
+                            <i class="fa-solid fa-circle-exclamation text-red-400 text-base mt-0.5"></i>
+                            <div>
+                                <span class="font-semibold text-red-200">Registration Warning:</span>
+                                <p class="mt-0.5 text-xs text-red-300">{{ session('failedMsg') }}</p>
+                            </div>
                         </div>
-                    </div>
                     @endif
 
                     <!-- Main Form (Preserves exact route, method, inputs, and JavaScript element IDs) -->
@@ -214,7 +216,7 @@
                             </div>
                             <div class="mt-1" id="sponhtml"></div>
                             @error('sponsorid')
-                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -239,7 +241,7 @@
                                     placeholder="Enter Full Name" required>
                             </div>
                             @error('name')
-                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -255,7 +257,7 @@
                             </div>
                             <div class="mt-1 text-xs" id="emailhtml"></div>
                             @error('email')
-                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -308,16 +310,16 @@
                                 <select name="country" id="countrySelect" class="auth-input auth-input-has-icon">
                                     <option value="">Select Country</option>
                                     @foreach ($cdata as $country)
-                                    <option value="{{ $country['nicename'] }}"
-                                        data-phonecode="{{ $country['phonecode'] ?? ($country['phone_code'] ?? ($country['dial_code'] ?? '')) }}"
-                                        {{ old('country') == $country['nicename'] ? 'selected' : '' }}>
-                                        {{ $country['nicename'] }}
-                                    </option>
+                                        <option value="{{ $country['nicename'] }}"
+                                            data-phonecode="{{ $country['phonecode'] ?? ($country['phone_code'] ?? ($country['dial_code'] ?? '')) }}"
+                                            {{ old('country') == $country['nicename'] ? 'selected' : '' }}>
+                                            {{ $country['nicename'] }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
                             @error('country')
-                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -337,7 +339,7 @@
                                     required>
                             </div>
                             @error('mobile')
-                            <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
+                                <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -574,15 +576,15 @@
                             '<span class="text-[#10B981] font-semibold">OTP sent successfully! Please check your email.' +
                             response.otp + '</span>'
                         );
-                        // ' + response.otp + '
+                        //' + response.otp + '
                         startTimer();
                         $('#otpStatus').html(
                             '<span class="text-[#10B981] font-semibold">OTP sent! Check your email inbox.</span>'
                         );
                         $('#resendOtpBtn').prop('disabled', true);
-                        $('#otpInput').focus();
+                        $('#otpInput').val('').focus();
                         $('#otpText').html(response.otp);
-                        $('#otpInput').val(response.otp);
+                        $('#verifyOtpBtn').prop('disabled', true);
                     } else {
                         $('#emailhtml').html(response.data);
                         $('#sendOtpBtn').prop('disabled', false).html('Send OTP');

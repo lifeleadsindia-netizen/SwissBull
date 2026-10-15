@@ -1458,6 +1458,60 @@
                                             <i class="fas fa-gift me-1"></i> Earn 500 PEPE / msg (Max 10/day)
                                         </span>
                                     </div>
+                                    <style>
+                                        .wa-unified-field {
+                                            background: #0c1a2e !important;
+                                            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+                                            border-radius: 10px !important;
+                                            height: 46px;
+                                            transition: all 0.25s ease;
+                                            position: relative;
+                                            width: 100%;
+                                        }
+                                        .wa-unified-field:focus-within {
+                                            border-color: #00e676 !important;
+                                            box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.2) !important;
+                                        }
+                                        .wa-unified-field select.form-select {
+                                            background-color: transparent !important;
+                                            border: none !important;
+                                            box-shadow: none !important;
+                                            outline: none !important;
+                                            color: #ffffff !important;
+                                            font-size: 13px !important;
+                                            height: 100%;
+                                            padding-left: 8px !important;
+                                            cursor: pointer;
+                                        }
+                                        .wa-unified-field select.form-select option {
+                                            background-color: #0c1a2e !important;
+                                            color: #ffffff !important;
+                                        }
+                                        .wa-unified-field input.form-control {
+                                            background-color: transparent !important;
+                                            border: none !important;
+                                            box-shadow: none !important;
+                                            outline: none !important;
+                                            color: #ffffff !important;
+                                            font-size: 13.5px !important;
+                                            height: 100%;
+                                            padding: 0 6px !important;
+                                        }
+                                        .wa-unified-field input.form-control::placeholder {
+                                            color: rgba(255, 255, 255, 0.45) !important;
+                                            font-size: 12.5px;
+                                        }
+                                        .wa-btn-action {
+                                            height: 46px;
+                                            border-radius: 10px;
+                                            display: inline-flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            font-size: 13.5px;
+                                            font-weight: 700;
+                                        }
+                                    </style>
+
                                     <div class="row align-items-center g-3">
                                         <!-- Country Selection -->
                                         <div class="col-xl-4 col-lg-4 col-md-5">
@@ -1466,23 +1520,18 @@
                                                 <i class="fas fa-globe me-1 text-info"></i> Select Country <span
                                                     class="text-danger">*</span>
                                             </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-dark text-white border-secondary"
-                                                    style="border-color: rgba(255, 255, 255, 0.15) !important;">
-                                                    <i class="fas fa-flag text-info"></i>
-                                                </span>
+                                            <div class="wa-unified-field d-flex align-items-center px-3"
+                                                style="{{ ($waTodayCount ?? 0) >= 10 ? 'opacity: 0.6; pointer-events: none;' : '' }}">
+                                                <i class="fas fa-flag text-info flex-shrink-0" style="font-size: 14px;"></i>
                                                 <select id="wa_country"
-                                                    class="form-select bg-dark text-white border-secondary"
-                                                    style="border-color: rgba(255, 255, 255, 0.15) !important; background-color: #0c1a2e !important;"
+                                                    class="form-select flex-grow-1"
                                                     onchange="onWaCountryChange()"
                                                     {{ ($waTodayCount ?? 0) >= 10 ? 'disabled' : '' }}>
-                                                    <option value="" data-phonecode="" selected>Select Country
-                                                    </option>
+                                                    <option value="" data-phonecode="" selected>Select Country</option>
                                                     @if (isset($countries) && count($countries) > 0)
                                                     @foreach ($countries as $c)
                                                     <option value="{{ $c->nicename }}"
-                                                        data-phonecode="{{ $c->phonecode }}"
-                                                        style="background-color: #0c1a2e; color: #fff;">
+                                                        data-phonecode="{{ $c->phonecode }}">
                                                         {{ $c->nicename }} (+{{ $c->phonecode }})
                                                     </option>
                                                     @endforeach
@@ -1495,22 +1544,18 @@
                                         <div class="col-xl-5 col-lg-5 col-md-7">
                                             <label for="wa_mobile_local" class="text-white font-weight-bold mb-1"
                                                 style="font-size: 13px;">
-                                                <i class="fab fa-whatsapp me-1 text-success"></i> WhatsApp Mobile
-                                                Number <span class="text-danger">*</span>
+                                                <i class="fab fa-whatsapp me-1 text-success"></i> WhatsApp Mobile Number <span class="text-danger">*</span>
                                             </label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-dark text-white border-secondary"
-                                                    style="border-color: rgba(255, 255, 255, 0.15) !important;">
-                                                    <i class="fab fa-whatsapp text-success"></i>
-                                                </span>
-                                                <span class="input-group-text font-weight-bold border-secondary"
-                                                    id="wa_code_badge"
-                                                    style="background: rgba(0, 230, 118, 0.12); color: #00e676; border-color: rgba(255, 255, 255, 0.15) !important; min-width: 62px; justify-content: center; font-size: 13px;">
+                                            <div class="wa-unified-field d-flex align-items-center px-3"
+                                                style="{{ ($waTodayCount ?? 0) >= 10 ? 'opacity: 0.6; pointer-events: none;' : '' }}">
+                                                <i class="fab fa-whatsapp text-success flex-shrink-0" style="font-size: 17px;"></i>
+                                                <span id="wa_code_badge"
+                                                    class="font-weight-bold flex-shrink-0 ms-2 pe-2 me-2"
+                                                    style="color: #00e676; font-size: 13px; border-right: 1px solid rgba(255, 255, 255, 0.15); min-width: 36px; text-align: center; line-height: 1.2;">
                                                     +--
                                                 </span>
                                                 <input type="tel" id="wa_mobile_local"
-                                                    class="form-control bg-dark text-white border-secondary"
-                                                    style="border-color: rgba(255, 255, 255, 0.15) !important;"
+                                                    class="form-control flex-grow-1"
                                                     placeholder="Select country first" oninput="syncWaFullNumber()"
                                                     {{ ($waTodayCount ?? 0) >= 10 ? 'disabled' : '' }}>
                                                 <input type="hidden" id="wa_mobile" name="wa_mobile">
@@ -1527,7 +1572,7 @@
 
                                             @if (($waTodayCount ?? 0) >= 10)
                                             <button type="button"
-                                                class="btn btn-secondary w-100 py-2 font-weight-bold" disabled
+                                                class="btn btn-secondary w-100 wa-btn-action" disabled
                                                 style="opacity: 0.85;">
                                                 <i class="fas fa-check-circle text-success me-1"></i> Today's Limit Reached (10/10)
                                             </button>
@@ -1537,12 +1582,12 @@
                                             </small>
                                             @else
                                             <button type="button" id="btnVerifyWa" onclick="verifyWaMobile()"
-                                                class="btn btn-warning w-100 py-2 font-weight-bold">
+                                                class="btn btn-warning w-100 wa-btn-action">
                                                 <i class="fas fa-shield-alt me-1"></i> Verify Mobile Number
                                             </button>
 
                                             <button type="button" id="btnSendWa" onclick="processWaReferral()"
-                                                class="btn btn-success w-100 py-2 font-weight-bold"
+                                                class="btn btn-success w-100 wa-btn-action"
                                                 style="display: none; background-color: #00e676; border-color: #00e676; color: #000;">
                                                 <i class="fab fa-whatsapp me-1"></i> Send WhatsApp &amp; Claim 500 PEPE
                                             </button>
@@ -4128,7 +4173,7 @@ $referralLink = url('/member/register/' . $data['memberid']);
     <div class="modal-dialog modal-dialog-centered modal-lg" style="width:80%">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="achieverModalLabel">Dashboard Images</h5>
+                <h5 class="modal-title" id="achieverModalLabel">{{ !empty($achieverImages->first()->title) ? $achieverImages->first()->title : 'Dashboard Images' }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -4137,7 +4182,8 @@ $referralLink = url('/member/register/' . $data['memberid']);
                     <div class="carousel-inner">
                         @foreach ($achieverImages as $image)
                         <div
-                            class="carousel-item @if ($loop->first) active @endif">
+                            class="carousel-item @if ($loop->first) active @endif"
+                            data-title="{{ $image->title ?? '' }}">
                             <img src="{{ asset('uploads/' . $image->image) }}"
                                 class="d-block w-100" alt="{{ $image->title }}"
                                 style="max-height: 550px; object-fit: contain; background: #000;">
@@ -4170,6 +4216,22 @@ $referralLink = url('/member/register/' . $data['memberid']);
         }
         var achieverModal = new bootstrap.Modal(achieverModalEl);
         achieverModal.show();
+
+        var achieverCarousel = document.getElementById('achieverCarousel');
+        var achieverModalLabel = document.getElementById('achieverModalLabel');
+        if (achieverCarousel && achieverModalLabel) {
+            function updateAchieverTitle(e) {
+                var nextItem = e.relatedTarget || achieverCarousel.querySelector('.carousel-item.active');
+                if (nextItem) {
+                    var title = nextItem.getAttribute('data-title');
+                    if (title) {
+                        achieverModalLabel.textContent = title;
+                    }
+                }
+            }
+            achieverCarousel.addEventListener('slide.bs.carousel', updateAchieverTitle);
+            achieverCarousel.addEventListener('slid.bs.carousel', updateAchieverTitle);
+        }
     });
 </script>
 @endif

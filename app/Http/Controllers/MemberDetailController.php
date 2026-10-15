@@ -38,7 +38,7 @@ class MemberDetailController extends Controller
         $result['country'] = Country::where('name', $country)->first();
         $result['data'] = MemberDetail::where([['memberid', $memberid], ['country', $country]])->first();
         $result['dashMsg'] = DashMessage::orderby('rank', 'asc')->get();
-        $result['achieverImages'] = AchiversImage::orderBy('id', 'desc')->get();
+        $result['achieverImages'] = AchiversImage::orderByRaw('rank IS NULL, rank ASC, id DESC')->get();
 
         // Sync any missed Rule 3 direct activation rewards for active directs
         PepeRewardService::syncDirectActivationRewards($memberid);
