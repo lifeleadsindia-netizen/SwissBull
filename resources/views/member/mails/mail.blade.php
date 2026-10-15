@@ -14,11 +14,8 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #08090C 0%, #12151E 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
         }
 
         .email-container {
@@ -29,6 +26,9 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
             animation: slideIn 0.6s ease-out;
+            margin: 0 auto;
+            text-align: left;
+            display: inline-block;
         }
 
         @keyframes slideIn {
@@ -80,7 +80,7 @@
         }
 
         .logo-wrapper img {
-            width: 80px;
+            width: 150px;
             height: auto;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -430,7 +430,10 @@
     </style>
 </head>
 <body>
-    <div class="email-container">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #08090C 0%, #12151E 100%); min-height: 100vh; padding: 20px 0;">
+        <tr>
+            <td align="center" valign="top" style="padding: 20px;">
+    <div class="email-container" style="max-width:600px; width:100%; margin:0 auto; display:block;">
         <!-- Header Section -->
         <div class="email-header">
             <div class="logo-wrapper">
@@ -522,14 +525,18 @@
             <p class="signature">With Regards,</p>
             <p class="company-name">Team {{ config('detailsApp.name') }}</p>
             <div style="margin-top: 15px;">
-                <img src="{{ $message->embed(public_path('logo/logo-dark.png')) }}" alt="{{ config('detailsApp.name') }}" style="max-width: 60px; height: auto;">
+                <img src="{{ $message->embed(public_path('logo/logo-dark.png')) }}" alt="{{ config('detailsApp.name') }}" style="max-width: 130px; height: auto;">
             </div>
             <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">
                 © {{ date('Y') }} {{ config('detailsApp.name') }}. All rights reserved.
             </p>
         </div>
     </div>
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>
+
 
