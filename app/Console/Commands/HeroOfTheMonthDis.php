@@ -21,20 +21,17 @@ class HeroOfTheMonthDis extends Command
         // Step 1: Pichle month ke top direct business wale members nikalna
         $max = monthlyMaxBiz();
 
+        // Agar koi eligible member nahi mila to yahin se wapas ho jaye
         if (empty($max['memberid'])) {
-            $this->info('No eligible members found for Hero of the Month.');
-
-            return 0;
+            return;
         }
 
         $totalMember = count($max['memberid']);
         if ($totalMember == 0) {
-            $this->info('No eligible members found for Hero of the Month.');
-
-            return 0;
+            return;
         }
 
-        // Step 2: Pichle month ka Year aur Month nikalna
+        // Step 2: Pichle month (Last Month) ka Year aur Month nikalna
         $lastMonthYear = date('Y', strtotime('last month'));
         $lastMonthMonth = date('m', strtotime('last month'));
 
@@ -43,25 +40,18 @@ class HeroOfTheMonthDis extends Command
             ->whereMonth('created_at', $lastMonthMonth)
             ->sum('invest_amount');
 
+        // Agar pichle month koi investment nahi hua to return kar jaye
         if ($totalInvestment <= 0) {
-            $this->info('No investments found for last month.');
-
-            return 0;
+            return;
         }
 
-        // Step 4: Total investment ka 2% nikalna (Reward Pool)
+        // Step 4: Total investment ka 2% nikalna (Pool Amount)
         $poolAmount = ($totalInvestment * 2) / 100;
 
-        // Step 5: Har member ka barabar hissa (share) nikalna
+        // Step 5: Har member ka barabar share (hissa) nikalna
         $share = round($poolAmount / $totalMember, 2);
 
-        if ($share <= 0) {
-            $this->info('Reward share is 0.');
-
-            return 0;
-        }
-
-        // Step 6: Sabhi winner members ko share distribute karna
+        // Step 6: Sabhi winner members me reward distribute karna
         foreach ($max['memberid'] as $memberid) {
             $value = MemberDetail::where([['memberid', $memberid], ['status', 'Active']])->first();
             if (! $value) {
@@ -70,7 +60,7 @@ class HeroOfTheMonthDis extends Command
 
             $direct_biz = $value->direct_biz;
 
-            // 1. Reward record create karna
+            // 1. HeroOfTheMonthReward table me record save karna
             $new = new HeroOfTheMonthReward;
             $new->month = date('Y-m');
             $new->memberid = $memberid;
@@ -80,12 +70,12 @@ class HeroOfTheMonthDis extends Command
             $new->status = 'Paid';
             $new->save();
 
-            // 2. Member ke wallet me reward add karna
+            // 2. Member ke wallet me share add karna
             $wallet = $value->wallet;
             $value->wallet += $share;
             $value->save();
 
-            // 3. Ledger transfer entry banana
+            // 3. Wallet ledger transfer entry save karna
             walletTransfer(
                 $memberid,
                 $share,
@@ -95,9 +85,5 @@ class HeroOfTheMonthDis extends Command
                 'Hero of the month Reward Amount Added into wallet.'
             );
         }
-
-        $this->info("Hero of the month distributed: {$totalMember} member(s), \${$share} each.");
-
-        return 0;
     }
 }

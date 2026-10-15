@@ -60,7 +60,7 @@ class DailyIncomeDis extends Command
                 }
             }
 
-            if ($amount > 0) {
+            if ($amount > 0.00) {
 
                 $qry = new StakingIncome;
                 $qry->date = date('Y-m-d');
@@ -76,7 +76,8 @@ class DailyIncomeDis extends Command
                 $update = StakingDetail::where('id', $value->id)->first();
                 $update->installments += 1;
                 $update->invest_date = date('Y-m-d');
-                if ($balance <= $stak_amount) {
+                if ($cap != 0 && $balance <= $stak_amount) {
+                    $memUpdate->trading_wallet -= $tradingWalletAmount;
                     $update->status = 'Deactive';
                 }
                 $update->save();

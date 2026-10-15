@@ -16,6 +16,8 @@ class MonthlyDirectBizUpdate extends Command
      */
     public function handle()
     {
-        $update = MemberDetail::where('status', '!=', 'Temp')->update(['direct_biz' => 0]);
+        $update = MemberDetail::query()->update([
+            'direct_biz' => 0,
+        ]);
     }
 }
