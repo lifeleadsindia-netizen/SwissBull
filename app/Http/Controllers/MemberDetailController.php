@@ -1114,8 +1114,6 @@ class MemberDetailController extends Controller
      */
     public function promotionalBanners(Request $request)
     {
-        AdminMediaController::ensureBootstrapped();
-
         $memberid = session('MEMBER_ID');
         $member = MemberDetail::where('memberid', $memberid)->first();
         $data = $member;
@@ -1181,8 +1179,6 @@ class MemberDetailController extends Controller
      */
     public function businessPlanPdf(Request $request)
     {
-        AdminMediaController::ensureBootstrapped();
-
         $memberid = session('MEMBER_ID');
         $member = MemberDetail::where('memberid', $memberid)->first();
         $data = $member;
@@ -1249,8 +1245,6 @@ class MemberDetailController extends Controller
      */
     public function planVideo(Request $request)
     {
-        AdminMediaController::ensureBootstrapped();
-
         $memberid = session('MEMBER_ID');
         $member = MemberDetail::where('memberid', $memberid)->first();
         $data = $member;
@@ -1333,8 +1327,6 @@ class MemberDetailController extends Controller
      */
     public function tutorialVideo(Request $request)
     {
-        AdminMediaController::ensureBootstrapped();
-
         $memberid = session('MEMBER_ID');
         $member = MemberDetail::where('memberid', $memberid)->first();
         $data = $member;

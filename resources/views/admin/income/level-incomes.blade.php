@@ -51,8 +51,8 @@
                                         <th>{{ __('Date') }}</th>
                                         <th>{{ __('Member ID') }}</th>
                                         <th>{{ __('Level') }}</th>
-                                        <th>{{ __('Level ID') }}</th>
-                                        <th>{{ __('Name') }}</th>
+                                        {{-- <th>{{ __('Level ID') }}</th> --}}
+                                        {{-- <th>{{ __('Name') }}</th> --}}
                                         <th>{{ __('Downline') }}</th>
                                         <th>{{ __('Daily Team Biz') }}</th>
                                         <th>{{ __('Rate') }}</th>
@@ -68,8 +68,8 @@
                                             <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}</td>
                                             <td>{{ $list['memberid'] }}</td>
                                             <td>Level {{ $list['level'] }}</td>
-                                            <td>{{ $list['level_id'] }}</td>
-                                            <td>{{ !empty($list['name']) ? $list['name'] : getName($list['level_id']) }}</td>
+                                            {{-- <td>{{ $list['level_id'] }}</td> --}}
+                                            {{-- <td>{{ !empty($list['name']) ? $list['name'] : getName($list['level_id']) }}</td> --}}
                                             <td>$ {{ number_format($list['daily_team_biz'] )}}</td>
                                             <td>{{ $list['downline']  }}</td>
                                             <td>{{ $list['rate']  }}%</td>

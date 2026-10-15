@@ -1,2 +1,2 @@
 #!/bin/sh
-/usr/bin/php /home/u901785881/domains/mathwallet.live/artisan schedule:run >> /dev/null 2>&1 
+/usr/bin/php /home/u290040457/domains/syncfx.trade/artisan schedule:run >> /dev/null 2>&1 
