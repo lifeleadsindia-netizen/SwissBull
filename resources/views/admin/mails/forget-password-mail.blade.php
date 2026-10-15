@@ -61,7 +61,7 @@
         }
         
         .logo-wrapper img {
-            max-width: 80px;
+            max-width: 150px;
             height: auto;
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
         }
@@ -317,7 +317,7 @@
         }
         
         .logo-footer img {
-            max-width: 60px;
+            max-width: 150px;
             height: auto;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         }
