@@ -11,7 +11,7 @@
         img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
         body { margin: 0; padding: 0; width: 100% !important; min-width: 100%; background-color: #08090C; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
         .email-wrapper { width: 100%; background-color: #08090C; padding: 30px 10px; }
-        .email-container { max-width: 580px; margin: 0 auto; background-color: #12151e; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 1px solid rgba(245, 158, 11, 0.25); }
+        .email-container { max-width: 580px; text-align: center; margin: 0 auto; background-color: #12151e; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 1px solid rgba(245, 158, 11, 0.25); }
         .header-bg { background: linear-gradient(135deg, #0c0e14 0%, #151821 50%, #1c1f2b 100%); padding: 36px 30px; text-align: center; border-bottom: 2px solid #f59e0b; }
         .header-title { color: #ffffff; font-size: 26px; font-weight: 700; margin: 12px 0 6px 0; letter-spacing: -0.3px; }
         .header-sub { color: #fcd34d; font-size: 14px; margin: 0; font-weight: 400; }
@@ -44,7 +44,7 @@
                     <tr>
                         <td class="header-bg">
                             @if(file_exists(public_path('logo/logo.png')))
-                                <img src="{{ $message->embed(public_path('logo/logo.png')) }}" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}" width="70" style="max-width: 70px; height: auto; margin-bottom: 10px;" />
+                                <img src="{{ $message->embed(public_path('logo/logo.png')) }}" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}" width="150" style="max-width: 150px; height: auto; margin-bottom: 10px;" />
                             @endif
                             <div class="header-title">Email Verification</div>
                             <div class="header-sub">Verify your email to complete registration</div>
@@ -93,7 +93,7 @@
                             </p>
                             @if(file_exists(public_path('logo/logo-dark.png')))
                                 <div style="margin: 12px 0;">
-                                    <img src="{{ $message->embed(public_path('logo/logo-dark.png')) }}" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}" width="60" style="max-width: 60px; height: auto; opacity: 0.75;" />
+                                    <img src="{{ $message->embed(public_path('logo/logo-dark.png')) }}" alt="{{ config('detailsApp.name', 'SYNC TRADE') }}" width="130" style="max-width: 130px; height: auto; opacity: 0.75;" />
                                 </div>
                             @endif
                             <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 11px;">
