@@ -44,7 +44,7 @@ class DailyTeamInvestmentShare extends Command
                     if (count($downlineMemberIds) == 0) {
                         break;
                     }
-                    $dailyTeamBiz = StakingDetail::whereIn('memberid', $downlineMemberIds)->where('invest_date', date('Y-m-d', strtotime('-1 day')))->sum('trading_wallet_amount');
+                    $dailyTeamBiz = StakingDetail::whereIn('memberid', $downlineMemberIds)->whereDate('created_at', date('Y-m-d', strtotime('-1 day')))->sum('invest_amount');
 
                     $amount = $dailyTeamBiz * $rate / 100;
 
@@ -75,8 +75,6 @@ class DailyTeamInvestmentShare extends Command
                             'Level '.$level.' Daily Team Investment Share Income Amount Added into wallet.'
                         );
 
-                    } else {
-                        break;
                     }
                 }
             }
