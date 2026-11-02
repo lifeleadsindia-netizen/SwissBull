@@ -6,8 +6,11 @@ use App\Models\MemberDetail;
 use App\Models\PepeRewardLog;
 use App\Models\WhatsappReferral;
 use App\Models\WhatsappReferralMessage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Throwable;
 
 class PepeRewardService
 {

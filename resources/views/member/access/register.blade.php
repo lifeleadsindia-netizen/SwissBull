@@ -35,6 +35,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="{{ asset('uassets/vendor/sweetalert2/dist/sweetalert2.min.css') }}">
+
     <!-- Custom Authentication Theme CSS -->
     <link rel="stylesheet" href="{{ asset('uassets/css/member-auth.css') }}">
 </head>
@@ -256,6 +259,8 @@
                                     id="userEmail" placeholder="Enter Email Address" required>
                             </div>
                             <div class="mt-1 text-xs" id="emailhtml"></div>
+                            {{-- <div class="mt-1 text-xs" style="color: #FF0000; font-size: 14px;">*** Verify Email OTP to continue ***</div> --}}
+                            <!--<span style="color: #FF0000; font-size: 14px;">Verify Email OTP to continue</span>-->
                             @error('email')
                                 <span class="text-xs text-red-400 font-semibold mt-1 block">{{ $message }}</span>
                             @enderror
@@ -307,7 +312,8 @@
                             </label>
                             <div class="auth-field-wrapper">
                                 <i class="fa-solid fa-earth-americas auth-input-icon"></i>
-                                <select name="country" id="countrySelect" class="auth-input auth-input-has-icon">
+                                <select name="country" id="countrySelect" class="auth-input auth-input-has-icon"
+                                    required>
                                     <option value="">Select Country</option>
                                     @foreach ($cdata as $country)
                                         <option value="{{ $country['nicename'] }}"
@@ -345,7 +351,7 @@
 
                         <!-- Submit Button (Preserved ID approveBtn) -->
                         <div class="pt-3">
-                            <button type="submit" id="approveBtn" class="btn-auth-primary" disabled>
+                            <button type="submit" id="approveBtn" class="btn-auth-primary">
                                 <span>Sign me up</span>
                                 <i class="fa-solid fa-arrow-right text-sm"></i>
                             </button>
@@ -373,6 +379,13 @@
     <script src="https://unpkg.com/@walletconnect/web3-provider@1.7.1/dist/umd/index.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        if (typeof Swal === 'undefined') {
+            document.write('<script src="{{ asset('uassets/vendor/sweetalert2/dist/sweetalert2.min.js') }}"><\/script>');
+        }
+    </script>
 
     <script>
         $(document).ready(function() {
@@ -389,24 +402,76 @@
         })
     </script>
     <script>
-        let emailVerified = false;
+        let emailVerified = {{ session('email_verified') && session('verified_email') ? 'true' : 'false' }};
         let timer = null;
         let countdown = 60;
         const rootSponsorId = @json($rootSponsorId ?? '');
 
+        function showVerifyEmailPopup() {
+            // Ensure OTP section is visible for user to enter/verify OTP
+            $('#otpSection').slideDown();
+            $('#otpBtnGroup').show();
+            if (!emailVerified) {
+                if (!$('#sendOtpBtn').is(':visible')) {
+                    $('#sendOtpBtn').show().prop('disabled', false);
+                }
+            }
+
+            var emailVal = $.trim($('#userEmail').val());
+            if (!emailVal || !isValidEmail(emailVal)) {
+                $('#userEmail').focus();
+            } else if (!emailVerified && $('#otpInput').val().length !== 6) {
+                $('#otpInput').focus();
+            }
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Verify E-Mail OTP to continue.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#F59E0B'
+                });
+            } else {
+                alert('Verify E-Mail OTP to continue.');
+            }
+        }
+
         function checkFormValidity() {
-            const isSponsorValid = $('#noSponsorId').is(':checked') || $.trim($('#sponsor').val()).length > 0;
-            const isNameValid = $.trim($('input[name="name"]').val()).length > 0;
-            const isEmailValid = emailVerified;
-            const isCountryValid = $.trim($('#countrySelect').val()).length > 0;
-            const isMobileValid = $.trim($('#mobile').val()).length >= 4;
-
-            const isFormValid = isSponsorValid && isNameValid && isEmailValid && isCountryValid && isMobileValid;
-
-            $('#approveBtn').prop('disabled', !isFormValid);
+            // Button is kept enabled so clicking without email verification triggers the error popup
         }
 
         $(document).ready(function() {
+            if (emailVerified) {
+                $('#emailhtml').html('<span class="text-[#10B981] font-bold">✓ Email verified</span>');
+            }
+
+            // Reset verification if user changes their email address
+            $('#userEmail').on('input', function() {
+                if (emailVerified) {
+                    emailVerified = false;
+                    $('#emailhtml').html('');
+                    $('#otpSection').show();
+                    $('#otpBtnGroup').show();
+                    $('#sendOtpBtn').show().prop('disabled', false).html('Send OTP');
+                    $('#resendOtpBtn').show().prop('disabled', true);
+                    $('#verifyOtpBtn').show().prop('disabled', true).html('Verify');
+                    $('#otpInput').prop('disabled', false).val('');
+                    $('#otpStatus').html(
+                        '<span class="text-amber-400 font-semibold">Email changed. Please verify OTP again.</span>'
+                    );
+                }
+            });
+
+            // Click handler on "Sign me up" button
+            $('#approveBtn').on('click', function(e) {
+                if (!emailVerified) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showVerifyEmailPopup();
+                    return false;
+                }
+            });
             checkFormValidity();
 
             $('#sponsor, #noSponsorId, input[name="name"], #userEmail, #countrySelect, #mobile').on(
@@ -541,11 +606,9 @@
 
             // Form submission handler
             $('form').on('submit', function(e) {
-                if (!emailVerified || $('#approveBtn').is(':disabled')) {
+                if (!emailVerified) {
                     e.preventDefault();
-                    $('#otpStatus').html(
-                        '<span class="text-red-400 font-semibold">Please verify your email address and fill all required fields before submitting.</span>'
-                    );
+                    showVerifyEmailPopup();
                     return false;
                 }
 
@@ -573,8 +636,7 @@
                 success: function(response) {
                     if (response.code == 1) {
                         $('#emailhtml').html(
-                            '<span class="text-[#10B981] font-semibold">OTP sent successfully! Please check your email.' +
-                            response.otp + '</span>'
+                            '<span class="text-[#10B981] font-semibold">OTP sent successfully! Please check your email.</span>'
                         );
                         //' + response.otp + '
                         startTimer();

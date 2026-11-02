@@ -69,7 +69,7 @@
                                              <td>{{ !empty($list['name']) ? $list['name'] : getName($list['level_id']) }}</td>
                                              <td>{{ $list['rate'] ?? levelRate($list['level']) }}%</td>
                                              <td>$ {{ number_format($list['staking_income'] ?? $list['package'] ?? 0, 2) }}</td>
-                                             <td>$ {{ number_format($list['amount'], 2) }}</td>
+                                             <td>$ {{ number_format($list['amount'], 4) }}</td>
                                              <td>
                                                  @if ($list['status'] == 'Paid')
                                                      <label class="badge badge-success">{{ $list['status'] }}</label>

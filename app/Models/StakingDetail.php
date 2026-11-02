@@ -14,6 +14,8 @@ class StakingDetail extends Model
 
     protected $table = 'staking_details';
 
+    protected $guarded = [];
+
     /**
      * Relationship to the member.
      */

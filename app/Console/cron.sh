@@ -1,2 +1,2 @@
 #!/bin/sh
-/usr/bin/php /home/u290040457/domains/syncfx.trade/artisan schedule:run >> /dev/null 2>&1 
+/opt/alt/php83/usr/bin/php /home/u290040457/domains/syncfx.trade/public_html/artisan schedule:run

@@ -245,7 +245,7 @@ class StakingRoiService
             // Minimum 4-decimal precision per specification
             $amount = round($dailyRoi * ($rate / 100), 4);
 
-            if ($amount > 0 && $sponsor->status === 'Active') {
+            if ($amount > 0 && $sponsor->status === 'Active' && $sponsor->hasActiveStaking()) {
                 // Prevent duplicate record on same date for same sponsor, level and downline
                 $alreadyPaid = RoiLevelIncome::where([
                     ['memberid', $sponsor->memberid],

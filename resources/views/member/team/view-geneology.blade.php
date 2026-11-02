@@ -222,9 +222,11 @@
                                             $memberAvatarStatus =
                                                 $memberStatusLower === 'active'
                                                     ? 'status-active'
-                                                    : ($memberStatusLower === 'temp'
-                                                        ? 'status-temp'
-                                                        : 'status-neutral');
+                                                    : ($memberStatusLower === 'deactive'
+                                                        ? 'status-deactive'
+                                                        : ($memberStatusLower === 'temp'
+                                                            ? 'status-temp'
+                                                            : 'status-neutral'));
                                         @endphp
 
                                         <a href="{{ url('member/team/view-geneology') }}/{{ is_object($member) ? $member->id ?? $member->memberid : $member['id'] ?? $member['memberid'] }}"
@@ -257,7 +259,7 @@
                                                 <div class="genealogy-member-tooltip">
                                                     <div class="genealogy-tooltip-header">
                                                         <span>{{ $memberName }}</span>
-                                                        <em>{{ $memberStatus }}</em>
+                                                        <em>{{ $memberStatus === 'Temp' ? 'Inactive' : $memberStatus }}</em>
                                                     </div>
                                                     <div class="genealogy-tooltip-row"><span>Member
                                                             ID</span><strong>{{ $memberId }}</strong></div>

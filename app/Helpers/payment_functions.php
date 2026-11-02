@@ -10,6 +10,9 @@ use App\Models\TeamTradingProfitConfiction;
 use App\Models\WalletTransfer;
 use App\Models\WithdrawalIncome;
 use App\Models\WithdrawalRequest;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 function walletTransfer($memberid, $amount, $type, $wallet, $walletType, $text)
 {
@@ -134,7 +137,7 @@ function withdrawalIncome($sponsorid, $memberid, $name, $id, $type)
                 $status = $var->status;
                 $downline = $var->downline;
 
-                if ($amount > 0 && $status == 'Active') {
+                if ($amount > 0 && $status === 'Active' && $var->hasActiveStaking()) {
 
                     $insert = new WithdrawalIncome;
                     $insert->memberid = $sponsorid;
@@ -231,7 +234,7 @@ function directIncome($sponsorid, $memberid, $name, $_amount, $type = 'Direct In
                 }
                 $status = $var->status;
 
-                if ($amount > 0 && $status == 'Active') {
+                if ($amount > 0 && $status === 'Active' && $var->hasActiveStaking()) {
                     $insert = new DirectIncome;
                     $insert->memberid = $sponsorid;
                     $insert->package = $_amount;

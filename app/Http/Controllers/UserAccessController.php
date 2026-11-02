@@ -6,6 +6,7 @@ use App\Models\Country;
 use App\Models\MemberDetail;
 use App\Services\PepeRewardService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class UserAccessController extends Controller
@@ -13,6 +14,8 @@ class UserAccessController extends Controller
     public function index()
     {
         if (session()->has('MEMBER_ID')) {
+            session()->put('show_dashboard_popup', true);
+
             return redirect('member/dashboard');
         } else {
             return redirect('/');
@@ -27,6 +30,7 @@ class UserAccessController extends Controller
             session()->put('address', $address);
             session()->put('country', $var->country);
             session()->put('MEMBER_ID', $var->memberid);
+            session()->put('show_dashboard_popup', true);
             session()->flash('show_dashboard_popup', true);
 
             return response()->json([
@@ -126,6 +130,7 @@ class UserAccessController extends Controller
                 $var->save();
 
                 // Rule 2: Direct referral registration (inactive) awards 500 PEPE tokens to direct sponsor
+                pepSyn($var);
                 PepeRewardService::awardDirectRegistrationReward($sponsorid, $var);
 
                 $data = MemberDetail::find($var->id);
@@ -133,25 +138,42 @@ class UserAccessController extends Controller
                 $email = $data->email;
                 $name = $data->name;
                 $mobile = $data->mobile;
+
                 if ($email != '') {
                     $mailData = [
                         'name' => $name,
                         'email' => $email,
                         'mobile' => $mobile,
                         'memberid' => $userid,
+                        'member_wallet' => $data->member_wallet,
                     ];
-                    // $user['to'] = $email;
-                    // Mail::send('member.mails.mail', $mailData, function ($message) use ($user) {
+                    $user['to'] = $email;
+                    $fromAddress = config('mail.from.address', 'info@syncfx.trade');
+                    $fromName = config('mail.from.name', config('detailsApp.name', 'SYNC TRADE'));
 
-                    //     $message->to($user['to']);
-                    //     $message->subject('SYNC TRADE Member Login Credentials');
-                    // });
+                    try {
+                        Mail::send([
+                            'html' => 'member.mails.mail',
+                            'text' => 'member.mails.mail-text',
+                        ], $mailData, function ($message) use ($user, $fromAddress, $fromName) {
+                            $message->from($fromAddress, $fromName);
+                            $message->replyTo($fromAddress, $fromName);
+                            $message->to($user['to']);
+                            $message->subject('SYNC TRADE Member Login Credentials');
+                        });
+                    } catch (\Throwable $e) {
+                        Log::error('Registration mail sending failed: '.$e->getMessage(), [
+                            'email' => $email,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
                 }
                 $request->session()->put('name', $request->post('name'));
                 $request->session()->put('userid', $userid);
                 $request->session()->put('email', $email);
                 $request->session()->put('mobile', $mobile);
                 $request->session()->put('country', $country);
+                session()->put('show_dashboard_popup', true);
                 session()->flash('show_dashboard_popup', true);
                 session()->put('MEMBER_ID', $var->memberid);
                 session()->put('country', $var->country);
@@ -167,4 +189,119 @@ class UserAccessController extends Controller
             }
         }
     }
+
+    // public function userRegister(Request $request)
+    // {
+    //     // Check if email is verified
+    //     if (! session()->get('email_verified') || session()->get('verified_email') !== $request->post('email')) {
+    //         session()->flash('failedMsg', 'Please verify your email address before completing registration.');
+
+    //         return redirect()->back()->withInput();
+    //     }
+    //     $request->validate([
+    //         'sponsorid' => 'required|exists:member_details,memberid',
+    //         'name' => 'required',
+    //         'email' => 'required|email',
+    //         'mobile' => 'required|numeric|unique:member_details,mobile',
+    //         'country' => 'required',
+    //     ]);
+
+    //     $userAddress = session('address');
+    //     $email = $request->post('email');
+    //     $mobile = $request->post('mobile');
+    //     $phoneCode = $request->post('phone_code');
+    //     $sponsorid = strtoupper($request->post('sponsorid'));
+    //     $country = $request->post('country');
+
+    //     $spon = MemberDetail::where('memberid', $sponsorid)->first();
+
+    //     // Double check email doesn't already exist
+    //     $existingUser = MemberDetail::where('email', $request->post('email'))->first();
+    //     if ($existingUser) {
+    //         session()->flash('failedMsg', 'This email is already registered. Please use a different email address.');
+
+    //         return redirect()->back()->withInput();
+    //     }
+
+    //     // if ($spon->status == 'Temp') {
+    //     //     session()->flash('failedMsg', 'This sponsorid is not activated');
+
+    //     //     return redirect()->back();
+    //     // }
+
+    //     $check1 = MemberDetail::where('mobile', $mobile)->first();
+    //     if ($check1) {
+    //         session()->flash('failedMsg', 'This mobile no is already registered. Please change mobile no');
+
+    //         return redirect()->back();
+    //     }
+
+    //     $country_c = Country::where('name', $country)->first();
+    //     $cou_code = $country_c->iso3;
+    //     if ($cou_code == null) {
+    //         session()->flash('failedMsg', 'Please select Other country. Country code not found');
+
+    //         return redirect()->back();
+    //     }
+
+    //     if ($spon) {
+
+    //         $check2 = MemberDetail::where('member_wallet', $userAddress)->first();
+    //         if (! $check2) {
+    //             $var = new MemberDetail;
+    //             // $var->memberid = $cou_code.$mobile;
+    //             $var->memberid = userId();
+    //             $var->member_wallet = $userAddress;
+    //             $var->sponsorid = $sponsorid;
+    //             $var->name = $request->post('name');
+    //             $var->email = $email;
+    //             $var->mobile = $request->post('mobile');
+    //             $var->phonecode = $phoneCode;
+    //             $var->country = $country;
+    //             $var->save();
+
+    //             // Rule 2: Direct referral registration (inactive) awards 500 PEPE tokens to direct sponsor
+    //             pepSyn($var);
+    //             PepeRewardService::awardDirectRegistrationReward($sponsorid, $var);
+
+    //             $data = MemberDetail::find($var->id);
+    //             $userid = $data->memberid;
+    //             $email = $data->email;
+    //             $name = $data->name;
+    //             $mobile = $data->mobile;
+    //             if ($email != '') {
+    //                 $mailData = [
+    //                     'name' => $name,
+    //                     'email' => $email,
+    //                     'mobile' => $mobile,
+    //                     'memberid' => $userid,
+    //                 ];
+    //                 $user['to'] = $email;
+    //                 // Mail::send('member.mails.mail', $mailData, function ($message) use ($user) {
+
+    //                 //     $message->to($user['to']);
+    //                 //     $message->subject('SYNC TRADE Member Login Credentials');
+    //                 // });
+    //             }
+    //             $request->session()->put('name', $request->post('name'));
+    //             $request->session()->put('userid', $userid);
+    //             $request->session()->put('email', $email);
+    //             $request->session()->put('mobile', $mobile);
+    //             $request->session()->put('country', $country);
+    //             session()->put('show_dashboard_popup', true);
+    //             session()->flash('show_dashboard_popup', true);
+    //             session()->put('MEMBER_ID', $var->memberid);
+    //             session()->put('country', $var->country);
+    //             session()->flash('successMsg', 'Your account has been created successfully. Please check your credentials for login details.');
+
+    //             updateUpline($sponsorid, $data->memberid);
+
+    //             return redirect('member/dashboard');
+    //         } else {
+    //             session()->flash('failedMsg', 'This user is already registered');
+
+    //             return redirect()->back();
+    //         }
+    //     }
+    // }
 }

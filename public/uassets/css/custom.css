@@ -258,17 +258,24 @@ body,
     align-items: center !important;
 }
 
+.nav-control,
+.nav-header .nav-control,
 .header .nav-control {
     color: var(--mw-text-main);
+    cursor: pointer;
 }
 
+.nav-control .hamburger,
+.nav-header .nav-control .hamburger,
 .header .nav-control .hamburger {
     cursor: pointer;
 }
 
+.nav-control .hamburger .line,
+.nav-header .nav-control .hamburger .line,
 .header .nav-control .hamburger .line {
-    background-color: var(--mw-gold-primary) !important;
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+    background-color: var(--mw-gold-primary, #F59E0B) !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.6) !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -391,7 +398,7 @@ body,
     position: relative !important;
 }
 
-.header-profile2 > .nav-link {
+.header-profile2>.nav-link {
     cursor: pointer !important;
     padding: 0 !important;
     display: flex !important;
@@ -417,7 +424,7 @@ body,
 }
 
 .header-profile2 .dropdown-menu.show,
-.header-profile2.show > .dropdown-menu {
+.header-profile2.show>.dropdown-menu {
     display: block !important;
     animation: profileDropdownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -427,6 +434,7 @@ body,
         opacity: 0;
         transform: translateY(-8px) scale(0.96);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -598,8 +606,8 @@ body,
 }
 
 /* MetisMenu Navigation */
-.dlabnav .metismenu > li,
-[data-sidebar-style="full"][data-layout="vertical"] .dlabnav .metismenu > li {
+.dlabnav .metismenu>li,
+[data-sidebar-style="full"][data-layout="vertical"] .dlabnav .metismenu>li {
     padding: 0 4px !important;
 }
 
@@ -869,14 +877,34 @@ body,
     .nav-header .nav-control {
         position: static !important;
         transform: none !important;
-        margin-left: 2px !important;
+        margin-left: 3px !important;
         margin-right: 4px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         flex-shrink: 0 !important;
-        width: 32px !important;
-        height: 32px !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 8px !important;
+        background: rgba(245, 158, 11, 0.15) !important;
+        border: 1px solid rgba(245, 158, 11, 0.45) !important;
+        cursor: pointer !important;
+    }
+
+    .nav-header .nav-control .hamburger {
+        padding: 4px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    .nav-header .nav-control .hamburger .line {
+        background-color: #F59E0B !important;
+        height: 2.5px !important;
+        width: 18px !important;
+        margin: 2px auto !important;
+        border-radius: 2px !important;
     }
 
     /* 2. Top Header Bar */
@@ -1658,4 +1686,80 @@ table.dataTable tbody tr:hover {
         margin: 2px 6px !important;
         padding: 10px 14px !important;
     }
+}
+
+/* ==========================================================================
+   PAGINATION STYLING (LUXURY DARK & OBSIDIAN / NEON GREEN / GOLD ACCENT)
+   ========================================================================== */
+.pagination {
+    margin-bottom: 0 !important;
+    display: inline-flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    align-items: center !important;
+    padding-left: 0 !important;
+    list-style: none !important;
+}
+
+.pagination .page-item {
+    margin: 0 !important;
+}
+
+.pagination .page-item .page-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    padding: 0 12px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #CBD5E1 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 8px !important;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: none !important;
+    user-select: none !important;
+}
+
+.pagination .page-item .page-link:hover {
+    color: #00E676 !important;
+    background: rgba(0, 230, 118, 0.15) !important;
+    border-color: rgba(0, 230, 118, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(0, 230, 118, 0.2) !important;
+    transform: translateY(-1px) !important;
+}
+
+.pagination .page-item.active .page-link {
+    color: #08090C !important;
+    font-weight: 700 !important;
+    background: linear-gradient(135deg, #00E676 0%, #10B981 100%) !important;
+    border-color: #00E676 !important;
+    box-shadow: 0 4px 14px rgba(0, 230, 118, 0.4) !important;
+    cursor: default !important;
+    transform: none !important;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: rgba(255, 255, 255, 0.22) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Defensive CSS: in case any pagination view ever renders an SVG */
+.pagination svg,
+nav[role="navigation"] svg,
+nav svg {
+    width: 14px !important;
+    height: 14px !important;
+    max-width: 14px !important;
+    max-height: 14px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
 }

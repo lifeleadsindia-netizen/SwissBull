@@ -148,8 +148,9 @@
                         <input type="hidden" name="id" id="pdf_id">
 
                         <div class="form-group mb-3">
-                            <label class="form-label font-weight-bold">{{ __('Document Title') }} <span class="text-danger">*</span></label>
+                            <label class="form-label font-weight-bold">{{ __('PDF Name / Document Title') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="title" id="pdf_title" placeholder="e.g. SYNC TRADE Global Business Plan" required>
+                            <small class="text-muted d-block mt-1">This name will appear on the PDF card, in-app viewer, and downloaded file.</small>
                         </div>
 
                         <div class="row">

@@ -64,7 +64,9 @@
                             <div class="form-group">
                                 <label>Wallet Type</label>
                                 <select class="form-control" name="wallet_type">
-                                    <option value="P2P">Fund Wallet</option>
+                                    <option value="">Select Wallet</option>
+                                    <option value="Fund Wallet">Fund Wallet</option>
+                                    <option value="Income Wallet">Income Wallet</option>
                                 </select>
                                 @error('wallet_type')
                                     <span class="text-danger">{{ $message }}</span>

@@ -45,10 +45,10 @@
     'admin.saveDailyTeamInvestmentShare'
     );
 
-    $isRoiSection = request()->is(
+    $isTradingPackageSection = request()->is(
     'admin/income/monthly-trading-profit*',
     'admin/income/roi-incomes*',
-    'admin/income/roi-details*'
+    'admin/income/trading-profite-details*'
     ) || request()->routeIs(
     'admin.income.monthlyTradingProfit'
     );
@@ -157,15 +157,23 @@
         </div>
     </div>
 
+    <div class="nav-item {{ (request()->is('*trade*') || $segment1 == 'alerts' || $segment1 == 'buttons'||$segment1 == 'badges'||$segment1 == 'navigation') ? 'active open' : '' }} has-sub">
+        <a href="#"><i class="ik ik-dollar-sign"></i><span>{{ __('Add Trading Profit')}}</span></a>
+        <div class="submenu-content">
+            <a href="{{url('admin/trade/add-trading-profit')}}" class="menu-item {{ request()->is('*trade/add-trading-profit') ? 'active' : '' }}">{{ __('Add Trading Profit')}}</a>
+            <a href="{{url('admin/trade/add-trading-profit-details')}}" class="menu-item {{ request()->is('*trade/add-trading-profit-details') ? 'active' : '' }}">{{ __('Add Trading Profit Details')}}</a>
+        </div>
+    </div>
+
 
     <div
-        class="nav-item {{ $isRoiSection ? 'active open' : '' }} has-sub">
-        <a href="#"><i class="ik ik-credit-card"></i><span>{{ __('ROI Section') }}</span></a>
+        class="nav-item {{ $isTradingPackageSection ? 'active open' : '' }} has-sub">
+        <a href="#"><i class="ik ik-credit-card"></i><span>{{ __('Trading Package Section') }}</span></a>
         <div class="submenu-content">
             <a href="{{ url('admin/income/monthly-trading-profit') }}"
                 class="menu-item {{ (request()->is('admin/income/monthly-trading-profit*', 'admin/income/roi-incomes*') || request()->routeIs('admin.income.monthlyTradingProfit')) ? 'active' : '' }}">{{ __('Monthly Trading Profit') }}</a>
-            <a href="{{ url('admin/income/roi-details') }}"
-                class="menu-item {{ request()->is('admin/income/roi-details*') ? 'active' : '' }}">{{ __('Trading Profit Details') }}</a>
+            <a href="{{ url('admin/income/trading-profite-details') }}"
+                class="menu-item {{ request()->is('admin/income/trading-profite-details') ? 'active' : '' }}">{{ __('Trading Profit Details') }}</a>
         </div>
     </div>
 

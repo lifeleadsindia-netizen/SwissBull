@@ -1114,10 +1114,14 @@
                                             <span class="mb-status-badge active">
                                                 <span class="mb-status-dot"></span> Active
                                             </span>
+                                            @elseif (strtolower(trim($data['status'] ?? '')) === 'deactive')
+                                            <span class="mb-status-badge deactive" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.35);">
+                                                <span class="mb-status-dot" style="background: #EF4444;"></span> Deactive
+                                            </span>
                                             @else
                                             <span class="mb-status-badge inactive">
                                                 <span class="mb-status-dot"></span>
-                                                {{ $data['status'] == 'Temp' ? 'Inactive' : 'Blocked' }}
+                                                {{ $data['status'] == 'Temp' ? 'Inactive' : ($data['status'] ?? 'Inactive') }}
                                             </span>
                                             @endif
                                         </h3>
@@ -1195,7 +1199,7 @@
                                                 <i class="fab fa-whatsapp text-success me-2" style="font-size: 32px;"></i>
                                                 <h2 class="text-white font-weight-bold mb-0"
                                                     style="font-size: 28px; letter-spacing: 1px;">
-                                                    DAILY <span style="color: #00e676;">PROMOTION</span>
+                                                    PROMOTION <span style="color: #00e676;">AIRDROP</span>
                                                 </h2>
                                             </div>
                                             <a href="{{ url('/member/whatsapp/referral-details') }}"
@@ -1222,17 +1226,17 @@
                                             </div>
                                         </div>
                                         <!-- Promotional Note Box -->
-                                        <div class="p-3 rounded"
-                                            style="background: rgba(0, 230, 118, 0.08); border: 1px solid rgba(0, 230, 118, 0.3);">
-                                            <div class="d-flex align-items-start">
-                                                <i class="fab fa-whatsapp me-2 mt-1"
-                                                    style="color: #00e676; font-size: 20px;"></i>
-                                                <p class="mb-0 text-white" style="font-size: 13px; line-height: 1.5;">
-                                                    Promote your Referral Link. Send WhatsApp messages to earn <strong
-                                                        style="color: #00e676;">500 PEPE Token</strong> per message (Max 10 messages/day = <strong style="color: #00e676;">5,000 PEPE/day</strong>). Plus earn <strong style="color: #00e676;">500 PEPE</strong> on Direct Registration and <strong style="color: #00e676;">500 PEPE</strong> on Direct Activation!
-                                                </p>
-                                            </div>
-                                        </div>
+                                        <!--<div class="p-3 rounded"-->
+                                        <!--    style="background: rgba(0, 230, 118, 0.08); border: 1px solid rgba(0, 230, 118, 0.3);">-->
+                                        <!--    <div class="d-flex align-items-start">-->
+                                        <!--        <i class="fab fa-whatsapp me-2 mt-1"-->
+                                        <!--            style="color: #00e676; font-size: 20px;"></i>-->
+                                        <!--        <p class="mb-0 text-white" style="font-size: 13px; line-height: 1.5;">-->
+                                        <!--            Promote your Referral Link. Send WhatsApp messages to earn <strong-->
+                                        <!--                style="color: #00e676;">500 PEPE Token</strong> per message (Max 10 messages/day = <strong style="color: #00e676;">5,000 PEPE/day</strong>). Plus earn <strong style="color: #00e676;">500 PEPE</strong> on Direct Registration and <strong style="color: #00e676;">500 PEPE</strong> on Direct Activation!-->
+                                        <!--        </p>-->
+                                        <!--    </div>-->
+                                        <!--</div>-->
                                     </div>
 
                                     <div class="col-lg-5 col-md-12">
@@ -2782,8 +2786,9 @@
                                     alt="">
                                 <h3 class="mt-2 mb-2 text-white">Congratulations
                                 </h3>
-                                <h2 class="mb-0 text-white">{{ $data['memberid'] }}</h2>
-                                <h4 class="mb-0 mt-3 text-white">{{ getName($data['memberid']) }}</h4>
+                                <h2 class="mb-0 text-white">{{ $data['memberid'] }}</h2><br>
+                                <h3 class="mb-0 text-yellow">Partnership Rank: <span class="mb-0 mt-3 text-white"> {{ $data['partnership_rank'] }}</span></h3>
+                                
                             </div>
                             <div class="card-body pt-3 pb-4 px-3 px-md-4 mt-auto" style="background-color: #0c0e14;">
                                 <div class="row g-3 text-center">
@@ -2838,7 +2843,7 @@
                                                 style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(12, 14, 20, 0.95) 100%); border: 1px solid rgba(245, 158, 11, 0.28); box-shadow: 0 4px 14px rgba(0,0,0,0.35);">
                                                 <div class="d-flex align-items-center justify-content-between mb-1 mb-sm-2">
                                                     <span class="text-uppercase text-white-50 font-weight-bold"
-                                                        style="font-size: clamp(0.62rem, 1.1vw, 0.72rem); letter-spacing: 0.04em;">Monthly Direct</span>
+                                                        style="font-size: clamp(0.62rem, 1.1vw, 0.72rem); letter-spacing: 0.04em;">Monthly Level-1 Business</span>
                                                     <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                                                         style="width: 28px; height: 28px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.8rem; border: 1px solid rgba(245, 158, 11, 0.35);">
                                                         <i class="fa-solid fa-hand-holding-dollar"></i>
@@ -2864,7 +2869,7 @@
                                                     </div>
                                                 </div>
                                                 <h4 class="mb-0 text-white font-weight-bold" style="font-size: clamp(0.95rem, 1.8vw, 1.25rem); letter-spacing: -0.01em;">
-                                                    $ {{ number_format((float) ($data['daily_team_biz'] + $data['part_daily_team_biz']), 2) }}
+                                                    $ {{ number_format((float) ($data['daily_team_biz']), 2) }}
                                                 </h4>
                                                 <small class="text-white-50 d-none d-sm-inline-block" style="font-size: 0.68rem;">Team turnover</small>
                                             </div>
@@ -2886,9 +2891,14 @@
                                                     <h4 class="mb-0 text-white font-weight-bold" style="font-size: clamp(0.95rem, 1.8vw, 1.25rem);">
                                                         {{ $data['downline'] }}
                                                     </h4>
-                                                    <small class="text-white-50" style="font-size: 0.7rem;">Active</small>
+                                                    <small class="text-white-50" style="font-size: 0.7rem;">Active Direct</small>
                                                 </div>
-                                                <small class="text-white-50 d-none d-sm-inline-block" style="font-size: 0.68rem;">Team network</small>
+                                                @php
+                                                    $totalTeamCount = (int) ($totalTeamMembers ?? totalLevelMembers($data['memberid']));
+                                                @endphp
+                                                <small class="text-white-50 d-inline-block" style="font-size: 0.68rem;" title="Total IDs in your team downline">
+                                                    Team Network: <strong class="text-white font-weight-bold">{{ number_format($totalTeamCount) }}</strong> {{ $totalTeamCount == 1 ? 'ID' : 'IDs' }}
+                                                </small>
                                             </div>
                                         </div>
 
@@ -2927,10 +2937,15 @@
                                                             style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700; border-radius: 6px; font-size: 11px; padding: 4px 10px; border: 1px solid rgba(16, 185, 129, 0.4);">
                                                             <i class="fa-solid fa-circle-check"></i> Active
                                                         </span>
-                                                    @else
+                                                    @elseif (strtolower(trim($data['status'] ?? '')) === 'deactive')
                                                         <span class="badge d-inline-flex align-items-center gap-1"
                                                             style="background: rgba(239, 68, 68, 0.2); color: #f87171; font-weight: 700; border-radius: 6px; font-size: 11px; padding: 4px 10px; border: 1px solid rgba(239, 68, 68, 0.4);">
-                                                            {{ $data['status'] == 'Temp' ? 'Inactive' : 'Blocked' }}
+                                                            <i class="fa-solid fa-circle-xmark"></i> Deactive
+                                                        </span>
+                                                    @else
+                                                        <span class="badge d-inline-flex align-items-center gap-1"
+                                                            style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 700; border-radius: 6px; font-size: 11px; padding: 4px 10px; border: 1px solid rgba(245, 158, 11, 0.4);">
+                                                            <i class="fa-solid fa-clock"></i> {{ $data['status'] == 'Temp' ? 'Inactive' : ($data['status'] ?? 'Inactive') }}
                                                         </span>
                                                     @endif
                                                 </div>
@@ -2978,7 +2993,7 @@
                                                             style="color: #6EE7B7; font-size: 0.78rem; letter-spacing: 0.1em;">
                                                             Trading Wallet
                                                         </span>
-                                                        <small class="text-white-50" style="font-size: 0.72rem;">Trading &amp; Staking Balance</small>
+                                                        <small class="text-white-50" style="font-size: 0.72rem;">Trading Balance</small>
                                                     </div>
                                                 </div>
 
@@ -3017,7 +3032,7 @@
                                             <div class="d-flex align-items-center justify-content-between pt-2 border-top flex-wrap gap-2"
                                                 style="border-color: rgba(255, 255, 255, 0.08) !important;">
                                                 <span class="text-white-50" style="font-size: 0.74rem;">
-                                                    {{ (isset($isFundLocked) && $isFundLocked) ? 'Fund locked under package policy • Daily ROI active' : 'Full balance available for withdrawal' }}
+                                                    {{ (isset($isFundLocked) && $isFundLocked) ? 'Fund locked under package policy • Daily Trading Profit Active' : 'Full balance available for withdrawal' }}
                                                 </span>
                                                 <div class="d-flex align-items-center gap-2 ms-auto ms-sm-0">
                                                     {{-- <a href="{{ url('member/trading-dashboard') }}" class="btn btn-sm"
@@ -3070,9 +3085,9 @@
                                         <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
                                             <i class="fa-solid fa-circle-check me-1"></i> Package Active
                                         </span>
-                                        @elseif (isset($packageStatus) && $packageStatus === 'Expired')
+                                        @elseif (isset($packageStatus) && in_array($packageStatus, ['Deactive', 'Expired', 'Capped / Deactivated']))
                                         <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
-                                            <i class="fa-solid fa-clock-rotate-left me-1"></i> Package Expired
+                                            <i class="fa-solid fa-circle-xmark me-1"></i> Package Deactive
                                         </span>
                                         @else
                                         <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.4); padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;">
@@ -3143,7 +3158,7 @@
                                         <div class="col-xl-4 col-md-4 col-sm-12">
                                             <div class="p-3 rounded h-100" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.12), rgba(12, 14, 20, 0.95)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px;">
                                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Investment</span>
+                                                    <span class="text-white-50 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.08em; font-weight: 600;">Latest Package</span>
                                                     <span class="badge bg-warning text-dark font-weight-bold" style="font-size: 10px;">
                                                         {{ $activePackage->package_range ?? ($activePackage->package ?? ($data['package'] ?? 'Standard')) }}
                                                     </span>
@@ -3175,7 +3190,7 @@
                                                     <i class="fa-solid fa-coins"></i>
                                                     <span>{{ number_format((float) ($activeTradingWalletPercent ?? ($defaultTradingWalletPercent ?? 0)), 0) }}% Allocated: $ {{ number_format((float) ($activeTradingWalletAmount ?? ($activePackage->trading_wallet_amount ?? (($activePackageInvestAmount ?? ($totalInvestment ?? 0)) * (($defaultTradingWalletPercent ?? 0) / 100)))), 2) }}</span>
                                                 </div>
-                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Available for trading &amp; withdrawal after unlock</small>
+                                                <small class="text-white-50 d-block mt-1" style="font-size: 0.72rem;">Available for trading Not Refundable upon total Capping Limit is achieved.</small>
                                             </div>
                                         </div>
 
@@ -3241,32 +3256,34 @@
                                             <div class="p-3 p-md-4 rounded-3" style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.16), rgba(12, 14, 20, 0.96)); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);">
                                                 
                                                 <!-- Card Header -->
-                                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pb-3 mb-3 border-bottom" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                                                <div class="pb-3 mb-3 border-bottom" style="border-color: rgba(255, 255, 255, 0.08) !important;">
                                                     <div class="d-flex align-items-center gap-3">
                                                         <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 46px; height: 46px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.35); color: #60A5FA; font-size: 1.25rem;">
                                                             <i class="fa-solid fa-chart-pie"></i>
                                                         </div>
-                                                        <div>
-                                                            <div class="d-flex align-items-center gap-2 flex-wrap">
-                                                                <h5 class="text-white font-weight-bold mb-0" style="font-size: 1.15rem; letter-spacing: 0.02em;">
-                                                                    Earning &amp; Capping Overview
-                                                                </h5>
-                                                                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; font-size: 11px; padding: 4px 8px; border: 1px solid rgba(59, 130, 246, 0.3);">
-                                                                    Dynamic Capping System
-                                                                </span>
+                                                        <div class="flex-grow-1">
+                                                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                    <h5 class="text-white font-weight-bold mb-0" style="font-size: 1.15rem; letter-spacing: 0.02em;">
+                                                                        Earning &amp; Capping Overview
+                                                                    </h5>
+                                                                    <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; font-size: 11px; padding: 4px 8px; border: 1px solid rgba(59, 130, 246, 0.3);">
+                                                                        Dynamic Capping System
+                                                                    </span>
+                                                                </div>
+                                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                                    <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 11.5px; padding: 5px 10px; font-weight: 600; border-radius: 6px;">
+                                                                        <i class="fa-solid fa-arrows-spin me-1 text-info"></i>Max Return: <strong class="ms-1">{{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : 'Unlimited' }}</strong>
+                                                                    </span>
+                                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11.5px; padding: 5px 10px; font-weight: 600; border-radius: 6px;">
+                                                                        <i class="fa-solid fa-bolt me-1 text-success"></i>Monthly Trading Profit up to: <strong class="ms-1">{{ number_format((float) ($dailyRoiPercent ?? 0), 1) }}%</strong>
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                             <small class="text-white-50 d-block mt-1" style="font-size: 0.78rem;">
                                                                 Capping limit is dynamically calculated as <strong>{{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : 'Unlimited' }}</strong> of your active Trading Wallet balance (<strong class="text-success">${{ number_format($twTotal, 2) }} TW</strong>).
                                                             </small>
                                                         </div>
-                                                    </div>
-                                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                                        <span class="badge px-3 py-2" style="background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 12px; font-weight: 600;">
-                                                            <i class="fa-solid fa-arrows-spin me-1 text-info"></i>Max Return: <strong class="ms-1">{{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : 'Unlimited' }}</strong>
-                                                        </span>
-                                                        <span class="badge px-3 py-2" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 12px; font-weight: 600;">
-                                                            <i class="fa-solid fa-bolt me-1 text-success"></i>Daily ROI: <strong class="ms-1">{{ number_format((float) ($dailyRoiPercent ?? 0), 1) }}%</strong>
-                                                        </span>
                                                     </div>
                                                 </div>
 
@@ -3362,14 +3379,14 @@
                                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                                         <div>
                                                             <span class="text-uppercase text-white font-weight-bold" style="font-size: 0.78rem; letter-spacing: 0.05em;">
-                                                                <i class="fa-solid fa-layer-group text-info me-2"></i>Active Stakings Trading Wallet Breakdown
+                                                                <i class="fa-solid fa-layer-group text-info me-2"></i>Active Package Trading Wallet Breakdown
                                                             </span>
                                                             <small class="text-white-50 d-block mt-0" style="font-size: 0.72rem;">
-                                                                Individual Trading Wallet allocation and {{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : '' }} capping limit for each active staking package
+                                                                Individual Trading Wallet allocation and {{ $maxRetVal > 0 ? number_format($maxRetVal, 0).'%' : '' }} capping limit for each active package
                                                             </small>
                                                         </div>
                                                         <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD; font-size: 11px; padding: 5px 10px;">
-                                                            {{ isset($packageInvestments) ? $packageInvestments->count() : 0 }} Active {{ (isset($packageInvestments) && $packageInvestments->count() == 1) ? 'Staking' : 'Stakings' }}
+                                                            {{ isset($packageInvestments) ? $packageInvestments->count() : 0 }} Active {{ (isset($packageInvestments) && $packageInvestments->count() == 1) ? 'Staking' : 'Tradings' }}
                                                         </span>
                                                     </div>
 
@@ -3421,15 +3438,15 @@
                                                         </div>
                                                         @if ($packageInvestments->count() > 6)
                                                             <div class="d-flex justify-content-between align-items-center mt-2 px-1" style="font-size: 0.75rem;">
-                                                                <span class="text-white-50">+{{ $packageInvestments->count() - 6 }} more active stakings</span>
+                                                                <span class="text-white-50">+{{ $packageInvestments->count() - 6 }} more active trading</span>
                                                                 <a href="#staking-investments-section" class="text-info text-decoration-none font-weight-bold">
-                                                                    View All Stakings in Table Below <i class="fa-solid fa-arrow-down ms-1"></i>
+                                                                    View All Trading in Table Below <i class="fa-solid fa-arrow-down ms-1"></i>
                                                                 </a>
                                                             </div>
                                                         @endif
                                                     @else
                                                         <div class="p-3 rounded text-white-50" style="background: rgba(255, 255, 255, 0.03); font-size: 0.8rem;">
-                                                            <i class="fa-solid fa-circle-info text-info me-1"></i> No active stakings found. Trading Wallet Capping limit: <strong class="text-warning">{{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}</strong>
+                                                            <i class="fa-solid fa-circle-info text-info me-1"></i> No active Trading found. Trading Wallet Capping limit: <strong class="text-warning">{{ $mEarn > 0 ? '$ '.number_format($mEarn, 2) : 'Unlimited' }}</strong>
                                                         </div>
                                                     @endif
                                                 </div>
@@ -3442,10 +3459,10 @@
                                     <div id="staking-investments-section" class="mt-3 pt-3 border-top" style="border-color: rgba(245, 158, 11, 0.15) !important;">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <span class="text-white font-weight-bold" style="font-size: 0.85rem;">
-                                                <i class="fa-solid fa-list-check text-warning me-1"></i> Staking Investments &amp; Individual Lock Period &amp; Live Timers
+                                                <i class="fa-solid fa-list-check text-warning me-1"></i> Trading Investments &amp; Individual Lock Period &amp; Live Timers
                                             </span>
                                             <a href="{{ Route::has('Staking.details') ? route('Staking.details') : url('/member/Staking/details') }}" class="text-warning text-decoration-none" style="font-size: 0.75rem;">
-                                                View All Stakings <i class="fa-solid fa-arrow-right ms-1"></i>
+                                                View All Trading <i class="fa-solid fa-arrow-right ms-1"></i>
                                             </a>
                                         </div>
                                         <div class="table-responsive">
@@ -3483,9 +3500,20 @@
                                                             @endif
                                                         </td>
                                                         <td>
-                                                            <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px; padding: 4px 8px;">
-                                                                <i class="fa-regular fa-clock me-1"></i>{{ $pkg->lock_days ?? ($defaultLockDays ?? 0) }} Days
-                                                            </span>
+                                                            @php
+                                                                $isOffStatus = isset($isTradingWalletOff)
+                                                                    ? $isTradingWalletOff
+                                                                    : (isset($tradingWalletStatus) ? in_array(strtolower((string) $tradingWalletStatus), ['off', 'unlock']) : (\App\Models\PackageDistribution::getActiveSetting()->isOff()));
+                                                            @endphp
+                                                            @if ($isOffStatus)
+                                                                <span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.35); font-size: 11px; padding: 4px 8px;">
+                                                                    <i class="fa-solid fa-lock me-1"></i>Locked
+                                                                </span>
+                                                            @else
+                                                                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 11px; padding: 4px 8px;">
+                                                                    <i class="fa-regular fa-clock me-1"></i>{{ $pkg->lock_days ?? ($defaultLockDays ?? 0) }} Days
+                                                                </span>
+                                                            @endif
                                                         </td>
                                                         <td>
                                                             <div class="text-white-50" style="font-size: 11px;">
@@ -3619,6 +3647,10 @@
                                                                         <strong>Country:</strong> <span class="text-info font-weight-bold">{{ $leader->country ?? 'N/A' }}</span>
                                                                         <span class="mx-2 text-white-50">|</span>
                                                                         <strong>Direct Investment:</strong> <span class="text-success font-weight-bold">${{ number_format((float) $leader->direct_biz, 2) }}</span>
+                                                                        <span class="mx-2 text-white-50">|</span>
+                                                                        <i class="fa-solid fa-award text-warning me-1"></i>
+                                                                        <strong>Reward Amount:</strong> <span class="text-warning font-weight-bold">${{ number_format((float) ($leader->reward_amount ?? 0), 2) }}</span>
+                                                                        <span class="text-white-50 ms-1">({{ $leader->reward_month ?? date('F Y') }})</span>
                                                                     </span>
                                                                     <span class="me-4 text-warning">&bull;</span>
                                                                 @endforeach
@@ -3632,7 +3664,7 @@
                                             <div class="row g-3">
                                                 @foreach ($heroLeaders as $leader)
                                                     <div class="col-xl-6 col-lg-6 col-md-6 col-12">
-                                                        <div class="p-3 d-flex align-items-center justify-content-between"
+                                                        <div class="p-3 d-flex align-items-center justify-content-between flex-wrap gap-2"
                                                             style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.10), rgba(18, 22, 32, 0.75)); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 18px;">
                                                             <div class="d-flex align-items-center">
                                                                 <div class="badge rounded-circle me-3 d-flex align-items-center justify-content-center"
@@ -3648,6 +3680,19 @@
                                                                     </small>
                                                                 </div>
                                                             </div>
+
+                                                            <!-- Middle: Reward Amount with Month -->
+                                                            <div class="text-center px-3 py-1 my-1"
+                                                                style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.35); border-radius: 12px; min-width: 140px;">
+                                                                <span class="text-white-50 d-block" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Reward Amount</span>
+                                                                <span class="text-success font-weight-bold d-block" style="font-size: 16px; line-height: 1.2;">
+                                                                    ${{ number_format((float) ($leader->reward_amount ?? 0), 2) }}
+                                                                </span>
+                                                                <small class="text-white-50 d-block" style="font-size: 11px;">
+                                                                    <i class="fa-regular fa-calendar me-1 text-warning"></i>Month: <span class="text-warning font-weight-bold">{{ $leader->reward_month ?? date('F Y') }}</span>
+                                                                </small>
+                                                            </div>
+
                                                             <div class="text-end">
                                                                 <span class="text-white-50 d-block" style="font-size: 10px; text-transform: uppercase;">Direct Investment</span>
                                                                 <span class="text-warning font-weight-bold" style="font-size: 16px;">
@@ -3678,6 +3723,19 @@
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <!-- Middle: Reward Amount with Month -->
+                                                <div class="text-center px-4 py-2 my-1"
+                                                    style="background: rgba(245, 158, 11, 0.08); border: 1px dashed rgba(245, 158, 11, 0.35); border-radius: 14px; min-width: 160px;">
+                                                    <span class="text-white-50 d-block" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Reward Amount</span>
+                                                    <h4 class="text-success font-weight-bold mb-0" style="font-size: 22px; line-height: 1.2;">
+                                                        ${{ number_format((float) ($topLeader->reward_amount ?? 0), 2) }}
+                                                    </h4>
+                                                    <small class="text-white-50 d-block mt-1" style="font-size: 12px;">
+                                                        <i class="fa-regular fa-calendar me-1 text-warning"></i>Month: <span class="text-warning font-weight-bold">{{ $topLeader->reward_month ?? date('F Y') }}</span>
+                                                    </small>
+                                                </div>
+
                                                 <div class="text-end">
                                                     <span class="text-white-50 d-block" style="font-size: 11px; text-transform: uppercase;">Highest Direct Investment</span>
                                                     <h3 class="text-warning font-weight-bold mb-0" style="font-size: 26px;">
@@ -3713,7 +3771,7 @@
                                         <span class="withdrawal-icon">
                                             <i class="fa-solid fa-arrow-down"></i>
                                         </span>
-                                        <span>Today's Withdrawal</span>
+                                        <span>Today's Income Withdrawal</span>
                                     </div>
                                 </div>
                                 <h3 class="withdrawal-amount">$
@@ -3723,7 +3781,7 @@
                                     <span
                                         style="width: {{ min(100, max(18, ((float) todayWithdrawals($data['memberid']) / max((float) totalWithdrawals($data['memberid']), 1)) * 100)) }}%;"></span>
                                 </div>
-                                <div class="withdrawal-meta">Today's withdrawal</div>
+                                <div class="withdrawal-meta">Today's Income Withdrawal</div>
                             </div>
                         </div>
                     </div>
@@ -3736,7 +3794,7 @@
                                         <span class="withdrawal-icon">
                                             <i class="fa-solid fa-wallet"></i>
                                         </span>
-                                        <span>Total withdrawal</span>
+                                        <span>Total Income Withdrawal</span>
                                     </div>
                                 </div>
                                 <h3 class="withdrawal-amount">$
@@ -3745,7 +3803,7 @@
                                 <div class="withdrawal-progress">
                                     <span style="width: 100%;"></span>
                                 </div>
-                                <div class="withdrawal-meta">Total Withdrawal</div>
+                                <div class="withdrawal-meta">Total Income Withdrawal</div>
                             </div>
                         </div>
                     </div>
@@ -4167,7 +4225,7 @@ $referralLink = url('/member/register/' . $data['memberid']);
 
 <!--********************************** Content body end ***********************************-->
 
-@if (session('show_dashboard_popup') && isset($achieverImages) && $achieverImages->count() > 0)
+@if ((!empty($showDashboardPopup) || session('show_dashboard_popup')) && isset($achieverImages) && $achieverImages->count() > 0)
 <div class="modal fade" id="achieverModal" tabindex="-1" aria-labelledby="achieverModalLabel"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="width:80%">
@@ -4211,11 +4269,20 @@ $referralLink = url('/member/register/' . $data['memberid']);
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var achieverModalEl = document.getElementById('achieverModal');
-        if (!achieverModalEl || typeof bootstrap === 'undefined') {
+        if (!achieverModalEl) {
             return;
         }
-        var achieverModal = new bootstrap.Modal(achieverModalEl);
-        achieverModal.show();
+
+        function showAchieverModal() {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                var achieverModal = bootstrap.Modal.getInstance(achieverModalEl) || new bootstrap.Modal(achieverModalEl);
+                achieverModal.show();
+            } else if (typeof $ !== 'undefined' && typeof $(achieverModalEl).modal === 'function') {
+                $(achieverModalEl).modal('show');
+            }
+        }
+
+        showAchieverModal();
 
         var achieverCarousel = document.getElementById('achieverCarousel');
         var achieverModalLabel = document.getElementById('achieverModalLabel');
@@ -4320,20 +4387,24 @@ $referralLink = url('/member/register/' . $data['memberid']);
     });
 </script>
 <script>
-    // Real-time clock functionality - Show UTC time
+    // Real-time clock functionality - Show Indian Standard Time (IST) / Asia/Kolkata
     function updateDateTime() {
-        // Get current UTC time
         const now = new Date();
+        const targetTimeZone = '{{ config('app.timezone', 'Asia/Kolkata') }}';
 
-        // Format time as HH:MM:SS (UTC)
-        const hours = String(now.getUTCHours()).padStart(2, '0');
-        const minutes = String(now.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(now.getUTCSeconds()).padStart(2, '0');
-        const timeString = hours + ':' + minutes + ':' + seconds;
+        // Format time as HH:MM:SS in Asia/Kolkata (IST)
+        const timeOptions = {
+            timeZone: targetTimeZone,
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        };
+        const timeString = new Intl.DateTimeFormat('en-GB', timeOptions).format(now);
 
-        // Format date (UTC)
+        // Format date in Asia/Kolkata (IST)
         const dateOptions = {
-            timeZone: 'UTC',
+            timeZone: targetTimeZone,
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -4353,11 +4424,15 @@ $referralLink = url('/member/register/' . $data['memberid']);
             dateElement.textContent = dateString;
         }
         if (timezoneElement) {
-            timezoneElement.textContent = 'UTC (Coordinated Universal Time)';
+            timezoneElement.textContent = targetTimeZone === 'Asia/Kolkata'
+                ? 'Daily Closing at 00:00 hrs.'
+                : targetTimeZone;
         }
     }
+    
+    //IST (Indian Standard Time)
 
-    // Update immediately and then every seconddate immediately and then every second
+    // Update immediately and then every second
     updateDateTime();
     setInterval(updateDateTime, 1000);
 </script>

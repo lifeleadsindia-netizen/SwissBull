@@ -81,4 +81,52 @@ class PepeRedeemHistoryTest extends TestCase
         $reqApproved->delete();
         $reqPending->delete();
     }
+
+    public function test_pepe_redeem_history_pagination_renders_cleanly(): void
+    {
+        $this->withoutMiddleware(PreventRequestForgery::class);
+
+        $memberId = 'PEPEPAGE'.rand(1000, 9999);
+        $member = MemberDetail::create([
+            'memberid' => $memberId,
+            'name' => 'Pepe Pagination Tester',
+            'mobile' => '98'.rand(10000000, 99999999),
+            'email' => 'pepepage'.rand(100, 999).'@example.com',
+            'password' => bcrypt('password'),
+            'pepe_wallet' => 50000,
+            'member_wallet' => '0x71C8fb866A370000000000000000000000000099',
+        ]);
+
+        $createdRequests = [];
+        for ($i = 1; $i <= 18; $i++) {
+            $req = new WithdrawalRequest;
+            $req->request_date = now();
+            $req->request_id = 'PEPEPG'.str_pad((string) $i, 6, '0', STR_PAD_LEFT);
+            $req->memberid = $memberId;
+            $req->wallet_address = $member->member_wallet;
+            $req->gross_amount = 100 * $i;
+            $req->service_charge = 0;
+            $req->net_amount = 100 * $i;
+            $req->type = 'Airdrop Withdrawal';
+            $req->status = 'Approved';
+            $req->save();
+            $createdRequests[] = $req;
+        }
+
+        $response = $this->withSession(['MEMBER_ID' => $memberId])
+            ->get('/member/pepe/redeem-history');
+
+        $response->assertStatus(200)
+            ->assertSee('pagination')
+            ->assertSee('page-item active')
+            ->assertSee('Showing')
+            ->assertSee('18')
+            ->assertDontSee('Pagination Navigation'); // No broken Tailwind pagination
+
+        // Cleanup
+        $member->delete();
+        foreach ($createdRequests as $req) {
+            $req->delete();
+        }
+    }
 }

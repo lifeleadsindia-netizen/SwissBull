@@ -1,11 +1,11 @@
 @extends('member.layouts.main')
-@section('title', 'Staking History')
+@section('title', 'Trading Package History')
 @section('container')
     @include('member.income._income-styles')
 
     <!--**********************************
-                                Content body start
-                            ***********************************-->
+                                        Content body start
+                                    ***********************************-->
     <div class="content-body inc-page">
         <div class="container-fluid py-4">
             <!-- row -->
@@ -15,17 +15,18 @@
                         <div class="inc-card-header">
                             <div class="inc-header-icon"><i class="fa-solid fa-sack-dollar"></i></div>
                             <div>
-                                <div class="inc-header-title">Staking History</div>
-                                <div class="inc-header-sub">Current staking investment summary</div>
+                                <div class="inc-header-title">Trading Package History</div>
+                                <div class="inc-header-sub">Current Trading Package Summary</div>
                             </div>
                         </div>
                         <div class="inc-table-shell">
                             <table id="example3" class="inc-table display dataTable no-footer">
                                 <thead>
                                     <tr>
-                                        <th>#</th>
+                                        <th>Sn No.</th>
                                         <th>Date</th>
                                         <th>Package Range</th>
+                                        <th>Trading Package</th>
                                         <th>Trading Amount</th>
                                         <th>Lock Period</th>
                                         <th>Unlock Date</th>
@@ -33,6 +34,7 @@
                                         <th>Lock Status</th>
                                         <th>Total Earning</th>
                                         <th>Max Earning</th>
+                                        <th>Balance</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -49,15 +51,35 @@
                                                 <span
                                                     class="text-white font-weight-bold">{{ $list->package_range ?? $list->package }}</span>
                                             </td>
+                                            <td>
+                                                <span class="text-white font-weight-bold">${{ $list->invest_amount }}</span>
+                                            </td>
                                             <td class="text-warning font-weight-bold">
                                                 ${{ number_format((float) $list->trading_wallet_amount, 2) }}</td>
                                             <td>
-                                                <span class="badge"
-                                                    style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 4px 8px;">
-                                                    <i
-                                                        class="fa-regular fa-clock me-1"></i>{{ $list->lock_days ?? ($defaultLockDays ?? 0) }}
-                                                    Days
-                                                </span>
+                                                @php
+                                                    $isOffStatus = isset($isTradingWalletOff)
+                                                        ? $isTradingWalletOff
+                                                        : (isset($tradingWalletStatus)
+                                                            ? in_array(strtolower((string) $tradingWalletStatus), [
+                                                                'off',
+                                                                'unlock',
+                                                            ])
+                                                            : \App\Models\PackageDistribution::getActiveSetting()->isOff());
+                                                @endphp
+                                                @if ($isOffStatus)
+                                                    <span class="badge"
+                                                        style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 4px 8px;">
+                                                        <i class="fa-solid fa-lock me-1"></i>Locked
+                                                    </span>
+                                                @else
+                                                    <span class="badge"
+                                                        style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 6px; padding: 4px 8px;">
+                                                        <i
+                                                            class="fa-regular fa-clock me-1"></i>{{ $list->lock_days ?? ($defaultLockDays ?? 0) }}
+                                                        Days
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td>
                                                 <small class="text-white-50"><i
@@ -94,12 +116,15 @@
                                             <td class="text-warning font-weight-bold">
                                                 ${{ totalEarning($list->id) }}</td>
                                             <td>
-                                                @if ( maxEarning($list->id) == 'No Limit')
-                                                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">No Limit</span>
+                                                @if (maxEarning($list->id) == 'No Limit')
+                                                    <span class="badge"
+                                                        style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 4px 8px;">No
+                                                        Limit</span>
                                                 @else
                                                     <span>${{ maxEarning($list->id) }}</span>
                                                 @endif
                                             </td>
+                                            <td>${{ totalStakingBalance($list->id) }}</td>
                                             <td>
                                                 @if ($list->status === 'Active')
                                                     <span class="badge"
@@ -121,8 +146,8 @@
         </div>
     </div>
     <!--**********************************
-                                Content body end
-                            ***********************************-->
+                                        Content body end
+                                    ***********************************-->
 
     <script>
         (function() {

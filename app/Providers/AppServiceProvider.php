@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\MemberDetail;
 use App\Models\Notification;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFour();
+
         View::composer('member.*', function ($view) {
             $recentNotifications = collect();
             $unreadCount = 0;

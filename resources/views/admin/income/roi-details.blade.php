@@ -1,5 +1,5 @@
 @extends('admin.layouts.main')
-@section('title', 'Roi Details')
+@section('title', 'Trading Profit Details')
 @section('content')
     @push('head')
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.css') }}">
@@ -11,8 +11,8 @@
                     <div class="page-header-title">
                         <i class="ik ik-edit bg-blue"></i>
                         <div class="d-inline">
-                            <h5>{{ __('Roi Details') }}</h5>
-                            <span>{{ __('Roi Details details') }}</span>
+                            <h5>{{ __('Trading Profit Details') }}</h5>
+                            <span>{{ __('Trading Profit Details') }}</span>
                         </div>
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                                 <a href="#"><i class="ik ik-home"></i></a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ __('Admin') }}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">{{ __('Roi Details') }}</li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ __('Trading Profit Details') }}</li>
                         </ol>
                     </nav>
                 </div>
@@ -40,7 +40,7 @@
                 @endif
                 <div class="card">
                     <div class="card-header">
-                        <h3>{{ __('Roi Income') }}</h3>
+                        <h3>{{ __('Trading Profit Details') }}</h3>
                     </div>
                     <div class="card-body px-5 " style="overflow: auto">
                         <div class="responsive">

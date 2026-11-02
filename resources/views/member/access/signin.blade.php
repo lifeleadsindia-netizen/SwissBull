@@ -315,7 +315,7 @@
                 if (addressResult == 0) {
                     window.location.href = "{{ url('/member/register/1') }}"
                 } else {
-                    window.location.href = "{{ url('member/dashboard') }}"
+                    window.location.href = "{{ url('member/dashboard?entry=login') }}"
                 }
 
             } catch (error) {

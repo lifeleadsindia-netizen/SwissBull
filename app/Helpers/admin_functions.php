@@ -41,6 +41,13 @@ function totalTempMembers()
     return $count;
 }
 
+function totalDeactiveMembers()
+{
+    $count = MemberDetail::where('status', 'Deactive')->count();
+
+    return $count;
+}
+
 function totalblockedMembers()
 {
     $count = MemberDetail::where('status', 'Blocked')->count();
@@ -292,21 +299,21 @@ function totalUpgrade()
 
 function totalgrossAmount()
 {
-    $count = WithdrawalRequest::where('type', 'USDT')->sum('gross_amount');
+    $count = WithdrawalRequest::where('type', 'Wallet')->sum('gross_amount');
 
     return $count;
 }
 
 function totalnetAmount()
 {
-    $count = WithdrawalRequest::where('type', 'USDT')->sum('net_amount');
+    $count = WithdrawalRequest::where('type', 'Wallet')->sum('net_amount');
 
     return $count;
 }
 
 function totaldeductions()
 {
-    $count = WithdrawalRequest::where('type', 'USDT')->sum('service_charge');
+    $count = WithdrawalRequest::where('type', 'Wallet')->sum('service_charge');
 
     return $count;
 }

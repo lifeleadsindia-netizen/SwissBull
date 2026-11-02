@@ -1,5 +1,5 @@
 @extends('member.layouts.main')
-@section('title', 'Start Staking')
+@section('title', 'Start Packages')
 @section('container')
     @include('member.investment._styles')
     <div class="content-body staking-page">
@@ -7,18 +7,18 @@
 
             {{-- ===================== HERO ===================== --}}
             <div class="staking-hero mb-4 mb-md-5">
-                <div class="staking-eyebrow">Staking &amp; Trading Packages</div>
-                <h1>Activate Staking Package</h1>
+                <div class="staking-eyebrow">Trading Packages</div>
+                <h1>Activate Trading Package</h1>
                 <p>Stake directly from your Fund Wallet. <strong><span
                             class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span> of the package
-                        amount</strong> is credited directly to your Trading Wallet to earn daily trading profits.</p>
+                        amount</strong> is credited directly to your Trading Wallet to earn monthly trading profits.</p>
                 <div class="sk-hero-chips">
                     <div class="sk-chip"><i class="fa-solid fa-wallet"></i> Funded from Fund Wallet</div>
                     <div class="sk-chip"><i class="fa-solid fa-chart-line"></i> <span
                             class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span> to Trading
                         Wallet
                     </div>
-                    <div class="sk-chip"><i class="fa-solid fa-bolt"></i> Daily Trading ROI</div>
+                    <div class="sk-chip"><i class="fa-solid fa-bolt"></i>Monthly trading profit</div>
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
                             </div>
                             <div>
                                 <div class="card-title">
-                                    Staking Package
+                                    Trading Package
                                     <span>Select your package tier and amount from your Fund Wallet</span>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
                                     {{-- Package Selection --}}
                                     <div class="col-md-12">
                                         <label class="staking-label" for="package">
-                                            <i class="fa-solid fa-layer-group me-1"></i> Select Staking Package
+                                            <i class="fa-solid fa-layer-group me-1"></i> Select Trading Package
                                         </label>
                                         <div class="input-group mb-2">
                                             <select class="form-select staking-input staking-select" id="package"
@@ -130,7 +130,7 @@
                                     {{-- Amount to Stake --}}
                                     <div class="col-md-12">
                                         <label class="staking-label" for="amount">
-                                            <i class="fa-solid fa-dollar-sign me-1"></i> Staking Amount (USDT)
+                                            <i class="fa-solid fa-dollar-sign me-1"></i> Trading Amount (USDT)
                                         </label>
                                         <div class="input-group">
                                             <span class="input-group-text"
@@ -170,8 +170,7 @@
                                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2"
                                                 style="border-bottom: 1px solid rgba(255,255,255,0.06);">
                                                 <span class="text-white-50 small"><i
-                                                        class="fa-solid fa-bolt text-warning me-1"></i> Estimated Daily
-                                                    ROI:</span>
+                                                        class="fa-solid fa-bolt text-warning me-1"></i> Estimated Monthly Trading Profit:</span>
                                                 <span id="preview-roi-rate" class="text-warning font-weight-bold">0% /
                                                     day</span>
                                             </div>
@@ -190,11 +189,11 @@
                                 {{-- Info Note --}}
                                 <div class="staking-note mt-4">
                                     <i class="fa-solid fa-circle-info"></i>
-                                    <span>Staking package is deducted from your <strong>Fund Wallet</strong>.
+                                    <span>Trading package is deducted from your <strong>Fund Wallet</strong>.
                                         <strong><span
                                                 class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span>
                                             of the amount</strong> is credited to your <strong>Trading Wallet</strong>.
-                                        Multiple staking packages are supported — every package operates independently with
+                                        Multiple trading packages are supported — every package operates independently with
                                         its own individual returns, capping, and expiry.</span>
                                 </div>
 
@@ -205,7 +204,7 @@
                                         <i class="fa-solid fa-shield-halved"></i> Internal Fund Wallet Transaction
                                     </span>
                                     <button type="submit" class="btn staking-btn" id="submitStakingBtn">
-                                        <i class="fa-solid fa-bolt me-2"></i>Create Staking
+                                        <i class="fa-solid fa-bolt me-2"></i>Create Trading
                                     </button>
                                 </div>
                             </form>
@@ -224,7 +223,7 @@
                                 <div class="sk-stat-icon green"><i class="fa-solid fa-wallet"></i></div>
                             </div>
                             <div class="sk-stat-value">${{ number_format((float) ($data['p2p_wallet'] ?? 0), 2) }}</div>
-                            <div class="sk-stat-sub">Available balance • Deducted on staking</div>
+                            <div class="sk-stat-sub">Available balance • Deducted on trading</div>
                         </div>
 
 
@@ -232,7 +231,7 @@
                         {{-- How it Works --}}
                         <div class="sk-howto-card">
                             <div class="sk-howto-title">
-                                <i class="fa-solid fa-lightbulb"></i> How Staking &amp; Trading Works
+                                <i class="fa-solid fa-lightbulb"></i> How Trading Works
                             </div>
 
                             <div class="sk-step">
@@ -246,7 +245,7 @@
                             <div class="sk-step">
                                 <div class="sk-step-num">2</div>
                                 <div class="sk-step-text">
-                                    <strong>Stake Package</strong>
+                                    <strong>Trade Package</strong>
                                     Select your package tier and enter your amount. The full package amount is deducted from
                                     your Fund Wallet.
                                 </div>
@@ -261,7 +260,7 @@
                                     <span
                                         class="dynamic-trading-percent">{{ $packageDistribution->trading_wallet }}%</span>
                                     of
-                                    your staked amount is credited to your Trading Wallet for
+                                    your trade amount is credited to your Trading Wallet for
                                     {{ $packageDistribution->lock_days }} days.
                                 </div>
                             </div>
@@ -269,7 +268,7 @@
                             <div class="sk-step">
                                 <div class="sk-step-num">4</div>
                                 <div class="sk-step-text">
-                                    <strong>Earn Daily ROI</strong>
+                                    <strong>Monthly Trading Profit</strong>
                                     Receive automated daily trading profits up to dynamic admin-configured maximum returns!
                                 </div>
                             </div>
@@ -290,7 +289,7 @@
                                 <div class="sk-card-title d-flex align-items-center">
                                     <div class="sk-title-icon me-3"><i class="fa-solid fa-list-check"></i></div>
                                     <div>
-                                        My Active Staking Packages
+                                        My Active Trading Packages
                                         <span>Every package has individual returns, capping, and expiry</span>
                                     </div>
                                 </div>
@@ -445,14 +444,15 @@
                 // Show valid state & live calculation
                 amountHint.style.display = 'block';
                 amountHint.style.color = '#10B981';
-                amountHint.textContent = `Valid staking amount. Ready to stake from Fund Wallet.`;
+                amountHint.textContent = `Valid trading amount. Ready to trade from Fund Wallet.`;
 
-                const tradingWalletCredit = (val * (tradingPercent / 100)).toFixed(2);
-                const maxCapReturn = (val * (cap / 100)).toFixed(2);
+                const tradingWalletCreditVal = val * (tradingPercent / 100);
+                const tradingWalletCredit = tradingWalletCreditVal.toFixed(2);
+                const maxCapReturn = (tradingWalletCreditVal * (cap / 100)).toFixed(2);
 
                 previewStaked.textContent = `$${val.toFixed(2)} USDT`;
                 previewTrading.textContent = `$${tradingWalletCredit} USDT (${tradingPercent}%)`;
-                previewRoi.textContent = `${rate}% Daily ROI`;
+                previewRoi.textContent = `${rate}% Monthly trading profit`;
 
                 if (cap === 0) {
                     previewCap.textContent = `No Capping`;

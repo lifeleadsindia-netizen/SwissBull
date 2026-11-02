@@ -221,19 +221,19 @@ class WhatsappReferralController extends Controller
 
         // return "Hello! Join SYNC TRADE using my referral link:\n".$referralLink;
         return 'Hi! 👋
-
-            I wanted to share something interesting with you. I’ve recently come across a *business opportunity with excellent earning potential* and a model that I feel is worth exploring.
-
-            What caught my attention is the *long-term income potential and the opportunity to build an additional source of income* with the right effort and consistency. I personally feel it’s worth taking a look before making any decision.
+            I hope you are doing well.
+            I recently came across Sync Trade, a platform that offers an exciting opportunity to benefit from the Forex market without requiring advanced trading knowledge. What I found interesting is its potential to create an additional income stream while leveraging a structured and transparent earning model.
+            
+            Many people are looking for ways to diversify their income, and Sync Trade provides a way to participate in the global Forex market through its unique ecosystem. With the right understanding and commitment, it can become a valuable opportunity for those seeking financial growth and passive income possibilities.
 
             👉 *Here’s my referral link:*
             '.$referralLink.'
 
-            Just *register your ID through my referral link* using DApp Browser and   BEP20 Network in any wallet that supports BEP20 Network. Take some time to check the opportunity, business model and earning plan yourself.
-
-            There’s no harm in exploring a good opportunity—and if you find it interesting, we can discuss it further. 😊
-
-            *Do check it out. You might discover something really valuable! *';
+            To get started, simply register using the link above through a DApp Browser and connect with a wallet that supports the BEP20 Network. Once registered, take your time to explore the platform, understand how it works, and review the earning structure and business model for yourself.
+            The best opportunities are often discovered by those who take a closer look. There is absolutely no pressure, just an invitation to learn more and see whether it aligns with your financial goals.
+            ✨ Sync Trade could be your gateway to earning from the Forex market while building an additional source of income.
+            Feel free to reach out if You would like more information. I would be happy to share my experience and insights.
+            Thank you, and wish you success! 😊';
     }
 
     /**

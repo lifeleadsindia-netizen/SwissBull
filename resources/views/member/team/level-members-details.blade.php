@@ -12,8 +12,11 @@
                 <div class="col-12">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Level Member Table</h4>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4 class="card-title mb-0">Level {{ $levelNo }} Members ({{ $users->count() }})</h4>
+                                <a href="{{ route('member.level-details', [], false) }}" class="btn btn-sm btn-outline-warning">
+                                    <i class="fa fa-arrow-left me-1"></i> Back to Level List
+                                </a>
                             </div>
                             <div class="card-body" style="overflow:auto">
                                 <table id="example3" class="display min-w850 dataTable no-footer">
@@ -45,7 +48,7 @@
                                                             width="50" class="img-fluid img-thumbnail" alt="">
                                                     @endif
                                                 </td>
-                                                <td> {{ date('d-m-Y', strtotime($list['created_at'])) }}</td>
+                                                <td>{{ !empty($list['created_at']) ? date('d-m-Y', strtotime((string)$list['created_at'])) : 'N/A' }}</td>
                                                 <td>{{ $list['memberid'] }}</td>
                                                 <td>{{ $list['name'] }}</td>
                                                 <td>{{ $list['sponsorid'] }} </td>
@@ -53,14 +56,13 @@
                                                 <td>{{ $list['downline'] }}</td>
                                                 <td>
                                                     @if ($list['status'] == 'Active')
-                                                        <div class="badge badge-pill bg-success ">{{ __($list['status']) }}
-                                                        </div>
+                                                        <div class="badge badge-pill bg-success">Active</div>
+                                                    @elseif ($list['status'] == 'Deactive')
+                                                        <div class="badge badge-pill bg-danger">Deactive</div>
                                                     @elseif ($list['status'] == 'Temp')
-                                                        <div class="badge badge-pill bg-primary ">Inactive
-                                                        </div>
+                                                        <div class="badge badge-pill bg-warning text-dark">Inactive</div>
                                                     @else
-                                                        <div class="badge badge-pill bg-danger ">{{ __($list['status']) }}
-                                                        </div>
+                                                        <div class="badge badge-pill bg-secondary">{{ __($list['status']) }}</div>
                                                     @endif
                                                 </td>
                                             </tr>

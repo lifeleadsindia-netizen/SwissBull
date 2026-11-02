@@ -58,10 +58,11 @@
                                 <th>{{ __('Time')}}</th>
                                 <th>{{ __('Memberid')}}</th>
                                 <th>{{ __('Txnid')}}</th>
+                                <th>{{ __('Wallet Type')}}</th>
                                 <th>{{ __('Amount')}}</th>
                                 <th>{{ __('Added By')}}</th>
                                 <th>{{ __('Type')}}</th>
-                                <th>{{ __('Mode')}}</th>
+                                <!--<th>{{ __('Mode')}}</th>-->
                                 <th>{{ __('Status')}}</th>
 
                             </tr>
@@ -74,6 +75,7 @@
                                     <td>{{ $list['created_at']}}</td>
                                     <td>{{ $list['memberid']}}</td>
                                     <td>{{ $list['txnid']}}</td>
+                                    <td>{{ $list['wallet_type']}}</td>
                                     <td>$ {{ $list['amount']}}</td>
                                     <td>
                                         {{ $list['added_by']}}
@@ -85,13 +87,13 @@
                                        <span class="badge badge-danger">{{ $list['type']}}</span>
                                        @endif
                                     </td>
-                                    <td>
-                                        @if ($list['mode']=='Online')
-                                          <span class="badge badge-warning">{{ $list['mode']}}</span>
-                                        @else
-                                        <span class="badge badge-primary">{{ $list['mode']}}</span>
-                                        @endif
-                                     </td>
+                                    <!--<td>-->
+                                    <!--    @if ($list['mode']=='Online')-->
+                                    <!--      <span class="badge badge-warning">{{ $list['mode']}}</span>-->
+                                    <!--    @else-->
+                                    <!--    <span class="badge badge-primary">{{ $list['mode']}}</span>-->
+                                    <!--    @endif-->
+                                    <!-- </td>-->
 
                                     <td>
                                         <div class="badge badge-success">

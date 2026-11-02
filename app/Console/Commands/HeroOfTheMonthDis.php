@@ -54,7 +54,7 @@ class HeroOfTheMonthDis extends Command
         // Step 6: Sabhi winner members me reward distribute karna
         foreach ($max['memberid'] as $memberid) {
             $value = MemberDetail::where([['memberid', $memberid], ['status', 'Active']])->first();
-            if (! $value) {
+            if (! $value || ! $value->hasActiveStaking()) {
                 continue;
             }
 

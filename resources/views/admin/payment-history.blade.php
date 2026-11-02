@@ -59,8 +59,8 @@
                                 </a>
                             </li>
                             <li class="nav-item ml-2">
-                                <a class="nav-link font-weight-bold" id="trading-tab" data-toggle="pill" href="#trading-panel"
-                                    role="tab" aria-controls="trading-panel" aria-selected="false"
+                                <a class="nav-link font-weight-bold" id="trading-tab" data-toggle="pill"
+                                    href="#trading-panel" role="tab" aria-controls="trading-panel" aria-selected="false"
                                     style="border-radius: 6px; padding: 8px 18px; border: 1px solid #ffc107; color: #ffc107;">
                                     <i class="ik ik-bar-chart-2 mr-1"></i> {{ __('Trading') }}
                                     <span class="badge badge-warning ml-1">{{ count($tradingData ?? []) }}</span>
@@ -82,6 +82,7 @@
                                                 <th>{{ __('Request Id') }}</th>
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('Wallet Address') }}</th>
+                                                <th>{{ __('Txn Hash') }}</th>
                                                 <th>{{ __('Type') }}</th>
                                                 {{-- <th>{{ __('Gross') }}</th> --}}
                                                 {{-- <th>{{ __('Charges') }}</th> --}}
@@ -95,10 +96,12 @@
                                             @foreach ($data as $list)
                                                 <tr>
                                                     <td>{{ $i }}</td>
-                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}<br>{{ date('H:i:s', strtotime($list['created_at'])) }}
+                                                    </td>
                                                     <td>{{ $list['request_id'] }}</td>
                                                     <td>{{ $list['memberid'] }}</td>
                                                     <td>{{ $list['wallet_address'] }}</td>
+                                                    <td>{{ $list['txnid'] }}</td>
                                                     <td><span
                                                             class="badge badge-{{ $list['type'] == 'Exchange' ? 'warning' : 'primary' }}">{{ $list['type'] }}</span>
                                                     </td>
@@ -126,8 +129,8 @@
                                                 <th>{{ __('Request Id') }}</th>
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('BEP-20 Wallet Address') }}</th>
+                                                <th>{{ __('Txn Hash') }}</th>
                                                 <th>{{ __('PEPE Tokens') }}</th>
-                                                {{-- <th>{{ __('Tx Hash') }}</th> --}}
                                                 <th>{{ __('Payment Date') }}</th>
                                                 <th>{{ __('Status') }}</th>
                                             </tr>
@@ -137,15 +140,17 @@
                                             @forelse (($pepeData ?? []) as $list)
                                                 <tr>
                                                     <td>{{ $j }}</td>
-                                                   <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}<br>{{ date('H:i:s', strtotime($list['created_at'])) }}
                                                     </td>
-                                                    <td><span
-                                                            class="badge badge-secondary">{{ $list['request_id'] }}</span>
+                                                    </td>
+                                                    <td><span class="">{{ $list['request_id'] }}</span>
                                                     </td>
                                                     <td><strong>{{ $list['memberid'] }}</strong></td>
                                                     <td>
-                                                        <code
-                                                            style="font-size: 11px; color: #007bff; word-break: break-all;">{{ $list['wallet_address'] }}</code>
+                                                        {{ $list['wallet_address'] }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $list['txnid'] }}
                                                     </td>
                                                     <td>
                                                         <strong class="text-success" style="font-size: 14px;">
@@ -196,6 +201,7 @@
                                                 <th>{{ __('Request Id') }}</th>
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('Wallet Address') }}</th>
+                                                <th>{{ __('Txn Hash') }}</th>
                                                 <th>{{ __('Type') }}</th>
                                                 <th>{{ __('Net ') }}</th>
                                                 <th>{{ __('Payment Date') }}</th>
@@ -207,10 +213,12 @@
                                             @forelse (($tradingData ?? []) as $list)
                                                 <tr>
                                                     <td>{{ $k }}</td>
-                                                    <td>{{ date('d-m-Y', strtotime($list['created_at']))}}<br>{{ date('H:i:s', strtotime($list['created_at']))}}</td>
+                                                    <td>{{ date('d-m-Y', strtotime($list['created_at'])) }}<br>{{ date('H:i:s', strtotime($list['created_at'])) }}
+                                                    </td>
                                                     <td>{{ $list['request_id'] }}</td>
                                                     <td>{{ $list['memberid'] }}</td>
                                                     <td>{{ $list['wallet_address'] }}</td>
+                                                    <td>{{ $list['txnid'] }}</td>
                                                     <td><span
                                                             class="badge badge-{{ $list['type'] == 'Exchange' ? 'warning' : 'primary' }}">{{ $list['type'] }}</span>
                                                     </td>

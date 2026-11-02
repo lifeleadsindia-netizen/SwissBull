@@ -98,7 +98,7 @@
                                         <td>{{ $list['sponsorid'] }}</td>
                                         <td>{{ $list['downline'] }}</td>
                                         <td>${{ $list['package'] }}</td>
-                                        <td>${{ $list['team_biz'] }}</td>
+                                        <td>${{ $list['team_biz'] - $list['self_biz'] }}</td>
                                         <td>${{ $list['self_biz'] }}</td>
                                         <td><span class="badge bg-primary rounded-pill px-2 py-1 text-white">
                                             ${{ $list['p2p_wallet'] }}</span>
@@ -108,7 +108,17 @@
                                         </td>
 
                                         <td><span class="btn btn-{{ $list['pepe_wallet'] == 0 ? 'danger' : 'success' }}">{{ $list['pepe_wallet'] }}</span></td>
-                                        <td><span class="btn btn-{{ $list['status'] == 'Active' ? 'success' : 'danger' }}">{{ $list['status'] == 'Active' ? 'Active' : ($list['status'] == 'Temp' ? 'Inactive' : $list['status']) }}</span></td>
+                                        <td>
+        @if ($list['status'] == 'Active')
+            <span class="btn btn-success">Active</span>
+        @elseif ($list['status'] == 'Deactive')
+            <span class="btn btn-danger">Deactive</span>
+        @elseif ($list['status'] == 'Temp')
+            <span class="btn btn-warning text-dark">Inactive</span>
+        @else
+            <span class="btn btn-secondary">{{ $list['status'] }}</span>
+        @endif
+    </td>
                                         <td>
                                             <a href="{{ url('admin/member-login') }}/{{ $list['id'] }}"
                                                 target="_blank" class="btn btn-success text-white"><i

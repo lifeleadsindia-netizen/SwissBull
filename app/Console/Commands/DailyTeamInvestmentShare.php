@@ -24,6 +24,9 @@ class DailyTeamInvestmentShare extends Command
             ->get();
 
         foreach ($members as $value) {
+            if (! $value->hasActiveStaking()) {
+                continue;
+            }
             $memberid = $value->memberid;
             $downline = (int) $value->downline;
             // $dailyTeamBiz = (float) $value->daily_team_biz;

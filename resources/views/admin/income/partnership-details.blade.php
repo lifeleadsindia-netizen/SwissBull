@@ -81,8 +81,8 @@
                                             <td>$ {{ number_format($investAmount, 2) }}</td>
                                             <td>$ {{ $capping }}</td>
                                             <td>{{ $rate }}%</td>
-                                            <td>{{ $installments }}</td>
                                             <td>$ {{ number_format($achieved, 2) }}</td>
+                                            <td>{{ $installments }}</td>
                                             <td>
                                                 @if ($status == 'Active')
                                                     <label class="badge badge-success">{{ $status }}</label>

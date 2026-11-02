@@ -28,10 +28,12 @@
                             <th>Date</th>
                             <th>Member ID</th>
                             <th>Name</th>
-                            <th>Total Investment</th>
+                            <th>Trading Volume</th>
                             <th>Rate</th>
                             <th>Installment</th>
-                            <th>Amount</th>
+                            <th>Paid Today</th>
+                            <th>Total Paid</th>
+                            <th>Total Balance</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -46,7 +48,9 @@
                                 <td>$ {{ number_format($list['total_investment'], 2) }}</td>
                                 <td>{{ $list['rate'] }}%</td>
                                 <td>{{ $list['installment'] }}</td>
-                                <td>$ {{ number_format($list['amount'], 2) }}</td>
+                                <td>$ {{ number_format($list['amount'], 4) }}</td>
+                                <td>$ {{ totalEarning($list['staking_id']) }}</td>
+                                <td>$ {{ totalStakingBalance($list['staking_id']) }}</td>
                                 <td>
                                     @if ($list['status'] == 'Unpaid')
                                         <span class="inc-badge unpaid"><i class="fa-solid fa-clock"></i>{{ $list['status'] }}</span>

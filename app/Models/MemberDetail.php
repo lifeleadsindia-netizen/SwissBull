@@ -223,4 +223,84 @@ class MemberDetail extends Model
     {
         // Lock calculation is anchored dynamically to staking_details.created_at + PackageDistribution.
     }
+
+    /**
+     * Check if the member has at least one active staking record in staking_details.
+     */
+    public function hasActiveStaking(): bool
+    {
+        return $this->stakingDetails()->where('status', 'Active')->exists();
+    }
+
+    /**
+     * Check if the member had staking records before, but now has zero active stakings.
+     */
+    public function hasOnlyDeactiveStakings(): bool
+    {
+        $hasAny = $this->stakingDetails()->exists();
+        if (! $hasAny) {
+            return false;
+        }
+
+        return ! $this->stakingDetails()->where('status', 'Active')->exists();
+    }
+
+    /**
+     * Determine dynamic effective status:
+     * - 'Blocked': if explicitly blocked by admin
+     * - 'Active': if member has at least 1 active package in staking_details
+     * - 'Deactive': if member has staking records, but all are Deactive/Expired
+     * - 'Inactive': if member has 0 staking records (newly registered / Temp)
+     */
+    public function getEffectiveStatusAttribute(): string
+    {
+        if ($this->status === 'Blocked') {
+            return 'Blocked';
+        }
+
+        if ($this->hasActiveStaking()) {
+            return 'Active';
+        }
+
+        if ($this->hasOnlyDeactiveStakings()) {
+            return 'Deactive';
+        }
+
+        return ($this->status === 'Temp' || empty($this->status)) ? 'Inactive' : $this->status;
+    }
+
+    /**
+     * Synchronize member_details.status in the database based on staking_details.
+     */
+    public function syncStakingStatus(): string
+    {
+        if ($this->status === 'Blocked') {
+            return 'Blocked';
+        }
+
+        if ($this->hasActiveStaking()) {
+            if ($this->status !== 'Active') {
+                $this->status = 'Active';
+                $this->save();
+            }
+
+            return 'Active';
+        }
+
+        if ($this->hasOnlyDeactiveStakings()) {
+            if ($this->status !== 'Deactive') {
+                $this->status = 'Deactive';
+                $this->save();
+            }
+
+            return 'Deactive';
+        }
+
+        if (empty($this->status) || $this->status === 'Inactive') {
+            $this->status = 'Temp';
+            $this->save();
+        }
+
+        return $this->status ?? 'Temp';
+    }
 }

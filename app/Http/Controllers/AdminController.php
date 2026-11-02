@@ -66,11 +66,11 @@ class AdminController extends Controller
                     'otp' => $otp,
                 ];
                 $user['to'] = $email;
-                // Mail::send('admin.mails.login-mail', $mailData, function ($message) use ($user) {
+                Mail::send('admin.mails.login-mail', $mailData, function ($message) use ($user) {
 
-                //     $message->to($user['to']);
-                //     $message->subject('SYNC TRADE Admin Login OTP');
-                // });
+                    $message->to($user['to']);
+                    $message->subject('SYNC TRADE Admin Login OTP');
+                });
             }
             session()->flash('OtpMsg', 'Your OTP has been send to admin email');
 
@@ -205,7 +205,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'DESC')->get(),
@@ -227,7 +227,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -249,7 +249,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'DESC')->get(),
@@ -300,8 +300,10 @@ class AdminController extends Controller
             $request->session()->put('country', $result->country);
             $request->session()->put('address', $result->address);
             $request->session()->put('MEMBER_ID', $result->memberid);
+            $request->session()->put('show_dashboard_popup', true);
+            $request->session()->flash('show_dashboard_popup', true);
 
-            return redirect('member/dashboard');
+            return redirect('member/dashboard?entry=login');
         }
     }
 
@@ -315,7 +317,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -365,7 +367,7 @@ class AdminController extends Controller
 
             $file = $request->file('image');
             $extension = $file->getClientOriginalExtension();
-            $filename = time().'.'.$extension;
+            $filename = time() . '.' . $extension;
             $file->move(public_path('uploads'), $filename);
             $var->profile_image = $filename;
         }
@@ -386,9 +388,12 @@ class AdminController extends Controller
         $request->validate([
             'memberid' => 'required',
             'amount' => 'required|gt:0',
+            'wallet_type' => 'required',
         ]);
         $memberid = $request->post('memberid');
         $amount = $request->post('amount');
+        $wallet_type = $request->post('wallet_type');
+
         $var = MemberDetail::where('memberid', $memberid)->first();
         if (! $var) {
             session()->flash('failedMsg', 'Entered Memberid is not Available. Please change memberid');
@@ -400,23 +405,31 @@ class AdminController extends Controller
 
             return redirect()->back();
         }
-        // $Wallet = $var->wallet;
-        $p2p_wallet = $var->p2p_wallet;
-        // $var->wallet += $amount;
-        $var->p2p_wallet += $amount;
-        $var->save();
+        if ($wallet_type == 'Fund Wallet') {
 
-        walletTransfer($memberid, $amount, 'debit', $p2p_wallet, 'Fund Transfer', '$ '.$amount.' has been transferred to your Fund Wallet by '.'Admin');
+            $p2p_wallet = $var->p2p_wallet;
+            $var->p2p_wallet += $amount;
+            $var->save();
+
+            walletTransfer($memberid, $amount, 'debit', $p2p_wallet, 'Fund Transfer', '$ ' . $amount . ' has been transferred to your Fund Wallet by ' . 'Admin');
+        } else {
+
+            $Wallet = $var->wallet;
+            $var->wallet += $amount;
+            $var->save();
+
+            walletTransfer($memberid, $amount, 'debit', $Wallet, 'Fund Transfer', '$ ' . $amount . ' has been transferred to your Fund Wallet by ' . 'Admin');
+        }
 
         $varimp = new ImportFund;
         $varimp->memberid = $memberid;
         $varimp->amount = $amount;
         $varimp->orderid = rand(10000, 99999);
-        $varimp->txnid = 'TXN'.rand(100000, 999999).time();
+        $varimp->txnid = 'TXN' . rand(100000, 999999) . time();
         $varimp->type = 'Add';
         $varimp->added_by = 'Admin';
         $varimp->status = 'Approved';
-        $varimp->wallet_type = 'P2P Wallet';
+        $varimp->wallet_type = $wallet_type;
         $varimp->mode = 'Mannual';
         $varimp->save();
 
@@ -435,9 +448,11 @@ class AdminController extends Controller
         $request->validate([
             'memberid' => 'required',
             'amount' => 'required|gt:0',
+            'wallet_type' => 'required',
         ]);
         $memberid = $request->post('memberid');
         $amount = $request->post('amount');
+        $wallet_type = $request->post('wallet_type');
         $var = MemberDetail::where('memberid', $memberid)->first();
         if (! $var) {
             session()->flash('failedMsg', 'Entered Memberid is not Available. Please change memberid');
@@ -454,22 +469,30 @@ class AdminController extends Controller
 
             return redirect()->back();
         }
-        // $Wallet = $var->wallet;
-        $p2p_wallet = $var->p2p_wallet;
-        // $var->wallet -= $amount;
-        $var->p2p_wallet -= $amount;
-        $var->save();
+        if ($wallet_type == 'Fund Wallet') {
 
-        walletTransfer($memberid, $amount, 'credit', $p2p_wallet, 'Fund Transfer', '$ '.$amount.' has been deducted from your Fund Wallet by '.'Admin');
+            $p2p_wallet = $var->p2p_wallet;
+            $var->p2p_wallet -= $amount;
+            $var->save();
+
+            walletTransfer($memberid, $amount, 'credit', $p2p_wallet, 'Fund Transfer', '$ ' . $amount . ' has been deducted from your Fund Wallet by ' . 'Admin');
+        } else {
+
+            $Wallet = $var->wallet;
+            $var->wallet -= $amount;
+            $var->save();
+
+            walletTransfer($memberid, $amount, 'credit', $Wallet, 'Fund Transfer', '$ ' . $amount . ' has been deducted from your Fund Wallet by ' . 'Admin');
+        }
 
         $varimp = new ImportFund;
         $varimp->memberid = $memberid;
         $varimp->amount = $amount;
         $varimp->orderid = rand(10000, 99999);
-        $varimp->txnid = 'TXN'.rand(100000, 999999).time();
+        $varimp->txnid = 'TXN' . rand(100000, 999999) . time();
         $varimp->type = 'Deduct';
         $varimp->added_by = 'Admin';
-        $varimp->wallet_type = 'P2P Wallet';
+        $varimp->wallet_type = $wallet_type;
         $varimp->status = 'Approved';
         $varimp->mode = 'Mannual';
         $varimp->save();
@@ -489,7 +512,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -541,14 +564,14 @@ class AdminController extends Controller
     public function packageDetails(Request $request)
     {
         $memberId = trim((string) $request->query('member_id', ''));
-        $query = PackageDetail::whereIn('status', ['Accepted', 'Active']);
+        $query = StakingDetail::whereIn('status', ['Accepted', 'Active']);
         if ($memberId !== '') {
             $query->where('memberid', $memberId);
         }
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -556,6 +579,8 @@ class AdminController extends Controller
             'action' => url('admin/package-details'),
             'showMemberIdFilter' => true,
         ]);
+        $capping = PackageDistribution::find(1)->value('capping');
+        $result['capping'] = $capping != 0 ? $capping / 100 : 0;
 
         return view('admin.package-details')->with($result);
     }
@@ -596,7 +621,7 @@ class AdminController extends Controller
 
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
 
         $result = array_merge($filterMeta, [
@@ -648,7 +673,7 @@ class AdminController extends Controller
 
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
 
         $result = array_merge($filterMeta, [
@@ -700,7 +725,7 @@ class AdminController extends Controller
 
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
 
         $result = array_merge($filterMeta, [
@@ -737,7 +762,7 @@ class AdminController extends Controller
                 $qry->pepe_wallet += $amount;
                 $qry->save();
             }
-            session()->flash('wMessage', 'PEPE Redeem request has been rejected and '.number_format($amount, 0).' PEPE refunded back to member wallet!');
+            session()->flash('wMessage', 'PEPE Redeem request has been rejected and ' . number_format($amount, 0) . ' PEPE refunded back to member wallet!');
 
             return redirect()->back();
         }
@@ -759,14 +784,19 @@ class AdminController extends Controller
             if (isset($staking)) {
                 $staking->status = 'Active';
                 $staking->save();
+
+                if ($qry) {
+                    $qry->status = 'Active';
+                    $qry->save();
+                }
             }
 
             if ($qry) {
                 $qry->trading_wallet += $amount;
                 $qry->save();
-                walletTransfer($memberid, $amount, 'credit', $qry->trading_wallet, 'Withdrawal Request Cancelled', ' $ '.$amount.' have been added to trading wallet due to withdrawal request cancellation');
+                walletTransfer($memberid, $amount, 'credit', $qry->trading_wallet, 'Withdrawal Request Cancelled', ' $ ' . $amount . ' have been added to trading wallet due to withdrawal request cancellation');
             }
-            session()->flash('wMessage', 'Trading Withdrawal request has been rejected and $'.number_format($amount, 2).' refunded back to trading wallet!');
+            session()->flash('wMessage', 'Trading Withdrawal request has been rejected and $' . number_format($amount, 2) . ' refunded back to trading wallet!');
 
             return redirect()->back();
         }
@@ -776,7 +806,7 @@ class AdminController extends Controller
             $qry->wallet += $amount;
             $qry->save();
 
-            walletTransfer($memberid, $amount, 'debit', $wallet, 'Withdrawal Request Cancelled', ' $ '.$amount.' have been added to wallet due to withdrawal request cancellation');
+            walletTransfer($memberid, $amount, 'debit', $wallet, 'Withdrawal Request Cancelled', ' $ ' . $amount . ' have been added to wallet due to withdrawal request cancellation');
         }
 
         session()->flash('wMessage', 'Withdrawal request has been rejected successfully!');
@@ -802,14 +832,14 @@ class AdminController extends Controller
 
         // If PEPE Token redeem, bypass USDT referral commission
         if ($var->type === 'Airdrop Withdrawal') {
-            session()->flash('wMessage', 'PEPE Token redeem request for '.number_format($var->gross_amount, 0).' PEPE has been accepted successfully!');
+            session()->flash('wMessage', 'PEPE Token redeem request for ' . number_format($var->gross_amount, 0) . ' PEPE has been accepted successfully!');
 
             return redirect()->back();
         }
 
         // If Trading Withdrawal, bypass USDT referral commission
         if ($var->type === 'Trading Withdrawal') {
-            session()->flash('wMessage', 'Trading Withdrawal request for $'.number_format($var->gross_amount, 2).' has been accepted successfully!');
+            session()->flash('wMessage', 'Trading Withdrawal request for $' . number_format($var->gross_amount, 2) . ' has been accepted successfully!');
 
             return redirect()->back();
         }
@@ -832,7 +862,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -985,12 +1015,12 @@ class AdminController extends Controller
             $rateVal = null;
             if (isset($submittedRates[$plan->id]) && $submittedRates[$plan->id] !== '') {
                 $rateVal = (float) $submittedRates[$plan->id];
-            } elseif ($request->filled('package_'.($index + 1).'_rate')) {
-                $rateVal = (float) $request->input('package_'.($index + 1).'_rate');
+            } elseif ($request->filled('package_' . ($index + 1) . '_rate')) {
+                $rateVal = (float) $request->input('package_' . ($index + 1) . '_rate');
             }
 
             if ($rateVal !== null) {
-                $field = 'package_'.($index + 1).'_rate';
+                $field = 'package_' . ($index + 1) . '_rate';
                 $distribution->{$field} = $rateVal;
                 $plan->update(['return_percent' => $rateVal]);
             }
@@ -1026,7 +1056,7 @@ class AdminController extends Controller
         ];
         // Add package rates dynamically
         foreach ($packagePlans as $index => $plan) {
-            $field = 'package_'.($index + 1).'_rate';
+            $field = 'package_' . ($index + 1) . '_rate';
             $newData[$field] = $distribution->{$field};
         }
 
@@ -1223,7 +1253,7 @@ class AdminController extends Controller
 
         $validator->after(function ($validator) use ($request) {
             for ($i = 2; $i <= 10; $i++) {
-                $prevKey = 'level_'.($i - 1).'_directs';
+                $prevKey = 'level_' . ($i - 1) . '_directs';
                 $currKey = "level_{$i}_directs";
 
                 if ($request->has($prevKey) && $request->has($currKey)) {
@@ -1237,7 +1267,7 @@ class AdminController extends Controller
                         if ($currVal < $prevVal) {
                             $validator->errors()->add(
                                 $currKey,
-                                "Level-{$i} Direct Referrals ({$currVal}) must be greater than or equal to Level-".($i - 1)." Direct Referrals ({$prevVal})."
+                                "Level-{$i} Direct Referrals ({$currVal}) must be greater than or equal to Level-" . ($i - 1) . " Direct Referrals ({$prevVal})."
                             );
                         }
                     }
@@ -1307,7 +1337,7 @@ class AdminController extends Controller
         $var->title = $request->post('title');
         $pImage = $request->file('image');
         $ext = $pImage->getClientOriginalExtension();
-        $imagename = 'P'.time().'.'.$ext;
+        $imagename = 'P' . time() . '.' . $ext;
         $pImage->move(public_path('uploads'), $imagename);
         $var->image = $imagename;
         $var->save();
@@ -1403,14 +1433,14 @@ class AdminController extends Controller
                     foreach ($members as $mem) {
                         $reads = is_array($mem->file_read) ? $mem->file_read : json_decode($mem->file_read, true);
                         if (is_array($reads) && in_array($newNotifId, array_map('intval', $reads), true)) {
-                            $cleaned = array_values(array_filter(array_map('intval', $reads), fn ($id) => $id !== $newNotifId));
+                            $cleaned = array_values(array_filter(array_map('intval', $reads), fn($id) => $id !== $newNotifId));
                             $mem->file_read = $cleaned;
                             $mem->save();
                         }
                     }
                 });
         } catch (\Throwable $ex) {
-            Log::warning('Clean new notification from file_read error: '.$ex->getMessage());
+            Log::warning('Clean new notification from file_read error: ' . $ex->getMessage());
         }
 
         session()->flash('successMsg', 'Notification sent successfully.');
@@ -1430,7 +1460,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1452,7 +1482,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1474,7 +1504,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'invest_date', ['invest_date' => 'invest_date', 'created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1496,7 +1526,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'invest_date', ['invest_date' => 'invest_date', 'created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1518,7 +1548,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1540,7 +1570,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1562,7 +1592,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1584,7 +1614,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1606,7 +1636,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1628,7 +1658,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1650,7 +1680,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1672,7 +1702,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'date', ['date' => 'date', 'created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1694,7 +1724,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'invest_date', ['invest_date' => 'invest_date', 'created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -1787,7 +1817,7 @@ class AdminController extends Controller
                 'created_at' => 'Date',
                 'invest_date' => 'Invest Date',
             ];
-            $fieldLabel = ($labels[$dateField] ?? ucfirst(str_replace('_', ' ', $dateField))).': ';
+            $fieldLabel = ($labels[$dateField] ?? ucfirst(str_replace('_', ' ', $dateField))) . ': ';
         }
 
         // 1. Basic Single Date Filter
@@ -1799,7 +1829,7 @@ class AdminController extends Controller
 
                 $query->whereBetween($targetColumn, [$start, $end]);
                 $activeFilter = true;
-                $summary = $fieldLabel.$parsed->format('d M Y');
+                $summary = $fieldLabel . $parsed->format('d M Y');
             } catch (\Exception $e) {
                 $errors[] = 'Invalid date format.';
             }
@@ -1827,29 +1857,29 @@ class AdminController extends Controller
                     // Today + 6 previous calendar days = 7 days inclusive
                     $start = $now->copy()->subDays(6)->startOfDay();
                     $end = $now->copy()->endOfDay();
-                    $label = 'Last 7 Days ('.$start->format('d M').' – '.$end->format('d M').')';
+                    $label = 'Last 7 Days (' . $start->format('d M') . ' – ' . $end->format('d M') . ')';
                     break;
                 case 'last_30_days':
                     // Today + 29 previous calendar days = 30 days inclusive
                     $start = $now->copy()->subDays(29)->startOfDay();
                     $end = $now->copy()->endOfDay();
-                    $label = 'Last 30 Days ('.$start->format('d M').' – '.$end->format('d M').')';
+                    $label = 'Last 30 Days (' . $start->format('d M') . ' – ' . $end->format('d M') . ')';
                     break;
                 case 'this_month':
                     $start = $now->copy()->startOfMonth()->startOfDay();
                     $end = $now->copy()->endOfMonth()->endOfDay();
-                    $label = 'This Month ('.$now->format('M Y').')';
+                    $label = 'This Month (' . $now->format('M Y') . ')';
                     break;
                 case 'last_month':
                     $lastMonth = $now->copy()->subMonth();
                     $start = $lastMonth->copy()->startOfMonth()->startOfDay();
                     $end = $lastMonth->copy()->endOfMonth()->endOfDay();
-                    $label = 'Last Month ('.$lastMonth->format('M Y').')';
+                    $label = 'Last Month (' . $lastMonth->format('M Y') . ')';
                     break;
                 case 'this_year':
                     $start = $now->copy()->startOfYear()->startOfDay();
                     $end = $now->copy()->endOfYear()->endOfDay();
-                    $label = 'This Year ('.$now->format('Y').')';
+                    $label = 'This Year (' . $now->format('Y') . ')';
                     break;
                 case 'custom':
                 default:
@@ -1863,7 +1893,7 @@ class AdminController extends Controller
                             } else {
                                 $start = $fromParsed->copy()->startOfDay();
                                 $end = $toParsed->copy()->endOfDay();
-                                $label = $fromParsed->format('d M Y').' – '.$toParsed->format('d M Y');
+                                $label = $fromParsed->format('d M Y') . ' – ' . $toParsed->format('d M Y');
                             }
                         } catch (\Exception $e) {
                             $errors[] = 'Invalid date range provided.';
@@ -1877,7 +1907,7 @@ class AdminController extends Controller
             if ($start && $end && empty($errors)) {
                 $query->whereBetween($targetColumn, [$start->toDateTimeString(), $end->toDateTimeString()]);
                 $activeFilter = true;
-                $summary = $fieldLabel.$label;
+                $summary = $fieldLabel . $label;
             }
         }
 
@@ -1900,7 +1930,7 @@ class AdminController extends Controller
         $filterMeta = $this->applyAdminDateFilter($query, $request, 'created_at', ['created_at' => 'created_at']);
         if ($memberId !== '') {
             $filterMeta['filterActive'] = true;
-            $filterMeta['filterSummary'] = 'Member: '.$memberId.(! empty($filterMeta['filterSummary']) ? ' | '.$filterMeta['filterSummary'] : '');
+            $filterMeta['filterSummary'] = 'Member: ' . $memberId . (! empty($filterMeta['filterSummary']) ? ' | ' . $filterMeta['filterSummary'] : '');
         }
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
@@ -2033,7 +2063,7 @@ class AdminController extends Controller
         $maxWithdrawable = $isLocked ? 0.00 : max(0.00, round(($p2pBalance * $withPercent) / 100.00, 2));
 
         $regDate = $member->created_at ? Carbon::parse($member->created_at)->format('d M Y') : 'N/A';
-        $pkgName = $latestStk ? ($latestStk->package ? 'Package '.$latestStk->package : 'Staking Package') : 'None';
+        $pkgName = $latestStk ? ($latestStk->package ? 'Package ' . $latestStk->package : 'Staking Package') : 'None';
         $pkgValue = $latestStk ? (float) ($latestStk->invest_amount ?? 0.00) : 0.00;
         $pkgDate = $activationTime ? $activationTime->format('d M Y') : 'N/A';
 

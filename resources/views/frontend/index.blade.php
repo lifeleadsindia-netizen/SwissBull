@@ -1752,7 +1752,7 @@
         <button class="theme-toggle" id="themeToggle" title="Toggle light/dark">🌙</button>
         <span id="walletAddr"></span>
         @if (session()->has('MEMBER_ID'))
-        <a href="{{ url('member/dashboard') }}" class="btn">📊 Dashboard</a>
+        <a href="{{ url('member/dashboard?entry=login') }}" class="btn">📊 Dashboard</a>
         @else
         <button class="btn" id="connectBtn" onclick="connectWallet()">🔗 Connect Wallet</button>
         @endif
@@ -1781,7 +1781,7 @@
       <p class="hero-sub">A technology-driven forex trading &amp; investment platform combining algorithmic systems, copy trading and structured market analysis — built on transparency, discipline and responsible risk management.</p>
       <div class="hero-cta">
         @if (session()->has('MEMBER_ID'))
-        <a href="{{ url('member/dashboard') }}" class="btn">📊 Dashboard</a>
+        <a href="{{ url('member/dashboard?entry=login') }}" class="btn">📊 Dashboard</a>
         @else
         <button class="btn" onclick="connectWallet()">🔗 Connect Wallet</button>
         @endif
@@ -2216,7 +2216,7 @@
       <p>Join a community built on transparency, discipline and technology. Create your account and put modern trading strategies to work.</p>
       <div class="hero-cta" style="opacity:1;animation:none">
         @if (session()->has('MEMBER_ID'))
-        <a href="{{ url('member/dashboard') }}" class="btn">📊 Dashboard</a>
+        <a href="{{ url('member/dashboard?entry=login') }}" class="btn">📊 Dashboard</a>
         @else
         <button class="btn" onclick="connectWallet()">🔗 Connect Wallet</button>
         @endif
@@ -2233,7 +2233,7 @@
         <a href="#about">About</a><a href="#what">What We Do</a><a href="#forex">Forex</a>
         <a href="#packages">Packages</a><a href="#income">Income</a><a href="#ranks">Partnership</a><a href="#airdrop">Airdrop</a><a href="#features">Features</a>
         @if (session()->has('MEMBER_ID'))
-        <a href="{{ url('member/dashboard') }}">Dashboard</a>
+        <a href="{{ url('member/dashboard?entry=login') }}" class="btn">📊 Dashboard</a>
         @endif
       </div>
       <div class="site-url">🌐 www.sync-trade.com</div>
@@ -2300,7 +2300,7 @@
     let account = null;
     const short = a => a.slice(0, 6) + '…' + a.slice(-4);
     const isMemberAuthenticated = @json(session()->has('MEMBER_ID'));
-    const memberDashboardUrl = @json(url('member/dashboard'));
+    const memberDashboardUrl = @json(url('member/dashboard?entry=login'));
 
     let eip6963Providers = [];
     window.addEventListener('eip6963:announceProvider', function(e) {
@@ -2332,7 +2332,12 @@
       }
     }
 
+    let isValidating = false;
     async function validateAndRedirect(address) {
+      if (isValidating) {
+        return;
+      }
+      isValidating = true;
       toast('Connected: ' + short(address) + '. Validating member status…');
       const csrfMeta = document.querySelector('meta[name="csrf-token"]');
       const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
@@ -2358,15 +2363,17 @@
         if (data.code === 1) {
           toast('Member verified! Redirecting to Member Dashboard…');
           setTimeout(() => {
-            window.location.href = "{{ url('member/dashboard') }}";
-          }, 500);
+            window.location.href = "{{ url('member/dashboard?entry=login') }}";
+          }, 400);
         } else {
+          isValidating = false;
           toast('New wallet detected. Redirecting to Member Registration…');
           setTimeout(() => {
             window.location.href = "{{ url('/member/register/1') }}";
           }, 500);
         }
       } catch (err) {
+        isValidating = false;
         console.error("Address validation error:", err);
         toast('Validation error. Please try again.');
       }

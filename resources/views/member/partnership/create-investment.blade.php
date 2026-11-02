@@ -234,7 +234,7 @@
                                 <div class="sk-step-num">1</div>
                                 <div class="sk-step-text">
                                     <strong>Select Package</strong>
-                                    Choose an available partnership investment package based on your current tier.
+                                    Packages are activated sequentially, from the lowest to the highest activation charge. Choose an available Partnership Package that matches your current tier.
                                 </div>
                             </div>
 
@@ -250,7 +250,7 @@
                                 <div class="sk-step-num">3</div>
                                 <div class="sk-step-text">
                                     <strong>Earn Returns</strong>
-                                    Returns are generated automatically and credited to your income wallet.
+                                    Your Partnership Bonus is calculated daily based on your team’s total business volume. You earn your pre-allocated commission percentage on the total daily team business volume until you reach your package’s maximum bonus cap.
                                 </div>
                             </div>
 
@@ -258,7 +258,7 @@
                                 <div class="sk-step-num">4</div>
                                 <div class="sk-step-text">
                                     <strong>Maturity & Withdrawal</strong>
-                                    Upon maturity, your investment principal and returns are fully available.
+                                    Maturity is determined by the maximum total earnings cap pre-allocated to each Partnership Package. Your daily earnings are credited to your Main Wallet and are available for withdrawal.
                                 </div>
                             </div>
                         </div>

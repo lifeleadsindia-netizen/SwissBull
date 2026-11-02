@@ -1,5 +1,5 @@
 @extends('admin.layouts.main')
-@section('title', 'Roi Income')
+@section('title', 'Monthly Trading Profit Income')
 @section('content')
     @push('head')
         <link rel="stylesheet" href="{{ asset('adm_assets/assets/plugins/DataTables/datatables.min.css') }}">
@@ -69,7 +69,7 @@
                                             <td>$ {{ number_format($list['total_investment'], 2) }}</td>
                                             <td>{{ $list['rate'] }}%</td>
                                             <td>{{ $list['installment'] }}</td>
-                                            <td>$ {{ number_format($list['amount'], 2) }}</td>
+                                            <td>$ {{ number_format($list['amount'], 4) }}</td>
                                             <td>
                                                 @if ($list['status'] == 'Paid')
                                                     <label class="badge badge-success">{{ $list['status'] }}</label>

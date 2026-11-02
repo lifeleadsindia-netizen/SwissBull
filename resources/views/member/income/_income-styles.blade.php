@@ -665,6 +665,12 @@
         box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25), 0 10px 24px rgba(16, 185, 129, 0.4);
     }
 
+    .genealogy-root-avatar.status-deactive,
+    .genealogy-card-avatar.status-deactive {
+        border-color: #EF4444;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25), 0 10px 24px rgba(239, 68, 68, 0.4);
+    }
+
     .genealogy-root-avatar.status-temp,
     .genealogy-card-avatar.status-temp {
         border-color: #EF4444;

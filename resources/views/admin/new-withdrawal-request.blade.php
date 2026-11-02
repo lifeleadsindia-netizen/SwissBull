@@ -82,6 +82,7 @@
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('Wallet Type') }}</th>
                                                 <th>{{ __('Wallet Address') }}</th>
+                                                <!--<th>{{ __('Txn ID') }}</th>-->
                                                 {{-- <th>{{ __('Gross') }}</th> --}}
                                                 {{-- <th>{{ __('Charges') }}</th> --}}
                                                 <th>{{ __('Net Amount ') }}</th>
@@ -102,6 +103,7 @@
                                                     <td>{{ $list['memberid'] }}</td>
                                                     <td>{{ $list['type'] }}</td>
                                                     <td>{{ $list['wallet_address'] }}</td>
+                                                    <!--<td>{{ $list['txnid'] }}</td>-->
                                                     {{-- <td> $ {{ $list['gross_amount'] }}</td> --}}
                                                     {{-- <td>$ {{ $list['service_charge'] }}</td> --}}
                                                     <td>$ {{ $list['net_amount'] }}</td>
@@ -136,6 +138,7 @@
                                                 <th>{{ __('Request Id') }}</th>
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('BEP-20 Wallet Address') }}</th>
+                                                <!--<th>{{ __('Tnn ID') }}</th>-->
                                                 <th>{{ __('PEPE Tokens') }}</th>
                                                 <th>{{ __('Action') }}</th>
                                                 <th>{{ __('Action') }}</th>
@@ -153,6 +156,9 @@
                                                     <td>
                                                         <code style="font-size: 11px; color: #007bff; word-break: break-all;">{{ $list['wallet_address'] }}</code>
                                                     </td>
+                                                    <!--<td>-->
+                                                    <!--    <code class="badge badge-secondary">{{ $list['txnid'] }}</code>-->
+                                                    <!--</td>-->
                                                     <td>
                                                         <strong class="text-success" style="font-size: 14px;">
                                                             {{ number_format($list['gross_amount'], 0) }} PEPE
@@ -196,6 +202,7 @@
                                                 <th>{{ __('Member Id') }}</th>
                                                 <th>{{ __('Wallet Type') }}</th>
                                                 <th>{{ __('Wallet Address') }}</th>
+                                                <!--<th>{{ __('Txn ID') }}</th>-->
                                                 <th>{{ __('Net Amount ') }}</th>
                                                 <th>{{ __('Action') }}</th>
                                                 <th>{{ __('Action') }}</th>
@@ -213,6 +220,7 @@
                                                     <td>{{ $list['memberid'] }}</td>
                                                     <td>{{ $list['type'] }}</td>
                                                     <td>{{ $list['wallet_address'] }}</td>
+                                                    <!--<td>{{ $list['txnid'] }}</td>-->
                                                     <td>$ {{ $list['net_amount'] }}</td>
                                                     <td class="px-0">
                                                         <a href="{{ url('admin/withdrawal/accept-online') }}/{{ $list['id'] }}"

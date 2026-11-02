@@ -10,7 +10,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('app:team-trading-profit')]
-#[Description('Command description')]
+#[Description('Distribute level team trading profit to active uplines')]
 class TeamTradingProfit extends Command
 {
     /**
@@ -18,50 +18,56 @@ class TeamTradingProfit extends Command
      */
     public function handle()
     {
-        $incomes = StakingIncome::where([['status', 'Paid'], ['level_status', 0]])->whereDate('created_at', date('Y-m-d'))->limit(50)->get();
-        foreach ($incomes as $value) {
-            $memberid = $value['memberid'];
-            $name = getName($memberid);
-            $package = $value['amount'];
-            $sponsorid = getSponsorid($memberid);
-            $limit = 11;
-            for ($i = 1; $i < $limit; $i++) {
-                $level = $i;
-                $rate = teamLevelRate($level);
-                $amount = $package * $rate / 100;
+        if (date('D') != 'Sun' && date('D') != 'Mon') {
+            $incomes = StakingIncome::where([['status', 'Paid'], ['level_status', 0]])->whereDate('created_at', date('Y-m-d'))->limit(50)->get();
+            foreach ($incomes as $value) {
+                $memberid = $value['memberid'];
+                $name = getName($memberid);
+                $package = $value['amount'];
+                $sponsorid = getSponsorid($memberid);
+                $limit = 11;
+                for ($i = 1; $i < $limit; $i++) {
+                    $level = $i;
+                    $rate = teamLevelRate($level);
+                    $amount = $package * $rate / 100;
 
-                if ($sponsorid != 'Root') {
-                    $var = MemberDetail::where('memberid', $sponsorid)->first();
-                    $status = $var->status;
-                    $name = $var->name;
-                    $downline = $var->downline;
+                    if ($sponsorid != 'Root') {
+                        $var = MemberDetail::where('memberid', $sponsorid)->first();
+                        if (! $var) {
+                            break;
+                        }
+                        $status = $var->status;
+                        $name = $var->name;
+                        $downline = $var->downline;
 
-                    if ($amount > 0 && $status == 'Active') {
+                        // Guard: Upline must have Active status AND at least one active staking package
+                        if ($amount > 0 && $status === 'Active' && $var->hasActiveStaking()) {
 
-                        $insert = new LevelIncome;
-                        $insert->memberid = $sponsorid;
-                        $insert->level = $level;
-                        $insert->level_id = $memberid;
-                        $insert->amount = $amount;
-                        $insert->package = $package;
-                        $insert->name = $name;
-                        $insert->rate = $rate;
-                        $insert->downline = $downline;
-                        $insert->type = 'Team Trading Profit';
-                        $insert->status = 'Paid';
-                        $insert->save();
+                            $insert = new LevelIncome;
+                            $insert->memberid = $sponsorid;
+                            $insert->level = $level;
+                            $insert->level_id = $memberid;
+                            $insert->amount = $amount;
+                            $insert->package = $package;
+                            $insert->name = getName($memberid);
+                            $insert->rate = $rate;
+                            $insert->downline = $downline;
+                            $insert->type = 'Team Trading Profit';
+                            $insert->status = 'Paid';
+                            $insert->save();
 
-                        $wallet = $var->wallet;
-                        $var->wallet += $amount;
-                        $var->save();
+                            $wallet = $var->wallet;
+                            $var->wallet += $amount;
+                            $var->save();
 
-                        walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Team Trading Profit Income', ''.$i.' Level Team Trading Profit Income Amount Added into wallet.');
+                            walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Team Trading Profit Income', ''.$i.' Level Team Trading Profit Income Amount Added into wallet.');
+                        }
+
+                        $sponsorid = $var['sponsorid'];
                     }
-
-                    $sponsorid = $var['sponsorid'];
                 }
+                $update = StakingIncome::where('id', $value->id)->update(['level_status' => 1]);
             }
-            $update = StakingIncome::where('id', $value->id)->update(['level_status' => 1]);
         }
     }
 }

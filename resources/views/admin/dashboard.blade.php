@@ -14,6 +14,7 @@
 $totalMembers = (int) totalMembersadmin();
 $activeMembers = (int) totalActiveMembers();
 $inactiveMembers = (int) totalTempMembers();
+$deactiveMembers = (int) totalDeactiveMembers();
 $blockedMembers = (int) totalblockedMembers();
 
 $activePercent = $totalMembers > 0 ? round(($activeMembers / $totalMembers) * 100, 1) : 0;
@@ -158,7 +159,7 @@ unset($cat);
                 <div class="adm-stat-top">
                     <div class="adm-stat-title-wrap">
                         <span class="adm-stat-indicator"></span>
-                        <h4 class="adm-stat-title">Total Inactive</h4>
+                        <h4 class="adm-stat-title">Inactive & Deactive</h4>
                     </div>
                     <div class="adm-stat-icon">
                         <i class="ik ik-user-minus"></i>
@@ -166,9 +167,9 @@ unset($cat);
                 </div>
                 <div class="adm-stat-bottom">
                     <div>
-                        <h2 class="adm-stat-num">{{ $inactiveMembers }}</h2>
-                        <span class="adm-stat-badge">
-                            <i class="ik ik-trending-down"></i> {{ $inactivePercent }}%
+                        <h2 class="adm-stat-num">{{ $inactiveMembers + $deactiveMembers }}</h2>
+                        <span class="adm-stat-badge" style="font-size: 0.72rem;">
+                            <i class="ik ik-trending-down"></i> {{ $inactiveMembers }} Inactive &bull; {{ $deactiveMembers }} Deactive
                         </span>
                     </div>
                     <div class="adm-stat-bars">

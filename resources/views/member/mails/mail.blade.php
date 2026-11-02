@@ -346,6 +346,47 @@
             vertical-align: middle;
         }
 
+        /* Login Notice Banner */
+        .login-notice-banner {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border: 2px solid #F59E0B;
+            border-left: 6px solid #D97706;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+            box-shadow: 0 6px 18px rgba(245, 158, 11, 0.15);
+        }
+
+        .login-notice-header {
+            color: #92400E;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .login-notice-text {
+            color: #78350F;
+            font-size: 14.5px;
+            line-height: 1.65;
+            font-weight: 500;
+        }
+
+        .wallet-highlight {
+            display: inline-block;
+            background: #FFFFFF;
+            color: #B45309;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13.5px;
+            font-weight: 700;
+            border: 1px solid #FDE68A;
+            word-break: break-all;
+        }
+
         /* Responsive Design */
         @media (max-width: 600px) {
             .email-container {
@@ -430,6 +471,11 @@
     </style>
 </head>
 <body>
+    <!-- Inbox Preview Snippet -->
+    <div style="display:none;font-size:1px;color:#333333;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">
+        Login Notice: Please login using DApp Browser in your Register Wallet, the registered wallet address is &quot;{{ $member_wallet ?? '' }}&quot;. Please choose BNB (BEP20/BSC Smartchain) network to access the our website https://syncfx.trade
+    </div>
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, #08090C 0%, #12151E 100%); min-height: 100vh; padding: 20px 0;">
         <tr>
             <td align="center" valign="top" style="padding: 20px;">
@@ -437,7 +483,7 @@
         <!-- Header Section -->
         <div class="email-header">
             <div class="logo-wrapper">
-                <img src="{{ $message->embed(public_path().'/logo/logo.png') }}" alt="{{ config('detailsApp.name') }} Logo">
+                <img src="{{ isset($message) ? $message->embed(public_path('logo/logo.png')) : asset('logo/logo.png') }}" alt="{{ config('detailsApp.name') }} Logo">
             </div>
             <h1 class="header-title">{{ config('detailsApp.name') }}</h1>
             <p class="header-subtitle">Welcome to Your Account</p>
@@ -445,6 +491,21 @@
 
         <!-- Body Section -->
         <div class="email-body">
+            <!-- Login Notice Section (Prominently at the beginning of email text) -->
+            <div class="login-notice-banner" style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border: 2px solid #F59E0B; border-left: 6px solid #D97706; border-radius: 12px; padding: 20px; margin-bottom: 28px; text-align: left; box-shadow: 0 6px 18px rgba(245, 158, 11, 0.15);">
+                <div class="login-notice-header" style="color: #92400E; font-size: 16px; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.3px; text-transform: uppercase;">
+                    📢 Login Notice:
+                </div>
+                <div class="login-notice-text" style="color: #78350F; font-size: 14.5px; line-height: 1.65; font-weight: 500;">
+                    <p style="margin: 0 0 10px 0;">
+                        Please login using <strong>DApp Browser</strong> in your <strong>Register Wallet</strong>, the registered wallet address is <span class="wallet-highlight" style="display: inline-block; background: #FFFFFF; color: #B45309; padding: 3px 8px; border-radius: 6px; font-family: 'Courier New', Courier, monospace; font-size: 13.5px; font-weight: 700; border: 1px solid #FDE68A; word-break: break-all;">"{{ $member_wallet ?? '' }}"</span>.
+                    </p>
+                    <p style="margin: 0;">
+                        Please choose <strong>BNB (BEP20/BSC Smartchain)</strong> network to access the our website <a href="https://syncfx.trade" target="_blank" rel="noopener noreferrer" style="color: #B45309; font-weight: 700; text-decoration: underline;">https://syncfx.trade</a>
+                    </p>
+                </div>
+            </div>
+
             <!-- Welcome Section -->
             <div class="welcome-section">
                 <div class="welcome-icon">🎉</div>
@@ -487,6 +548,15 @@
                         <div class="credential-value">{{ $mobile }}</div>
                     </div>
 
+                    @if(!empty($member_wallet))
+                    <!-- Registered Wallet Address -->
+                    <div class="credential-card credential-card-full">
+                        <div class="credential-icon">👛</div>
+                        <div class="credential-label">Registered Wallet Address</div>
+                        <div class="credential-value" style="font-size: 14px;">{{ $member_wallet }}</div>
+                    </div>
+                    @endif
+
                     <!-- Password -->
                     <!--<div class="credential-card">-->
                     <!--    <div class="credential-icon">🔐</div>-->
@@ -525,7 +595,7 @@
             <p class="signature">With Regards,</p>
             <p class="company-name">Team {{ config('detailsApp.name') }}</p>
             <div style="margin-top: 15px;">
-                <img src="{{ $message->embed(public_path('logo/logo-dark.png')) }}" alt="{{ config('detailsApp.name') }}" style="max-width: 130px; height: auto;">
+                <img src="{{ isset($message) ? $message->embed(public_path('logo/logo-dark.png')) : asset('logo/logo-dark.png') }}" alt="{{ config('detailsApp.name') }}" style="max-width: 130px; height: auto;">
             </div>
             <p style="margin-top: 12px; font-size: 12px; color: #9ca3af;">
                 © {{ date('Y') }} {{ config('detailsApp.name') }}. All rights reserved.

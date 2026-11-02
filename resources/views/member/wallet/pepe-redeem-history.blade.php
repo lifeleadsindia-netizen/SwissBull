@@ -363,14 +363,14 @@
                             </div>
 
                             @if ($redeemRequests->hasPages())
-                                <div class="d-flex justify-content-between align-items-center p-3"
-                                    style="border-top: 1px solid rgba(255, 255, 255, 0.08);">
-                                    <small class="text-muted">
-                                        Showing {{ $redeemRequests->firstItem() }} to {{ $redeemRequests->lastItem() }} of
-                                        {{ $redeemRequests->total() }} entries
-                                    </small>
-                                    <div>
-                                        {{ $redeemRequests->links() }}
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 p-3 px-4"
+                                    style="border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.015);">
+                                    <div class="text-muted d-flex align-items-center" style="font-size: 13px;">
+                                        <i class="fas fa-list-ol me-2 text-success opacity-75"></i>
+                                        <span>Showing <strong class="text-white">{{ $redeemRequests->firstItem() }}</strong> to <strong class="text-white">{{ $redeemRequests->lastItem() }}</strong> of <strong class="text-white">{{ $redeemRequests->total() }}</strong> entries</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        {{ $redeemRequests->links('pagination::bootstrap-4') }}
                                     </div>
                                 </div>
                             @endif

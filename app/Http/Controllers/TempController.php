@@ -19,128 +19,132 @@ class TempController extends Controller
     public function dailyIncomeDis()
     {
         // Monthly Income(Run Daily)
-        $stakings = StakingDetail::where('status', 'Active')->get();
-        foreach ($stakings as $value) {
-            $memberid = $value->memberid;
-            $staking_id = $value->id;
-            $installment = $value->installments + 1;
-
-            $packageDis = PackageDistribution::find(1);
-            if ($value->package == 'Package1') {
-                $rate = $packageDis->package_1_rate;
-            } elseif ($value->package == 'Package2') {
-                $rate = $packageDis->package_2_rate;
-            } elseif ($value->package == 'Package3') {
-                $rate = $packageDis->package_3_rate;
-            } else {
-                $rate = 0;
-            }
-            $tradingWalletAmount = $value->trading_wallet_amount;
-
-            $stak_amount = ($tradingWalletAmount / 100 * $rate) / 30;
-            if (rand(0, 1) == 1) {
-                $stak_amount += $stak_amount / 100 * rand(1, 10);
-            } else {
-                $stak_amount -= $stak_amount / 100 * rand(1, 10);
-            }
-            $memUpdate = MemberDetail::where('memberid', $memberid)->first();
-            $cap = $packageDis->capping;
-            if ($cap == 0) {
-                $amount = $stak_amount;
-                $balance = 0;
-            } else {
-                $capValue = ($tradingWalletAmount / 100) * $cap;
-                $achieved = StakingIncome::where([['status', 'Paid'], ['staking_id', $staking_id], ['memberid', $memberid]])->sum('amount');
-                $balance = $capValue - $achieved;
-                if ($balance <= $stak_amount) {
-                    $amount = $balance;
+        //if (date('D') != 'Sat' && date('D') != 'Sun') {
+            $stakings = StakingDetail::where('status', 'Active')->get();
+            foreach ($stakings as $value) {
+                $memberid = $value->memberid;
+                $staking_id = $value->id;
+                $installment = $value->installments + 1;
+    
+                $packageDis = PackageDistribution::find(1);
+                if ($value->package == 'Package1') {
+                    $rate = $packageDis->package_1_rate;
+                } elseif ($value->package == 'Package2') {
+                    $rate = $packageDis->package_2_rate;
+                } elseif ($value->package == 'Package3') {
+                    $rate = $packageDis->package_3_rate;
                 } else {
+                    $rate = 0;
+                }
+                $tradingWalletAmount = $value->trading_wallet_amount;
+    
+                $stak_amount = ($tradingWalletAmount / 100 * $rate) / 30;
+                if (rand(0, 1) == 1) {
+                    $stak_amount += $stak_amount / 100 * rand(1, 10);
+                } else {
+                    $stak_amount -= $stak_amount / 100 * rand(1, 10);
+                }
+                $memUpdate = MemberDetail::where('memberid', $memberid)->first();
+                $cap = $packageDis->capping;
+                if ($cap == 0) {
                     $amount = $stak_amount;
+                    $balance = 0;
+                } else {
+                    $capValue = ($tradingWalletAmount / 100) * $cap;
+                    $achieved = StakingIncome::where([['status', 'Paid'], ['staking_id', $staking_id], ['memberid', $memberid]])->sum('amount');
+                    $balance = $capValue - $achieved;
+                    if ($balance <= $stak_amount) {
+                        $amount = $balance;
+                    } else {
+                        $amount = $stak_amount;
+                    }
+                }
+    
+                if ($amount > 0.00) {
+    
+                    $qry = new StakingIncome;
+                    $qry->date = date('Y-m-d');
+                    $qry->staking_id = $value->id;
+                    $qry->memberid = $memberid;
+                    $qry->total_investment = $tradingWalletAmount;
+                    $qry->rate = $rate;
+                    $qry->amount = $amount;
+                    $qry->installment = $installment;
+                    $qry->status = 'Paid';
+                    $qry->save();
+    
+                    $update = StakingDetail::where('id', $value->id)->first();
+                    $update->installments += 1;
+                    $update->invest_date = date('Y-m-d');
+                    if ($cap != 0 && $balance <= $stak_amount) {
+                        $memUpdate->trading_wallet -= $tradingWalletAmount;
+                        $update->status = 'Deactive';
+                    }
+                    $update->save();
+    
+                    $wallet = $memUpdate->wallet;
+                    $memUpdate->wallet += $amount;
+                    $memUpdate->save();
+    
+                    walletTransfer($memberid, $amount, 'debit', $wallet, 'Staking Income', 'Staking Income amount has been transfered into wallet.');
+    
+                } else {
+                    $value->status = 'Deactive';
+                    $value->save();
                 }
             }
-
-            if ($amount > 0.00) {
-
-                $qry = new StakingIncome;
-                $qry->date = date('Y-m-d');
-                $qry->staking_id = $value->id;
-                $qry->memberid = $memberid;
-                $qry->total_investment = $tradingWalletAmount;
-                $qry->rate = $rate;
-                $qry->amount = $amount;
-                $qry->installment = $installment;
-                $qry->status = 'Paid';
-                $qry->save();
-
-                $update = StakingDetail::where('id', $value->id)->first();
-                $update->installments += 1;
-                $update->invest_date = date('Y-m-d');
-                if ($cap != 0 && $balance <= $stak_amount) {
-                    $memUpdate->trading_wallet -= $tradingWalletAmount;
-                    $update->status = 'Deactive';
-                }
-                $update->save();
-
-                $wallet = $memUpdate->wallet;
-                $memUpdate->wallet += $amount;
-                $memUpdate->save();
-
-                walletTransfer($memberid, $amount, 'debit', $wallet, 'Staking Income', 'Staking Income amount has been transfered into wallet.');
-
-            } else {
-                $value->status = 'Deactive';
-                $value->save();
-            }
-        }
+        //}
     }
 
     public function teamTradingProfit()
     {
-        $incomes = StakingIncome::where([['status', 'Paid'], ['level_status', 0]])->whereDate('created_at', date('Y-m-d'))->limit(50)->get();
-        foreach ($incomes as $value) {
-            $memberid = $value['memberid'];
-            $name = getName($memberid);
-            $package = $value['amount'];
-            $sponsorid = getSponsorid($memberid);
-            $limit = 11;
-            for ($i = 1; $i < $limit; $i++) {
-                $level = $i;
-                $rate = teamLevelRate($level);
-                $amount = $package * $rate / 100;
-
-                if ($sponsorid != 'Root') {
-                    $var = MemberDetail::where('memberid', $sponsorid)->first();
-                    $status = $var->status;
-                    $name = $var->name;
-                    $downline = $var->downline;
-
-                    if ($amount > 0 && $status == 'Active') {
-
-                        $insert = new LevelIncome;
-                        $insert->memberid = $sponsorid;
-                        $insert->level = $level;
-                        $insert->level_id = $memberid;
-                        $insert->amount = $amount;
-                        $insert->package = $package;
-                        $insert->name = $name;
-                        $insert->rate = $rate;
-                        $insert->downline = $downline;
-                        $insert->type = 'Team Trading Profit';
-                        $insert->status = 'Paid';
-                        $insert->save();
-
-                        $wallet = $var->wallet;
-                        $var->wallet += $amount;
-                        $var->save();
-
-                        walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Team Trading Profit Income', ''.$i.' Level Team Trading Profit Income Amount Added into wallet.');
+        // if (date('D') != 'Sat' && date('D') != 'Sun') {
+            $incomes = StakingIncome::where([['status', 'Paid'], ['level_status', 0]])->whereDate('created_at', date('Y-m-d'))->limit(50)->get();
+            foreach ($incomes as $value) {
+                $memberid = $value['memberid'];
+                $name = getName($memberid);
+                $package = $value['amount'];
+                $sponsorid = getSponsorid($memberid);
+                $limit = 11;
+                for ($i = 1; $i < $limit; $i++) {
+                    $level = $i;
+                    $rate = teamLevelRate($level);
+                    $amount = $package * $rate / 100;
+    
+                    if ($sponsorid != 'Root') {
+                        $var = MemberDetail::where('memberid', $sponsorid)->first();
+                        $status = $var->status;
+                        $name = $var->name;
+                        $downline = $var->downline;
+    
+                        if ($amount > 0 && $status == 'Active') {
+    
+                            $insert = new LevelIncome;
+                            $insert->memberid = $sponsorid;
+                            $insert->level = $level;
+                            $insert->level_id = $memberid;
+                            $insert->amount = $amount;
+                            $insert->package = $package;
+                            $insert->name = getName($memberid);
+                            $insert->rate = $rate;
+                            $insert->downline = $downline;
+                            $insert->type = 'Team Trading Profit';
+                            $insert->status = 'Paid';
+                            $insert->save();
+    
+                            $wallet = $var->wallet;
+                            $var->wallet += $amount;
+                            $var->save();
+    
+                            walletTransfer($sponsorid, $amount, 'debit', $wallet, 'Team Trading Profit Income', ''.$i.' Level Team Trading Profit Income Amount Added into wallet.');
+                        }
+    
+                        $sponsorid = $var['sponsorid'];
                     }
-
-                    $sponsorid = $var['sponsorid'];
                 }
+                $update = StakingIncome::where('id', $value->id)->update(['level_status' => 1]);
             }
-            $update = StakingIncome::where('id', $value->id)->update(['level_status' => 1]);
-        }
+        // }
     }
 
     public function dailyTeamInvestmentShare()
@@ -271,6 +275,7 @@ class TempController extends Controller
             $new->memberid = $memberid;
             $new->direct_business = $direct_biz;
             $new->total_members = $totalMember;
+            $new->mon_total_biz = $totalInvestment;
             $new->amount = $share;
             $new->status = 'Paid';
             $new->save();
@@ -312,8 +317,8 @@ class TempController extends Controller
 
             $memUpdate = MemberDetail::where('memberid', $memberid)->first();
             $stack_dailyTeamBiz = $memUpdate->daily_team_biz;
-            $part_dailyTeamBiz = $memUpdate->part_daily_team_biz;
-            $dailyTeamBiz = $stack_dailyTeamBiz + $part_dailyTeamBiz;
+            // $part_dailyTeamBiz = $memUpdate->part_daily_team_biz;
+            $dailyTeamBiz = $stack_dailyTeamBiz;
 
             if ($dailyTeamBiz <= 0) {
                 continue;

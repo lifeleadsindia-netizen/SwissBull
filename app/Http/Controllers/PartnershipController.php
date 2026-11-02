@@ -104,7 +104,7 @@ class PartnershipController extends Controller
         $member->partnership_rank = $rank;
         $member->partnership_self_biz += $amount;
         $member->partnership_team_biz += $amount;
-        $member->part_daily_team_biz += $amount;
+        // $member->part_daily_team_biz += $amount;
         $wallet = $member->p2p_wallet;
         $member->p2p_wallet -= $amount;
         if ($member->status == 'Temp') {

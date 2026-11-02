@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\MemberDetail;
 use App\Models\PartnershipDetail;
 use App\Models\PartnershipIncome;
+use App\Models\StakingDetail;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
@@ -21,6 +22,12 @@ class PartnershipIncomeDis extends Command
         $stakings = PartnershipDetail::where('status', 'Active')->get();
         foreach ($stakings as $value) {
             $memberid = $value->memberid;
+
+            // Guard: Member must have an active staking in staking_details to receive partnership income
+            $hasActiveStaking = StakingDetail::where('memberid', $memberid)->where('status', 'Active')->exists();
+            if (! $hasActiveStaking) {
+                continue;
+            }
             $rank = $value->rank;
             $achieved = $value->achieved;
             $capping = $value->capping;
@@ -36,8 +43,8 @@ class PartnershipIncomeDis extends Command
 
             $memUpdate = MemberDetail::where('memberid', $memberid)->first();
             $stack_dailyTeamBiz = $memUpdate->daily_team_biz;
-            $part_dailyTeamBiz = $memUpdate->part_daily_team_biz;
-            $dailyTeamBiz = $stack_dailyTeamBiz + $part_dailyTeamBiz;
+            // $part_dailyTeamBiz = $memUpdate->part_daily_team_biz;
+            $dailyTeamBiz = $stack_dailyTeamBiz;
 
             if ($dailyTeamBiz <= 0) {
                 continue;

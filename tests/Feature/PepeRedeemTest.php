@@ -380,4 +380,151 @@ class PepeRedeemTest extends TestCase
         WhatsappReferral::where('member_id', $memberId)->delete();
         WithdrawalRequest::where('memberid', $memberId)->delete();
     }
+
+    public function test_full_and_partial_pepe_token_redemption_flow_does_not_reset_wallet(): void
+    {
+        $this->withoutMiddleware(PreventRequestForgery::class);
+
+        $memberId = 'FULLTEST'.rand(1000, 9999);
+        $walletAddr = '0x9999999999999999999999999999999999999999';
+
+        $member = MemberDetail::create([
+            'memberid' => $memberId,
+            'name' => 'Full Redeem Tester',
+            'mobile' => '9123456789',
+            'email' => 'fulltest'.rand(100, 999).'@example.com',
+            'password' => bcrypt('password'),
+            'country' => 'India',
+            'member_wallet' => $walletAddr,
+            'pepe_wallet' => 22500,
+        ]);
+
+        WhatsappReferral::create([
+            'member_id' => $memberId,
+            'mobile_number' => '+919123456789',
+            'reward_amount' => 22500,
+            'status' => 'Completed',
+            'reward_given' => true,
+        ]);
+
+        // 1. Initial dashboard visit: Should show 22,500 PEPE
+        $resDash1 = $this->withSession(['MEMBER_ID' => $memberId, 'country' => 'India'])
+            ->get('/member/dashboard');
+        $resDash1->assertStatus(200);
+        $resDash1->assertSee('22,500 PEPE');
+        $resDash1->assertSee('window.pepeWalletBalance = 22500', false);
+
+        // 2. Partial redeem of 500 PEPE
+        $resPart = $this->withSession(['MEMBER_ID' => $memberId])
+            ->postJson('/member/initPepeWithdrawalForm', [
+                'memberid' => $memberId,
+                'amount' => 500,
+            ]);
+        $resPart->assertStatus(200)->assertJson(['success' => true]);
+
+        // Member's pepe_wallet in DB should now be 22,000
+        $member->refresh();
+        $this->assertEquals(22000, $member->pepe_wallet);
+
+        // 3. Dashboard visit after partial redeem: MUST show 22,000 PEPE
+        $resDash2 = $this->withSession(['MEMBER_ID' => $memberId, 'country' => 'India'])
+            ->get('/member/dashboard');
+        $resDash2->assertStatus(200);
+        $resDash2->assertSee('22,000 PEPE');
+        $resDash2->assertSee('window.pepeWalletBalance = 22000', false);
+
+        // 4. Full redeem of remaining 22,000 PEPE
+        $resFull = $this->withSession(['MEMBER_ID' => $memberId])
+            ->postJson('/member/initPepeWithdrawalForm', [
+                'memberid' => $memberId,
+                'amount' => 22000,
+            ]);
+        $resFull->assertStatus(200)->assertJson(['success' => true]);
+
+        // Member's pepe_wallet in DB should now be 0
+        $member->refresh();
+        $this->assertEquals(0, $member->pepe_wallet);
+
+        // 5. Dashboard visit after full redeem: MUST show 0 PEPE and NOT reset to 22,500!
+        $resDash3 = $this->withSession(['MEMBER_ID' => $memberId, 'country' => 'India'])
+            ->get('/member/dashboard');
+        $resDash3->assertStatus(200);
+        $resDash3->assertSee('0 PEPE');
+        $resDash3->assertSee('window.pepeWalletBalance = 0', false);
+        $resDash3->assertDontSee('window.pepeWalletBalance = 22500', false);
+
+        // 6. Attempting another redeem with 0 balance MUST be rejected
+        $resRejected = $this->withSession(['MEMBER_ID' => $memberId])
+            ->postJson('/member/initPepeWithdrawalForm', [
+                'memberid' => $memberId,
+                'amount' => 500,
+            ]);
+        $resRejected->assertStatus(200);
+        $resRejected->assertJson(['success' => false]);
+        $this->assertStringContainsString('Amount can not be greater than PEPE wallet balance', $resRejected->json('message'));
+
+        // Cleanup
+        $member->delete();
+        WhatsappReferral::where('member_id', $memberId)->delete();
+        WithdrawalRequest::where('memberid', $memberId)->delete();
+    }
+
+    public function test_full_pepe_token_direct_redemption_does_not_reset_wallet(): void
+    {
+        $this->withoutMiddleware(PreventRequestForgery::class);
+
+        $memberId = 'DIRECTFULL'.rand(1000, 9999);
+        $walletAddr = '0x8888888888888888888888888888888888888888';
+
+        $member = MemberDetail::create([
+            'memberid' => $memberId,
+            'name' => 'Direct Full Tester',
+            'mobile' => '9888777666',
+            'email' => 'directfull'.rand(100, 999).'@example.com',
+            'password' => bcrypt('password'),
+            'country' => 'India',
+            'member_wallet' => $walletAddr,
+            'pepe_wallet' => 22500,
+        ]);
+
+        WhatsappReferral::create([
+            'member_id' => $memberId,
+            'mobile_number' => '+919888777666',
+            'reward_amount' => 22500,
+            'status' => 'Completed',
+            'reward_given' => true,
+        ]);
+
+        // 1. Initial dashboard visit
+        $resDash1 = $this->withSession(['MEMBER_ID' => $memberId, 'country' => 'India'])
+            ->get('/member/dashboard');
+        $resDash1->assertStatus(200);
+        $resDash1->assertSee('22,500 PEPE');
+
+        // 2. Direct full redeem of all 22,500 PEPE
+        $resFull = $this->withSession(['MEMBER_ID' => $memberId])
+            ->postJson('/member/initPepeWithdrawalForm', [
+                'memberid' => $memberId,
+                'amount' => 22500,
+            ]);
+        $resFull->assertStatus(200)->assertJson(['success' => true]);
+
+        // Member's pepe_wallet in DB should now be 0
+        $member->refresh();
+        $this->assertEquals(0, $member->pepe_wallet);
+
+        // 3. Dashboard reload: MUST show 0 PEPE and NOT reset to 22,500!
+        $resDash2 = $this->withSession(['MEMBER_ID' => $memberId, 'country' => 'India'])
+            ->get('/member/dashboard');
+        $resDash2->assertStatus(200);
+        $resDash2->assertSee('0 PEPE');
+        $resDash2->assertSee('window.pepeWalletBalance = 0', false);
+        $resDash2->assertDontSee('window.pepeWalletBalance = 22500', false);
+
+        // Cleanup
+        $member->delete();
+        WhatsappReferral::where('member_id', $memberId)->delete();
+        WithdrawalRequest::where('memberid', $memberId)->delete();
+    }
 }
+

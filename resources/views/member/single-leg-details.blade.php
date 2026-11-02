@@ -413,13 +413,17 @@
                                             <span class="inc-badge paid">
                                                 <i class="fa-solid fa-circle-check"></i> Active
                                             </span>
+                                        @elseif ($member->status === 'Deactive')
+                                            <span class="inc-badge unpaid blocked">
+                                                <i class="fa-solid fa-circle-xmark"></i> Deactive
+                                            </span>
                                         @elseif ($member->status === 'Temp')
                                             <span class="inc-badge pending">
                                                 <i class="fa-solid fa-circle-question"></i> Inactive
                                             </span>
                                         @else
                                             <span class="inc-badge unpaid blocked">
-                                                <i class="fa-solid fa-circle-xmark"></i> {{ $member->status }}
+                                                <i class="fa-solid fa-ban"></i> {{ $member->status }}
                                             </span>
                                         @endif
                                     </td>

@@ -20,8 +20,15 @@
                                     <div class="inc-header-sub">Trading Withdrawal Details</div>
                                 </div>
                             </div>
+
+                            @php
+                                $adminStatusOn = isset($trading_settings) && $trading_settings->isOn();
+                            @endphp
+
+
                             
-                            <!-- Timer Section -->
+                            <!-- Timer Section (only active when admin trading withdrawal status is ON) -->
+                            @if ($adminStatusOn)
                             <div class="timer-container text-center py-3 mb-3 mx-4" style="display: none; background: rgba(0, 0, 0, 0.2); border: 1px solid #ffc107; border-radius: 8px;">
                                 <h5 class="text-warning mb-2"><i class="fa-regular fa-clock"></i> Unlock Timer</h5>
                                 <div id="unlock-timer" style="font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: 1px;">
@@ -29,6 +36,7 @@
                                 </div>
                                 <small class="text-muted" id="timer-entry-id"></small>
                             </div>
+                            @endif
 
                             <div class="inc-table-shell">
                                 <table id="example3" class="inc-table display dataTable no-footer">
@@ -42,7 +50,9 @@
                                             {{-- <th>Rate</th> --}}
                                             <th>Trading Amount</th>
                                             <th>Status</th>
-                                            <th class="text-center">Action</th>
+                                            @if ($adminStatusOn)
+                                                <th class="text-center">Action</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -50,7 +60,6 @@
                                         @php $i = 1;  @endphp
                                         @foreach ($staking_details as $list)
                                             @php
-                                                $adminStatusOn = isset($trading_settings) && $trading_settings->isOn();
                                                 $targetTimeMs = $list->locked_until ? $list->locked_until->timestamp * 1000 : 0;
                                                 $isLockActive = $list->isLocked();
                                                 $isDeactive = ($list->status === 'Deactive');
@@ -86,6 +95,7 @@
                                                         <label class="btn btn-danger">{{ $list->status }}</label>
                                                     @endif
                                                 </td>
+                                                @if ($adminStatusOn)
                                                 <td>
                                                     <div class="d-flex justify-content-center align-items-center gap-2">
                                                         <button type="button" class="btn btn-sm btn-outline-warning" 
@@ -113,6 +123,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
+                                                @endif
                                             </tr>
                                             @php $i++;  @endphp
                                         @endforeach
@@ -131,7 +142,7 @@
 
 <script>
     let countdownInterval;
-    let adminTradingStatus = "{{ isset($trading_settings) && $trading_settings->isOn() ? 'on' : 'off' }}";
+    let adminTradingStatus = "{{ $adminStatusOn ? 'on' : 'off' }}";
 
     function revalidateAdminStatus(callback) {
         $.ajax({
@@ -143,7 +154,13 @@
             },
             success: function(res) {
                 if (res && res.admin_status) {
+                    let oldStatus = adminTradingStatus;
                     adminTradingStatus = res.admin_status;
+                    // If status flipped, reload page to dynamically show/hide Action column
+                    if (oldStatus !== adminTradingStatus) {
+                        location.reload();
+                        return;
+                    }
                 }
                 if (typeof callback === 'function') {
                     callback();
@@ -208,14 +225,24 @@
     }
 
     function startCountdown(targetTimeMs, entryName, stakingId) {
-        document.querySelector('.timer-container').style.display = 'block';
-        document.getElementById('timer-entry-id').innerText = 'Showing timer for: ' + entryName;
+        let timerContainer = document.querySelector('.timer-container');
+        if (!timerContainer) {
+            return;
+        }
+        timerContainer.style.display = 'block';
+        let entryIdEl = document.getElementById('timer-entry-id');
+        if (entryIdEl) {
+            entryIdEl.innerText = 'Showing timer for: ' + entryName;
+        }
         
         clearInterval(countdownInterval);
         
         let now = new Date().getTime();
+        let unlockTimerEl = document.getElementById('unlock-timer');
         if (!targetTimeMs || targetTimeMs <= now) {
-            document.getElementById('unlock-timer').innerText = "Unlocked / Ready";
+            if (unlockTimerEl) {
+                unlockTimerEl.innerText = "Unlocked / Ready";
+            }
             revalidateAdminStatus(function() {
                 updateAllWithdrawalButtons();
             });
@@ -228,7 +255,9 @@
 
             if (distance <= 0) {
                 clearInterval(countdownInterval);
-                document.getElementById('unlock-timer').innerText = "Unlocked / Ready";
+                if (unlockTimerEl) {
+                    unlockTimerEl.innerText = "Unlocked / Ready";
+                }
                 revalidateAdminStatus(function() {
                     updateAllWithdrawalButtons();
                 });
@@ -240,7 +269,9 @@
             let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             let seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            document.getElementById('unlock-timer').innerText = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+            if (unlockTimerEl) {
+                unlockTimerEl.innerText = days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+            }
         };
 
         updateTimer(); // Trigger immediately
@@ -248,14 +279,15 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        @if (isset($staking_details) && count($staking_details) > 0)
+        @if ($adminStatusOn && isset($staking_details) && count($staking_details) > 0)
             @php $firstItem = $staking_details->first(); @endphp
             startCountdown({{ $firstItem->locked_until ? $firstItem->locked_until->timestamp * 1000 : 0 }}, 'Entry #1 - {{ $firstItem->memberid }}', {{ $firstItem->id }});
         @endif
 
         updateAllWithdrawalButtons();
 
-        // Check for countdown expirations every second
+        // Check for countdown expirations every second (if action buttons exist)
+        @if ($adminStatusOn)
         setInterval(function() {
             let now = new Date().getTime();
             let hasNewlyExpired = false;
@@ -276,6 +308,7 @@
                 });
             }
         }, 1000);
+        @endif
 
         // Periodically revalidate Admin status in background every 15 seconds
         setInterval(function() {

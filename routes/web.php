@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivationController;
+use App\Http\Controllers\AddTradingProfitController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminMediaController;
 use App\Http\Controllers\AdminWhatsappController;
@@ -104,7 +105,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     // income routes
     Route::get('/income/monthly-trading-profit', [AdminController::class, 'roiInc'])->name('admin.income.monthlyTradingProfit');
     Route::get('/income/roi-incomes', [AdminController::class, 'roiInc']);
-    Route::get('/income/roi-details', [AdminController::class, 'roiDetails']);
+    Route::get('/income/trading-profite-details', [AdminController::class, 'roiDetails']);
 
     Route::get('/income/referral-bonus', [AdminController::class, 'directIncomes'])->name('admin.income.referralBonus');
     Route::get('/income/direct-incomes', [AdminController::class, 'directIncomes'])->name('admin.income.direct');
@@ -212,6 +213,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
     // PEPE Token Settings
     Route::get('/pepe-settings', [AdminController::class, 'pepeSettings'])->name('admin.pepeSettings');
     Route::post('/updatePepeSettings', [AdminController::class, 'updatePepeSettings'])->name('admin.updatePepeSettings');
+
+    Route::get('/trade/add-trading-profit', [AddTradingProfitController::class, 'addTradeProfit']);
+    Route::post('/trade/get-member-capping', [AddTradingProfitController::class, 'getMemberCapping'])->name('admin.getMemberCapping');
+    Route::post('addTradingProfit', [AddTradingProfitController::class, 'addTradingProfit'])->name('addTradingProfit');
+    Route::get('/trade/add-trading-profit-details', [AddTradingProfitController::class, 'addTradeProfitDetails']);
 });
 
 // Member Routes
@@ -249,9 +255,9 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::get('/activation-detail', [ActivationController::class, 'activationDetail'])->name('activationDetail');
 
     //  Staking Routes
-    Route::get('/Staking/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
+    Route::get('/package/create', [InvestmentController::class, 'createStaking'])->name('Staking.create');
     Route::post('/createInvestment', [InvestmentController::class, 'createInvestment'])->name('createInvestment');
-    Route::get('/Staking/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
+    Route::get('/package/details', [InvestmentController::class, 'StakingDetails'])->name('Staking.details');
 
     // Partnership Investment Routes
     Route::get('/partnership/create-investment', [PartnershipController::class, 'partCreateInvestment']);
@@ -318,11 +324,11 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
     Route::post('initiateTradingWithdrawal', [WithdrawalController::class, 'initiateTradingWithdrawal'])->name('initiateTradingWithdrawal');
 
     // Geneology Section
-    Route::get('/team/geneology', [MemberDetailController::class, 'geneology'])->name('member.team.geneology');
+    // Route::get('/team/geneology', [MemberDetailController::class, 'geneology'])->name('member.team.geneology');
     Route::get('/team/view-geneology/{id}', [MemberDetailController::class, 'ViewGeneology'])->name('member.team.view-geneology');
-    Route::get('/direct-team', [MemberDetailController::class, 'directteam']);
-    Route::get('/level-details', [MemberDetailController::class, 'leveldetails']);
-    Route::get('/level-members-details/{level}', [MemberDetailController::class, 'lelMemDetails']);
+    Route::get('/direct-team', [MemberDetailController::class, 'directteam'])->name('member.direct-team');
+    Route::get('/level-details', [MemberDetailController::class, 'leveldetails'])->name('member.level-details');
+    Route::get('/level-members-details/{level}', [MemberDetailController::class, 'lelMemDetails'])->name('member.level-members-details');
 
     // member usdt support section //
     Route::get('/support/usdt-support', [SupportController::class, 'usdtSupport']);
@@ -390,14 +396,21 @@ Route::fallback(function () {
     return view('frontend.error404');
 });
 
-Route::get('dailyIncomeDis', [TempController::class, 'dailyIncomeDis']);
-Route::get('roiLevelIncomeDis', [TempController::class, 'roiLevelIncomeDis']);
-Route::get('/addTempMember/{memberid}', [TempController::class, 'addTempMember']);
-Route::get('teamTradingProfit', [TempController::class, 'teamTradingProfit']);
-Route::get('partnershipIncomeDis', [TempController::class, 'partnershipIncomeDis']);
-Route::get('dailyPartTeamBizUpdate', [TempController::class, 'dailyPartTeamBizUpdate']);
-Route::get('dailyTeamInvestmentShare', [TempController::class, 'dailyTeamInvestmentShare']);
-Route::get('heroOfTheMonthDis', [TempController::class, 'heroOfTheMonthDis']);
-Route::get('monthlyDirectBizUpdate', [TempController::class, 'monthlyDirectBizUpdate']);
+// Route::get('dailyIncomeDis', [TempController::class, 'dailyIncomeDis']);
+// Route::get('/addTempMember/{memberid}', [TempController::class, 'addTempMember']);
+// Route::get('teamTradingProfit', [TempController::class, 'teamTradingProfit']);
+// Route::get('partnershipIncomeDis', [TempController::class, 'partnershipIncomeDis']);
+// Route::get('dailyPartTeamBizUpdate', [TempController::class, 'dailyPartTeamBizUpdate']);
+// Route::get('dailyTeamInvestmentShare', [TempController::class, 'dailyTeamInvestmentShare']);
+// Route::get('heroOfTheMonthDis', [TempController::class, 'heroOfTheMonthDis']);
+// Route::get('monthlyDirectBizUpdate', [TempController::class, 'monthlyDirectBizUpdate']);
+
+// https://syncfx.trade/dailyIncomeDis
+// https://syncfx.trade/teamTradingProfit
+// https://syncfx.trade/dailyTeamInvestmentShare
+// https://syncfx.trade/dailyPartTeamBizUpdate
+// https://syncfx.trade/monthlyDirectBizUpdate
+// https://syncfx.trade/heroOfTheMonthDis
+// https://syncfx.trade/partnershipIncomeDis
 
 Route::get('/temp', function () {});

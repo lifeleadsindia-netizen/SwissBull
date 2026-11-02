@@ -1502,12 +1502,12 @@
                 <li><a class="has-arrow" href="javascript:void(0);" aria-expanded="false">
                         <i class="material-symbols-outlined notranslate" translate="no"
                             data-icon="">stack</i>
-                        <span class="nav-text">Staking</span>
+                        <span class="nav-text">Package Section</span>
                     </a>
                     <ul aria-expanded="false">
-                        <li><a href="{{ url('member/Staking/create') }}">Create Staking</a>
+                        <li><a href="{{ url('member/package/create') }}">Create Package</a>
                         </li>
-                        <li><a href="{{ url('member/Staking/details') }}">Staking History</a>
+                        <li><a href="{{ url('member/package/details') }}">Package History</a>
                         </li>
                     </ul>
                 </li>
@@ -1600,13 +1600,13 @@
                         <span class="nav-text">Team Details</span>
                     </a>
                     <ul aria-expanded="false">
-                        <li><a href="{{ url('member/team/geneology') }}">Level Team</a></li>
+                        <!--<li><a href="{{ url('member/team/geneology') }}">Level Team</a></li>-->
                         <li><a href="{{ url('/member/direct-team') }}">Direct Team</a></li>
                         <li><a href="{{ url('/member/level-details') }}">Level Details</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="https://cyclestudio.online/"
+                    <a href="https://cyclestudio.online/member/register/IND3566555665"
                         target="_blank"
                         rel="noopener noreferrer">
                         <i class="fas fa-external-link-alt"

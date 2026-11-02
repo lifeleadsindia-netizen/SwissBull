@@ -206,9 +206,11 @@
                                             $memberAvatarStatus =
                                                 $memberStatusLower === 'active'
                                                     ? 'status-active'
-                                                    : ($memberStatusLower === 'temp'
-                                                        ? 'status-temp'
-                                                        : 'status-neutral');
+                                                    : ($memberStatusLower === 'deactive'
+                                                        ? 'status-deactive'
+                                                        : ($memberStatusLower === 'temp'
+                                                            ? 'status-temp'
+                                                            : 'status-neutral'));
                                             $memberWallet = is_object($member)
                                                 ? $member->wallet ?? 0
                                                 : $member['wallet'] ?? 0;
@@ -259,7 +261,7 @@
                                                 <div class="genealogy-member-tooltip">
                                                     <div class="genealogy-tooltip-header">
                                                         <span>{{ $memberName }}</span>
-                                                        <em>{{ $memberStatus }}</em>
+                                                        <em>{{ $memberStatus === 'Temp' ? 'Inactive' : $memberStatus }}</em>
                                                     </div>
                                                     <div class="genealogy-tooltip-row"><span>Member
                                                             ID</span><strong>{{ $memberId }}</strong></div>

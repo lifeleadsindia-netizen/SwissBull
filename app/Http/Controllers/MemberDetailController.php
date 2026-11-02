@@ -7,6 +7,7 @@ use App\Models\BusinessPlanDocument;
 use App\Models\Country;
 use App\Models\DailyTeamInvestmentShareConfiction;
 use App\Models\DashMessage;
+use App\Models\HeroOfTheMonthReward;
 use App\Models\MemberDetail;
 use App\Models\MemberVideo;
 use App\Models\PackageDetail;
@@ -40,6 +41,13 @@ class MemberDetailController extends Controller
         $result['dashMsg'] = DashMessage::orderby('rank', 'asc')->get();
         $result['achieverImages'] = AchiversImage::orderByRaw('rank IS NULL, rank ASC, id DESC')->get();
 
+        $isEntryLogin = $request->query('entry') === 'login';
+        $showDashboardPopup = (bool) ($isEntryLogin || session('show_dashboard_popup'));
+        if (session()->has('show_dashboard_popup')) {
+            session()->forget('show_dashboard_popup');
+        }
+        $result['showDashboardPopup'] = $showDashboardPopup;
+        
         // Sync any missed Rule 3 direct activation rewards for active directs
         PepeRewardService::syncDirectActivationRewards($memberid);
         if (isset($result['data']) && $result['data']) {
@@ -61,15 +69,22 @@ class MemberDetailController extends Controller
         $waTotalPepe = PepeRewardService::getTotalEarned($memberid);
         $waTotalRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
             ->where('type', 'Airdrop Withdrawal')
-            ->where('status', 'Approved')
+            ->whereIn('status', ['Approved', 'APPROVED'])
             ->sum('gross_amount');
+        $waPendingRedeemed = (float) WithdrawalRequest::where('memberid', $memberid)
+            ->where('type', 'Airdrop Withdrawal')
+            ->whereIn('status', ['Pending', 'PENDING'])
+            ->sum('gross_amount');
+        $hasWithdrawalHistory = WithdrawalRequest::where('memberid', $memberid)
+            ->where('type', 'Airdrop Withdrawal')
+            ->exists();
         $pepeWalletBalance = (float) ($result['data']->pepe_wallet ?? 0);
-        $waPromoAvailable = max(0, $waTotalPepe - $waTotalRedeemed);
+        $waPromoAvailable = max(0, $waTotalPepe - ($waTotalRedeemed + $waPendingRedeemed));
 
         // Current PEPE wallet balance is the actual balance remaining in member's pepe_wallet
         $waAvailablePepe = $pepeWalletBalance;
-        // If pepe_wallet column has not yet been initialized for this member but promo tokens are available, sync them
-        if ($pepeWalletBalance <= 0 && $waPromoAvailable > 0 && $waTotalRedeemed == 0) {
+        // If pepe_wallet column has not yet been initialized for this member but promo tokens are available and member has never redeemed, sync them once
+        if ($pepeWalletBalance <= 0 && $waPromoAvailable > 0 && ! $hasWithdrawalHistory) {
             $waAvailablePepe = $waPromoAvailable;
             if ($result['data']) {
                 $result['data']->pepe_wallet = $waPromoAvailable;
@@ -79,6 +94,7 @@ class MemberDetailController extends Controller
 
         $result['waTotalPepe'] = $waTotalPepe;
         $result['waTotalRedeemed'] = $waTotalRedeemed;
+        $result['waPendingRedeemed'] = $waPendingRedeemed;
         $result['pepeWalletBalance'] = $waAvailablePepe;
         $result['waAvailablePepe'] = $waAvailablePepe;
         $lastWa = WhatsappReferral::where('member_id', $memberid)->latest('created_at')->first();
@@ -88,6 +104,20 @@ class MemberDetailController extends Controller
 
         // Phase 2 + Phase 3: Package, Staking & Trading Wallet Lock Information (Backend Computed)
         $member = $result['data'];
+
+        // Synchronize member status with staking_details
+        if ($member && $member->status !== 'Blocked') {
+            $hasActive = StakingDetail::where('memberid', $memberid)->where('status', 'Active')->exists();
+            $hasAny = StakingDetail::where('memberid', $memberid)->exists();
+
+            if ($hasActive && $member->status !== 'Active') {
+                $member->status = 'Active';
+                $member->save();
+            } elseif (! $hasActive && $hasAny && $member->status !== 'Deactive') {
+                $member->status = 'Deactive';
+                $member->save();
+            }
+        }
 
         $activePackages = PackageDetail::where('memberid', $memberid)
             ->whereIn('status', ['Active', 'Accepted'])
@@ -141,6 +171,8 @@ class MemberDetailController extends Controller
         $defaultLockDays = (int) ($defaultSetting?->lock_days ?? (PackagePlan::value('lock_days') ?? 0));
         $defaultTradingWalletPercent = (float) ($defaultSetting?->trading_wallet ?? (PackagePlan::value('trading_wallet_percent') ?? 0.0));
         $adminCappingPercent = (float) PackageDistribution::getCapping();
+        $tradingWalletStatus = strtolower((string) ($defaultSetting?->status ?? 'on'));
+        $isTradingWalletOff = in_array($tradingWalletStatus, ['off', 'unlock']);
 
         // Maximum Return % dynamically fetched from admin settings
         $maxReturnPercent = $adminCappingPercent;
@@ -263,16 +295,13 @@ class MemberDetailController extends Controller
         $result['remainingEligibility'] = $remainingEligibility;
 
         // 5. Package Status
-        if ($activePackage && $activePackage->isPackageActive()) {
+        $hasActiveStk = $stakings->where('status', 'Active')->count() > 0;
+        $hasAnyStk = $stakings->count() > 0;
+
+        if ($hasActiveStk) {
             $packageStatus = 'Active';
-        } elseif ($activePackage && $activePackage->isExpired()) {
-            $packageStatus = 'Expired';
-        } elseif ($activeStaking && $activeStaking->status === 'Active') {
-            $packageStatus = 'Active';
-        } elseif ($activeStaking && $activeStaking->status === 'Deactive') {
-            $packageStatus = 'Capped / Deactivated';
-        } elseif ($totalInvestment > 0) {
-            $packageStatus = 'Active';
+        } elseif ($hasAnyStk) {
+            $packageStatus = 'Deactive';
         } else {
             $packageStatus = 'No Active Package';
         }
@@ -414,6 +443,7 @@ class MemberDetailController extends Controller
             $stk->package_range = $pkgRangeLabel;
             $stk->activated_at = $stkActivatedAt;
             $stk->lock_days = $stkLockDays;
+            $stk->is_trading_wallet_off = $isTradingWalletOff;
             $stk->is_locked = $stkIsLocked;
             $stk->lock_status_label = $stkIsLocked ? 'Fund Locked' : 'Fund Unlocked';
             $stk->remaining_lock_days = $stkRemainingDays;
@@ -458,6 +488,9 @@ class MemberDetailController extends Controller
             ? ($maxReturnPercent > 0 ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'Fund Locked, You are eligible for Unlimited Returns')
             : ($maxReturnPercent > 0 ? 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'You are eligible for Unlimited Returns');
         $result['packageInvestments'] = $processedCollection;
+        $result['defaultLockDays'] = $defaultLockDays;
+        $result['tradingWalletStatus'] = $tradingWalletStatus;
+        $result['isTradingWalletOff'] = $isTradingWalletOff;
 
         // =========================================================================
         // Hero of the Month: Current Month ke Top Performer Members nikalna
@@ -475,12 +508,54 @@ class MemberDetailController extends Controller
                 ->get(['memberid', 'name', 'country', 'direct_biz']);
         }
 
+        $currentMonthStr = date('Y-m');
+        $currentMonthName = date('F Y');
+        $heroOfTheMonthPercent = (float) (\App\Models\PackageDistribution::first()?->hero_of_the_month ?? 2.0);
+        $heroLeaderCount = $heroLeaders->count();
+
+        // Current month ka pool estimation (agar distribution abhi nahi hua)
+        $currentMonthInvestment = (float) StakingDetail::whereYear('created_at', date('Y'))
+            ->whereMonth('created_at', date('m'))
+            ->sum('invest_amount');
+        $estimatedPool = round(($currentMonthInvestment * $heroOfTheMonthPercent) / 100, 2);
+        $estimatedShare = $heroLeaderCount > 0 ? round($estimatedPool / $heroLeaderCount, 2) : 0;
+
+        foreach ($heroLeaders as $leader) {
+            // Check if member already has a reward record in HeroOfTheMonthReward for current month
+            $reward = HeroOfTheMonthReward::where('memberid', $leader->memberid)
+                ->where('month', $currentMonthStr)
+                ->latest('id')
+                ->first();
+
+            // If not found for current month, check latest reward
+            if (! $reward) {
+                $reward = HeroOfTheMonthReward::where('memberid', $leader->memberid)
+                    ->latest('id')
+                    ->first();
+            }
+
+            if ($reward && (float) ($reward->amount ?? 0) > 0) {
+                $leader->reward_amount = (float) $reward->amount;
+                try {
+                    $leader->reward_month = ! empty($reward->month)
+                        ? Carbon::parse(strlen($reward->month) === 7 ? $reward->month . '-01' : $reward->month)->format('F Y')
+                        : $currentMonthName;
+                } catch (\Throwable $e) {
+                    $leader->reward_month = $currentMonthName;
+                }
+            } else {
+                $leader->reward_amount = $estimatedShare;
+                $leader->reward_month = $currentMonthName;
+            }
+        }
+
         // 3. View ke liye data set karna
         $result['heroLeaders']            = $heroLeaders;
         $result['heroMaxBiz']             = $maxHeroBiz;
         $result['heroIsTie']              = $heroLeaders->count() > 1; // Agar 1 se zyada members hain to Tie hai
-        $result['heroLeaderCount']        = $heroLeaders->count();
-        $result['heroOfTheMonthPercent']  = (float) (\App\Models\PackageDistribution::first()?->hero_of_the_month ?? 2.0);
+        $result['heroLeaderCount']        = $heroLeaderCount;
+        $result['heroOfTheMonthPercent']  = $heroOfTheMonthPercent;
+        $result['totalTeamMembers']        = totalLevelMembers($memberid);
 
         return view('member.dashboard')->with($result);
     }
@@ -546,6 +621,8 @@ class MemberDetailController extends Controller
         $defaultLockDays = (int) ($defaultSetting?->lock_days ?? (PackagePlan::value('lock_days') ?? 0));
         $defaultTradingWalletPercent = (float) ($defaultSetting?->trading_wallet ?? (PackagePlan::value('trading_wallet_percent') ?? 0.0));
         $adminCappingPercent = (float) PackageDistribution::getCapping();
+        $tradingWalletStatus = strtolower((string) ($defaultSetting?->status ?? 'on'));
+        $isTradingWalletOff = in_array($tradingWalletStatus, ['off', 'unlock']);
 
         $maxReturnPercent = $adminCappingPercent;
 
@@ -591,16 +668,13 @@ class MemberDetailController extends Controller
 
         $remainingEligibility = max(0.00, round($maxEarning - $totalEarning, 2));
 
-        if ($activePackage && $activePackage->isPackageActive()) {
+        $hasActiveStk = $stakings->where('status', 'Active')->count() > 0;
+        $hasAnyStk = $stakings->count() > 0;
+
+        if ($hasActiveStk) {
             $packageStatus = 'Active';
-        } elseif ($activePackage && $activePackage->isExpired()) {
-            $packageStatus = 'Expired';
-        } elseif ($activeStaking && $activeStaking->status === 'Active') {
-            $packageStatus = 'Active';
-        } elseif ($activeStaking && $activeStaking->status === 'Deactive') {
-            $packageStatus = 'Capped / Deactivated';
-        } elseif ($totalInvestment > 0) {
-            $packageStatus = 'Active';
+        } elseif ($hasAnyStk) {
+            $packageStatus = 'Deactive';
         } else {
             $packageStatus = 'No Active Package';
         }
@@ -658,6 +732,7 @@ class MemberDetailController extends Controller
                 'is_locked' => $pkgIsLocked,
                 'lock_status_label' => $pkgIsLocked ? 'Fund Locked' : 'Fund Unlocked',
                 'lock_days' => $pkgLockDays,
+                'is_trading_wallet_off' => $isTradingWalletOff,
                 'remaining_lock_days' => $pkgRemainingDays,
                 'remaining_lock_seconds' => $pkgRemainingSeconds,
                 'remaining_lock_formatted' => $pkgIsLocked
@@ -735,6 +810,7 @@ class MemberDetailController extends Controller
                 'is_locked' => $stkIsLocked,
                 'lock_status_label' => $stkIsLocked ? 'Fund Locked' : 'Fund Unlocked',
                 'lock_days' => $stkLockDays,
+                'is_trading_wallet_off' => $isTradingWalletOff,
                 'remaining_lock_days' => $stkRemainingDays,
                 'remaining_lock_seconds' => $stkRemainingSeconds,
                 'remaining_lock_formatted' => $stkIsLocked
@@ -774,6 +850,8 @@ class MemberDetailController extends Controller
                 'fund_lock_return_message' => $isFundLocked
                     ? ($maxReturnPercent > 0 ? 'Fund Locked, You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'Fund Locked, You are eligible for Unlimited Returns')
                     : ($maxReturnPercent > 0 ? 'You are eligible for total return of '.number_format($maxReturnPercent, 0).'% Returns' : 'You are eligible for Unlimited Returns'),
+                'trading_wallet_status' => $tradingWalletStatus,
+                'is_trading_wallet_off' => $isTradingWalletOff,
                 'packages' => $processedPackages,
             ],
         ]);
@@ -798,6 +876,7 @@ class MemberDetailController extends Controller
         $request->session()->forget('name');
         $request->session()->forget('email');
         $request->session()->forget('mobile');
+        $request->session()->forget('show_dashboard_popup');
 
         return redirect('/');
     }
@@ -929,6 +1008,11 @@ class MemberDetailController extends Controller
 
     public function lelMemDetails($level)
     {
+        $level = (int) $level;
+        if ($level < 1 || $level > 10) {
+            return redirect('/member/level-details')->with('error', 'Invalid level selected');
+        }
+
         $uplines = 'upline_'.$level;
         $memberid = session('MEMBER_ID');
         $result['data'] = MemberDetail::where('memberid', $memberid)->first();
@@ -1031,7 +1115,7 @@ class MemberDetailController extends Controller
                 'otp' => $otp,
             ];
             $user['to'] = $email;
-            $fromAddress = config('mail.from.address', 'support@mathwallet.live');
+            $fromAddress = config('mail.from.address', 'info@syncfx.trade');
             $fromName = config('mail.from.name', config('detailsApp.name', 'SYNC TRADE'));
 
             Mail::send([
@@ -1190,9 +1274,14 @@ class MemberDetailController extends Controller
 
         $pdfs = [];
         foreach ($dbPdfs as $pdf) {
+            $rawName = trim($pdf->title ?: basename($pdf->file_path));
+            $pdfFileName = str_ends_with(strtolower($rawName), '.pdf') ? $rawName : $rawName.'.pdf';
+
             $pdfs[] = [
                 'id' => $pdf->id,
-                'filename' => $pdf->file_path,
+                'filename' => $pdfFileName,
+                'display_name' => $rawName,
+                'raw_file_path' => $pdf->file_path,
                 'language' => $pdf->language,
                 'native_language' => $pdf->native_language ?: $pdf->language,
                 'flag' => $pdf->flag ?: '📄',
@@ -1229,7 +1318,12 @@ class MemberDetailController extends Controller
             ->first();
 
         if ($doc && $doc->disk_path && file_exists($doc->disk_path)) {
-            return response()->download($doc->disk_path, basename($doc->disk_path));
+            $downloadFilename = trim($doc->title ?: basename($doc->disk_path));
+            if (! str_ends_with(strtolower($downloadFilename), '.pdf')) {
+                $downloadFilename .= '.pdf';
+            }
+
+            return response()->download($doc->disk_path, $downloadFilename);
         }
 
         $fallback = public_path('uassets/mw_pdf/'.$cleanFilename);

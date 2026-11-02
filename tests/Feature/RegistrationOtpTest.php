@@ -98,4 +98,58 @@ class RegistrationOtpTest extends TestCase
         $data = $response->json();
         $this->assertEquals(0, $data['code']);
     }
+
+    /**
+     * Test that successful registration email (HTML) contains Login Notice with member_wallet at the beginning.
+     */
+    public function test_registration_success_mail_contains_login_notice_with_wallet_address(): void
+    {
+        $memberWallet = '0x1234567890abcdef1234567890abcdef12345678';
+        $mailData = [
+            'name' => 'Test User',
+            'email' => 'testuser@example.com',
+            'mobile' => '9876543210',
+            'memberid' => 'ST999999',
+            'member_wallet' => $memberWallet,
+        ];
+
+        $html = view('member.mails.mail', $mailData)->render();
+
+        $this->assertStringContainsString('Login Notice:', $html);
+        $this->assertStringContainsString('Please login using <strong>DApp Browser</strong> in your <strong>Register Wallet</strong>', $html);
+        $this->assertStringContainsString($memberWallet, $html);
+        $this->assertStringContainsString('Please choose <strong>BNB (BEP20/BSC Smartchain)</strong> network to access the our website', $html);
+        $this->assertStringContainsString('https://syncfx.trade', $html);
+
+        // Verify Login Notice banner appears before the Welcome Section div in body
+        $loginNoticePos = strpos($html, '<div class="login-notice-banner"');
+        $welcomeDivPos = strpos($html, '<div class="welcome-section">');
+        $this->assertNotFalse($loginNoticePos);
+        $this->assertNotFalse($welcomeDivPos);
+        $this->assertLessThan($welcomeDivPos, $loginNoticePos, 'Login Notice banner must appear before Welcome Section');
+    }
+
+    /**
+     * Test that successful registration plain text email contains Login Notice at the beginning using member_wallet.
+     */
+    public function test_registration_success_plain_text_mail_contains_login_notice(): void
+    {
+        $memberWallet = '0x1234567890abcdef1234567890abcdef12345678';
+        $mailData = [
+            'name' => 'Test User',
+            'email' => 'testuser@example.com',
+            'mobile' => '9876543210',
+            'memberid' => 'ST999999',
+            'member_wallet' => $memberWallet,
+        ];
+
+        $text = view('member.mails.mail-text', $mailData)->render();
+
+        $expectedNotice = 'Login Notice:' . "\n" .
+            'Please login using DApp Browser in your Register Wallet, the registered wallet address is "' . $memberWallet . '".' . "\n" .
+            'Please choose BNB (BEP20/BSC Smartchain) network to access the our website https://syncfx.trade';
+
+        $this->assertStringStartsWith('Login Notice:', trim($text));
+        $this->assertStringContainsString($expectedNotice, $text);
+    }
 }
