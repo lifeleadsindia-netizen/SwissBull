@@ -211,20 +211,6 @@ class TempController extends Controller
         }
     }
 
-    // daily command
-    public function dailyPartTeamBizUpdate()
-    {
-        $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0, 'part_daily_team_biz' => 0]);
-    }
-
-    // monthly command
-    public function monthlyDirectBizUpdate()
-    {
-        $update = MemberDetail::query()->update([
-            'direct_biz' => 0,
-        ]);
-    }
-
     public function heroOfTheMonthDis()
     {
         // Step 1: Pichle month ke top direct business wale members nikalna
@@ -297,6 +283,14 @@ class TempController extends Controller
         }
     }
 
+    // monthly command
+    public function monthlyDirectBizUpdate()
+    {
+        $update = MemberDetail::query()->update([
+            'direct_biz' => 0,
+        ]);
+    }
+
     public function partnershipIncomeDis()
     {
         $stakings = PartnershipDetail::where('status', 'Active')->get();
@@ -365,6 +359,12 @@ class TempController extends Controller
                 $value->save();
             }
         }
+    }
+
+     // daily command
+    public function dailyPartTeamBizUpdate()
+    {
+        $update = MemberDetail::where('status', '!=', 'Temp')->update(['daily_team_biz' => 0, 'part_daily_team_biz' => 0]);
     }
 
     //  use for testing purpose only
