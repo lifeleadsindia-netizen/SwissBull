@@ -47,14 +47,14 @@ class TeamTradingProfitTest extends TestCase
 
     public function test_guest_cannot_access_team_trading_profit_page(): void
     {
-        $response = $this->get('/admin/team-trading-profit');
+        $response = $this->get('/hdgteyusjasget/team-trading-profit');
         $response->assertStatus(302);
     }
 
     public function test_admin_can_access_team_trading_profit_page_and_all_10_levels_are_displayed(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/team-trading-profit');
+            ->get('/hdgteyusjasget/team-trading-profit');
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.team-trading-profit');
@@ -90,10 +90,10 @@ class TeamTradingProfitTest extends TestCase
         ];
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/team-trading-profit', $postData);
+            ->post('/hdgteyusjasget/team-trading-profit', $postData);
 
         $response->assertSessionHas('successMsg');
-        $response->assertRedirect('/admin/team-trading-profit');
+        $response->assertRedirect('/hdgteyusjasget/team-trading-profit');
 
         $this->assertDatabaseHas('team_trading_profit_confiction', [
             'level_1_rate' => 6.00,
@@ -137,10 +137,10 @@ class TeamTradingProfitTest extends TestCase
         ];
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/team-trading-profit', $postData);
+            ->post('/hdgteyusjasget/team-trading-profit', $postData);
 
         $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/team-trading-profit');
+            ->get('/hdgteyusjasget/team-trading-profit');
 
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertSee('value="7.00"', false);
@@ -159,7 +159,7 @@ class TeamTradingProfitTest extends TestCase
     {
         // First save
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/team-trading-profit', [
+            ->post('/hdgteyusjasget/team-trading-profit', [
                 'level_1_rate' => '8.00',
                 'level_2_rate' => '7.00',
                 'level_3_rate' => '6.00',
@@ -174,7 +174,7 @@ class TeamTradingProfitTest extends TestCase
 
         // Second save / edit
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/team-trading-profit', [
+            ->post('/hdgteyusjasget/team-trading-profit', [
                 'level_1_rate' => '9.00',
                 'level_2_rate' => '8.00',
                 'level_3_rate' => '7.00',
@@ -188,7 +188,7 @@ class TeamTradingProfitTest extends TestCase
             ]);
 
         $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/team-trading-profit');
+            ->get('/hdgteyusjasget/team-trading-profit');
 
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertSee('value="9.00"', false);
@@ -219,7 +219,7 @@ class TeamTradingProfitTest extends TestCase
     public function test_validation_rejects_empty_or_invalid_rates(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/team-trading-profit', [
+            ->post('/hdgteyusjasget/team-trading-profit', [
                 'level_1_rate' => '',
                 'level_2_rate' => '-5',
                 'level_3_rate' => 'xyz',
@@ -232,7 +232,7 @@ class TeamTradingProfitTest extends TestCase
     public function test_sidebar_includes_team_trading_profit_link(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/team-trading-profit');
+            ->get('/hdgteyusjasget/team-trading-profit');
 
         $response->assertStatus(200);
         $response->assertSee(route('admin.teamTradingProfit'));

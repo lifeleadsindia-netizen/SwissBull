@@ -25,7 +25,7 @@ class AdminAddTradingProfitStakingTest extends TestCase
         }
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->postJson('/admin/trade/get-member-capping', [
+            ->postJson('/hdgteyusjasget/trade/get-member-capping', [
                 'memberid' => 'ST1234567',
             ]);
 
@@ -58,7 +58,7 @@ class AdminAddTradingProfitStakingTest extends TestCase
     public function test_admin_view_contains_stakings_table_and_action_elements(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/trade/add-trading-profit');
+            ->get('/hdgteyusjasget/trade/add-trading-profit');
 
         $response->assertStatus(200);
         $response->assertSee('id="memberStakingsSection"', false);
@@ -96,7 +96,7 @@ class AdminAddTradingProfitStakingTest extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/addTradingProfit', [
+            ->post('/hdgteyusjasget/addTradingProfit', [
                 'memberid' => 'ST_TEST_999',
                 'amount' => 10.00,
                 'staking_id' => $testStaking->id,
@@ -131,7 +131,7 @@ class AdminAddTradingProfitStakingTest extends TestCase
 
         // Fetching member capping should automatically detect remaining <= 0 and deactivate all exhausted stakings
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->postJson('/admin/trade/get-member-capping', [
+            ->postJson('/hdgteyusjasget/trade/get-member-capping', [
                 'memberid' => 'ST1234567',
             ]);
 
@@ -147,7 +147,7 @@ class AdminAddTradingProfitStakingTest extends TestCase
 
         // Verify trying to disburse to this deactivated staking is rejected
         $disburseResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/addTradingProfit', [
+            ->post('/hdgteyusjasget/addTradingProfit', [
                 'memberid' => 'ST1234567',
                 'amount' => 10.00,
                 'staking_id' => 1,
@@ -197,7 +197,7 @@ class AdminAddTradingProfitStakingTest extends TestCase
 
         // Disburse full 500.00 (100 * 500%) to member overall (staking_id = 0)
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/addTradingProfit', [
+            ->post('/hdgteyusjasget/addTradingProfit', [
                 'memberid' => 'ST_TEST_TOTAL',
                 'amount' => 500.00,
                 'staking_id' => 0,
@@ -214,7 +214,7 @@ class AdminAddTradingProfitStakingTest extends TestCase
 
         // Fetch member capping should show remaining 0 and both stakings Deactive
         $capResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->postJson('/admin/trade/get-member-capping', [
+            ->postJson('/hdgteyusjasget/trade/get-member-capping', [
                 'memberid' => 'ST_TEST_TOTAL',
             ]);
 

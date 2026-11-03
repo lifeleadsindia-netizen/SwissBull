@@ -33,14 +33,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [FrontendController::class, 'index']);
 // Route::get('/about', [FrontendController::class, 'about']);
 // Route::get('/contact', [FrontendController::class, 'contact']);
-Route::get('/forget-password', [AdminController::class, 'forgetPassword']);
-Route::post('retrivePassword', [AdminController::class, 'retrivePassword'])->name('retrivePassword');
+Route::get('/hdgteyusjasget/forget-password', [AdminController::class, 'forgetPassword']);
+Route::post('/hdgteyusjasget/retrivePassword', [AdminController::class, 'retrivePassword'])->name('retrivePassword');
 
-Route::get('/admin', [AdminController::class, 'index']);
-Route::get('/send-admin-otp', [AdminController::class, 'sendAdminOtp']);
-Route::post('adminLogin', [AdminController::class, 'authenticate'])->name('adminLogin');
+Route::get('/hdgteyusjasget', [AdminController::class, 'index'])->name('adminLogin');
+Route::get('/hdgteyusjasget/send-otp', [AdminController::class, 'sendAdminOtp']);
+Route::post('/hdgteyusjasget', [AdminController::class, 'authenticate']);
+Route::post('/hdgteyusjasget/login', [AdminController::class, 'authenticate']);
 
-Route::group(['prefix' => 'admin', 'middleware' => 'AdminAuth'], function () {
+Route::group(['prefix' => 'hdgteyusjasget', 'middleware' => 'AdminAuth'], function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
     Route::get('/logout', [AdminController::class, 'logout']);
 
@@ -393,7 +394,7 @@ Route::group(['prefix' => 'member', 'middleware' => 'MemberAuth'], function () {
 });
 
 Route::fallback(function () {
-    return view('frontend.error404');
+    return response()->view('frontend.error404', [], 404);
 });
 
 // Route::get('dailyIncomeDis', [TempController::class, 'dailyIncomeDis']);

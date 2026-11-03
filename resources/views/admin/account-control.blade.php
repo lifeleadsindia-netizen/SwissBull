@@ -84,17 +84,17 @@
                                     <td>{{ $list['sponsorid']}}</td>
                                     <td>
                                         @if ($list['status'] == 'Active')
-                                            <a href="{{url('admin/account-control')}}/{{$list['id']}}"><button class="btn btn-success">{{$list['status']}}</button></a>
+                                            <a href="{{url('hdgteyusjasget/account-control')}}/{{$list['id']}}"><button class="btn btn-success">{{$list['status']}}</button></a>
                                         @elseif ($list['status'] == 'Deactive')
-                                            <a href="{{url('admin/account-control')}}/{{$list['id']}}"><button class="btn btn-danger">{{$list['status']}}</button></a>
+                                            <a href="{{url('hdgteyusjasget/account-control')}}/{{$list['id']}}"><button class="btn btn-danger">{{$list['status']}}</button></a>
                                         @elseif ($list['status'] == 'Temp')
-                                            <a href="{{url('admin/account-control')}}/{{$list['id']}}"><button class="btn btn-warning text-dark">Inactive</button></a>
+                                            <a href="{{url('hdgteyusjasget/account-control')}}/{{$list['id']}}"><button class="btn btn-warning text-dark">Inactive</button></a>
                                         @else
-                                            <a href="{{url('admin/account-control')}}/{{$list['id']}}"><button class="btn btn-secondary">{{$list['status']}}</button></a>
+                                            <a href="{{url('hdgteyusjasget/account-control')}}/{{$list['id']}}"><button class="btn btn-secondary">{{$list['status']}}</button></a>
                                         @endif
                                     </td>
-                                    <td><a href="{{url('admin/members/member-update')}}/{{$list['id']}}" class="btn btn-primary"><i class="ik ik-edit"></i> Edit</a></td>
-                                    <!--<td><a href="{{url('admin/account-statement')}}" class="btn btn-primary"><i class="ik ik-info"></i> Info</a></td>-->
+                                    <td><a href="{{url('hdgteyusjasget/members/member-update')}}/{{$list['id']}}" class="btn btn-primary"><i class="ik ik-edit"></i> Edit</a></td>
+                                    <!--<td><a href="{{url('hdgteyusjasget/account-statement')}}" class="btn btn-primary"><i class="ik ik-info"></i> Info</a></td>-->
                                 </tr>
                                 @php $i++;  @endphp
                             @endforeach

@@ -99,7 +99,7 @@ class SupportController extends Controller
         $result['showMemberIdFilter'] = true;
         $result['filterActive'] = ($memberId !== '');
         $result['filterSummary'] = ($memberId !== '') ? 'Member: '.$memberId : null;
-        $result['action'] = url('admin/support/new-support-ticket');
+        $result['action'] = url('hdgteyusjasget/support/new-support-ticket');
 
         return view('admin.support.new-support-ticket')->with($result);
     }
@@ -151,7 +151,7 @@ class SupportController extends Controller
         $result['showMemberIdFilter'] = true;
         $result['filterActive'] = ($memberId !== '');
         $result['filterSummary'] = ($memberId !== '') ? 'Member: '.$memberId : null;
-        $result['action'] = url('admin/support/close-support-ticket');
+        $result['action'] = url('hdgteyusjasget/support/close-support-ticket');
 
         return view('admin.support.closed-support-ticket')->with($result);
     }
@@ -162,7 +162,7 @@ class SupportController extends Controller
         $result['support']->status = 'Closed';
         $result['support']->save();
 
-        return redirect('admin/support/close-support-ticket');
+        return redirect('hdgteyusjasget/support/close-support-ticket');
     }
 
     public function viewClosed($id)
@@ -185,7 +185,7 @@ class SupportController extends Controller
         $result['showMemberIdFilter'] = true;
         $result['filterActive'] = ($memberId !== '');
         $result['filterSummary'] = ($memberId !== '') ? 'Member: '.$memberId : null;
-        $result['action'] = url('admin/support/open-support-ticket');
+        $result['action'] = url('hdgteyusjasget/support/open-support-ticket');
 
         return view('admin.support.open-support-ticket')->with($result);
     }

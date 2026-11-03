@@ -178,9 +178,9 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
     public function test_all_three_pages_display_member_id_field(): void
     {
         $urls = [
-            '/admin/new-withdrawal-request',
-            '/admin/cancelled-request',
-            '/admin/payment-history',
+            '/hdgteyusjasget/new-withdrawal-request',
+            '/hdgteyusjasget/cancelled-request',
+            '/hdgteyusjasget/payment-history',
         ];
 
         foreach ($urls as $url) {
@@ -200,7 +200,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // 1. Filter by MW1111111
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?member_id=MW1111111');
+            ->get('/hdgteyusjasget/new-withdrawal-request?member_id=MW1111111');
 
         $response->assertStatus(200);
         $response->assertSee('TEST-NEW-1');
@@ -209,7 +209,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // 2. Filter by MW2222222
         $response2 = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?member_id=MW2222222');
+            ->get('/hdgteyusjasget/new-withdrawal-request?member_id=MW2222222');
 
         $response2->assertStatus(200);
         $response2->assertSee('TEST-NEW-2');
@@ -222,7 +222,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // 1. Filter by MW1111111
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/cancelled-request?member_id=MW1111111');
+            ->get('/hdgteyusjasget/cancelled-request?member_id=MW1111111');
 
         $response->assertStatus(200);
         $response->assertSee('TEST-CAN-1');
@@ -231,7 +231,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // 2. Filter by MW2222222
         $response2 = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/cancelled-request?member_id=MW2222222');
+            ->get('/hdgteyusjasget/cancelled-request?member_id=MW2222222');
 
         $response2->assertStatus(200);
         $response2->assertSee('TEST-CAN-2');
@@ -244,7 +244,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // 1. Filter by MW1111111
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/payment-history?member_id=MW1111111');
+            ->get('/hdgteyusjasget/payment-history?member_id=MW1111111');
 
         $response->assertStatus(200);
         $response->assertSee('TEST-PAID-1');
@@ -253,7 +253,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // 2. Filter by MW2222222
         $response2 = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/payment-history?member_id=MW2222222');
+            ->get('/hdgteyusjasget/payment-history?member_id=MW2222222');
 
         $response2->assertStatus(200);
         $response2->assertSee('TEST-PAID-2');
@@ -268,7 +268,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // Member MW1111111 on today's date -> should match TEST-NEW-1
         $response1 = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'member_id' => 'MW1111111',
                 'filter_date' => $today,
                 'filter_mode' => 'single',
@@ -280,7 +280,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // Member MW1111111 on yesterday's date -> no matching records
         $response2 = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'member_id' => 'MW1111111',
                 'filter_date' => $yesterday,
                 'filter_mode' => 'single',
@@ -297,7 +297,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // Member MW1111111 + Preset "today"
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'member_id' => 'MW1111111',
                 'filter_mode' => 'advanced',
                 'preset' => 'today',
@@ -318,9 +318,9 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
         $this->createTestWithdrawals();
 
         $urls = [
-            '/admin/new-withdrawal-request?member_id=NONEXISTENT_99999',
-            '/admin/cancelled-request?member_id=NONEXISTENT_99999',
-            '/admin/payment-history?member_id=NONEXISTENT_99999',
+            '/hdgteyusjasget/new-withdrawal-request?member_id=NONEXISTENT_99999',
+            '/hdgteyusjasget/cancelled-request?member_id=NONEXISTENT_99999',
+            '/hdgteyusjasget/payment-history?member_id=NONEXISTENT_99999',
         ];
 
         foreach ($urls as $url) {
@@ -341,7 +341,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // When visiting the clean URL (which the Reset / Clear Filters buttons link to)
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request');
+            ->get('/hdgteyusjasget/new-withdrawal-request');
 
         $response->assertStatus(200);
         $response->assertSee('TEST-NEW-1');
@@ -351,9 +351,9 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
     public function test_other_admin_pages_do_not_display_member_id_field(): void
     {
         $otherPages = [
-            '/admin/set-packages',
-            '/admin/trading-wallet-control',
-            '/admin/promotion-banners',
+            '/hdgteyusjasget/set-packages',
+            '/hdgteyusjasget/trading-wallet-control',
+            '/hdgteyusjasget/promotion-banners',
         ];
 
         foreach ($otherPages as $url) {
@@ -371,7 +371,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
         $this->createTestWithdrawals();
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'member_id' => 'MW1111111',
                 'filter_mode' => 'advanced',
                 'preset' => 'today',
@@ -392,7 +392,7 @@ class WithdrawalPagesMemberIdFilterTest extends TestCase
 
         // New Withdrawal Requests: PEPE & Trading tabs
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?member_id=MW1111111');
+            ->get('/hdgteyusjasget/new-withdrawal-request?member_id=MW1111111');
 
         $response->assertStatus(200);
         $response->assertSee('TEST-PEPE-1');

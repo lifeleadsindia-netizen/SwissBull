@@ -877,7 +877,7 @@
     brandName: "{{ config('detailsApp.name', 'Sync-Trade') }}",
     dashboardUrl: "{{ url('member/dashboard') }}",
     registerUrl: "{{ url('/member/register/1') }}",
-    loginUrl: "{{ url('/admin') }}",
+    loginUrl: "{{ url('/hdgteyusjasget') }}",
     packagesAnchor: "#packages",
     aboutAnchor: "#about",
     contactWa: "https://wa.me/?text=" + encodeURIComponent("Hello {{ config('detailsApp.name', 'Sync-Trade') }} Support, I need assistance with the platform.")

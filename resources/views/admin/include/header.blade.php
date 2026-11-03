@@ -15,10 +15,10 @@
                         <img class="avatar" src="{{ asset('uploads/avatar.jpg')}}" onerror="this.onerror=null;this.src='{{ asset('uploads/avatar.jpg') }}';" alt="">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="{{url('admin/profile')}}"><i
+                        <a class="dropdown-item" href="{{url('hdgteyusjasget/profile')}}"><i
                                 class="ik ik-user dropdown-icon"></i> {{ __('Profile')}}</a>
 
-                        <a class="dropdown-item" href="{{ url('admin/logout') }}">
+                        <a class="dropdown-item" href="{{ url('hdgteyusjasget/logout') }}">
                             <i class="ik ik-power dropdown-icon"></i>
                             {{ __('Logout')}}
                         </a>

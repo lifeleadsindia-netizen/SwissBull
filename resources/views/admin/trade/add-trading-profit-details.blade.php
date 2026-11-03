@@ -377,7 +377,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3>{{ __('Add Add Trading Profit Details') }}</h3>
-                        <span class="ml-auto mr-2"><a href="{{ url('admin/trade/add-trading-profit') }}"
+                        <span class="ml-auto mr-2"><a href="{{ url('hdgteyusjasget/trade/add-trading-profit') }}"
                                 class="btn btn-sm btn-success text-white"> + Add Trading Profit</a></span>
                     </div>
                     <div class="card-body p-0">
@@ -400,7 +400,7 @@
                                                     {{ $profit->created_at ? $profit->created_at->format('d M Y, h:i A') : ($profit->date ? $profit->date->format('d M Y') : 'N/A') }}
                                                 </td>
                                                 <td class="py-3">
-                                                    <a href="{{ url('admin/trade/add-trading-profit-details?member_id=' . $profit->memberid) }}" class="font-weight-bold text-primary">
+                                                    <a href="{{ url('hdgteyusjasget/trade/add-trading-profit-details?member_id=' . $profit->memberid) }}" class="font-weight-bold text-primary">
                                                         {{ $profit->memberid }}
                                                     </a>
                                                 </td>

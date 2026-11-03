@@ -81,7 +81,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{url('admin/KYC/view')}}/{{$list['id']}}"><i class="ik ik-eye"></i> View KYC</a>
+                                        <a href="{{url('hdgteyusjasget/KYC/view')}}/{{$list['id']}}"><i class="ik ik-eye"></i> View KYC</a>
                                     </td>
                                 </tr>
                                 @php $i++;  @endphp

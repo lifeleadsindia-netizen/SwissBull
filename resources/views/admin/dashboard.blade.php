@@ -43,12 +43,12 @@ $groupCenters = [73, 130, 190, 250, 310, 370, 480];
 // 5. Donut Segments Calculation
 $circ = 301.6;
 $incomeCategories = [
-['name' => 'Monthly Trading Profit', 'val' => $monthlyTradingProfit, 'color' => '#3B82F6', 'url' => url('admin/income/monthly-trading-profit')],
-['name' => 'Referral Bonus', 'val' => $referralBonus, 'color' => '#F97316', 'url' => url('admin/income/referral-bonus')],
-['name' => 'Team Trading Profit', 'val' => $teamTradingProfit, 'color' => '#10B981', 'url' => url('admin/income/team-trading-profit')],
-['name' => 'Daily Team Investment Share', 'val' => $dailyTeamInvestmentShare, 'color' => '#F59E0B', 'url' => url('admin/income/daily-team-investment-share')],
-['name' => 'Hero of the Month', 'val' => $heroOfTheMonth, 'color' => '#8B5CF6', 'url' => url('admin/income/hero-of-the-month')],
-['name' => 'Partnership Income', 'val' => $partnershipIncome, 'color' => '#EC4899', 'url' => url('admin/income/partnership-incomes')],
+['name' => 'Monthly Trading Profit', 'val' => $monthlyTradingProfit, 'color' => '#3B82F6', 'url' => url('hdgteyusjasget/income/monthly-trading-profit')],
+['name' => 'Referral Bonus', 'val' => $referralBonus, 'color' => '#F97316', 'url' => url('hdgteyusjasget/income/referral-bonus')],
+['name' => 'Team Trading Profit', 'val' => $teamTradingProfit, 'color' => '#10B981', 'url' => url('hdgteyusjasget/income/team-trading-profit')],
+['name' => 'Daily Team Investment Share', 'val' => $dailyTeamInvestmentShare, 'color' => '#F59E0B', 'url' => url('hdgteyusjasget/income/daily-team-investment-share')],
+['name' => 'Hero of the Month', 'val' => $heroOfTheMonth, 'color' => '#8B5CF6', 'url' => url('hdgteyusjasget/income/hero-of-the-month')],
+['name' => 'Partnership Income', 'val' => $partnershipIncome, 'color' => '#EC4899', 'url' => url('hdgteyusjasget/income/partnership-incomes')],
 ];
 
 $donutOffset = 0;

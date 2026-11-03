@@ -16,7 +16,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
     public function test_new_withdrawal_requests_page_loads_and_has_correct_form_action(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request');
+            ->get('/hdgteyusjasget/new-withdrawal-request');
 
         $response->assertStatus(200);
         $response->assertDontSee('hdgteyusjasget');
@@ -28,7 +28,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
         $yesterday = now()->subDay()->format('Y-m-d');
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'filter_date' => '',
                 'filter_mode' => 'advanced',
                 'preset' => 'yesterday',
@@ -47,7 +47,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
         $today = now()->format('Y-m-d');
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'filter_date' => '',
                 'filter_mode' => 'advanced',
                 'preset' => 'today',
@@ -64,7 +64,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
     public function test_filter_with_last_7_days_preset(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'filter_date' => '',
                 'filter_mode' => 'advanced',
                 'preset' => 'last_7_days',
@@ -81,7 +81,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
     public function test_filter_with_this_month_preset(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'filter_date' => '',
                 'filter_mode' => 'advanced',
                 'preset' => 'this_month',
@@ -98,7 +98,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
     public function test_filter_with_custom_date_range(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'filter_date' => '',
                 'filter_mode' => 'advanced',
                 'preset' => 'custom',
@@ -115,7 +115,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
     public function test_filter_with_different_date_type(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'filter_date' => '',
                 'filter_mode' => 'advanced',
                 'preset' => 'today',
@@ -131,7 +131,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
     public function test_filter_with_date_type_parameter_alias(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request?'.http_build_query([
+            ->get('/hdgteyusjasget/new-withdrawal-request?'.http_build_query([
                 'filter_date' => '',
                 'filter_mode' => 'advanced',
                 'preset' => 'today',
@@ -147,7 +147,7 @@ class NewWithdrawalRequestFilterTest extends TestCase
     public function test_reset_url_clears_filters(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/new-withdrawal-request');
+            ->get('/hdgteyusjasget/new-withdrawal-request');
 
         $response->assertStatus(200);
         $response->assertDontSee('hdgteyusjasget');

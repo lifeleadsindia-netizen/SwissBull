@@ -30,7 +30,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
     public function test_view_renders_all_10_levels_editable_without_readonly(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/daily-team-investment-share');
+            ->get('/hdgteyusjasget/daily-team-investment-share');
 
         $response->assertStatus(200);
         $content = $response->getContent();
@@ -58,7 +58,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         }
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $data);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $data);
 
         $response->assertSessionHasNoErrors();
         $response->assertRedirect(route('admin.dailyTeamInvestmentShare'));
@@ -82,7 +82,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         $data['level_2_directs'] = 3;
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $data);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $data);
 
         $response->assertSessionHasErrors(['level_2_directs']);
 
@@ -104,7 +104,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         $data['level_3_directs'] = 5;
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $data);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $data);
 
         $response->assertSessionHasErrors([
             'level_3_directs' => 'Level-3 Direct Referrals (5) must be greater than or equal to Level-2 Direct Referrals (6).',
@@ -123,7 +123,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         }
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $data);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $data);
 
         $response->assertSessionHasNoErrors();
         $response->assertRedirect(route('admin.dailyTeamInvestmentShare'));
@@ -145,7 +145,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         $data['level_2_directs'] = -1;
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $data);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $data);
 
         $response->assertSessionHasErrors(['level_2_directs']);
     }
@@ -161,7 +161,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         $data['level_1_rate'] = 105;
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $data);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $data);
 
         $response->assertSessionHasErrors(['level_1_rate']);
     }
@@ -175,7 +175,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
             $baseline["level_{$i}_directs"] = 5;
         }
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $baseline);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $baseline);
 
         // Attempt an invalid update where Level 1 and 2 are changed, but Level 3 decreases
         $invalidData = [];
@@ -186,7 +186,7 @@ class DailyTeamInvestmentShareDirectValidationTest extends TestCase
         $invalidData['level_3_directs'] = 2; // Invalid: Level 3 (2) < Level 2 (10)
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $invalidData);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $invalidData);
 
         $response->assertSessionHasErrors(['level_3_directs']);
 

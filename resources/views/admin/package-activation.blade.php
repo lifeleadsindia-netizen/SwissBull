@@ -70,7 +70,7 @@
                                         <td>{{ __($list->name)}}</td>
                                         <td>{{ __($list->email)}}</td>
                                         <td>{{ __($list->mobile)}}</td>
-                                        <td><a href="{{url('admin/activate-package')}}/{{($list->id)}}" class="btn btn-sm btn-success">Activate Package</a>
+                                        <td><a href="{{url('hdgteyusjasget/activate-package')}}/{{($list->id)}}" class="btn btn-sm btn-success">Activate Package</a>
                                         </td>
                                     </tr>
                                 @endforeach

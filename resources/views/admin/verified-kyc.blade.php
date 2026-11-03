@@ -74,7 +74,7 @@
                                     <td>
                                         <div class="table-actions">
                                             
-                                            <a href="{{url('admin/KYC/view')}}/{{$list['id']}}"><i class="ik ik-eye"></i> View KYC</a>
+                                            <a href="{{url('hdgteyusjasget/KYC/view')}}/{{$list['id']}}"><i class="ik ik-eye"></i> View KYC</a>
                                         </div>
                                     </td>
                                 </tr>

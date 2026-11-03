@@ -355,7 +355,7 @@ class AddTradingProfitController extends Controller
         $result = array_merge($filterMeta, [
             'data' => $query->orderby('created_at', 'desc')->get(),
             'pageTitle' => 'Trading Profit Details',
-            'action' => url('admin/trade/add-trading-profit-details'),
+            'action' => url('hdgteyusjasget/trade/add-trading-profit-details'),
             'showMemberIdFilter' => true,
         ]);
 

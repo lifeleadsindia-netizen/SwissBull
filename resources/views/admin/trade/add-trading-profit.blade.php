@@ -326,7 +326,7 @@
                     </div>
                 </div>
                 <div class="col-lg-5 col-md-6 text-md-right mt-3 mt-md-0">
-                    <a href="{{ url('admin/trade/add-trading-profit-details') }}" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-2" style="border-radius: 8px;">
+                    <a href="{{ url('hdgteyusjasget/trade/add-trading-profit-details') }}" class="btn btn-sm btn-outline-primary font-weight-bold px-3 py-2" style="border-radius: 8px;">
                         <i class="ik ik-list mr-1"></i> {{ __('Profit Distribution History') }}
                     </a>
                 </div>
@@ -777,7 +777,7 @@
                                 </div>
                                 <span>{{ __('Recent Profit Disbursements (Admin)') }}</span>
                             </div>
-                            <a href="{{ url('admin/trade/add-trading-profit-details') }}" class="btn btn-sm btn-link font-weight-bold text-primary p-0">
+                            <a href="{{ url('hdgteyusjasget/trade/add-trading-profit-details') }}" class="btn btn-sm btn-link font-weight-bold text-primary p-0">
                                 {{ __('View Complete History') }} <i class="ik ik-arrow-right ml-1"></i>
                             </a>
                         </div>
@@ -801,7 +801,7 @@
                                                     {{ $profit->created_at ? $profit->created_at->format('d M Y, h:i A') : ($profit->date ? $profit->date->format('d M Y') : 'N/A') }}
                                                 </td>
                                                 <td class="py-3">
-                                                    <a href="{{ url('admin/trade/add-trading-profit-details?member_id=' . $profit->memberid) }}" class="font-weight-bold text-primary">
+                                                    <a href="{{ url('hdgteyusjasget/trade/add-trading-profit-details?member_id=' . $profit->memberid) }}" class="font-weight-bold text-primary">
                                                         {{ $profit->memberid }}
                                                     </a>
                                                 </td>

@@ -158,11 +158,11 @@
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img
                                     class="avatar" src="{{ asset('uploads/avatar.jpg') }}" onerror="this.onerror=null;this.src='{{ asset('uploads/avatar.jpg') }}';" alt=""></a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="{{ url('profile') }}"><i
+                                <a class="dropdown-item" href="{{ url('hdgteyusjasget/profile') }}"><i
                                         class="ik ik-user dropdown-icon"></i> {{ __('Profile') }}</a>
                                 <a class="dropdown-item" href="#"><i
                                         class="ik ik-navigation dropdown-icon"></i> {{ __('Message') }}</a>
-                                <a class="dropdown-item" href="{{ url('logout') }}">
+                                <a class="dropdown-item" href="{{ url('hdgteyusjasget/logout') }}">
                                     <i class="ik ik-power dropdown-icon"></i>
                                     {{ __('Logout') }}
                                 </a>
@@ -176,7 +176,7 @@
 
         <div class="app-sidebar colored">
             <div class="sidebar-header">
-                <a class="header-brand" href="{{ route('dashboard') }}">
+                <a class="header-brand" href="{{ url('hdgteyusjasget/dashboard') }}">
                     <div class="logo-img">
                         <img src="{{ asset('logo/name-logo.png') }}"
                             class="header-brand-img" alt="{{ config('detailsApp.name') }}" title="{{ config('detailsApp.name') }}">
