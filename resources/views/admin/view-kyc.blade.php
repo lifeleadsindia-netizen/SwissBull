@@ -45,8 +45,8 @@
                         @if ($data['kyc_status']=='Verified')
                             
                         @else
-                        <a href="{{url('admin/kyc/verify')}}/{{$data['id']}}" class="btn btn-sm btn-primary ml-auto mr-3">Verify KYC</a>
-                        <a href="{{url('admin/kyc/reject')}}/{{$data['id']}}" class="btn btn-sm btn-danger  mr-0">Reject KYC</a>
+                        <a href="{{url('hdgteyusjasget/kyc/verify')}}/{{$data['id']}}" class="btn btn-sm btn-primary ml-auto mr-3">Verify KYC</a>
+                        <a href="{{url('hdgteyusjasget/kyc/reject')}}/{{$data['id']}}" class="btn btn-sm btn-danger  mr-0">Reject KYC</a>
                         @endif
                         
                     </div>

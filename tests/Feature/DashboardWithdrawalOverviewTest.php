@@ -128,7 +128,7 @@ class DashboardWithdrawalOverviewTest extends TestCase
     public function test_admin_dashboard_renders_withdrawal_overview_and_trading_metrics(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/dashboard');
+            ->get('/hdgteyusjasget/dashboard');
 
         $response->assertStatus(200);
         $response->assertSee('Platform Token &amp; Withdrawal Live Metrics', false);

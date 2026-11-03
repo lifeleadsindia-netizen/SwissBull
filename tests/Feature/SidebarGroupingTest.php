@@ -16,7 +16,7 @@ class SidebarGroupingTest extends TestCase
     public function test_sidebar_contains_plan_and_income_configuration_section(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/dashboard');
+            ->get('/hdgteyusjasget/dashboard');
 
         $response->assertStatus(200);
         $response->assertSee('Plan & Income Configuration');
@@ -31,12 +31,12 @@ class SidebarGroupingTest extends TestCase
     public function test_section_has_active_open_when_visiting_configured_pages(): void
     {
         $pages = [
-            '/admin/set-packages',
-            '/admin/trading-wallet-control',
-            '/admin/monthly-trading-profit',
-            '/admin/referral-bonus',
-            '/admin/team-trading-profit',
-            '/admin/daily-team-investment-share',
+            '/hdgteyusjasget/set-packages',
+            '/hdgteyusjasget/trading-wallet-control',
+            '/hdgteyusjasget/monthly-trading-profit',
+            '/hdgteyusjasget/referral-bonus',
+            '/hdgteyusjasget/team-trading-profit',
+            '/hdgteyusjasget/daily-team-investment-share',
         ];
 
         foreach ($pages as $url) {
@@ -52,7 +52,7 @@ class SidebarGroupingTest extends TestCase
     public function test_section_is_collapsed_on_dashboard(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/dashboard');
+            ->get('/hdgteyusjasget/dashboard');
 
         $response->assertStatus(200);
         $content = $response->getContent();
@@ -67,7 +67,7 @@ class SidebarGroupingTest extends TestCase
     public function test_no_duplicate_menu_items_for_the_six_routes_in_sidebar(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/dashboard');
+            ->get('/hdgteyusjasget/dashboard');
 
         $response->assertStatus(200);
         $content = $response->getContent();

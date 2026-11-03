@@ -280,7 +280,7 @@
             </div>
             @endif
 
-            <form method="POST" action="{{ route('retrivePassword') }}">
+            <form method="POST" action="{{ url('/hdgteyusjasget/retrivePassword') }}">
                 @csrf
                 <button type="submit" class="btn-submit">
                     <span>Retrieve Password</span>
@@ -293,7 +293,7 @@
                 </div>
 
                 <div class="text-center mt-2">
-                    <a href="{{ url('/admin') }}" class="back-link">
+                    <a href="{{ url('/hdgteyusjasget') }}" class="back-link">
                         <i class="ik ik-arrow-left"></i>
                         <span>Back to Login</span>
                     </a>

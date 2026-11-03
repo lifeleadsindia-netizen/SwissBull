@@ -120,7 +120,7 @@
         @endif
     </td>
                                         <td>
-                                            <a href="{{ url('admin/member-login') }}/{{ $list['id'] }}"
+                                            <a href="{{ url('hdgteyusjasget/member-login') }}/{{ $list['id'] }}"
                                                 target="_blank" class="btn btn-success text-white"><i
                                                     class="ik ik-eye text-white"></i> View</a>
                                         </td>

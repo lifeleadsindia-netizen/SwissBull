@@ -87,7 +87,7 @@ class NotificationTest extends TestCase
         $this->withoutMiddleware(PreventRequestForgery::class);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true])
-            ->from('/admin/notification')
+            ->from('/hdgteyusjasget/notification')
             ->post(route('saveNotification'), [
                 'type' => 'Specific Member',
                 'memberid' => 'INVALID_MEMBER_999999',

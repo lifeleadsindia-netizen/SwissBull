@@ -164,32 +164,32 @@ class IncomeDashboardAndSidebarTest extends TestCase
         $adminSession = ['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1];
 
         // 1. Monthly Trading Profit
-        $res = $this->withSession($adminSession)->get('admin/income/monthly-trading-profit');
+        $res = $this->withSession($adminSession)->get('hdgteyusjasget/income/monthly-trading-profit');
         $res->assertStatus(200);
         $res->assertSee('Monthly Trading Profit');
 
         // 2. Referral Bonus
-        $res = $this->withSession($adminSession)->get('admin/income/referral-bonus');
+        $res = $this->withSession($adminSession)->get('hdgteyusjasget/income/referral-bonus');
         $res->assertStatus(200);
         $res->assertSee('Referral Bonus');
 
         // 3. Team Trading Profit
-        $res = $this->withSession($adminSession)->get('admin/income/team-trading-profit');
+        $res = $this->withSession($adminSession)->get('hdgteyusjasget/income/team-trading-profit');
         $res->assertStatus(200);
         $res->assertSee('Team Trading Profit');
 
         // 4. Daily Team Investment Share
-        $res = $this->withSession($adminSession)->get('admin/income/daily-team-investment-share');
+        $res = $this->withSession($adminSession)->get('hdgteyusjasget/income/daily-team-investment-share');
         $res->assertStatus(200);
         $res->assertSee('Daily Team Investment Share');
 
         // 5. Hero of the Month
-        $res = $this->withSession($adminSession)->get('admin/income/hero-of-the-month');
+        $res = $this->withSession($adminSession)->get('hdgteyusjasget/income/hero-of-the-month');
         $res->assertStatus(200);
         $res->assertSee('Hero of the Month');
 
         // 6. Admin Dashboard and Sidebar
-        $dashRes = $this->withSession($adminSession)->get('admin/dashboard');
+        $dashRes = $this->withSession($adminSession)->get('hdgteyusjasget/dashboard');
         $dashRes->assertStatus(200);
         $dashRes->assertSee('Monthly Trading Profit');
         $dashRes->assertSee('Referral Bonus');

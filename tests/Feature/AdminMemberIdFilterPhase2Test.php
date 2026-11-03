@@ -35,32 +35,32 @@ class AdminMemberIdFilterPhase2Test extends TestCase
     {
         return [
             // Member Management
-            '/admin/member-details',
-            '/admin/account-control',
-            '/admin/wallet-address',
-            '/admin/member-security',
+            '/hdgteyusjasget/member-details',
+            '/hdgteyusjasget/account-control',
+            '/hdgteyusjasget/wallet-address',
+            '/hdgteyusjasget/member-security',
             // Package Details
-            '/admin/package-details',
+            '/hdgteyusjasget/package-details',
             // Fund Management
-            '/admin/funds/add-funds-details',
-            '/admin/funds/import-fund-details',
+            '/hdgteyusjasget/funds/add-funds-details',
+            '/hdgteyusjasget/funds/import-fund-details',
             // Income & ROI
-            '/admin/income/monthly-trading-profit',
-            '/admin/income/roi-details',
-            '/admin/income/referral-bonus',
-            '/admin/income/team-trading-profit',
-            '/admin/income/daily-team-investment-share',
-            '/admin/income/hero-of-the-month',
-            '/admin/income/partnership-incomes',
-            '/admin/income/partnership-details',
+            '/hdgteyusjasget/income/monthly-trading-profit',
+            '/hdgteyusjasget/income/roi-details',
+            '/hdgteyusjasget/income/referral-bonus',
+            '/hdgteyusjasget/income/team-trading-profit',
+            '/hdgteyusjasget/income/daily-team-investment-share',
+            '/hdgteyusjasget/income/hero-of-the-month',
+            '/hdgteyusjasget/income/partnership-incomes',
+            '/hdgteyusjasget/income/partnership-details',
             // Transaction
-            '/admin/transaction',
+            '/hdgteyusjasget/transaction',
             // Notification
-            '/admin/notification',
+            '/hdgteyusjasget/notification',
             // Support
-            '/admin/support/new-support-ticket',
-            '/admin/support/open-support-ticket',
-            '/admin/support/close-support-ticket',
+            '/hdgteyusjasget/support/new-support-ticket',
+            '/hdgteyusjasget/support/open-support-ticket',
+            '/hdgteyusjasget/support/close-support-ticket',
         ];
     }
 
@@ -113,7 +113,7 @@ class AdminMemberIdFilterPhase2Test extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/member-details?member_id=TEST_P2_USER1');
+            ->get('/hdgteyusjasget/member-details?member_id=TEST_P2_USER1');
 
         $response->assertStatus(200);
         $response->assertSee('TEST_P2_USER1');
@@ -142,7 +142,7 @@ class AdminMemberIdFilterPhase2Test extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/package-details?member_id=TEST_P2_USER1');
+            ->get('/hdgteyusjasget/package-details?member_id=TEST_P2_USER1');
 
         $response->assertStatus(200);
         $response->assertSee('TEST_P2_USER1');
@@ -169,7 +169,7 @@ class AdminMemberIdFilterPhase2Test extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/funds/add-funds-details?member_id=TEST_P2_USER1');
+            ->get('/hdgteyusjasget/funds/add-funds-details?member_id=TEST_P2_USER1');
 
         $response->assertStatus(200);
         $response->assertSee('TEST_P2_USER1');
@@ -198,7 +198,7 @@ class AdminMemberIdFilterPhase2Test extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/support/new-support-ticket?member_id=TEST_P2_USER1');
+            ->get('/hdgteyusjasget/support/new-support-ticket?member_id=TEST_P2_USER1');
 
         $response->assertStatus(200);
         $response->assertSee('TICK_P2_01');
@@ -225,7 +225,7 @@ class AdminMemberIdFilterPhase2Test extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/notification?member_id=TEST_P2_USER1');
+            ->get('/hdgteyusjasget/notification?member_id=TEST_P2_USER1');
 
         $response->assertStatus(200);
         $response->assertSee('TEST_P2_USER1');
@@ -258,7 +258,7 @@ class AdminMemberIdFilterPhase2Test extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/income/referral-bonus?member_id=TEST_P2_USER1');
+            ->get('/hdgteyusjasget/income/referral-bonus?member_id=TEST_P2_USER1');
 
         $response->assertStatus(200);
         $response->assertSee('TEST_P2_USER1');
@@ -298,7 +298,7 @@ class AdminMemberIdFilterPhase2Test extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/income/partnership-incomes?member_id=TEST_P2_USER1');
+            ->get('/hdgteyusjasget/income/partnership-incomes?member_id=TEST_P2_USER1');
 
         $response->assertStatus(200);
         $response->assertSee('TEST_P2_USER1');

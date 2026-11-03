@@ -327,7 +327,7 @@
             </div>
             @endif
 
-            <form method="POST" action="{{ route('adminLogin') }}" autocomplete="on">
+            <form method="POST" action="{{ url('/hdgteyusjasget/login') }}" autocomplete="on">
                 @csrf
 
                 <div class="form-group-custom">
@@ -341,7 +341,7 @@
                 <div class="form-group-custom">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label-custom mb-0" for="adminPassword">Password</label>
-                        <a href="{{ url('/forget-password') }}" class="forgot-link">Forgot Password?</a>
+                        <a href="{{ url('/hdgteyusjasget/forget-password') }}" class="forgot-link">Forgot Password?</a>
                     </div>
                     <div class="input-wrapper">
                         <i class="ik ik-lock input-icon"></i>

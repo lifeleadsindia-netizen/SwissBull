@@ -39,14 +39,14 @@ class ReferralBonusTest extends TestCase
 
     public function test_guest_cannot_access_referral_bonus_page(): void
     {
-        $response = $this->get('/admin/referral-bonus');
+        $response = $this->get('/hdgteyusjasget/referral-bonus');
         $response->assertStatus(302);
     }
 
     public function test_admin_can_access_referral_bonus_page_and_default_inputs_are_displayed(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/referral-bonus');
+            ->get('/hdgteyusjasget/referral-bonus');
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.referral-bonus');
@@ -71,10 +71,10 @@ class ReferralBonusTest extends TestCase
         ];
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/referral-bonus', $postData);
+            ->post('/hdgteyusjasget/referral-bonus', $postData);
 
         $response->assertSessionHas('successMsg');
-        $response->assertRedirect('/admin/referral-bonus');
+        $response->assertRedirect('/hdgteyusjasget/referral-bonus');
 
         $this->assertDatabaseHas('referral_bonus_confiction', [
             'level_1_rate' => 6.00,
@@ -97,10 +97,10 @@ class ReferralBonusTest extends TestCase
         ];
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/referral-bonus', $postData);
+            ->post('/hdgteyusjasget/referral-bonus', $postData);
 
         $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/referral-bonus');
+            ->get('/hdgteyusjasget/referral-bonus');
 
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertSee('value="7.50"', false);
@@ -112,7 +112,7 @@ class ReferralBonusTest extends TestCase
     {
         // First edit
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/referral-bonus', [
+            ->post('/hdgteyusjasget/referral-bonus', [
                 'level_1_rate' => '8.00',
                 'level_2_rate' => '4.00',
                 'level_3_rate' => '2.00',
@@ -120,14 +120,14 @@ class ReferralBonusTest extends TestCase
 
         // Second edit
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/referral-bonus', [
+            ->post('/hdgteyusjasget/referral-bonus', [
                 'level_1_rate' => '9.00',
                 'level_2_rate' => '5.00',
                 'level_3_rate' => '3.00',
             ]);
 
         $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/referral-bonus');
+            ->get('/hdgteyusjasget/referral-bonus');
 
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertSee('value="9.00"', false);
@@ -144,7 +144,7 @@ class ReferralBonusTest extends TestCase
     public function test_validation_rejects_empty_or_negative_rates(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/referral-bonus', [
+            ->post('/hdgteyusjasget/referral-bonus', [
                 'level_1_rate' => '',
                 'level_2_rate' => '-5',
                 'level_3_rate' => 'abc',
@@ -232,7 +232,7 @@ class ReferralBonusTest extends TestCase
     public function test_sidebar_includes_referral_bonus_link(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/referral-bonus');
+            ->get('/hdgteyusjasget/referral-bonus');
 
         $response->assertStatus(200);
         $response->assertSee(route('admin.referralBonus'));

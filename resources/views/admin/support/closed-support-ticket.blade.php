@@ -65,7 +65,7 @@
                                         <td>{{ $list['subject']}}</td>
                                         <td>
                                             <div >
-                                                <a href="{{url('admin/support/view-closed-ticket')}}/{{$list['id']}}" class="btn btn-sm btn-primary ">View</a>
+                                                <a href="{{url('hdgteyusjasget/support/view-closed-ticket')}}/{{$list['id']}}" class="btn btn-sm btn-primary ">View</a>
                                             </div>
                                         </td>
                                     </tr>

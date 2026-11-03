@@ -60,14 +60,14 @@ class DailyTeamInvestmentShareTest extends TestCase
 
     public function test_guest_cannot_access_daily_team_investment_share_page(): void
     {
-        $response = $this->get('/admin/daily-team-investment-share');
+        $response = $this->get('/hdgteyusjasget/daily-team-investment-share');
         $response->assertStatus(302);
     }
 
     public function test_admin_can_access_daily_team_investment_share_page_and_all_10_levels_displayed(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/daily-team-investment-share');
+            ->get('/hdgteyusjasget/daily-team-investment-share');
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.daily-team-investment-share');
@@ -105,10 +105,10 @@ class DailyTeamInvestmentShareTest extends TestCase
         }
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $postData);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $postData);
 
         $response->assertSessionHas('successMsg');
-        $response->assertRedirect('/admin/daily-team-investment-share');
+        $response->assertRedirect('/hdgteyusjasget/daily-team-investment-share');
 
         $this->assertDatabaseHas('daily_team_investment_share_confiction', [
             'level_1_rate' => 1.00,
@@ -143,10 +143,10 @@ class DailyTeamInvestmentShareTest extends TestCase
         }
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $postData);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $postData);
 
         $response->assertSessionHas('successMsg');
-        $response->assertRedirect('/admin/daily-team-investment-share');
+        $response->assertRedirect('/hdgteyusjasget/daily-team-investment-share');
 
         $this->assertDatabaseHas('daily_team_investment_share_confiction', [
             'level_1_rate' => 1.50,
@@ -163,7 +163,7 @@ class DailyTeamInvestmentShareTest extends TestCase
         ]);
 
         $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/daily-team-investment-share');
+            ->get('/hdgteyusjasget/daily-team-investment-share');
 
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertSee('id="level_1_directs" name="level_1_directs" value="1"', false);
@@ -184,7 +184,7 @@ class DailyTeamInvestmentShareTest extends TestCase
         }
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $postData);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $postData);
 
         $this->assertDatabaseHas('daily_team_investment_share_confiction', [
             'level_1_directs' => 4,
@@ -213,10 +213,10 @@ class DailyTeamInvestmentShareTest extends TestCase
         ];
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', $postData);
+            ->post('/hdgteyusjasget/daily-team-investment-share', $postData);
 
         $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/daily-team-investment-share');
+            ->get('/hdgteyusjasget/daily-team-investment-share');
 
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertSee('value="2.50"', false);
@@ -230,7 +230,7 @@ class DailyTeamInvestmentShareTest extends TestCase
     public function test_validation_rejects_empty_or_invalid_values(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/daily-team-investment-share', [
+            ->post('/hdgteyusjasget/daily-team-investment-share', [
                 'level_1_rate' => '',
                 'level_1_directs' => '-2',
                 'level_2_rate' => '-5',
@@ -248,7 +248,7 @@ class DailyTeamInvestmentShareTest extends TestCase
     public function test_sidebar_includes_daily_team_investment_share_link(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/daily-team-investment-share');
+            ->get('/hdgteyusjasget/daily-team-investment-share');
 
         $response->assertStatus(200);
         $response->assertSee(route('admin.dailyTeamInvestmentShare'));

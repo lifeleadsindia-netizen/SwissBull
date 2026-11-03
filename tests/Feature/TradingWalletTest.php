@@ -91,7 +91,7 @@ class TradingWalletTest extends TestCase
     public function test_trading_wallet_control_admin_page_renders_simplified_two_cards_only(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/trading-wallet-control');
+            ->get('/hdgteyusjasget/trading-wallet-control');
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.trading-wallet-control');
@@ -125,12 +125,12 @@ class TradingWalletTest extends TestCase
     public function test_admin_can_save_locking_days_and_persists(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/apply-trading-wallet-control', [
+            ->post('/hdgteyusjasget/apply-trading-wallet-control', [
                 'lock_days' => 90,
             ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('/admin/trading-wallet-control');
+        $response->assertRedirect('/hdgteyusjasget/trading-wallet-control');
         $response->assertSessionHas('successMsg');
 
         $setting = TradingWalletSetting::getActiveSetting();
@@ -138,7 +138,7 @@ class TradingWalletTest extends TestCase
 
         // Refresh / GET confirm 90 persists
         $get = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/trading-wallet-control');
+            ->get('/hdgteyusjasget/trading-wallet-control');
         $get->assertStatus(200);
         $get->assertSee('value="90"', false);
     }
@@ -149,12 +149,12 @@ class TradingWalletTest extends TestCase
     public function test_admin_can_turn_on_trading_wallet_and_status_persists(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/apply-trading-wallet-control', [
+            ->post('/hdgteyusjasget/apply-trading-wallet-control', [
                 'status' => 'on',
             ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('/admin/trading-wallet-control');
+        $response->assertRedirect('/hdgteyusjasget/trading-wallet-control');
         $response->assertSessionHas('successMsg');
 
         $setting = TradingWalletSetting::getActiveSetting();
@@ -164,7 +164,7 @@ class TradingWalletTest extends TestCase
 
         // Refresh / GET confirm status persists
         $get = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/trading-wallet-control');
+            ->get('/hdgteyusjasget/trading-wallet-control');
         $get->assertStatus(200);
         $get->assertSee('ON');
         $get->assertDontSee('LOCKED');
@@ -176,12 +176,12 @@ class TradingWalletTest extends TestCase
     public function test_admin_can_turn_off_trading_wallet_and_status_persists(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/apply-trading-wallet-control', [
+            ->post('/hdgteyusjasget/apply-trading-wallet-control', [
                 'status' => 'off',
             ]);
 
         $response->assertStatus(302);
-        $response->assertRedirect('/admin/trading-wallet-control');
+        $response->assertRedirect('/hdgteyusjasget/trading-wallet-control');
         $response->assertSessionHas('successMsg');
 
         $setting = TradingWalletSetting::getActiveSetting();
@@ -191,7 +191,7 @@ class TradingWalletTest extends TestCase
 
         // Refresh / GET confirm status persists
         $get = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/trading-wallet-control');
+            ->get('/hdgteyusjasget/trading-wallet-control');
         $get->assertStatus(200);
         $get->assertSee('OFF');
     }
@@ -211,7 +211,7 @@ class TradingWalletTest extends TestCase
         $toDate = Carbon::parse($staking->created_at)->addDay()->format('Y-m-d');
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->postJson('/admin/filter-trading-members', [
+            ->postJson('/hdgteyusjasget/filter-trading-members', [
                 'date_from' => $fromDate,
                 'date_to' => $toDate,
             ]);
@@ -337,7 +337,7 @@ class TradingWalletTest extends TestCase
     public function test_admin_can_save_trading_wallet_rules(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/apply-trading-wallet-control', [
+            ->post('/hdgteyusjasget/apply-trading-wallet-control', [
                 'action' => 'save_current_setting',
                 'lock_days' => 90,
                 'withdrawal_percent' => 100.00,
@@ -360,7 +360,7 @@ class TradingWalletTest extends TestCase
         $this->assertNotNull($staking);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->postJson('/admin/get-trading-member', [
+            ->postJson('/hdgteyusjasget/get-trading-member', [
                 'memberid' => $staking->memberid,
             ]);
 

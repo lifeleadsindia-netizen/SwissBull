@@ -16,10 +16,10 @@ class IncomeSectionSidebarTest extends TestCase
     public function test_income_section_is_collapsed_on_income_pages(): void
     {
         $pages = [
-            '/admin/income/referral-bonus',
-            '/admin/income/team-trading-profit',
-            '/admin/income/daily-team-investment-share',
-            '/admin/income/hero-of-the-month',
+            '/hdgteyusjasget/income/referral-bonus',
+            '/hdgteyusjasget/income/team-trading-profit',
+            '/hdgteyusjasget/income/daily-team-investment-share',
+            '/hdgteyusjasget/income/hero-of-the-month',
         ];
 
         foreach ($pages as $url) {
@@ -48,7 +48,7 @@ class IncomeSectionSidebarTest extends TestCase
     public function test_income_section_is_collapsed_on_dashboard(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/dashboard');
+            ->get('/hdgteyusjasget/dashboard');
 
         $response->assertStatus(200);
         $content = $response->getContent();

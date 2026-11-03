@@ -48,7 +48,7 @@ class AdminSidebarActiveSectionTest extends TestCase
     public function test_income_referral_bonus_activates_only_income_section(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/income/referral-bonus');
+            ->get('/hdgteyusjasget/income/referral-bonus');
 
         $response->assertStatus(200);
         $html = $response->getContent();
@@ -71,14 +71,14 @@ class AdminSidebarActiveSectionTest extends TestCase
         );
 
         // Child menu item verification
-        $this->assertMatchesRegularExpression('/<a href="[^"]*admin\/income\/referral-bonus"[^>]*class="menu-item active"/', $html);
-        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*admin\/referral-bonus"[^>]*class="menu-item active"/', $html);
+        $this->assertMatchesRegularExpression('/<a href="[^"]*hdgteyusjasget\/income\/referral-bonus"[^>]*class="menu-item active"/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*hdgteyusjasget\/referral-bonus"[^>]*class="menu-item active"/', $html);
     }
 
     public function test_roi_monthly_trading_profit_activates_only_roi_section(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/income/monthly-trading-profit');
+            ->get('/hdgteyusjasget/income/monthly-trading-profit');
 
         $response->assertStatus(200);
         $html = $response->getContent();
@@ -101,14 +101,14 @@ class AdminSidebarActiveSectionTest extends TestCase
         );
 
         // Child menu item verification
-        $this->assertMatchesRegularExpression('/<a href="[^"]*admin\/income\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
-        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*admin\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
+        $this->assertMatchesRegularExpression('/<a href="[^"]*hdgteyusjasget\/income\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*hdgteyusjasget\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
     }
 
     public function test_roi_details_activates_only_roi_section(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/income/roi-details');
+            ->get('/hdgteyusjasget/income/roi-details');
 
         $response->assertStatus(200);
         $html = $response->getContent();
@@ -116,13 +116,13 @@ class AdminSidebarActiveSectionTest extends TestCase
         $this->assertFalse($this->isSectionActiveOpen($html, 'Plan &amp; Income'));
         $this->assertTrue($this->isSectionActiveOpen($html, 'ROI Section'));
         $this->assertFalse($this->isSectionActiveOpen($html, 'Income Section'));
-        $this->assertMatchesRegularExpression('/<a href="[^"]*admin\/income\/roi-details"[^>]*class="menu-item active"/', $html);
+        $this->assertMatchesRegularExpression('/<a href="[^"]*hdgteyusjasget\/income\/roi-details"[^>]*class="menu-item active"/', $html);
     }
 
     public function test_plan_config_monthly_trading_profit_activates_only_plan_config(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/monthly-trading-profit');
+            ->get('/hdgteyusjasget/monthly-trading-profit');
 
         $response->assertStatus(200);
         $html = $response->getContent();
@@ -141,14 +141,14 @@ class AdminSidebarActiveSectionTest extends TestCase
         );
 
         // Child menu item verification
-        $this->assertMatchesRegularExpression('/<a href="[^"]*admin\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
-        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*admin\/income\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
+        $this->assertMatchesRegularExpression('/<a href="[^"]*hdgteyusjasget\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*hdgteyusjasget\/income\/monthly-trading-profit"[^>]*class="menu-item active"/', $html);
     }
 
     public function test_plan_config_referral_bonus_activates_only_plan_config(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/referral-bonus');
+            ->get('/hdgteyusjasget/referral-bonus');
 
         $response->assertStatus(200);
         $html = $response->getContent();
@@ -157,17 +157,17 @@ class AdminSidebarActiveSectionTest extends TestCase
         $this->assertFalse($this->isSectionActiveOpen($html, 'Income Section'));
         $this->assertFalse($this->isSectionActiveOpen($html, 'ROI Section'));
 
-        $this->assertMatchesRegularExpression('/<a href="[^"]*admin\/referral-bonus"[^>]*class="menu-item active"/', $html);
-        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*admin\/income\/referral-bonus"[^>]*class="menu-item active"/', $html);
+        $this->assertMatchesRegularExpression('/<a href="[^"]*hdgteyusjasget\/referral-bonus"[^>]*class="menu-item active"/', $html);
+        $this->assertDoesNotMatchRegularExpression('/<a href="[^"]*hdgteyusjasget\/income\/referral-bonus"[^>]*class="menu-item active"/', $html);
     }
 
     public function test_all_income_pages_activate_only_income_section(): void
     {
         $incomeUrls = [
-            '/admin/income/referral-bonus',
-            '/admin/income/team-trading-profit',
-            '/admin/income/daily-team-investment-share',
-            '/admin/income/hero-of-the-month',
+            '/hdgteyusjasget/income/referral-bonus',
+            '/hdgteyusjasget/income/team-trading-profit',
+            '/hdgteyusjasget/income/daily-team-investment-share',
+            '/hdgteyusjasget/income/hero-of-the-month',
         ];
 
         foreach ($incomeUrls as $url) {
@@ -195,12 +195,12 @@ class AdminSidebarActiveSectionTest extends TestCase
     public function test_all_plan_config_pages_activate_only_plan_config(): void
     {
         $planUrls = [
-            '/admin/set-packages',
-            '/admin/trading-wallet-control',
-            '/admin/monthly-trading-profit',
-            '/admin/referral-bonus',
-            '/admin/team-trading-profit',
-            '/admin/daily-team-investment-share',
+            '/hdgteyusjasget/set-packages',
+            '/hdgteyusjasget/trading-wallet-control',
+            '/hdgteyusjasget/monthly-trading-profit',
+            '/hdgteyusjasget/referral-bonus',
+            '/hdgteyusjasget/team-trading-profit',
+            '/hdgteyusjasget/daily-team-investment-share',
         ];
 
         foreach ($planUrls as $url) {
@@ -228,8 +228,8 @@ class AdminSidebarActiveSectionTest extends TestCase
     public function test_partnership_pages_activate_only_partnership_section(): void
     {
         $partnershipUrls = [
-            '/admin/income/partnership-incomes',
-            '/admin/income/partnership-details',
+            '/hdgteyusjasget/income/partnership-incomes',
+            '/hdgteyusjasget/income/partnership-details',
         ];
 
         foreach ($partnershipUrls as $url) {
@@ -249,7 +249,7 @@ class AdminSidebarActiveSectionTest extends TestCase
     public function test_daily_team_investment_share_page_title_displays_correct_title(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/income/daily-team-investment-share');
+            ->get('/hdgteyusjasget/income/daily-team-investment-share');
 
         $response->assertStatus(200);
         $html = $response->getContent();

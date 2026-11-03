@@ -175,7 +175,7 @@ class Phase3StakingRoiTest extends TestCase
         ];
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/savePackages', $postData);
+            ->post('/hdgteyusjasget/savePackages', $postData);
 
         $response->assertSessionHas('successMsg');
 

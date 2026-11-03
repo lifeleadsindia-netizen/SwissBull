@@ -265,7 +265,7 @@ class Phase2InvestmentTest extends TestCase
             ->assertStatus(200);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/package-details');
+            ->get('/hdgteyusjasget/package-details');
 
         $response->assertStatus(200);
         $response->assertSee('Trading Wallet (70%)');

@@ -30,14 +30,14 @@ class SetPackagesTest extends TestCase
 
     public function test_guest_cannot_access_set_packages_page(): void
     {
-        $response = $this->get('/admin/set-packages');
+        $response = $this->get('/hdgteyusjasget/set-packages');
         $response->assertStatus(302);
     }
 
     public function test_admin_can_access_set_packages_page(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/set-packages');
+            ->get('/hdgteyusjasget/set-packages');
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.set-packages');
@@ -76,7 +76,7 @@ class SetPackagesTest extends TestCase
         ];
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/savePackages', $postData);
+            ->post('/hdgteyusjasget/savePackages', $postData);
 
         $response->assertSessionHas('successMsg');
         $response->assertStatus(302);
@@ -105,7 +105,7 @@ class SetPackagesTest extends TestCase
         ]);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/set-packages');
+            ->get('/hdgteyusjasget/set-packages');
 
         $response->assertStatus(200);
         $response->assertSee('value="70.00"', false);
@@ -135,7 +135,7 @@ class SetPackagesTest extends TestCase
         ];
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/savePackages', $updateData);
+            ->post('/hdgteyusjasget/savePackages', $updateData);
 
         $response->assertSessionHas('successMsg');
         $this->assertEquals(1, DB::table('package_distributions')->count());
@@ -154,7 +154,7 @@ class SetPackagesTest extends TestCase
         ];
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/savePackages', $invalidData);
+            ->post('/hdgteyusjasget/savePackages', $invalidData);
 
         $response->assertSessionHasErrors(['trading_wallet', 'hero_of_the_month']);
     }
@@ -162,7 +162,7 @@ class SetPackagesTest extends TestCase
     public function test_sidebar_contains_set_packages_link(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/set-packages');
+            ->get('/hdgteyusjasget/set-packages');
 
         $response->assertStatus(200);
         $response->assertSee(route('admin.setPackages'));
@@ -179,11 +179,11 @@ class SetPackagesTest extends TestCase
         ];
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/savePackages', $data)
+            ->post('/hdgteyusjasget/savePackages', $data)
             ->assertRedirect();
 
         $pageRefreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/set-packages');
+            ->get('/hdgteyusjasget/set-packages');
 
         $pageRefreshResponse->assertStatus(200);
         $pageRefreshResponse->assertSee('value="72.50"', false);
@@ -198,7 +198,7 @@ class SetPackagesTest extends TestCase
         $admin = ['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1];
 
         // 1. Open /admin/set-packages
-        $response1 = $this->withSession($admin)->get('/admin/set-packages');
+        $response1 = $this->withSession($admin)->get('/hdgteyusjasget/set-packages');
         $response1->assertStatus(200);
 
         // 2. Confirm the 3 fields are completely gone
@@ -215,7 +215,7 @@ class SetPackagesTest extends TestCase
         $response1->assertSee('Package Plans & Investment Tiers');
 
         // 4 & 5. Save Set Packages without the removed fields and confirm save works without validation errors
-        $saveResponse = $this->withSession($admin)->post('/admin/savePackages', [
+        $saveResponse = $this->withSession($admin)->post('/hdgteyusjasget/savePackages', [
             'p2p_wallet' => '70.00',
             'hero_of_the_month' => '2.00',
         ]);
@@ -224,26 +224,26 @@ class SetPackagesTest extends TestCase
         $saveResponse->assertRedirect();
 
         // 6. Open Referral Bonus and confirm it still works
-        $refResponse = $this->withSession($admin)->get('/admin/referral-bonus');
+        $refResponse = $this->withSession($admin)->get('/hdgteyusjasget/referral-bonus');
         $refResponse->assertStatus(200);
         $refResponse->assertSee('Referral Bonus');
         $refResponse->assertSee('Level-1 Rate');
 
         // 7. Open Team Trading Profit and confirm it still works
-        $teamResponse = $this->withSession($admin)->get('/admin/team-trading-profit');
+        $teamResponse = $this->withSession($admin)->get('/hdgteyusjasget/team-trading-profit');
         $teamResponse->assertStatus(200);
         $teamResponse->assertSee('Team Trading Profit');
         $teamResponse->assertSee('Level-1 Rate');
         $teamResponse->assertSee('Level-10 Rate');
 
         // 8. Open Daily Team Investment Share and confirm it still works
-        $dailyResponse = $this->withSession($admin)->get('/admin/daily-team-investment-share');
+        $dailyResponse = $this->withSession($admin)->get('/hdgteyusjasget/daily-team-investment-share');
         $dailyResponse->assertStatus(200);
         $dailyResponse->assertSee('Daily Team Investment Share');
         $dailyResponse->assertSee('Direct Referrals');
 
         // 9. Refresh Set Packages and confirm no removed fields return
-        $refreshResponse = $this->withSession($admin)->get('/admin/set-packages');
+        $refreshResponse = $this->withSession($admin)->get('/hdgteyusjasget/set-packages');
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertDontSee('id="referral_bonus"', false);
         $refreshResponse->assertDontSee('id="team_trading_profit"', false);
@@ -262,7 +262,7 @@ class SetPackagesTest extends TestCase
     {
         $admin = ['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1];
 
-        $response = $this->withSession($admin)->get('/admin/set-packages');
+        $response = $this->withSession($admin)->get('/hdgteyusjasget/set-packages');
         $response->assertStatus(200);
 
         // Confirm both forms exist
@@ -281,7 +281,7 @@ class SetPackagesTest extends TestCase
     {
         $admin = ['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1];
 
-        $response = $this->withSession($admin)->post('/admin/savePackages', [
+        $response = $this->withSession($admin)->post('/hdgteyusjasget/savePackages', [
             'p2p_wallet' => '65.00',
             'hero_of_the_month' => '3.50',
         ]);
@@ -303,7 +303,7 @@ class SetPackagesTest extends TestCase
         $plan = PackagePlan::first();
         $this->assertNotNull($plan);
 
-        $response = $this->withSession($admin)->post('/admin/savePackages', [
+        $response = $this->withSession($admin)->post('/hdgteyusjasget/savePackages', [
             'plans' => [
                 [
                     'id' => $plan->id,
@@ -339,7 +339,7 @@ class SetPackagesTest extends TestCase
         $originalLockDays = $plan->lock_days;
 
         // Save plan without the 4 removed fields (trading_wallet_percent, return_percent, max_return_percent, lock_days)
-        $response = $this->withSession($admin)->post('/admin/savePackages', [
+        $response = $this->withSession($admin)->post('/hdgteyusjasget/savePackages', [
             'plans' => [
                 [
                     'id' => $plan->id,
@@ -383,14 +383,14 @@ class SetPackagesTest extends TestCase
         $this->assertEquals('6000+ USDT', $plan3->fresh()->display_range);
 
         // 2. Open /admin/set-packages and confirm the rendered header contains the dynamic ranges
-        $response = $this->withSession($admin)->get('/admin/set-packages');
+        $response = $this->withSession($admin)->get('/hdgteyusjasget/set-packages');
         $response->assertStatus(200);
         $response->assertSee('36–550 USDT');
         $response->assertSee('600–5000 USDT');
         $response->assertSee('6000+ USDT');
 
         // 3. Save new values via HTTP POST
-        $saveResponse = $this->withSession($admin)->post('/admin/savePackages', [
+        $saveResponse = $this->withSession($admin)->post('/hdgteyusjasget/savePackages', [
             'plans' => [
                 [
                     'id' => 1,
@@ -404,7 +404,7 @@ class SetPackagesTest extends TestCase
         $saveResponse->assertSessionHasNoErrors();
 
         // 4. Reload page and confirm updated range appears
-        $refresh = $this->withSession($admin)->get('/admin/set-packages');
+        $refresh = $this->withSession($admin)->get('/hdgteyusjasget/set-packages');
         $refresh->assertStatus(200);
         $refresh->assertSee('45–520 USDT');
     }

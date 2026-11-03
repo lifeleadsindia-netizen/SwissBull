@@ -18,7 +18,7 @@ class MonthlyTradingProfitTest extends TestCase
 
     public function test_guest_cannot_access_monthly_trading_profit_page(): void
     {
-        $response = $this->get('/admin/monthly-trading-profit');
+        $response = $this->get('/hdgteyusjasget/monthly-trading-profit');
         $response->assertStatus(302);
     }
 
@@ -28,7 +28,7 @@ class MonthlyTradingProfitTest extends TestCase
         $this->assertCount(3, $packages);
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/monthly-trading-profit');
+            ->get('/hdgteyusjasget/monthly-trading-profit');
 
         $response->assertStatus(200);
         $response->assertViewIs('admin.monthly-trading-profit');
@@ -61,10 +61,10 @@ class MonthlyTradingProfitTest extends TestCase
         ];
 
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/monthly-trading-profit', $postData);
+            ->post('/hdgteyusjasget/monthly-trading-profit', $postData);
 
         $response->assertSessionHas('successMsg');
-        $response->assertRedirect('/admin/monthly-trading-profit');
+        $response->assertRedirect('/hdgteyusjasget/monthly-trading-profit');
 
         // Verify data in table monthly_trading_profit_confiction
         $this->assertDatabaseCount('monthly_trading_profit_confiction', 3);
@@ -99,12 +99,12 @@ class MonthlyTradingProfitTest extends TestCase
         ];
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/monthly-trading-profit', $postData)
+            ->post('/hdgteyusjasget/monthly-trading-profit', $postData)
             ->assertRedirect();
 
         // Refresh/visit the page
         $refreshResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/monthly-trading-profit');
+            ->get('/hdgteyusjasget/monthly-trading-profit');
 
         $refreshResponse->assertStatus(200);
         $refreshResponse->assertSee('value="5.50"', false);
@@ -130,7 +130,7 @@ class MonthlyTradingProfitTest extends TestCase
         ];
 
         $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/monthly-trading-profit', $initialData);
+            ->post('/hdgteyusjasget/monthly-trading-profit', $initialData);
 
         $this->assertDatabaseCount('monthly_trading_profit_confiction', 3);
 
@@ -145,7 +145,7 @@ class MonthlyTradingProfitTest extends TestCase
         ];
 
         $updateResponse = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/monthly-trading-profit', $updatedData);
+            ->post('/hdgteyusjasget/monthly-trading-profit', $updatedData);
 
         $updateResponse->assertSessionHas('successMsg');
         $this->assertDatabaseCount('monthly_trading_profit_confiction', 3);
@@ -169,7 +169,7 @@ class MonthlyTradingProfitTest extends TestCase
 
         // Check that updated values persist on GET request
         $refreshed = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/monthly-trading-profit');
+            ->get('/hdgteyusjasget/monthly-trading-profit');
 
         $refreshed->assertStatus(200);
         $refreshed->assertSee('value="6.50"', false);
@@ -181,7 +181,7 @@ class MonthlyTradingProfitTest extends TestCase
     public function test_validation_requires_capping_percent(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->post('/admin/monthly-trading-profit', [
+            ->post('/hdgteyusjasget/monthly-trading-profit', [
                 'capping_percent' => '',
             ]);
 
@@ -191,7 +191,7 @@ class MonthlyTradingProfitTest extends TestCase
     public function test_sidebar_includes_monthly_trading_profit_link(): void
     {
         $response = $this->withSession(['ADMIN_LOGIN' => true, 'ADMIN_ID' => 1])
-            ->get('/admin/monthly-trading-profit');
+            ->get('/hdgteyusjasget/monthly-trading-profit');
 
         $response->assertStatus(200);
         $response->assertSee(route('admin.monthlyTradingProfit'));
