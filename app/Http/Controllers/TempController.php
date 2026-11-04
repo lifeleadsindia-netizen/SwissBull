@@ -38,7 +38,7 @@ class TempController extends Controller
                 }
                 $tradingWalletAmount = $value->trading_wallet_amount;
     
-                $stak_amount = ($tradingWalletAmount / 100 * $rate) / 30;
+                $stak_amount = ($tradingWalletAmount / 100 * $rate) / 23;
                 if (rand(0, 1) == 1) {
                     $stak_amount += $stak_amount / 100 * rand(1, 10);
                 } else {
